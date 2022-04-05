@@ -17,8 +17,9 @@ class BackendApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-
-		userRepository.save(new User("Lasse Kløvstad"));
+		User user = new User();
+		user.name = "Lasse Kløvstad";
+		userRepository.save(user);
 
 	}
 
