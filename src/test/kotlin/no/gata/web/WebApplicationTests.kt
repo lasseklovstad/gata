@@ -1,13 +1,13 @@
-package no.gata.backend
+package no.gata.web
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
-class BackendApplicationTests {
+class WebApplicationTests {
 
 	@Test
-	void contextLoads() {
+	fun contextLoads() {
 	}
 
 }
