@@ -1,24 +1,18 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useState} from 'react';
 import './App.css';
+import {LoginButton} from "./components/LoginButton";
+import {useGetRole} from "./api/role.api";
+import {useAuth0} from "@auth0/auth0-react";
 
 function App() {
+    const {getRoles} = useGetRole();
+    const {user} = useAuth0();
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          GATA1
-        </a>
-      </header>
+      <LoginButton/>
+      <button onClick={()=>getRoles()}>Fetch roles</button>
+        {user?.email}
     </div>
   );
 }
