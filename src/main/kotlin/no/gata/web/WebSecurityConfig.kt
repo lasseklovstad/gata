@@ -23,7 +23,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Override
     override fun configure(http: HttpSecurity) {
-        http.authorizeRequests().mvcMatchers("/api/role").authenticated().and().oauth2ResourceServer().jwt();
+        http.authorizeRequests().mvcMatchers("/api/role","/api/user").authenticated().and().oauth2ResourceServer().jwt();
     }
 
     @Bean
