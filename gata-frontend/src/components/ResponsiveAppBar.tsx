@@ -98,7 +98,7 @@ export const ResponsiveAppBar = () => {
                     <Box sx={{flexGrow: 0, display:"flex", alignItems:"center"}}>
                         {isAuthenticated && <>
                             <Typography variant={"body2"}>{user?.email}</Typography>
-                            <Button onClick={() => logout()} sx={{my: 2, color: 'white', display: 'block'}}>Logg ut</Button>
+                            <Button onClick={() => logout({ returnTo: window.location.origin })} sx={{my: 2, color: 'white', display: 'block'}}>Logg ut</Button>
                         </>}
                         {!isAuthenticated && <>
                             <Button onClick={() => loginWithRedirect()} sx={{my: 2, color: 'white', display: 'block'}}>Logg inn</Button>

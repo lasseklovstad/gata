@@ -3,16 +3,23 @@ package no.gata.web
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.core.OAuth2TokenValidator
 import org.springframework.security.oauth2.jwt.*
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
+
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 
 
-@Configuration
+
+
+
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Value(value = "\${auth0.audience}")
@@ -23,10 +30,12 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Override
     override fun configure(http: HttpSecurity) {
-        http.authorizeRequests().mvcMatchers("/api/role","/api/user").authenticated().and().oauth2ResourceServer().jwt();
+        http.authorizeRequests()
+                .mvcMatchers("/api/user")
+                .authenticated().and().oauth2ResourceServer().jwt().decoder(jwtDecoder())
+                .jwtAuthenticationConverter(jwtAuthenticationConverter());
     }
 
-    @Bean
     fun jwtDecoder(): JwtDecoder? {
         val jwtDecoder = JwtDecoders.fromOidcIssuerLocation<JwtDecoder>(issuer) as NimbusJwtDecoder
         val audienceValidator: OAuth2TokenValidator<Jwt> = AudienceValidator(audience)
@@ -34,5 +43,14 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
         val withAudience: OAuth2TokenValidator<Jwt> = DelegatingOAuth2TokenValidator(withIssuer, audienceValidator)
         jwtDecoder.setJwtValidator(withAudience)
         return jwtDecoder
+    }
+
+    fun jwtAuthenticationConverter(): JwtAuthenticationConverter? {
+        val converter = JwtGrantedAuthoritiesConverter()
+        converter.setAuthoritiesClaimName("permissions")
+        converter.setAuthorityPrefix("")
+        val jwtConverter = JwtAuthenticationConverter()
+        jwtConverter.setJwtGrantedAuthoritiesConverter(converter)
+        return jwtConverter
     }
 }
