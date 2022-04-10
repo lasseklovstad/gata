@@ -1,4 +1,4 @@
-import {Alert, CircularProgress, List, ListItem, ListItemText, Typography} from "@mui/material";
+import {Alert, AlertTitle, CircularProgress, List, ListItem, ListItemText, Typography} from "@mui/material";
 import {useGetUsers} from "../api/user.api";
 
 export const Member = ()=>{
@@ -8,7 +8,8 @@ export const Member = ()=>{
             Medlemmer
         </Typography>
         {usersResponse.status === "loading" && <CircularProgress/>}
-        {usersResponse.status === "error" && <Alert title={"Det oppstod en feil"}>
+        {usersResponse.status === "error" && <Alert severity={"error"}>
+            <AlertTitle>Det oppstod en feil ved henting av medlemer</AlertTitle>
             {usersResponse.error?.message}
         </Alert>}
         <List aria-labelledby={"member-title"}>
