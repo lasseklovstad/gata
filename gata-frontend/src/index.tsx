@@ -2,12 +2,12 @@ import reportWebVitals from './reportWebVitals';
 import {createRoot} from 'react-dom/client';
 import App from "./App";
 import {Auth0Provider} from "@auth0/auth0-react";
-import {BrowserRouter} from "react-router-dom";
+import {HashRouter} from "react-router-dom";
 
 const container = document.getElementById('root');
 if (container) {
     const root = createRoot(container);
-    root.render(<BrowserRouter>
+    root.render(<HashRouter>
         <Auth0Provider
             domain={process.env.REACT_APP_AUTH0_DOMAIN || ""}
             clientId={process.env.REACT_APP_AUTH0_CLIENT_ID || ""}
@@ -16,7 +16,7 @@ if (container) {
         >
             <App />
         </Auth0Provider>
-    </BrowserRouter>);
+    </HashRouter>);
 }
 
 // If you want to start measuring performance in your app, pass a function
