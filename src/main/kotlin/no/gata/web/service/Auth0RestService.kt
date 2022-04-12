@@ -1,4 +1,4 @@
-package no.gata.web
+package no.gata.web.service
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.slf4j.LoggerFactory
@@ -16,8 +16,15 @@ import java.util.function.Consumer
 class Auth0User(
         var name: String,
         var email: String,
+        var picture: String,
         @JsonProperty("user_id")
         var userId: String,
+)
+
+class Auth0Role(
+        var id: String,
+        var name: String,
+        var description: String,
 )
 
 class Auth0TokenPayload(
@@ -67,15 +74,31 @@ class Auth0RestService(private val builder: WebClient.Builder) {
         }
     }
 
-    private fun getClient (): WebClient {
+    private fun getClient(): WebClient {
         return builder.baseUrl(issuer).filter(logRequest()).build()
     }
 
-    fun getUsers (): Array<Auth0User>? {
+    fun getUsers(): Array<Auth0User>? {
         val token = getToken();
         val client = getClient();
-        val response = client.get().uri("/api/v2/users").accept(MediaType.APPLICATION_JSON).header("Authorization", "Bearer "+token)
+        val response = client.get().uri("/api/v2/users").accept(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token)
                 .retrieve().bodyToMono(Array<Auth0User>::class.java);
+        return response.block()
+    }
+
+    fun getUsers(roleId: String): Array<Auth0User>? {
+        val token = getToken();
+        val client = getClient();
+        val response = client.get().uri("/api/v2/roles/"+roleId+"/users").accept(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token)
+                .retrieve().bodyToMono(Array<Auth0User>::class.java);
+        return response.block()
+    }
+
+    fun getRoles(): Array<Auth0Role>? {
+        val token = getToken();
+        val client = getClient();
+        val response = client.get().uri("/api/v2/roles").accept(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token)
+                .retrieve().bodyToMono(Array<Auth0Role>::class.java);
         return response.block()
     }
 }

@@ -11,8 +11,9 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import {Link} from "react-router-dom";
 import {useAuth0} from "@auth0/auth0-react";
+import {NavLinkStyled} from "./NavLinkStyled";
 
-const pages = [{name: "Hjem", url: ""},{name: "Privacy", url: "privacy"}, {name: "Medlem", url: "member"}];
+const pages = [{name: "Hjem", url: ""}, {name: "Privacy", url: "privacy"}, {name: "Admin", url: "admin", hide: false}];
 
 export const ResponsiveAppBar = () => {
     const {user, isAuthenticated, logout, loginWithRedirect} = useAuth0()
@@ -26,8 +27,10 @@ export const ResponsiveAppBar = () => {
         setAnchorElNav(null);
     };
 
+    console.log(user);
+
     return (
-        <AppBar position="static">
+        <AppBar position="fixed" sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     <Typography
@@ -69,7 +72,8 @@ export const ResponsiveAppBar = () => {
                             }}
                         >
                             {pages.map((page) => (
-                                <MenuItem key={page.url} component={Link} to={page.url} onClick={handleCloseNavMenu}>
+                                <MenuItem key={page.url} component={Link} to={page.url}
+                                          onClick={handleCloseNavMenu}>
                                     <Typography textAlign="center">{page.name}</Typography>
                                 </MenuItem>
                             ))}
@@ -95,13 +99,15 @@ export const ResponsiveAppBar = () => {
                         ))}
                     </Box>
 
-                    <Box sx={{flexGrow: 0, display:"flex", alignItems:"center"}}>
+                    <Box sx={{flexGrow: 0, display: "flex", alignItems: "center"}}>
                         {isAuthenticated && <>
                             <Typography variant={"body2"}>{user?.email}</Typography>
-                            <Button onClick={() => logout({ returnTo: window.location.origin })} sx={{my: 2, color: 'white', display: 'block'}}>Logg ut</Button>
+                            <Button onClick={() => logout({returnTo: window.location.origin})}
+                                    sx={{my: 2, color: 'white', display: 'block'}}>Logg ut</Button>
                         </>}
                         {!isAuthenticated && <>
-                            <Button onClick={() => loginWithRedirect()} sx={{my: 2, color: 'white', display: 'block'}}>Logg inn</Button>
+                            <Button onClick={() => loginWithRedirect()} sx={{my: 2, color: 'white', display: 'block'}}>Logg
+                                inn</Button>
                         </>}
                     </Box>
                 </Toolbar>

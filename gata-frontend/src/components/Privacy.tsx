@@ -1,5 +1,9 @@
+import {Container} from "@mui/material";
+import Toolbar from "@mui/material/Toolbar";
+
 export const Privacy = () => {
-    return <>
+    return <Container component={"main"}>
+        <Toolbar/>
         <h1>Privacy Policy</h1>
         <p>Last updated: April 10, 2022</p>
         <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your
@@ -290,5 +294,5 @@ export const Privacy = () => {
         <ul>
             <li>By email: lasse.klovstad@gmail.com</li>
         </ul>
-    </>
+    </Container>
 }

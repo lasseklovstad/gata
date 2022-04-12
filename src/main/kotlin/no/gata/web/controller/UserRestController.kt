@@ -1,5 +1,7 @@
-package no.gata.web
+package no.gata.web.controller
 
+import no.gata.web.service.Auth0RestService
+import no.gata.web.service.Auth0User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
