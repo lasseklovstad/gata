@@ -1,6 +1,7 @@
 import { useClient } from "./client/useClient";
 import { useCallback, useEffect } from "react";
 import { IAuth0User } from "../types/Auth0User.type";
+import { Responsibility } from "../types/Responsibility.type";
 
 export const useGetUsers = () => {
    const [usersResponse, clientFetch] = useClient<IAuth0User[], never>();
@@ -23,6 +24,15 @@ export const useGetUser = (userId: string) => {
    }, [fetchUsers, userId]);
 
    return { userResponse };
+};
+
+export const useGetUserResponsitbility = (userId: string) => {
+   const [responsibilityResponse, fetchUsers] = useClient<Responsibility[], never>();
+   useEffect(() => {
+      fetchUsers(`user/${encodeURIComponent(userId)}/responsibility`);
+   }, [fetchUsers, userId]);
+
+   return { responsibilityResponse };
 };
 
 export const useClearUserCache = () => {

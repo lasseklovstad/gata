@@ -10,4 +10,6 @@ data class Responsibility (
         var id: UUID?,
         var name: String,
         var description: String,
+        @ManyToOne
+        var user: GataUser
 )

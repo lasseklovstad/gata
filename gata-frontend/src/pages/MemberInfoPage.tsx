@@ -1,8 +1,8 @@
-import { Avatar, Box, Button, List, ListItem, ListItemSecondaryAction, Typography } from "@mui/material";
+import { Avatar, Box, Button, List, ListItem, ListItemSecondaryAction, ListItemText, Typography } from "@mui/material";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useGetRoles, useUpdateUserRoles } from "../api/role.api";
-import { useGetUser } from "../api/user.api";
+import { useGetUser, useGetUserResponsitbility } from "../api/user.api";
 import { Loading } from "../components/Loading";
 import { IAuth0Role } from "../types/Auth0Role.type";
 import { IAuth0User } from "../types/Auth0User.type";
@@ -10,6 +10,7 @@ import { IAuth0User } from "../types/Auth0User.type";
 export const MemberInfoPage = () => {
    const { memberId } = useParams<{ memberId: string }>();
    const { userResponse } = useGetUser(memberId!!);
+   const { responsibilityResponse } = useGetUserResponsitbility(memberId!!);
    const { rolesResponse } = useGetRoles();
 
    return (
@@ -40,6 +41,18 @@ export const MemberInfoPage = () => {
                   </ListItem>
                );
             })}
+         </List>
+         <Typography variant="h2">Ansvarsposter</Typography>
+         <Loading response={responsibilityResponse} />
+         <List>
+            {responsibilityResponse.data?.map((resp) => {
+               return (
+                  <ListItem divider key={resp.id}>
+                     <ListItemText primary={resp.name} secondary={resp.description} />
+                  </ListItem>
+               );
+            })}
+            {responsibilityResponse.data?.length === 0 && <ListItem>Ingen ansvarsposter</ListItem>}
          </List>
       </>
    );
