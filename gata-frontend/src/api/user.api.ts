@@ -16,10 +16,10 @@ export const useGetUsers = () => {
    return { usersResponse, getUsers };
 };
 
-export const useGetUser = (userId?: string) => {
+export const useGetUser = (userId: string) => {
    const [userResponse, fetchUsers] = useClient<IAuth0User, never>();
    useEffect(() => {
-      fetchUsers(`user/${userId}`);
+      fetchUsers(`user/${encodeURIComponent(userId)}`);
    }, [fetchUsers, userId]);
 
    return { userResponse };

@@ -9,7 +9,7 @@ import { IAuth0User } from "../types/Auth0User.type";
 
 export const MemberInfoPage = () => {
    const { memberId } = useParams<{ memberId: string }>();
-   const { userResponse } = useGetUser(memberId);
+   const { userResponse } = useGetUser(memberId!!);
    const { rolesResponse } = useGetRoles();
 
    return (
