@@ -8,6 +8,7 @@ import { AdminPageLayout } from "./pages/admin/AdminPageLayout";
 import { MemberPage } from "./pages/Members";
 import { Admin } from "./pages/admin/Admin";
 import { MemberInfoPage } from "./pages/MemberInfoPage";
+import { ResponsibilityPage } from "./pages/ResponsibilityPage";
 
 let theme = createTheme({
    typography: {
@@ -33,7 +34,7 @@ export const App = () => {
             <Routes>
                <Route path="privacy" element={<Privacy />} />
                <Route path="admin" element={<AdminPageLayout />}>
-                  <Route path="responsibility" element="responsibility" />
+                  <Route path="responsibility" element={<ResponsibilityPage />} />
                   <Route path="member" element={<MemberPage />} />
                   <Route path="member/:memberId" element={<MemberInfoPage />} />
                   <Route index element={<Admin />} />
