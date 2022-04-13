@@ -7,7 +7,7 @@ import javax.persistence.*
 data class GataUser(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        var id: UUID,
+        var id: UUID?,
         var externalUserProviderId: String,
         @OneToMany
         var responsibilities: List<Responsibility>,

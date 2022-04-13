@@ -1,6 +1,21 @@
-import { Avatar, Box, Button, List, ListItem, ListItemSecondaryAction, ListItemText, Typography } from "@mui/material";
+import { Add } from "@mui/icons-material";
+import {
+   Avatar,
+   Box,
+   Button,
+   IconButton,
+   List,
+   ListItem,
+   ListItemSecondaryAction,
+   ListItemText,
+   MenuItem,
+   Select,
+   TextField,
+   Typography,
+} from "@mui/material";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { useGetResponisibilies } from "../api/responsibility.api";
 import { useGetRoles, useUpdateUserRoles } from "../api/role.api";
 import { useGetUser, useGetUserResponsitbility } from "../api/user.api";
 import { Loading } from "../components/Loading";
@@ -11,7 +26,9 @@ export const MemberInfoPage = () => {
    const { memberId } = useParams<{ memberId: string }>();
    const { userResponse } = useGetUser(memberId!!);
    const { responsibilityResponse } = useGetUserResponsitbility(memberId!!);
+   const { responsibilitiesResponse } = useGetResponisibilies();
    const { rolesResponse } = useGetRoles();
+   const [selectedResp, setSelectedResp] = useState("");
 
    return (
       <>
@@ -42,7 +59,31 @@ export const MemberInfoPage = () => {
                );
             })}
          </List>
-         <Typography variant="h2">Ansvarsposter</Typography>
+         <Box>
+            <Typography variant="h2">Ansvarsposter</Typography>
+            <Box display="flex" alignItems="center" mt={1}>
+               <TextField
+                  variant="filled"
+                  label="Ansvar"
+                  placeholder="Velg ansvarspost"
+                  select
+                  onChange={(ev) => setSelectedResp(ev.target.value)}
+                  value={selectedResp}
+                  sx={{ width: "200px", mr: 1 }}
+               >
+                  {responsibilitiesResponse.data?.map((res) => {
+                     return (
+                        <MenuItem value={res.id} key={res.id}>
+                           {res.name}
+                        </MenuItem>
+                     );
+                  })}
+               </TextField>
+               <IconButton>
+                  <Add />
+               </IconButton>
+            </Box>
+         </Box>
          <Loading response={responsibilityResponse} />
          <List>
             {responsibilityResponse.data?.map((resp) => {

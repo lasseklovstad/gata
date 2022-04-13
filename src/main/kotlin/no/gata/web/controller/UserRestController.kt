@@ -1,5 +1,6 @@
 package no.gata.web.controller
 
+import no.gata.web.models.GataUser
 import no.gata.web.models.Responsibility
 import no.gata.web.repoistory.GataUserResponsibility
 import no.gata.web.repoistory.ResponsibilityRepository
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.util.*
+import java.util.stream.Stream
+import kotlin.collections.ArrayList
 
 
 @RestController
@@ -46,6 +49,26 @@ class UserRestController {
             return ResponseEntity(responsibilityRepository.findResponsibilityByUser(user.get()), HttpStatus.OK)
         } else {
             return ResponseEntity(emptyList(), HttpStatus.OK)
+        }
+    }
+
+    @PostMapping("{userId}/responsibility/{responsibilityId}")
+    @PreAuthorize("hasAuthority('admin')")
+    fun postUsersResponsibility(
+        @PathVariable("userId") userId: String,
+        @PathVariable("responsibilityId") responsibilityId: String
+    ): ResponseEntity<List<Responsibility>> {
+        val user = gataUserResponsibility.findByExternalUserProviderId(userId)
+        val resp = responsibilityRepository.findById(UUID.fromString(responsibilityId))
+        if (user.isPresent) {
+            val newUser = user.get()
+            newUser.responsibilities = Stream.concat(newUser.responsibilities.stream(), listOf(resp.get()).stream()).toList()
+            gataUserResponsibility.save(newUser)
+            return ResponseEntity(newUser.responsibilities, HttpStatus.OK)
+        } else {
+            val newUser = GataUser(id=null, externalUserProviderId = userId, responsibilities = listOf(resp.get()))
+            gataUserResponsibility.save(newUser)
+            return ResponseEntity(newUser.responsibilities, HttpStatus.OK)
         }
     }
 
