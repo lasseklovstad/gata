@@ -1,59 +1,49 @@
-import {
-    Alert,
-    AlertTitle, Avatar,
-    CircularProgress,
-    Divider,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    Typography
-} from "@mui/material";
-import {useGetRoles, useGetUsersFromRole} from "../api/role.api";
+import { Avatar, Box, Button, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
+import { useClearUserCache, useGetUsers } from "../api/user.api";
+import { Loading } from "../components/Loading";
+import { useRoles } from "../components/useRoles";
+import { IAuth0User } from "../types/Auth0User.type";
 
-type MembersProps = {
-    roleId: string
-    name: string
-}
-
-const Members = ({roleId, name}:MembersProps)=>{
-    const {usersResponse} = useGetUsersFromRole(roleId)
-    return <>
-        <Typography variant={"h2"} id={"member-title"}>
-            {name}
-        </Typography>
-        {usersResponse.status === "loading" && <CircularProgress/>}
-        {usersResponse.status === "error" && <Alert severity={"error"}>
-            <AlertTitle>Det oppstod en feil ved henting av medlemer</AlertTitle>
-            {usersResponse.error?.message}
-        </Alert>}
-        <List aria-labelledby={"member-title"}>
-            {usersResponse.data?.map((user)=>{
-                return <ListItem key={user.user_id} divider>
-                    <ListItemIcon>
-                        <Avatar src={user.picture}/>
-                    </ListItemIcon>
-                    <ListItemText primary={user.name} secondary={user.email} />
-
-                </ListItem>
+export const MemberPage = () => {
+   const { isAdmin } = useRoles();
+   const { usersResponse, getUsers } = useGetUsers();
+   const { cacheResponse, clearCache } = useClearUserCache();
+   const handleUpdate = async () => {
+      const { status } = await clearCache();
+      if (status === "success") {
+         getUsers();
+      }
+   };
+   return (
+      <>
+         <Box display="flex" justifyContent="space-between">
+            <Typography variant="h1" id="role-title">
+               Medlemer
+            </Typography>
+            {isAdmin && <Button onClick={handleUpdate}>Oppdater</Button>}
+         </Box>
+         <Loading response={cacheResponse} alertTitle="Det oppstod en feil ved oppdatering av cache" />
+         <Loading response={usersResponse} alertTitle="Det oppstod en feil ved henting av medlemer" />
+         <List aria-labelledby="member-title">
+            {usersResponse.data?.map((user) => {
+               return (
+                  <ListItemButton key={user.user_id} divider component={Link} to={user.user_id}>
+                     <ListItemIcon>
+                        <Avatar src={user.picture} />
+                     </ListItemIcon>
+                     <ListItemText primary={user.name} secondary={getRolesFormated(user)} />
+                  </ListItemButton>
+               );
             })}
-        </List>
-    </>
-}
+         </List>
+      </>
+   );
+};
 
-export const MemberPage = ()=>{
-    const {rolesResponse} = useGetRoles()
-    return <>
-        <Typography variant={"h1"} id={"role-title"}>
-            Medlemer
-        </Typography>
-        {rolesResponse.status === "loading" && <CircularProgress/>}
-        {rolesResponse.status === "error" && <Alert severity={"error"}>
-            <AlertTitle>Det oppstod en feil ved henting av roller</AlertTitle>
-            {rolesResponse.error?.message}
-        </Alert>}
-        {rolesResponse.data?.map((role)=>{
-            return <Members key={role.id} roleId={role.id} name={role.name}/>
-        })}
-    </>
-}
+const getRolesFormated = (user: IAuth0User) => {
+   if (user.roles.length === 0) {
+      return "Ikke meldem";
+   }
+   return user.roles.map((role) => role.name).join(", ");
+};

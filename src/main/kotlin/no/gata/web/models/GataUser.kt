@@ -9,4 +9,6 @@ data class GataUser(
         @GeneratedValue(strategy = GenerationType.AUTO)
         var id: UUID,
         var externalUserProviderId: String,
+        @OneToMany
+        var responsibilities: List<Responsibility>,
 )

@@ -24,7 +24,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     @Override
     override fun configure(http: HttpSecurity) {
         http.authorizeRequests()
-                .mvcMatchers("/api/user")
+                .mvcMatchers("/api/user", "/api/role")
                 .authenticated().and().oauth2ResourceServer().jwt().decoder(jwtDecoder())
                 .jwtAuthenticationConverter(jwtAuthenticationConverter());
     }
