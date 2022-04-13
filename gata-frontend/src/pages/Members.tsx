@@ -28,7 +28,7 @@ export const MemberPage = () => {
          <List aria-labelledby="member-title">
             {usersResponse.data?.map((user) => {
                return (
-                  <ListItemButton key={user.user_id} divider component={Link} to={user.user_id}>
+                  <ListItemButton key={user.user_id} divider component={Link} to={encodeURIComponent(user.user_id)}>
                      <ListItemIcon>
                         <Avatar src={user.picture} />
                      </ListItemIcon>
