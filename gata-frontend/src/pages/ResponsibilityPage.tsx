@@ -93,14 +93,16 @@ export const ResponsibilityPage = () => {
                return (
                   <ListItem key={id} divider>
                      <ListItemText primary={name} secondary={description} />
-                     <ListItemSecondaryAction>
-                        <IconButton onClick={() => openModal(resp)}>
-                           <Edit />
-                        </IconButton>
-                        <IconButton onClick={() => handleDelete(resp)}>
-                           <Delete />
-                        </IconButton>
-                     </ListItemSecondaryAction>
+                     {isAdmin && (
+                        <ListItemSecondaryAction>
+                           <IconButton onClick={() => openModal(resp)}>
+                              <Edit />
+                           </IconButton>
+                           <IconButton onClick={() => handleDelete(resp)}>
+                              <Delete />
+                           </IconButton>
+                        </ListItemSecondaryAction>
+                     )}
                   </ListItem>
                );
             })}
