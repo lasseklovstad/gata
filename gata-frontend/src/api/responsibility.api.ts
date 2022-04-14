@@ -32,3 +32,21 @@ export const useDeleteResponsibility = () => {
 
    return { deleteResponse, deleteResponsibility };
 };
+
+export const useSaveResponsibilityForUser = (userId: string) => {
+   const [response, clientFetch] = useClient<Responsibility[], never>();
+   const postResponsibility = (responsibilityId: string) => {
+      return clientFetch(`responsibility/${responsibilityId}/user/${userId}`, { method: "POST" });
+   };
+
+   return { response, postResponsibility };
+};
+
+export const useDeleteResponsibilityForUser = (userId: string) => {
+   const [deleteResponse, clientFetch] = useClient<Responsibility[], never>();
+   const deleteResponsibility = (responsibilityId: string) => {
+      return clientFetch(`responsibility/${responsibilityId}/user/${userId}`, { method: "DELETE" });
+   };
+
+   return { deleteResponse, deleteResponsibility };
+};

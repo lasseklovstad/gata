@@ -1,9 +1,11 @@
 import { Avatar, Box, Button, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import { useClearUserCache, useGetUsers } from "../api/user.api";
-import { Loading } from "../components/Loading";
-import { useRoles } from "../components/useRoles";
-import { IAuth0User } from "../types/Auth0User.type";
+import { useClearUserCache, useGetUsers } from "../../api/user.api";
+import { Loading } from "../../components/Loading";
+import { useRoles } from "../../components/useRoles";
+import { IAuth0User } from "../../types/Auth0User.type";
+import { IGataRole } from "../../types/GataRole.type";
+import { IGataUser } from "../../types/GataUser.type";
 
 export const MemberPage = () => {
    const { isAdmin } = useRoles();
@@ -28,7 +30,7 @@ export const MemberPage = () => {
          <List aria-labelledby="member-title">
             {usersResponse.data?.map((user) => {
                return (
-                  <ListItemButton key={user.user_id} divider component={Link} to={encodeURIComponent(user.user_id)}>
+                  <ListItemButton key={user.id} divider component={Link} to={user.id}>
                      <ListItemIcon>
                         <Avatar src={user.picture} />
                      </ListItemIcon>
@@ -41,7 +43,7 @@ export const MemberPage = () => {
    );
 };
 
-const getRolesFormated = (user: IAuth0User) => {
+const getRolesFormated = (user: IGataUser) => {
    if (user.roles.length === 0) {
       return "Ikke meldem";
    }

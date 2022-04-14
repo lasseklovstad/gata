@@ -5,9 +5,9 @@ import { ResponsiveAppBar } from "./components/ResponsiveAppBar";
 import { Box, createTheme, CssBaseline, responsiveFontSizes, ThemeProvider } from "@mui/material";
 import { Home } from "./pages/Home";
 import { AdminPageLayout } from "./pages/admin/AdminPageLayout";
-import { MemberPage } from "./pages/Members";
+import { MemberPage } from "./pages/member/MemberPage";
 import { Admin } from "./pages/admin/Admin";
-import { MemberInfoPage } from "./pages/MemberInfoPage";
+import { MemberInfoPage } from "./pages/member/MemberInfoPage";
 import { ResponsibilityPage } from "./pages/ResponsibilityPage";
 
 let theme = createTheme({

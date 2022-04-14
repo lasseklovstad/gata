@@ -1,10 +1,11 @@
 import { useClient } from "./client/useClient";
 import { useEffect } from "react";
-import { IAuth0Role } from "../types/Auth0Role.type";
 import { IAuth0User } from "../types/Auth0User.type";
+import { IGataRole } from "../types/GataRole.type";
+import { IGataUser } from "../types/GataUser.type";
 
 export const useGetRoles = () => {
-   const [rolesResponse, clientFetch] = useClient<IAuth0Role[], never>();
+   const [rolesResponse, clientFetch] = useClient<IGataRole[], never>();
    useEffect(() => {
       clientFetch("role");
    }, [clientFetch]);
@@ -27,13 +28,13 @@ type IPostRoleBody = {
 };
 
 export const useUpdateUserRoles = (userId: string) => {
-   const [postRoleResponse, clientFetch] = useClient<never, IPostRoleBody>();
+   const [postRoleResponse, clientFetch] = useClient<IGataUser, IPostRoleBody>();
    const postRole = (roleId: string) => {
-      return clientFetch(`role`, { method: "POST", body: { roles: [roleId], userId } });
+      return clientFetch(`role/${roleId}/user/${userId}`, { method: "POST" });
    };
 
    const deleteRole = (roleId: string) => {
-      return clientFetch(`role`, { method: "DELETE", body: { roles: [roleId], userId } });
+      return clientFetch(`role/${roleId}/user/${userId}`, { method: "DELETE" });
    };
 
    return { postRoleResponse, postRole, deleteRole };
