@@ -11,5 +11,5 @@ data class Responsibility (
         var name: String,
         var description: String,
         @ManyToOne
-        var user: GataUser
+        var user: GataUser?
 )

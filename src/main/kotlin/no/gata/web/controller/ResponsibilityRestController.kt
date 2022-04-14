@@ -8,8 +8,8 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 data class ResponsibilityBody(
-    var name: String,
-    var description: String,
+        var name: String,
+        var description: String,
 )
 
 @RestController
@@ -26,9 +26,9 @@ class ResponsibilityRestController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('admin')")
-    fun postResponsibility(@RequestBody body: Responsibility): Responsibility {
+    fun postResponsibility(@RequestBody body: ResponsibilityBody): Responsibility {
         return responsibilityRepository.save(
-            body
+                Responsibility(id = null, name = body.name, description = body.description, user = null)
         );
     }
 
@@ -36,7 +36,7 @@ class ResponsibilityRestController {
     @PreAuthorize("hasAuthority('admin')")
     fun putResponsibility(@RequestBody body: Responsibility): Responsibility {
         return responsibilityRepository.save(
-            body
+                body
         );
     }
 
@@ -45,7 +45,7 @@ class ResponsibilityRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteResponsibility(@RequestBody body: Responsibility) {
         return responsibilityRepository.delete(
-            body
+                body
         );
     }
 }
