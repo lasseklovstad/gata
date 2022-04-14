@@ -17,6 +17,7 @@ import {
    useSaveResponsibilityForUser,
 } from "../../api/responsibility.api";
 import { Loading } from "../../components/Loading";
+import { useRoles } from "../../components/useRoles";
 import { IGataUser } from "../../types/GataUser.type";
 import { Responsibility } from "../../types/Responsibility.type";
 
@@ -25,17 +26,23 @@ type MemberResponsibilityProps = {
 };
 
 export const MemberResponsibility = ({ user }: MemberResponsibilityProps) => {
+   const { isAdmin } = useRoles();
    const { responsibilitiesResponse, getResponsibilities } = useGetResponisibilies();
    const [selectedResp, setSelectedResp] = useState("");
    const { response, postResponsibility } = useSaveResponsibilityForUser(user.id);
    const { deleteResponse, deleteResponsibility } = useDeleteResponsibilityForUser(user.id);
 
-   const userRoles = responsibilitiesResponse.data?.filter((resp) => resp.user?.id === user.id);
+   const availableResponsibilities = responsibilitiesResponse.data?.filter((resp) => !resp.user?.id);
+   const userResponsibilities = responsibilitiesResponse.data?.filter((resp) => resp.user?.id === user.id);
 
    const handleAddResponsibility = async () => {
+      if (!selectedResp) {
+         return;
+      }
       const { status, data } = await postResponsibility(selectedResp);
       if (status === "success" && data) {
          getResponsibilities();
+         setSelectedResp("");
       }
    };
 
@@ -49,33 +56,37 @@ export const MemberResponsibility = ({ user }: MemberResponsibilityProps) => {
       <>
          <Box>
             <Typography variant="h2">Ansvarsposter</Typography>
-            <Box display="flex" alignItems="center" mt={1}>
-               <TextField
-                  variant="filled"
-                  label="Velg ansvarspost"
-                  placeholder="Velg ansvarspost"
-                  select
-                  onChange={(ev) => setSelectedResp(ev.target.value)}
-                  value={selectedResp}
-                  sx={{ width: "200px", mr: 1 }}
-               >
-                  {responsibilitiesResponse.data?.map((res) => {
-                     return (
-                        <MenuItem value={res.id} key={res.id}>
-                           {res.name}
-                        </MenuItem>
-                     );
-                  })}
-               </TextField>
-               <IconButton onClick={handleAddResponsibility}>
-                  <Add />
-               </IconButton>
-            </Box>
+            {isAdmin && availableResponsibilities && (
+               <Box display="flex" alignItems="center" mt={1}>
+                  <TextField
+                     variant="filled"
+                     label="Velg ansvarspost"
+                     placeholder="Velg ansvarspost"
+                     select
+                     onChange={(ev) => setSelectedResp(ev.target.value)}
+                     value={selectedResp}
+                     sx={{ width: "200px", mr: 1 }}
+                  >
+                     <MenuItem value="">Ikke valgt</MenuItem>
+                     {availableResponsibilities.map((res) => {
+                        return (
+                           <MenuItem value={res.id} key={res.id}>
+                              {res.name}
+                           </MenuItem>
+                        );
+                     })}
+                  </TextField>
+                  <IconButton onClick={handleAddResponsibility}>
+                     <Add />
+                  </IconButton>
+               </Box>
+            )}
          </Box>
+
          <Loading response={response} />
          <Loading response={deleteResponse} />
          <List>
-            {userRoles?.map((resp) => {
+            {userResponsibilities?.map((resp) => {
                return (
                   <ListItem divider key={resp.id}>
                      <ListItemText primary={resp.name} secondary={resp.description} />
@@ -87,10 +98,10 @@ export const MemberResponsibility = ({ user }: MemberResponsibilityProps) => {
                   </ListItem>
                );
             })}
-            {userRoles?.length === 0 && (
+            {userResponsibilities?.length === 0 && (
                <ListItem>
                   <ListItemText>
-                     Ingen ansvarsposter lagt til. Velg og trykk på pluss tegnet for å legge til
+                     Ingen ansvarsposter lagt til. {isAdmin && "Velg og trykk på pluss tegnet for å legge til"}
                   </ListItemText>
                </ListItem>
             )}

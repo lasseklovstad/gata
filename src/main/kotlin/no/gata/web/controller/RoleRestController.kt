@@ -15,11 +15,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
-data class PostRoleBody(
-        val userId: String,
-        val roles: List<String>
-)
-
 @RestController
 @RequestMapping("api/role")
 class RoleRestController {

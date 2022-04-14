@@ -30,9 +30,9 @@ export const useClient = <ResponseBody extends unknown, RequestBody extends Requ
                setClientState(state);
                return state;
             })
-            .catch((error) => {
+            .catch((error: Error) => {
                const state = {
-                  error,
+                  error: error,
                   status: "error" as const,
                   data: undefined,
                };

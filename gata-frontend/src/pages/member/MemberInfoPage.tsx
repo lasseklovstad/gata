@@ -4,11 +4,13 @@ import { useParams } from "react-router-dom";
 import { useGetRoles, useUpdateUserRoles } from "../../api/role.api";
 import { useGetUser } from "../../api/user.api";
 import { Loading } from "../../components/Loading";
+import { useRoles } from "../../components/useRoles";
 import { IGataRole } from "../../types/GataRole.type";
 import { IGataUser } from "../../types/GataUser.type";
 import { MemberResponsibility } from "./MemberResponsibility";
 
 export const MemberInfoPage = () => {
+   const { isAdmin } = useRoles();
    const { memberId } = useParams<{ memberId: string }>();
    const { userResponse } = useGetUser(memberId!!);
    const [user, setUser] = useState<IGataUser>();
@@ -41,9 +43,11 @@ export const MemberInfoPage = () => {
                return (
                   <ListItem divider key={role.id}>
                      {role.name}
-                     <ListItemSecondaryAction>
-                        {user && <RoleButton role={role} user={user} onChange={(newUser) => setUser(newUser)} />}
-                     </ListItemSecondaryAction>
+                     {isAdmin && (
+                        <ListItemSecondaryAction>
+                           {user && <RoleButton role={role} user={user} onChange={(newUser) => setUser(newUser)} />}
+                        </ListItemSecondaryAction>
+                     )}
                   </ListItem>
                );
             })}
