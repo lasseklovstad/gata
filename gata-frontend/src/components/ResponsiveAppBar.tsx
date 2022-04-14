@@ -10,7 +10,7 @@ import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import { Link } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
+import { UserMenu } from "./UserMenu";
 
 const pages = [
    { name: "Hjem", url: "" },
@@ -19,7 +19,6 @@ const pages = [
 ];
 
 export const ResponsiveAppBar = () => {
-   const { user, isAuthenticated, logout, loginWithRedirect } = useAuth0();
    const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
 
    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -29,8 +28,6 @@ export const ResponsiveAppBar = () => {
    const handleCloseNavMenu = () => {
       setAnchorElNav(null);
    };
-
-   console.log(user);
 
    return (
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, maxHeight: "64px" }}>
@@ -98,24 +95,7 @@ export const ResponsiveAppBar = () => {
                </Box>
 
                <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>
-                  {isAuthenticated && (
-                     <>
-                        <Typography variant="body2">{user?.email}</Typography>
-                        <Button
-                           onClick={() => logout({ returnTo: window.location.origin })}
-                           sx={{ my: 2, color: "white", display: "block" }}
-                        >
-                           Logg ut
-                        </Button>
-                     </>
-                  )}
-                  {!isAuthenticated && (
-                     <>
-                        <Button onClick={() => loginWithRedirect()} sx={{ my: 2, color: "white", display: "block" }}>
-                           Logg inn
-                        </Button>
-                     </>
-                  )}
+                  <UserMenu />
                </Box>
             </Toolbar>
          </Container>
