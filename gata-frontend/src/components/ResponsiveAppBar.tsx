@@ -15,7 +15,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 const pages = [
    { name: "Hjem", url: "" },
    { name: "Privacy", url: "privacy" },
-   { name: "Admin", url: "admin", hide: false },
+   { name: "Admin", url: "admin" },
 ];
 
 export const ResponsiveAppBar = () => {

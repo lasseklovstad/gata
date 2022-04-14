@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import { useClearUserCache, useGetUsers } from "../../api/user.api";
 import { Loading } from "../../components/Loading";
 import { useRoles } from "../../components/useRoles";
-import { IAuth0User } from "../../types/Auth0User.type";
-import { IGataRole } from "../../types/GataRole.type";
 import { IGataUser } from "../../types/GataUser.type";
 
 export const MemberPage = () => {
@@ -21,7 +19,7 @@ export const MemberPage = () => {
       <>
          <Box display="flex" justifyContent="space-between">
             <Typography variant="h1" id="role-title">
-               Medlemer
+               Medlemmer
             </Typography>
             {isAdmin && <Button onClick={handleUpdate}>Oppdater</Button>}
          </Box>

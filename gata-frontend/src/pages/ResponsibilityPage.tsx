@@ -78,11 +78,11 @@ export const ResponsibilityPage = () => {
       <>
          {ConfirmDialogComponent}
          <Loading response={deleteResponse} />
-         <Box display="flex" justifyContent="space-between">
+         <Box display="flex" justifyContent="space-between" flexWrap="wrap">
             <Typography variant="h1">Ansvarsposter</Typography>
             {isAdmin && (
                <Button variant="contained" startIcon={<Add />} onClick={() => openModal()}>
-                  Ny ansvarspost
+                  Legg til
                </Button>
             )}
          </Box>
@@ -106,6 +106,7 @@ export const ResponsibilityPage = () => {
                   </ListItem>
                );
             })}
+            {responsibilities.length === 0 && <ListItem>Ingen ansvarsposter, trykk legg til for å lage ny</ListItem>}
          </List>
          {modalOpen && (
             <ResponsibilityDialog

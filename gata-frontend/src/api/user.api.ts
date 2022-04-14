@@ -1,6 +1,5 @@
 import { useClient } from "./client/useClient";
 import { useCallback, useEffect } from "react";
-import { IAuth0User } from "../types/Auth0User.type";
 import { Responsibility } from "../types/Responsibility.type";
 import { IGataUser } from "../types/GataUser.type";
 
