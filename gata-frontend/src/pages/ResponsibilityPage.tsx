@@ -89,10 +89,10 @@ export const ResponsibilityPage = () => {
          <Loading response={responsibilitiesResponse} />
          <List>
             {responsibilities.map((resp) => {
-               const { name, id, description } = resp;
+               const { name, id, description, user } = resp;
                return (
                   <ListItem key={id} divider>
-                     <ListItemText primary={name} secondary={description} />
+                     <ListItemText primary={`${name} ${user ? `(${user.name})` : ""}`} secondary={description} />
                      {isAdmin && (
                         <ListItemSecondaryAction>
                            <IconButton onClick={() => openModal(resp)}>

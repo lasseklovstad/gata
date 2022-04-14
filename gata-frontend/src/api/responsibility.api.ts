@@ -8,16 +8,20 @@ export const useGetResponisibilies = () => {
       clientFetch("responsibility");
    }, [clientFetch]);
 
-   return { responsibilitiesResponse };
+   const getResponsibilities = () => {
+      return clientFetch("responsibility");
+   };
+
+   return { responsibilitiesResponse, getResponsibilities };
 };
 
 export const useSaveResponsibility = () => {
-   const [response, clientFetch] = useClient<Responsibility, Omit<Responsibility, "id">>();
-   const postResponsibility = (body: Omit<Responsibility, "id">) => {
+   const [response, clientFetch] = useClient<Responsibility, Omit<Responsibility, "id" | "user">>();
+   const postResponsibility = (body: Omit<Responsibility, "id" | "user">) => {
       return clientFetch("responsibility", { method: "POST", body });
    };
 
-   const putResponsibility = (body: Responsibility) => {
+   const putResponsibility = (body: Omit<Responsibility, "user">) => {
       return clientFetch("responsibility", { method: "PUT", body });
    };
 
@@ -25,7 +29,7 @@ export const useSaveResponsibility = () => {
 };
 
 export const useDeleteResponsibility = () => {
-   const [deleteResponse, clientFetch] = useClient<Responsibility, Responsibility>();
+   const [deleteResponse, clientFetch] = useClient<Responsibility, Omit<Responsibility, "user">>();
    const deleteResponsibility = (body: Responsibility) => {
       return clientFetch("responsibility", { method: "DELETE", body });
    };

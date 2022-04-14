@@ -2,6 +2,7 @@ package no.gata.web.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import java.util.*
 import javax.persistence.*
 
@@ -14,10 +15,10 @@ data class GataUser(
         var name: String,
         var email: String,
         var picture: String,
-        @OneToMany
+        @OneToMany(mappedBy = "user")
+        @JsonIgnore
         var responsibilities: Set<Responsibility>,
         @ManyToMany()
-        @JsonIgnoreProperties("users")
         var roles: List<GataRole>
 ){
         fun getIsUserMember(): Boolean {

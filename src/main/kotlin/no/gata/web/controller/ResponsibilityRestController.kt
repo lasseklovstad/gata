@@ -62,9 +62,9 @@ class ResponsibilityRestController {
         val user = gataUserRepository.findById(UUID.fromString(id)).get()
         if(user.getIsUserMember()){
             val responsibility = responsibilityRepository.findById(UUID.fromString(respnsibilityId)).get()
-            user.responsibilities = user.responsibilities.minus(responsibility)
-            gataUserRepository.save(user)
-            return user.responsibilities.toList()
+            responsibility.user = null
+            responsibilityRepository.save(responsibility)
+            return responsibilityRepository.findResponsibilityByUser(user)
         }else{
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Bruker må være medlem for å kunne få ansvarspost.");
         }
@@ -76,9 +76,9 @@ class ResponsibilityRestController {
         val user = gataUserRepository.findById(UUID.fromString(id)).get()
         if(user.getIsUserMember()){
             val responsibility = responsibilityRepository.findById(UUID.fromString(respnsibilityId)).get()
-            user.responsibilities = user.responsibilities.plus(responsibility)
-            gataUserRepository.save(user)
-            return user.responsibilities.toList()
+            responsibility.user = user
+            responsibilityRepository.save(responsibility)
+            return responsibilityRepository.findResponsibilityByUser(user)
 
         }else{
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Bruker må være medlem for å kunne få ansvarspost.");

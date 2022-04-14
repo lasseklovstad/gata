@@ -22,25 +22,27 @@ import { Responsibility } from "../../types/Responsibility.type";
 
 type MemberResponsibilityProps = {
    user: IGataUser;
-   onChangeResponsibility: (responsibilities: Responsibility[]) => void;
 };
 
-export const MemberResponsibility = ({ user, onChangeResponsibility }: MemberResponsibilityProps) => {
-   const { responsibilitiesResponse } = useGetResponisibilies();
+export const MemberResponsibility = ({ user }: MemberResponsibilityProps) => {
+   const { responsibilitiesResponse, getResponsibilities } = useGetResponisibilies();
    const [selectedResp, setSelectedResp] = useState("");
    const { response, postResponsibility } = useSaveResponsibilityForUser(user.id);
    const { deleteResponse, deleteResponsibility } = useDeleteResponsibilityForUser(user.id);
+
+   const userRoles = responsibilitiesResponse.data?.filter((resp) => resp.user?.id === user.id);
+
    const handleAddResponsibility = async () => {
       const { status, data } = await postResponsibility(selectedResp);
       if (status === "success" && data) {
-         onChangeResponsibility(data);
+         getResponsibilities();
       }
    };
 
    const handleDelete = async (resp: Responsibility) => {
       const { status, data } = await deleteResponsibility(resp.id);
       if (status === "success" && data) {
-         onChangeResponsibility(data);
+         getResponsibilities();
       }
    };
    return (
@@ -50,7 +52,7 @@ export const MemberResponsibility = ({ user, onChangeResponsibility }: MemberRes
             <Box display="flex" alignItems="center" mt={1}>
                <TextField
                   variant="filled"
-                  label="Ansvar"
+                  label="Velg ansvarspost"
                   placeholder="Velg ansvarspost"
                   select
                   onChange={(ev) => setSelectedResp(ev.target.value)}
@@ -73,7 +75,7 @@ export const MemberResponsibility = ({ user, onChangeResponsibility }: MemberRes
          <Loading response={response} />
          <Loading response={deleteResponse} />
          <List>
-            {user.responsibilities.map((resp) => {
+            {userRoles?.map((resp) => {
                return (
                   <ListItem divider key={resp.id}>
                      <ListItemText primary={resp.name} secondary={resp.description} />
@@ -85,7 +87,13 @@ export const MemberResponsibility = ({ user, onChangeResponsibility }: MemberRes
                   </ListItem>
                );
             })}
-            {user.responsibilities.length === 0 && <ListItem>Ingen ansvarsposter</ListItem>}
+            {userRoles?.length === 0 && (
+               <ListItem>
+                  <ListItemText>
+                     Ingen ansvarsposter lagt til. Velg og trykk på pluss tegnet for å legge til
+                  </ListItemText>
+               </ListItem>
+            )}
          </List>
       </>
    );

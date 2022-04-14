@@ -7,7 +7,6 @@ export interface IGataUser {
    id: string;
    name: string;
    picture: string;
-   responsibilities: Responsibility[];
    isUserAdmin: boolean;
    isUserMember: boolean;
    roles: IGataRole[];

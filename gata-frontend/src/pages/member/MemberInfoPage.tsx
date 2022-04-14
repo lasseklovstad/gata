@@ -6,7 +6,6 @@ import { useGetUser } from "../../api/user.api";
 import { Loading } from "../../components/Loading";
 import { IGataRole } from "../../types/GataRole.type";
 import { IGataUser } from "../../types/GataUser.type";
-import { Responsibility } from "../../types/Responsibility.type";
 import { MemberResponsibility } from "./MemberResponsibility";
 
 export const MemberInfoPage = () => {
@@ -19,12 +18,6 @@ export const MemberInfoPage = () => {
    useEffect(() => {
       userResponse.data && setUser(userResponse.data);
    }, [userResponse.data]);
-
-   const handleChangeResponsibility = (responsibilities: Responsibility[]) => {
-      if (user) {
-         setUser({ ...user, responsibilities });
-      }
-   };
 
    return (
       <>
@@ -56,9 +49,7 @@ export const MemberInfoPage = () => {
             })}
          </List>
 
-         {user?.isUserMember && (
-            <MemberResponsibility user={user} onChangeResponsibility={handleChangeResponsibility} />
-         )}
+         {user?.isUserMember && <MemberResponsibility user={user} />}
       </>
    );
 };
