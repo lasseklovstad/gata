@@ -91,10 +91,10 @@ export const MemberResponsibility = ({ user }: MemberResponsibilityProps) => {
          <Loading response={response} />
          <Loading response={deleteResponse} />
          <List>
-            {userResponsibilities?.map(({ responsibility, id }) => {
+            {userResponsibilities?.map(({ responsibility, id, year }) => {
                return (
                   <ListItem divider key={id}>
-                     <ListItemText primary={responsibility.name} secondary={responsibility.description} />
+                     <ListItemText primary={responsibility.name} secondary={year} />
                      <ListItemSecondaryAction>
                         <IconButton onClick={() => handleDelete(id)}>
                            <Delete />
