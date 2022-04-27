@@ -17,7 +17,7 @@ data class GataUser(
         var picture: String,
         @OneToMany(mappedBy = "user")
         @JsonIgnore
-        var responsibilities: Set<Responsibility>,
+        var responsibilities: List<ResponsibilityYear>,
         @ManyToMany()
         var roles: List<GataRole>
 ){

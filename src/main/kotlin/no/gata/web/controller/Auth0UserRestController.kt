@@ -24,9 +24,6 @@ class Auth0UserRestController {
     lateinit var auth0RestService: Auth0RestService
 
     @Autowired
-    private lateinit var responsibilityRepository: ResponsibilityRepository
-
-    @Autowired
     private lateinit var gataUserRepository: GataUserRepository
 
     @Autowired
@@ -127,7 +124,7 @@ class Auth0UserRestController {
                             name = externalUser.name,
                             email = externalUser.email,
                             picture = externalUser.picture,
-                            responsibilities = emptySet(),
+                            responsibilities = emptyList(),
                             roles = newUserRoles as ArrayList<GataRole>)
                     gataUserRepository.save(newUser)
                 }

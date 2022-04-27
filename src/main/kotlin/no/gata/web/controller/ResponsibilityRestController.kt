@@ -1,14 +1,18 @@
 package no.gata.web.controller
 
-import no.gata.web.models.GataUser
 import no.gata.web.models.Responsibility
+import no.gata.web.models.ResponsibilityNote
+import no.gata.web.models.ResponsibilityYear
 import no.gata.web.repository.GataUserRepository
+import no.gata.web.repository.ResponsibilityNoteRepository
 import no.gata.web.repository.ResponsibilityRepository
+import no.gata.web.repository.ResponsibilityYearRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.time.Year
 import java.util.*
 
 data class ResponsibilityBody(
@@ -25,17 +29,32 @@ class ResponsibilityRestController {
     @Autowired
     private lateinit var gataUserRepository: GataUserRepository
 
+    @Autowired
+    private lateinit var responsibilityYearRepository: ResponsibilityYearRepository
+
+    @Autowired
+    private lateinit var responsibilityNoteRepository: ResponsibilityNoteRepository
+
     @GetMapping
     @PreAuthorize("hasAuthority('member')")
     fun getResponsibilities(): List<Responsibility> {
         return responsibilityRepository.findAll();
     }
 
+    @GetMapping("available")
+    @PreAuthorize("hasAuthority('member')")
+    fun getAvailableResponsibilities(@RequestParam("year") yearParam: String?): List<Responsibility> {
+        val allResponsibilities = responsibilityRepository.findAll();
+        val year = if (yearParam == null) Year.now() else Year.of(yearParam.toInt());
+        val responsibilityYears = responsibilityYearRepository.findResponsibilityYearsByYearEquals(year);
+        return allResponsibilities.filter { responsibilityYears.find { responsibilityYear -> responsibilityYear.responsibility.id == it.id } == null }
+    }
+
     @PostMapping
     @PreAuthorize("hasAuthority('admin')")
     fun postResponsibility(@RequestBody body: ResponsibilityBody): Responsibility {
         return responsibilityRepository.save(
-                Responsibility(id = null, name = body.name, description = body.description, user = null)
+                Responsibility(id = null, name = body.name, description = body.description, responsibilityYears = null)
         );
     }
 
@@ -56,39 +75,4 @@ class ResponsibilityRestController {
         );
     }
 
-    @DeleteMapping("{respnsibilityId}/user/{id}")
-    @PreAuthorize("hasAuthority('admin')")
-    fun removeResponseibilityForUser(@PathVariable respnsibilityId: String,@PathVariable id: String): List<Responsibility> {
-        val user = gataUserRepository.findById(UUID.fromString(id)).get()
-        if(user.getIsUserMember()){
-            val responsibility = responsibilityRepository.findById(UUID.fromString(respnsibilityId)).get()
-            responsibility.user = null
-            responsibilityRepository.save(responsibility)
-            return responsibilityRepository.findResponsibilityByUser(user)
-        }else{
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Bruker må være medlem for å kunne få ansvarspost.");
-        }
-    }
-
-    @PostMapping("{respnsibilityId}/user/{id}")
-    @PreAuthorize("hasAuthority('admin')")
-    fun addResponseibilityForUser(@PathVariable respnsibilityId: String,@PathVariable id: String): List<Responsibility> {
-        val user = gataUserRepository.findById(UUID.fromString(id)).get()
-        if(user.getIsUserMember()){
-            val responsibility = responsibilityRepository.findById(UUID.fromString(respnsibilityId)).get()
-            responsibility.user = user
-            responsibilityRepository.save(responsibility)
-            return responsibilityRepository.findResponsibilityByUser(user)
-
-        }else{
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Bruker må være medlem for å kunne få ansvarspost.");
-        }
-    }
-
-    @GetMapping("/user/{id}")
-    @PreAuthorize("hasAuthority('member')")
-    fun getResponsibilitiesByUserId(@PathVariable id: String): List<Responsibility> {
-        val user = gataUserRepository.findById(UUID.fromString(id)).get()
-        return user.responsibilities.toList()
-    }
 }

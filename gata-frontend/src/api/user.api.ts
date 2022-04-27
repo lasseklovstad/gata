@@ -1,7 +1,7 @@
 import { useClient } from "./client/useClient";
 import { useCallback, useEffect } from "react";
-import { Responsibility } from "../types/Responsibility.type";
 import { IGataUser } from "../types/GataUser.type";
+import { IResponsibilityYear, IResponsibilityYearPayload } from "../types/ResponsibilityYear.type";
 
 export const useGetUsers = () => {
    const [usersResponse, clientFetch] = useClient<IGataUser[], never>();
@@ -26,15 +26,6 @@ export const useGetUser = (userId: string) => {
    return { userResponse };
 };
 
-export const useGetUserResponsitbility = (userId: string) => {
-   const [responsibilityResponse, fetchUsers] = useClient<Responsibility[], never>();
-   useEffect(() => {
-      fetchUsers(`responsibility/user/${userId}`);
-   }, [fetchUsers, userId]);
-
-   return { responsibilityResponse };
-};
-
 export const useClearUserCache = () => {
    const [cacheResponse, clientFetch] = useClient<never, never>();
    const clearCache = () => {
@@ -42,4 +33,31 @@ export const useClearUserCache = () => {
    };
 
    return { cacheResponse, clearCache };
+};
+
+export const useGetUserResponsitbilityYears = (userId: string) => {
+   const [responsibilityYearResponse, fetchUsers] = useClient<IResponsibilityYear[], never>();
+   useEffect(() => {
+      fetchUsers(`user/${userId}/responsibilityyear`);
+   }, [fetchUsers, userId]);
+
+   return { responsibilityYearResponse };
+};
+
+export const useSaveResponsibilityForUser = (userId: string) => {
+   const [response, clientFetch] = useClient<IResponsibilityYear[], IResponsibilityYearPayload>();
+   const postResponsibility = (responsibilityId: string, year: number) => {
+      return clientFetch(`user/${userId}/responsibilityyear`, { method: "POST", body: { responsibilityId, year } });
+   };
+
+   return { response, postResponsibility };
+};
+
+export const useDeleteResponsibilityForUser = (userId: string) => {
+   const [deleteResponse, clientFetch] = useClient<IResponsibilityYear[], never>();
+   const deleteResponsibility = (responsibilityYearId: string) => {
+      return clientFetch(`user/${userId}/responsibilityyear/${responsibilityYearId}`, { method: "DELETE" });
+   };
+
+   return { deleteResponse, deleteResponsibility };
 };

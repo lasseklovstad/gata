@@ -1,13 +1,13 @@
 import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from "@mui/material";
 import { useState } from "react";
 import { useSaveResponsibility } from "../api/responsibility.api";
-import { Responsibility } from "../types/Responsibility.type";
+import { IResponsibility } from "../types/Responsibility.type";
 import { Loading } from "./Loading";
 
 type ResponsibilityDialogProps = {
    onClose: () => void;
-   onSuccess: (responsibility: Responsibility, type: "update" | "create") => void;
-   responsibility: Responsibility | undefined;
+   onSuccess: (responsibility: IResponsibility, type: "update" | "create") => void;
+   responsibility: IResponsibility | undefined;
 };
 
 export const ResponsibilityDialog = ({ onClose, onSuccess, responsibility }: ResponsibilityDialogProps) => {

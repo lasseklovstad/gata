@@ -29,14 +29,14 @@ export const client = <ResponseBody extends unknown, RequestBody extends Request
             return (await response.json()) as ResponseBody;
          }
       } else {
-         const errorMessage = await response.text();
          if (response.status === 401) {
             return Promise.reject(new Error("Du er ikke logget in"));
          }
          if (response.status === 403) {
             return Promise.reject(new Error("Du har ikke tilgang"));
          }
-         return Promise.reject(new Error(errorMessage));
+         const errorMessage = await response.json();
+         return Promise.reject(new Error(errorMessage.message));
       }
    });
 };

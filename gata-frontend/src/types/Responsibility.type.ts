@@ -1,8 +1,5 @@
-import { IGataUser } from "./GataUser.type";
-
-export type Responsibility = {
+export interface IResponsibility {
    id: string;
    name: string;
    description: string;
-   user: Pick<IGataUser, "id" | "name"> | null;
-};
+}

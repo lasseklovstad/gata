@@ -1,4 +1,4 @@
-export type RequestBodyBase = Record<string, string | boolean | number | string[]>;
+export type RequestBodyBase = any;
 
 export type ClientConfigType<RequestBody extends RequestBodyBase> = {
    body?: RequestBody;

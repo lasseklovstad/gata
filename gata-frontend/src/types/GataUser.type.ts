@@ -1,5 +1,5 @@
 import { IGataRole } from "./GataRole.type";
-import { Responsibility } from "./Responsibility.type";
+import { IResponsibility } from "./Responsibility.type";
 
 export interface IGataUser {
    email: string;

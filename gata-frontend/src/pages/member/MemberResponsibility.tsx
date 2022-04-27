@@ -10,16 +10,17 @@ import {
    TextField,
    Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useGetResponisibilies } from "../../api/responsibility.api";
 import {
    useDeleteResponsibilityForUser,
-   useGetResponisibilies,
+   useGetUserResponsitbilityYears,
    useSaveResponsibilityForUser,
-} from "../../api/responsibility.api";
+} from "../../api/user.api";
 import { Loading } from "../../components/Loading";
 import { useRoles } from "../../components/useRoles";
 import { IGataUser } from "../../types/GataUser.type";
-import { Responsibility } from "../../types/Responsibility.type";
+import { IResponsibilityYear } from "../../types/ResponsibilityYear.type";
 
 type MemberResponsibilityProps = {
    user: IGataUser;
@@ -27,36 +28,40 @@ type MemberResponsibilityProps = {
 
 export const MemberResponsibility = ({ user }: MemberResponsibilityProps) => {
    const { isAdmin } = useRoles();
-   const { responsibilitiesResponse, getResponsibilities } = useGetResponisibilies();
+   const { responsibilitiesResponse } = useGetResponisibilies();
+   const { responsibilityYearResponse } = useGetUserResponsitbilityYears(user.id);
+   const [userResponsibilities, setUserResponsibilities] = useState<IResponsibilityYear[]>();
    const [selectedResp, setSelectedResp] = useState("");
    const { response, postResponsibility } = useSaveResponsibilityForUser(user.id);
    const { deleteResponse, deleteResponsibility } = useDeleteResponsibilityForUser(user.id);
 
-   const availableResponsibilities = responsibilitiesResponse.data?.filter((resp) => !resp.user?.id);
-   const userResponsibilities = responsibilitiesResponse.data?.filter((resp) => resp.user?.id === user.id);
+   useEffect(() => {
+      setUserResponsibilities(responsibilityYearResponse.data);
+   }, [responsibilityYearResponse.data]);
 
    const handleAddResponsibility = async () => {
       if (!selectedResp) {
          return;
       }
-      const { status, data } = await postResponsibility(selectedResp);
+      const today = new Date();
+      const { status, data } = await postResponsibility(selectedResp, today.getFullYear());
       if (status === "success" && data) {
-         getResponsibilities();
+         setUserResponsibilities(data);
          setSelectedResp("");
       }
    };
 
-   const handleDelete = async (resp: Responsibility) => {
-      const { status, data } = await deleteResponsibility(resp.id);
+   const handleDelete = async (responsibilityYearId: string) => {
+      const { status, data } = await deleteResponsibility(responsibilityYearId);
       if (status === "success" && data) {
-         getResponsibilities();
+         setUserResponsibilities(data);
       }
    };
    return (
       <>
          <Box>
             <Typography variant="h2">Ansvarsposter</Typography>
-            {isAdmin && availableResponsibilities && (
+            {isAdmin && responsibilitiesResponse.data && (
                <Box display="flex" alignItems="center" mt={1}>
                   <TextField
                      variant="filled"
@@ -68,7 +73,7 @@ export const MemberResponsibility = ({ user }: MemberResponsibilityProps) => {
                      sx={{ width: "200px", mr: 1 }}
                   >
                      <MenuItem value="">Ikke valgt</MenuItem>
-                     {availableResponsibilities.map((res) => {
+                     {responsibilitiesResponse.data.map((res) => {
                         return (
                            <MenuItem value={res.id} key={res.id}>
                               {res.name}
@@ -86,12 +91,12 @@ export const MemberResponsibility = ({ user }: MemberResponsibilityProps) => {
          <Loading response={response} />
          <Loading response={deleteResponse} />
          <List>
-            {userResponsibilities?.map((resp) => {
+            {userResponsibilities?.map(({ responsibility, id }) => {
                return (
-                  <ListItem divider key={resp.id}>
-                     <ListItemText primary={resp.name} secondary={resp.description} />
+                  <ListItem divider key={id}>
+                     <ListItemText primary={responsibility.name} secondary={responsibility.description} />
                      <ListItemSecondaryAction>
-                        <IconButton onClick={() => handleDelete(resp)}>
+                        <IconButton onClick={() => handleDelete(id)}>
                            <Delete />
                         </IconButton>
                      </ListItemSecondaryAction>

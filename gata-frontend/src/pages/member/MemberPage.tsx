@@ -1,4 +1,14 @@
-import { Avatar, Box, Button, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import {
+   Avatar,
+   Box,
+   Button,
+   List,
+   ListItem,
+   ListItemButton,
+   ListItemIcon,
+   ListItemText,
+   Typography,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import { useClearUserCache, useGetUsers } from "../../api/user.api";
 import { Loading } from "../../components/Loading";
@@ -17,7 +27,7 @@ export const MemberPage = () => {
    };
    return (
       <>
-         <Box display="flex" justifyContent="space-between">
+         <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography variant="h1" id="role-title">
                Medlemmer
             </Typography>
@@ -36,6 +46,11 @@ export const MemberPage = () => {
                   </ListItemButton>
                );
             })}
+            {usersResponse.data?.length === 0 && (
+               <ListItem>
+                  <ListItemText>Ingen medlemmer funnet</ListItemText>
+               </ListItem>
+            )}
          </List>
       </>
    );

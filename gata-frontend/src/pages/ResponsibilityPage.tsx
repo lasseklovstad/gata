@@ -7,14 +7,14 @@ import { useConfirmDialog } from "../components/ConfirmDialog";
 import { Loading } from "../components/Loading";
 import { ResponsibilityDialog } from "../components/ResponsibilityDialog";
 import { useRoles } from "../components/useRoles";
-import { Responsibility } from "../types/Responsibility.type";
+import { IResponsibility } from "../types/Responsibility.type";
 
 export const ResponsibilityPage = () => {
    const { isAdmin } = useRoles();
    const { responsibilitiesResponse } = useGetResponisibilies();
-   const [responsibilities, setResponsibilities] = useState<Responsibility[]>([]);
+   const [responsibilities, setResponsibilities] = useState<IResponsibility[]>([]);
    const [modalOpen, setModalOpen] = useState(false);
-   const [selectedResp, setSelectedResp] = useState<Responsibility>();
+   const [selectedResp, setSelectedResp] = useState<IResponsibility>();
    const { deleteResponse, deleteResponsibility } = useDeleteResponsibility();
    const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog({
       text: "Ved å slette mister du ansvarsposten",
@@ -33,7 +33,7 @@ export const ResponsibilityPage = () => {
       },
    });
 
-   const handleDelete = (resp: Responsibility) => {
+   const handleDelete = (resp: IResponsibility) => {
       setSelectedResp(resp);
       openConfirmDialog();
    };
@@ -43,12 +43,12 @@ export const ResponsibilityPage = () => {
       setModalOpen(false);
    };
 
-   const openModal = (resp?: Responsibility) => {
+   const openModal = (resp?: IResponsibility) => {
       setSelectedResp(resp);
       setModalOpen(true);
    };
 
-   const handleSuccess = (responsibility: Responsibility, type: "update" | "create") => {
+   const handleSuccess = (responsibility: IResponsibility, type: "update" | "create") => {
       setModalOpen(false);
       if (type === "update") {
          setResponsibilities(responsibilities.map((res) => (res.id === responsibility.id ? responsibility : res)));
@@ -66,7 +66,7 @@ export const ResponsibilityPage = () => {
       <>
          {ConfirmDialogComponent}
          <Loading response={deleteResponse} />
-         <Box display="flex" justifyContent="space-between" flexWrap="wrap">
+         <Box display="flex" justifyContent="space-between" flexWrap="wrap" alignItems="center">
             <Typography variant="h1">Ansvarsposter</Typography>
             {isAdmin && (
                <Button variant="contained" startIcon={<Add />} onClick={() => openModal()}>
@@ -77,10 +77,10 @@ export const ResponsibilityPage = () => {
          <Loading response={responsibilitiesResponse} />
          <List>
             {responsibilities.map((resp) => {
-               const { name, id, description, user } = resp;
+               const { name, id, description } = resp;
                return (
                   <ListItem key={id} divider>
-                     <ListItemText primary={`${name} ${user ? `(${user.name})` : ""}`} secondary={description} />
+                     <ListItemText primary={name} secondary={description} />
                      {isAdmin && (
                         <ListItemSecondaryAction>
                            <IconButton onClick={() => openModal(resp)}>
@@ -94,7 +94,9 @@ export const ResponsibilityPage = () => {
                   </ListItem>
                );
             })}
-            {responsibilities.length === 0 && <ListItem>Ingen ansvarsposter, trykk legg til for å lage ny</ListItem>}
+            {responsibilitiesResponse.status !== "loading" && responsibilities.length === 0 && (
+               <ListItem>Ingen ansvarsposter, trykk legg til for å lage ny</ListItem>
+            )}
          </List>
          {modalOpen && (
             <ResponsibilityDialog

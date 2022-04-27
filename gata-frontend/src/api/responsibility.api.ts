@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { Responsibility } from "../types/Responsibility.type";
+import { IResponsibility } from "../types/Responsibility.type";
 import { useClient } from "./client/useClient";
 
 export const useGetResponisibilies = () => {
-   const [responsibilitiesResponse, clientFetch] = useClient<Responsibility[], never>();
+   const [responsibilitiesResponse, clientFetch] = useClient<IResponsibility[], never>();
    useEffect(() => {
       clientFetch("responsibility");
    }, [clientFetch]);
@@ -16,12 +16,12 @@ export const useGetResponisibilies = () => {
 };
 
 export const useSaveResponsibility = () => {
-   const [response, clientFetch] = useClient<Responsibility, Omit<Responsibility, "id" | "user">>();
-   const postResponsibility = (body: Omit<Responsibility, "id" | "user">) => {
+   const [response, clientFetch] = useClient<IResponsibility, Omit<IResponsibility, "id" | "user">>();
+   const postResponsibility = (body: Omit<IResponsibility, "id" | "user">) => {
       return clientFetch("responsibility", { method: "POST", body });
    };
 
-   const putResponsibility = (body: Omit<Responsibility, "user">) => {
+   const putResponsibility = (body: Omit<IResponsibility, "user">) => {
       return clientFetch("responsibility", { method: "PUT", body });
    };
 
@@ -29,27 +29,9 @@ export const useSaveResponsibility = () => {
 };
 
 export const useDeleteResponsibility = () => {
-   const [deleteResponse, clientFetch] = useClient<Responsibility, Omit<Responsibility, "user">>();
-   const deleteResponsibility = (body: Responsibility) => {
+   const [deleteResponse, clientFetch] = useClient<IResponsibility, Omit<IResponsibility, "user">>();
+   const deleteResponsibility = (body: IResponsibility) => {
       return clientFetch("responsibility", { method: "DELETE", body });
-   };
-
-   return { deleteResponse, deleteResponsibility };
-};
-
-export const useSaveResponsibilityForUser = (userId: string) => {
-   const [response, clientFetch] = useClient<Responsibility[], never>();
-   const postResponsibility = (responsibilityId: string) => {
-      return clientFetch(`responsibility/${responsibilityId}/user/${userId}`, { method: "POST" });
-   };
-
-   return { response, postResponsibility };
-};
-
-export const useDeleteResponsibilityForUser = (userId: string) => {
-   const [deleteResponse, clientFetch] = useClient<Responsibility[], never>();
-   const deleteResponsibility = (responsibilityId: string) => {
-      return clientFetch(`responsibility/${responsibilityId}/user/${userId}`, { method: "DELETE" });
    };
 
    return { deleteResponse, deleteResponsibility };
