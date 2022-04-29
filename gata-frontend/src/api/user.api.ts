@@ -17,6 +17,15 @@ export const useGetUsers = () => {
    return { usersResponse, getUsers };
 };
 
+export const useGetLoggedInUser = () => {
+   const [userResponse, fetchUsers] = useClient<IGataUser, never>();
+   useEffect(() => {
+      fetchUsers("user/loggedin");
+   }, [fetchUsers]);
+
+   return { userResponse };
+};
+
 export const useGetUser = (userId: string) => {
    const [userResponse, fetchUsers] = useClient<IGataUser, never>();
    useEffect(() => {

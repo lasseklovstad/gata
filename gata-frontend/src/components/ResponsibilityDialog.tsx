@@ -1,8 +1,10 @@
+import { Save } from "@mui/icons-material";
 import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from "@mui/material";
 import { useState } from "react";
 import { useSaveResponsibility } from "../api/responsibility.api";
 import { IResponsibility } from "../types/Responsibility.type";
-import { Loading } from "./Loading";
+import { ErrorAlert } from "./ErrorAlert";
+import { LoadingButton } from "./Loading";
 
 type ResponsibilityDialogProps = {
    onClose: () => void;
@@ -55,11 +57,11 @@ export const ResponsibilityDialog = ({ onClose, onSuccess, responsibility }: Res
             </DialogContent>
             <DialogActions>
                <Button onClick={onClose}>Avbryt</Button>
-               <Button type="submit" variant="contained" disabled={response.status === "loading"}>
+               <LoadingButton type="submit" response={response} variant="contained" startIcon={<Save />}>
                   Lagre
-               </Button>
+               </LoadingButton>
             </DialogActions>
-            <Loading response={response} />
+            <ErrorAlert response={response} />
          </form>
       </Dialog>
    );

@@ -10,6 +10,7 @@ import no.gata.web.repository.ResponsibilityYearRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.time.Year
@@ -37,6 +38,16 @@ class GataUserRestController {
     fun getUsers(): List<GataUser> {
         val users =  gataUserRepository.findAll()
         return users
+    }
+
+    @GetMapping("loggedin")
+    @PreAuthorize("hasAuthority('member')")
+    fun getLoggedInUser(authentication: Authentication): GataUser {
+        val user =  gataUserRepository.findByExternalUserProviderId(authentication.name)
+        if(user.isPresent){
+            return user.get()
+        }
+        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Brukeren finnes ikke!");
     }
 
     @GetMapping("{id}")

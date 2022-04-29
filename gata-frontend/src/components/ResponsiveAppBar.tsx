@@ -11,14 +11,18 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import { Link } from "react-router-dom";
 import { UserMenu } from "./UserMenu";
+import { useRoles } from "./useRoles";
+import { GataRoleType } from "../types/GataRole.type";
 
 const pages = [
    { name: "Hjem", url: "" },
    { name: "Privacy", url: "privacy" },
-   { name: "Admin", url: "admin" },
+   { name: "Admin", url: "admin", roles: ["Administrator", "Medlem"] },
+   { name: "Min side", url: "mypage", roles: ["Medlem"] },
 ];
 
 export const ResponsiveAppBar = () => {
+   const { roles } = useRoles();
    const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
 
    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -31,7 +35,7 @@ export const ResponsiveAppBar = () => {
 
    return (
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, maxHeight: "64px" }}>
-         <Container maxWidth="xl">
+         <Container maxWidth="md">
             <Toolbar disableGutters>
                <Typography variant="h6" noWrap component="div" sx={{ mr: 2, display: { xs: "none", md: "flex" } }}>
                   <img src="logo192.png" style={{ height: "40px" }} alt="Hesten blå" />
@@ -81,17 +85,29 @@ export const ResponsiveAppBar = () => {
                   <img src="logo192.png" style={{ height: "40px" }} alt="Hesten blå" />
                </Typography>
                <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-                  {pages.map((page) => (
-                     <Button
-                        key={page.url}
-                        component={Link}
-                        to={page.url}
-                        onClick={handleCloseNavMenu}
-                        sx={{ my: 2, color: "white", display: "block" }}
-                     >
-                        {page.name}
-                     </Button>
-                  ))}
+                  {pages
+                     .filter((page) => {
+                        if (!page.roles || page.roles.length === 0) {
+                           return true;
+                        }
+                        for (let pageRole of page.roles) {
+                           if (roles.includes(pageRole as GataRoleType)) {
+                              return true;
+                           }
+                        }
+                        return false;
+                     })
+                     .map((page) => (
+                        <Button
+                           key={page.url}
+                           component={Link}
+                           to={page.url}
+                           onClick={handleCloseNavMenu}
+                           sx={{ my: 2, color: "white", display: "block" }}
+                        >
+                           {page.name}
+                        </Button>
+                     ))}
                </Box>
 
                <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>

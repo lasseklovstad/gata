@@ -4,10 +4,11 @@ import { useParams } from "react-router-dom";
 import { useGetRoles, useUpdateUserRoles } from "../../api/role.api";
 import { useGetUser } from "../../api/user.api";
 import { Loading } from "../../components/Loading";
+import { UserInfo } from "../../components/UserInfo";
 import { useRoles } from "../../components/useRoles";
+import { UserResponsibility } from "../../components/UserResponsibilities";
 import { IGataRole } from "../../types/GataRole.type";
 import { IGataUser } from "../../types/GataUser.type";
-import { MemberResponsibility } from "./MemberResponsibility";
 
 export const MemberInfoPage = () => {
    const { isAdmin } = useRoles();
@@ -28,14 +29,7 @@ export const MemberInfoPage = () => {
             <Typography variant="h1">Informasjon</Typography>
          </Box>
          <Loading response={userResponse} />
-         <Box m={1}>
-            <Typography variant="body1">
-               <strong>Navn:</strong> {user?.name}
-            </Typography>
-            <Typography variant="body1">
-               <strong>Email:</strong> {user?.email}
-            </Typography>
-         </Box>
+         {user && <UserInfo user={user} />}
          <Typography variant="h2">Roller</Typography>
          <Loading response={rolesResponse} />
          <List>
@@ -53,7 +47,7 @@ export const MemberInfoPage = () => {
             })}
          </List>
 
-         {user?.isUserMember && <MemberResponsibility user={user} />}
+         {user?.isUserMember && <UserResponsibility user={user} />}
       </>
    );
 };

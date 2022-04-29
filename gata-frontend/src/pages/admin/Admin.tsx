@@ -8,7 +8,7 @@ export const Admin = () => {
          <Typography variant="h1">Admin</Typography>
          {isAdmin && (
             <Typography variant="body1">
-               Velkommen til sidene for admin. Her kan du administrere gatamedlemmer. Velg en underside på venstre side.
+               Velkommen til sidene for admin. Her kan du administrere gatamedlemmer.
             </Typography>
          )}
          {!isAdmin && isMember && (
