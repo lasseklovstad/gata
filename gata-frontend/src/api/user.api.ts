@@ -1,7 +1,11 @@
 import { useClient } from "./client/useClient";
 import { useCallback, useEffect } from "react";
 import { IGataUser } from "../types/GataUser.type";
-import { IResponsibilityYear, IResponsibilityYearPayload } from "../types/ResponsibilityYear.type";
+import {
+   IResponsibilityNotePayload,
+   IResponsibilityYear,
+   IResponsibilityYearPayload,
+} from "../types/ResponsibilityYear.type";
 
 export const useGetUsers = () => {
    const [usersResponse, clientFetch] = useClient<IGataUser[], never>();
@@ -69,4 +73,16 @@ export const useDeleteResponsibilityForUser = (userId: string) => {
    };
 
    return { deleteResponse, deleteResponsibility };
+};
+
+export const usePutResponsibilityNote = (userId: string, responsibilityYearId: string) => {
+   const [putResponse, clientFetch] = useClient<IResponsibilityYear, IResponsibilityNotePayload>();
+   const putNote = (text: string) => {
+      return clientFetch(`user/${userId}/responsibilityyear/${responsibilityYearId}/note`, {
+         method: "PUT",
+         body: { text },
+      });
+   };
+
+   return { putResponse, putNote };
 };

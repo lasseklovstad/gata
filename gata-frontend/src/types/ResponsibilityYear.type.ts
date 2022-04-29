@@ -16,3 +16,7 @@ export interface IResponsibilityYearPayload {
    responsibilityId: string;
    year: number;
 }
+
+export interface IResponsibilityNotePayload {
+   text: string;
+}

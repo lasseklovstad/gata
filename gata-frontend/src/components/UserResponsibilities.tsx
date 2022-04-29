@@ -69,6 +69,7 @@ export const UserResponsibility = ({ user }: UserResponsibilityProps) => {
                      onDelete={handleDelete}
                      onExpand={handleExpand}
                      responsibilityYear={responsibilityYear}
+                     user={user}
                   />
                );
             })}

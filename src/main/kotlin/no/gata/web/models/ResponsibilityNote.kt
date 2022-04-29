@@ -16,4 +16,10 @@ data class ResponsibilityNote(
         @JoinColumn(name = "resonsibility_year_id", referencedColumnName = "id")
         @JsonIgnore
         val responsibilityYear: ResponsibilityYear?
-)
+){
+        fun update(user: GataUser, text:String){
+                this.text = text
+                lastModifiedBy = user.name
+                lastModifiedDate = Date()
+        }
+}
