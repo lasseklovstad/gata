@@ -8,6 +8,7 @@ import { ErrorAlert } from "./ErrorAlert";
 import { LoadingButton } from "./Loading";
 import { useRoles } from "./useRoles";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useConfirmDialog } from "./ConfirmDialog";
 
 type ResponsibilityFormProps = {
    responsibilityYear: IResponsibilityYear;
@@ -29,16 +30,21 @@ export const ResponsibilityForm = ({
    const { isAdmin } = useRoles();
    const { user: auth0User } = useAuth0();
    const { deleteResponse, deleteResponsibility } = useDeleteResponsibilityForUser(user.id);
+   const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog({
+      text: "Ved å slette mister brukeren ansvarsposten",
+      response: deleteResponse,
+      onConfirm: async () => {
+         const { status, data } = await deleteResponsibility(id);
+         if (status === "success" && data) {
+            onDelete(id);
+         }
+      },
+   });
+
    const { putNote, putResponse } = usePutResponsibilityNote(user.id, id);
    const [text, setText] = useState(note.text);
    const lastModifiedDate = new Date(note.lastModifiedDate);
    const canEditNote = auth0User?.sub === user.externalUserProviderId || isAdmin;
-   const handleDelete = async () => {
-      const { status, data } = await deleteResponsibility(id);
-      if (status === "success" && data) {
-         onDelete(id);
-      }
-   };
 
    const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (ev) => {
       ev.preventDefault();
@@ -49,10 +55,13 @@ export const ResponsibilityForm = ({
 
    return (
       <>
+         {ConfirmDialogComponent}
          <Accordion expanded={expanded} onChange={() => onExpand(id)}>
             <AccordionSummary expandIcon={<ExpandMore />} aria-controls={`${id}-content`} id={`${id}-header`}>
                <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
-                  <Typography>{responsibility.name}</Typography>
+                  <Typography variant={expanded ? "h6" : "body1"} component="div">
+                     {responsibility.name}
+                  </Typography>
                   <Typography sx={{ color: "text.secondary", mr: 2 }}>{year}</Typography>
                </Box>
             </AccordionSummary>
@@ -83,7 +92,7 @@ export const ResponsibilityForm = ({
                            sx={{ mr: 1 }}
                            response={deleteResponse}
                            startIcon={<Delete />}
-                           onClick={() => handleDelete()}
+                           onClick={() => openConfirmDialog()}
                         >
                            Fjern ansvarspost
                         </LoadingButton>

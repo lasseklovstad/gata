@@ -28,17 +28,16 @@ export const ConfirmDialog = ({ text, onClose, onConfirm, open, response }: Conf
    );
 };
 
-export const useConfirmDialog = ({
-   onConfirm,
-   text,
-   onClose,
-   response,
-}: Pick<ConfirmDialogProps, "onConfirm" | "text" | "onClose" | "response">) => {
+type UseConfirmDialogProps = {
+   onClose?: () => void;
+} & Pick<ConfirmDialogProps, "onConfirm" | "text" | "response">;
+
+export const useConfirmDialog = ({ onConfirm, text, onClose, response }: UseConfirmDialogProps) => {
    const [open, setOpen] = useState(false);
    const openConfirmDialog = () => setOpen(true);
    const closeConfirmDialog = () => {
       setOpen(false);
-      onClose();
+      onClose && onClose();
    };
 
    const handleConfirm = async () => {
