@@ -3,10 +3,7 @@ package no.gata.web.controller
 import no.gata.web.models.GataUser
 import no.gata.web.models.ResponsibilityNote
 import no.gata.web.models.ResponsibilityYear
-import no.gata.web.repository.GataUserRepository
-import no.gata.web.repository.ResponsibilityNoteRepository
-import no.gata.web.repository.ResponsibilityRepository
-import no.gata.web.repository.ResponsibilityYearRepository
+import no.gata.web.repository.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
@@ -40,12 +37,18 @@ class GataUserRestController {
 
     @Autowired
     private lateinit var responsibilityRepository: ResponsibilityRepository
+    @Autowired
+    private lateinit var gataRoleRepository: GataRoleRepository
 
     @GetMapping
     @PreAuthorize("hasAuthority('member')")
-    fun getUsers(): List<GataUser> {
-        val users = gataUserRepository.findAll()
-        return users
+    fun getUsers(authentication: Authentication): List<GataUser> {
+        val isAdmin = authentication.authorities.find { it.authority.equals("admin") }
+        if(isAdmin!= null){
+            return gataUserRepository.findAll()
+        }
+        val role = gataRoleRepository.findByName("Medlem")
+        return gataUserRepository.findAllByRolesEquals(role.get())
     }
 
     @GetMapping("loggedin")

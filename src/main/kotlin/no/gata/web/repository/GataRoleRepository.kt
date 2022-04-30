@@ -6,4 +6,5 @@ import java.util.*
 
 interface GataRoleRepository: JpaRepository<GataRole, UUID> {
     fun findByExternalUserProviderId(id: String): Optional<GataRole>
+    fun findByName(name : String): Optional<GataRole>
 }
