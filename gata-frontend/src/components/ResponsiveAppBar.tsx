@@ -19,6 +19,7 @@ const pages = [
    { name: "Privacy", url: "privacy" },
    { name: "Admin", url: "admin", roles: ["Administrator", "Medlem"] },
    { name: "Min side", url: "mypage", roles: ["Medlem"] },
+   { name: "Referat", url: "report", roles: ["Medlem"] },
 ];
 
 export const ResponsiveAppBar = () => {

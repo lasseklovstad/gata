@@ -27,13 +27,7 @@ class ResponsibilityRestController {
     private lateinit var responsibilityRepository: ResponsibilityRepository
 
     @Autowired
-    private lateinit var gataUserRepository: GataUserRepository
-
-    @Autowired
     private lateinit var responsibilityYearRepository: ResponsibilityYearRepository
-
-    @Autowired
-    private lateinit var responsibilityNoteRepository: ResponsibilityNoteRepository
 
     @GetMapping
     @PreAuthorize("hasAuthority('member')")

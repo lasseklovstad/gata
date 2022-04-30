@@ -10,6 +10,8 @@ import { Admin } from "./pages/admin/Admin";
 import { MemberInfoPage } from "./pages/member/MemberInfoPage";
 import { ResponsibilityPage } from "./pages/ResponsibilityPage";
 import { MyPage } from "./pages/MyPage";
+import { ReportPage } from "./pages/ReportPage";
+import { ReportInfoPage } from "./pages/ReportInfoPage";
 
 let theme = createTheme({
    typography: {
@@ -21,6 +23,15 @@ let theme = createTheme({
       },
       h3: {
          fontSize: "1.8rem",
+      },
+      h4: {
+         fontSize: "1.6rem",
+      },
+      h5: {
+         fontSize: "1.4rem",
+      },
+      h6: {
+         fontSize: "1.2rem",
       },
    },
 });
@@ -36,6 +47,8 @@ export const App = () => {
                <Routes>
                   <Route path="privacy" element={<Privacy />} />
                   <Route path="mypage" element={<MyPage />} />
+                  <Route path="report" element={<ReportPage />} />
+                  <Route path="report/:reportId" element={<ReportInfoPage />}></Route>
                   <Route path="admin" element={<AdminPageLayout />}>
                      <Route path="responsibility" element={<ResponsibilityPage />} />
                      <Route path="member" element={<MemberPage />} />
