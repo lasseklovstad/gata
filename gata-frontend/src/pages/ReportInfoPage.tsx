@@ -1,5 +1,5 @@
 import { Delete, Edit } from "@mui/icons-material";
-import { Box, Button, Paper, Typography } from "@mui/material";
+import { Box, Button, IconButton, Paper, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Descendant } from "slate";
@@ -75,12 +75,28 @@ export const ReportInfoPage = () => {
             </Typography>
             {isAdmin && (
                <Box>
-                  <Button variant="text" startIcon={<Delete />} onClick={openConfirmDelete} sx={{ mr: 1 }}>
+                  <Button
+                     variant="text"
+                     startIcon={<Delete />}
+                     onClick={openConfirmDelete}
+                     sx={{ mr: 1, display: { xs: "none", md: "inline-flex" } }}
+                  >
                      Slett
                   </Button>
-                  <Button variant="contained" startIcon={<Edit />} onClick={() => setIsReportModalOpen(true)}>
+                  <Button
+                     variant="text"
+                     startIcon={<Edit />}
+                     onClick={() => setIsReportModalOpen(true)}
+                     sx={{ display: { xs: "none", md: "inline-flex" } }}
+                  >
                      Rediger info
                   </Button>
+                  <IconButton onClick={openConfirmDelete} sx={{ mr: 1, display: { md: "none" } }}>
+                     <Delete />
+                  </IconButton>
+                  <IconButton onClick={() => setIsReportModalOpen(true)} sx={{ display: { md: "none" } }}>
+                     <Edit />
+                  </IconButton>
                </Box>
             )}
          </Box>
@@ -101,12 +117,22 @@ export const ReportInfoPage = () => {
          </Typography>
          {!editing && (
             <>
-               <Paper sx={{ p: 2 }} onDoubleClick={() => setEditing(true)}>
-                  {isAdmin && (
-                     <Button variant="outlined" onClick={() => setEditing(true)} sx={{ mb: 1 }}>
-                        Start redigering
+               {isAdmin && (
+                  <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                     <Button
+                        variant="contained"
+                        startIcon={<Edit />}
+                        onClick={() => setEditing(true)}
+                        sx={{ display: { xs: "none", md: "inline-flex" } }}
+                     >
+                        Rediger innhold
                      </Button>
-                  )}
+                     <IconButton color="primary" onClick={() => setEditing(true)} sx={{ display: { md: "none" } }}>
+                        <Edit />
+                     </IconButton>
+                  </Box>
+               )}
+               <Paper variant="outlined" sx={{ p: { xs: 1, md: 2 } }} onDoubleClick={() => setEditing(true)}>
                   {report.content && <RichTextPreview content={report.content} />}
                   {!report.content && <Typography gutterBottom>Det er ikke lagt til innhold enda.</Typography>}
                </Paper>
@@ -122,7 +148,7 @@ export const ReportInfoPage = () => {
                />
             </>
          )}
-         <Typography variant="body2" sx={{ color: "text.secondary", mt: 1 }}>
+         <Typography variant="body2" sx={{ color: "text.secondary", mt: 1, mb: 10 }}>
             Sist redigert av: {report.lastModifiedBy}, {lastModifiedDate.toLocaleDateString()}{" "}
             {lastModifiedDate.toLocaleTimeString()}
          </Typography>
