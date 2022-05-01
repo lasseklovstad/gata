@@ -1,7 +1,7 @@
 import { Editor, Element, Transforms } from "slate";
 
 export const withImages = (editor: Editor) => {
-   const { isVoid } = editor;
+   const { isVoid, insertData } = editor;
 
    editor.isVoid = (element: Element) => {
       return element.type === "image" ? true : isVoid(element);
@@ -10,8 +10,8 @@ export const withImages = (editor: Editor) => {
    editor.insertData = (data) => {
       const { files } = data;
       const text = data.getData("text/plain");
-
-      if (files && files.length > 0) {
+      console.log(text);
+      if (!text && files && files.length > 0) {
          for (let i = 0; i < files.length; i++) {
             const file = files.item(i);
             const reader = new FileReader();
@@ -26,9 +26,8 @@ export const withImages = (editor: Editor) => {
                reader.readAsDataURL(file!);
             }
          }
-      } else {
-         insertImage(editor, text);
       }
+      insertData(data);
    };
 
    return editor;
