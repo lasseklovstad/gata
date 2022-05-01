@@ -22,7 +22,7 @@ export const RichTextPreview = ({ content }: RichTextPreviewProps) => {
    const getElement = (element: Descendant, index: number) => {
       if (Element.isElement(element)) {
          return (
-            <RichTextElement key={index} element={element}>
+            <RichTextElement key={index} element={element} outsideContext>
                {element.children.map((child, j) => {
                   return getElement(child, j);
                })}

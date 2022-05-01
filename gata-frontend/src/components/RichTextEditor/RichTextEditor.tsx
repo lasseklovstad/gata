@@ -7,6 +7,7 @@ import { withReact, RenderElementProps, RenderLeafProps, Slate, Editable } from 
 import { UseClientState } from "../../api/client/client.types";
 import { LoadingButton } from "../Loading";
 import { BlockButton } from "./BlockButton";
+import { withImages } from "./images";
 import { MarkButton } from "./MarkButton";
 import { toggleMark } from "./RichTextEditor.util";
 import { RichTextElement } from "./RichTextElement";
@@ -20,7 +21,7 @@ type RichTextEditorProps = {
 };
 
 export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent }: RichTextEditorProps) => {
-   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+   const editor = useMemo(() => withImages(withHistory(withReact(createEditor()))), []);
    const renderElement = useCallback((props: RenderElementProps) => <RichTextElement {...props} />, []);
    const renderLeaf = useCallback((props: RenderLeafProps) => {
       return <RichTextLeaf {...props} />;
