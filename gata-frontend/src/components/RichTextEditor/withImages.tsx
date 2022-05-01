@@ -35,6 +35,9 @@ export const withImages = (editor: Editor) => {
 
 const insertImage = (editor: Editor, url: string | null) => {
    const text = { text: "" };
-   const image = { type: "image" as const, url, children: [text] };
+   const image = [
+      { type: "image" as const, url, size: 50, children: [text] },
+      { type: "body2" as const, children: [text] },
+   ];
    Transforms.insertNodes(editor, image);
 };

@@ -7,7 +7,7 @@ import { withReact, RenderElementProps, RenderLeafProps, Slate, Editable } from 
 import { UseClientState } from "../../api/client/client.types";
 import { LoadingButton } from "../Loading";
 import { BlockButton } from "./BlockButton";
-import { withImages } from "./images";
+import { withImages } from "./withImages";
 import { MarkButton } from "./MarkButton";
 import { toggleMark } from "./RichTextEditor.util";
 import { RichTextElement } from "./RichTextElement";
@@ -15,7 +15,7 @@ import { RichTextLeaf } from "./RichTextLeaf";
 
 type RichTextEditorProps = {
    onCancel: () => void;
-   onSave: (content: Descendant[]) => void;
+   onSave: (content: Descendant[] | undefined, close: boolean) => void;
    initialContent?: string | null;
    saveResponse?: UseClientState<unknown>;
 };
@@ -37,11 +37,11 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent 
               },
            ];
    }, [initialContent]);
-   const content = useRef(initialValue);
+   const content = useRef<Descendant[]>();
 
-   const handleSave = () => {
+   const handleSave = (close: boolean) => {
       console.log(content.current);
-      onSave(content.current);
+      onSave(content.current, close);
    };
 
    return (
@@ -101,7 +101,7 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent 
                         startIcon={<Save />}
                         response={saveResponse}
                         variant="contained"
-                        onClick={handleSave}
+                        onClick={() => handleSave(true)}
                         sx={{ mr: 1 }}
                      >
                         Save
@@ -114,6 +114,14 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent 
                      renderElement={renderElement}
                      renderLeaf={renderLeaf}
                      onKeyDown={(event) => {
+                        switch (event.key) {
+                           case "Escape": {
+                              event.preventDefault();
+                              onCancel();
+                              break;
+                           }
+                        }
+
                         if (!event.ctrlKey) {
                            return;
                         }
@@ -129,6 +137,11 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent 
                            case "k": {
                               event.preventDefault();
                               toggleMark(editor, "italic");
+                              break;
+                           }
+                           case "s": {
+                              event.preventDefault();
+                              handleSave(false);
                               break;
                            }
                            case "u": {

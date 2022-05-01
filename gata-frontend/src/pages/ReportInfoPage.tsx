@@ -46,11 +46,15 @@ export const ReportInfoPage = () => {
       setReport(reportResponse.data);
    }, [reportResponse.data]);
 
-   const handleSaveContent = async (content: Descendant[]) => {
-      const { data } = await putReportContent(content);
-      if (data) {
-         setReport(data);
-         setEditing(false);
+   const handleSaveContent = async (content: Descendant[] | undefined, close: boolean) => {
+      if (content) {
+         const { data } = await putReportContent(content);
+         if (data) {
+            setReport(data);
+            close && setEditing(false);
+         }
+      } else {
+         close && setEditing(false);
       }
    };
 
@@ -97,7 +101,7 @@ export const ReportInfoPage = () => {
          </Typography>
          {!editing && (
             <>
-               <Paper sx={{ p: 2 }}>
+               <Paper sx={{ p: 2 }} onDoubleClick={() => setEditing(true)}>
                   {isAdmin && (
                      <Button variant="outlined" onClick={() => setEditing(true)} sx={{ mb: 1 }}>
                         Start redigering
