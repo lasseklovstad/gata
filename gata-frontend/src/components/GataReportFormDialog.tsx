@@ -40,6 +40,7 @@ export const GataReportFormDialog = ({ onClose, onSuccess, report }: GataReportF
                   variant="filled"
                   autoFocus
                   sx={{ mb: 2 }}
+                  inputProps={{ maxLength: 255 }}
                   label="Tittel"
                   value={title}
                   onChange={(ev) => setTitle(ev.target.value)}
@@ -49,6 +50,7 @@ export const GataReportFormDialog = ({ onClose, onSuccess, report }: GataReportF
                <TextField
                   variant="filled"
                   multiline
+                  inputProps={{ maxLength: 255 }}
                   rows={3}
                   label="Beskrivelse (Valgfri)"
                   value={description}

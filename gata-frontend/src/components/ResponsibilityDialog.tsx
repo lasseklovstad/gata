@@ -42,6 +42,7 @@ export const ResponsibilityDialog = ({ onClose, onSuccess, responsibility }: Res
                   sx={{ mb: 2 }}
                   label="Navn"
                   value={name}
+                  inputProps={{ maxLength: 255 }}
                   onChange={(ev) => setName(ev.target.value)}
                   error={!!error}
                   helperText={error}
@@ -50,6 +51,7 @@ export const ResponsibilityDialog = ({ onClose, onSuccess, responsibility }: Res
                   variant="filled"
                   multiline
                   rows={3}
+                  inputProps={{ maxLength: 255 }}
                   label="Beskrivelse (Valgfri)"
                   value={description}
                   onChange={(ev) => setDescription(ev.target.value)}

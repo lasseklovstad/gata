@@ -11,6 +11,7 @@ data class ResponsibilityNote(
         var id: UUID?,
         var lastModifiedDate: Date,
         var lastModifiedBy: String,
+        @Column(columnDefinition = "TEXT")
         var text: String,
         @OneToOne
         @JoinColumn(name = "resonsibility_year_id", referencedColumnName = "id")
