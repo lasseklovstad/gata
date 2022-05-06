@@ -2,20 +2,28 @@ import { Editor, Transforms, Element, Text } from "slate";
 import { BlockTypes } from "./BlockButton";
 import { ListTypes, LIST_TYPES, MarkType } from "./RichTextEditor.types";
 
-export const getIsListType = (type: BlockTypes): type is ListTypes => {
+const getIsListType = (type: BlockTypes): type is ListTypes => {
    return LIST_TYPES.includes(type as ListTypes);
+};
+
+const getIsMuiListType = (type: BlockTypes): type is ListTypes => {
+   return type === "mui-list";
 };
 
 export const toggleBlock = (editor: Editor, type: BlockTypes) => {
    const isActive = isBlockActive(editor, type);
    const isList = getIsListType(type);
+   const isMuiList = getIsMuiListType(type);
 
    Transforms.unwrapNodes(editor, {
       match: (n) => !Editor.isEditor(n) && Element.isElement(n) && LIST_TYPES.includes(n.type as ListTypes),
       split: true,
    });
-
-   Transforms.setNodes<Element>(editor, { type: isActive ? "body1" : isList ? "list-item" : type });
+   if (isList) {
+      Transforms.setNodes<Element>(editor, { type: isActive ? "body1" : isMuiList ? "list-item" : "native-list-item" });
+   } else {
+      Transforms.setNodes<Element>(editor, { type: isActive ? "body1" : type });
+   }
 
    if (!isActive && isList) {
       const block = { type: type, children: [] };

@@ -27,8 +27,18 @@ export const RichTextElement = ({ attributes, children, element, outsideContext 
                <ListItemText>{children}</ListItemText>
             </ListItem>
          );
+      case "native-list-item":
+         return (
+            <Typography component="li" {...attributes}>
+               {children}
+            </Typography>
+         );
       case "bulleted-list":
-         return <List>{children}</List>;
+         return <ul {...attributes}>{children}</ul>;
+      case "numbered-list":
+         return <ol {...attributes}>{children}</ol>;
+      case "mui-list":
+         return <List {...attributes}>{children}</List>;
       case "image":
          return !outsideContext ? (
             <SlateImage attributes={attributes} element={element}>

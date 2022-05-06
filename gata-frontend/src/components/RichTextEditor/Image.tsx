@@ -3,7 +3,6 @@ import { Box, IconButton, CardMedia, Skeleton } from "@mui/material";
 import { Transforms, Element } from "slate";
 import { RenderElementProps, useSlateStatic, ReactEditor, useSelected, useFocused } from "slate-react";
 import { useGetGataReportFile } from "../../api/file.api";
-import { Loading } from "../Loading";
 
 export const SlateImage = ({ attributes, children, element }: Partial<RenderElementProps>) => {
    const editor = useSlateStatic();

@@ -1,4 +1,12 @@
-import { FormatBold, FormatItalic, FormatUnderlined, Save, ViewList } from "@mui/icons-material";
+import {
+   FormatBold,
+   FormatItalic,
+   FormatListBulleted,
+   FormatListNumbered,
+   FormatUnderlined,
+   Save,
+   ViewList,
+} from "@mui/icons-material";
 import { Paper, ToggleButtonGroup, Button, Box, Divider } from "@mui/material";
 import { useMemo, useCallback, useRef } from "react";
 import { Descendant, createEditor } from "slate";
@@ -18,7 +26,7 @@ type RichTextEditorProps = {
    onCancel: () => void;
    onSave: (content: Descendant[] | undefined, close: boolean) => void;
    initialContent?: string | null;
-   saveResponse?: UseClientState<unknown>;
+   saveResponse: UseClientState<unknown>;
    reportId: string;
 };
 
@@ -49,7 +57,6 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
 
    return (
       <>
-         <Loading response={fileResponse} />
          <Slate
             editor={editor}
             value={initialValue}
@@ -81,8 +88,14 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                         <BlockButton type="h4">H4</BlockButton>
                         <BlockButton type="body1">Normal</BlockButton>
                         <BlockButton type="body2">Liten</BlockButton>
-                        <BlockButton type="bulleted-list">
+                        <BlockButton type="mui-list">
                            <ViewList />
+                        </BlockButton>
+                        <BlockButton type="bulleted-list">
+                           <FormatListBulleted />
+                        </BlockButton>
+                        <BlockButton type="numbered-list">
+                           <FormatListNumbered />
                         </BlockButton>
                      </ToggleButtonGroup>
                      <ToggleButtonGroup exclusive aria-label="Velg tekststørrelse" sx={{ p: 1 }}>
@@ -96,6 +109,8 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                            <FormatUnderlined />
                         </MarkButton>
                      </ToggleButtonGroup>
+                     <Loading response={fileResponse} />
+                     <Loading response={saveResponse} />
                   </Box>
                   <Box sx={{ p: 1 }}>
                      <Button variant="text" onClick={() => onCancel()} sx={{ mr: 1 }}>
