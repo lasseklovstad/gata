@@ -5,23 +5,26 @@ import { Descendant, createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { withReact, RenderElementProps, RenderLeafProps, Slate, Editable } from "slate-react";
 import { UseClientState } from "../../api/client/client.types";
-import { LoadingButton } from "../Loading";
+import { Loading, LoadingButton } from "../Loading";
 import { BlockButton } from "./BlockButton";
 import { withImages } from "./withImages";
 import { MarkButton } from "./MarkButton";
 import { toggleMark } from "./RichTextEditor.util";
 import { RichTextElement } from "./RichTextElement";
 import { RichTextLeaf } from "./RichTextLeaf";
+import { usePostGataReportFile } from "../../api/file.api";
 
 type RichTextEditorProps = {
    onCancel: () => void;
    onSave: (content: Descendant[] | undefined, close: boolean) => void;
    initialContent?: string | null;
    saveResponse?: UseClientState<unknown>;
+   reportId: string;
 };
 
-export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent }: RichTextEditorProps) => {
-   const editor = useMemo(() => withImages(withHistory(withReact(createEditor()))), []);
+export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent, reportId }: RichTextEditorProps) => {
+   const { postReportFile, fileResponse } = usePostGataReportFile(reportId);
+   const editor = useMemo(() => withImages(withHistory(withReact(createEditor())), postReportFile), [postReportFile]);
    const renderElement = useCallback((props: RenderElementProps) => <RichTextElement {...props} />, []);
    const renderLeaf = useCallback((props: RenderLeafProps) => {
       return <RichTextLeaf {...props} />;
@@ -46,6 +49,7 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent 
 
    return (
       <>
+         <Loading response={fileResponse} />
          <Slate
             editor={editor}
             value={initialValue}

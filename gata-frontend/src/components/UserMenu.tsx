@@ -7,12 +7,10 @@ export const UserMenu = () => {
    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
    const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
-      console.log("open");
       setAnchorEl(event.currentTarget);
    };
 
    const handleCloseMenu = () => {
-      console.log("close");
       setAnchorEl(null);
    };
 

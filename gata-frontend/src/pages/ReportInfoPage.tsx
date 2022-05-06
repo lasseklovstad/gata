@@ -145,6 +145,7 @@ export const ReportInfoPage = () => {
                   onCancel={openConfirmCancel}
                   onSave={handleSaveContent}
                   saveResponse={putReportResponse}
+                  reportId={reportId!!}
                />
             </>
          )}

@@ -1,5 +1,6 @@
 package no.gata.web.models
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.*
 import javax.persistence.*
 
@@ -15,6 +16,9 @@ data class GataReport(
         var lastModifiedBy: String,
         @Lob
         var content: String?,
+        @OneToMany(mappedBy = "report", cascade = [CascadeType.ALL])
+        @JsonIgnore
+        var files: List<GataReportFile>
 )
 
 interface GataReportSimple{

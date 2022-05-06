@@ -1,7 +1,6 @@
 package no.gata.web.controller
 
 import no.gata.web.service.Auth0RestService
-import no.gata.web.models.Auth0Role
 import no.gata.web.models.GataRole
 import no.gata.web.models.GataUser
 import no.gata.web.repository.GataRoleRepository
@@ -9,7 +8,6 @@ import no.gata.web.repository.GataUserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException

@@ -1,7 +1,9 @@
 import { Add, Delete, Remove } from "@mui/icons-material";
-import { Box, IconButton, CardMedia } from "@mui/material";
+import { Box, IconButton, CardMedia, Skeleton } from "@mui/material";
 import { Transforms, Element } from "slate";
 import { RenderElementProps, useSlateStatic, ReactEditor, useSelected, useFocused } from "slate-react";
+import { useGetGataReportFile } from "../../api/file.api";
+import { Loading } from "../Loading";
 
 export const SlateImage = ({ attributes, children, element }: Partial<RenderElementProps>) => {
    const editor = useSlateStatic();
@@ -14,7 +16,7 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
          {children}
 
          <Box contentEditable={false} position="relative">
-            <Image url={element?.url!} selected={selected} focused={focused} size={element?.size} />
+            <Image id={element?.imageId!} selected={selected} focused={focused} size={element?.size} />
 
             <IconButton
                onMouseDown={(ev) => ev.preventDefault()}
@@ -71,25 +73,30 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
 };
 
 type ImageProps = {
-   url: string;
+   id: string;
    selected?: boolean;
    focused?: boolean;
    size?: number;
 };
 
-export const Image = ({ url, selected = false, focused = false, size = 50 }: ImageProps) => {
+export const Image = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
+   const { fileResponse } = useGetGataReportFile(id);
    return (
       <>
-         <CardMedia
-            component="img"
-            image={url}
-            sx={{
-               boxShadow: selected && focused ? "0 0 0 3px #B4D5FF" : "none",
-               display: "block",
-               maxWidth: `${size}%`,
-               m: 1,
-            }}
-         />
+         {fileResponse.status === "loading" && <Skeleton variant="rectangular" width={400} height={300} />}
+         {fileResponse.data && (
+            <CardMedia
+               component="img"
+               image={fileResponse.data.data}
+               sx={{
+                  boxShadow: selected && focused ? "0 0 0 3px #B4D5FF" : "none",
+                  display: "block",
+                  maxWidth: `${size}%`,
+                  mt: 1,
+                  mb: 1,
+               }}
+            />
+         )}
       </>
    );
 };

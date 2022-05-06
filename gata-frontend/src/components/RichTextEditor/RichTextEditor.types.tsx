@@ -7,7 +7,7 @@ export const LIST_TYPES: ListTypes[] = ["numbered-list", "bulleted-list"];
 export type CustomElement = {
    type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "body1" | "body2" | "paragraph" | "image" | ListTypes;
    children: CustomText[];
-   url?: string | null;
+   imageId?: string | null;
    size?: number;
 };
 

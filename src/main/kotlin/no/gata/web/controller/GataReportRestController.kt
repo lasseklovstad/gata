@@ -1,8 +1,9 @@
 package no.gata.web.controller
 
-import no.gata.web.models.GataReport
-import no.gata.web.models.GataReportSimple
-import no.gata.web.models.GataUser
+import com.fasterxml.jackson.databind.JsonSerializable
+import com.fasterxml.jackson.databind.ObjectMapper
+import no.gata.web.models.*
+import no.gata.web.repository.GataReportFileRepository
 import no.gata.web.repository.GataReportRepository
 import no.gata.web.repository.GataUserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,6 +28,9 @@ class GataReportRestController {
 
     @Autowired
     private lateinit var gataUserRepository: GataUserRepository
+
+    @Autowired
+    private lateinit var gataReportFileRepository: GataReportFileRepository
 
     @GetMapping
     @PreAuthorize("hasAuthority('member')")
@@ -65,7 +69,8 @@ class GataReportRestController {
                 content = null,
                 lastModifiedBy = user.name,
                 createdDate = Date(),
-                lastModifiedDate = Date())
+                lastModifiedDate = Date(),
+                files = emptyList())
         return gataReportRepository.save(report)
     }
 
@@ -87,12 +92,16 @@ class GataReportRestController {
 
     @PutMapping("{id}/content")
     @PreAuthorize("hasAuthority('admin')")
-    fun updateReportContent(@RequestBody body: String, authentication: Authentication, @PathVariable id: String): GataReport {
+    fun updateReportContent(@RequestBody body: List<RichTextBlock>, authentication: Authentication, @PathVariable id: String): GataReport {
         val user = getLoggedInUser(authentication)
         val report = gataReportRepository.findById(UUID.fromString(id))
         if (report.isPresent) {
+            val files = body.filter { it.type == "image" }
             val newReport = report.get()
-            newReport.content = body
+            val reportFiles = gataReportFileRepository.findAllByReport(newReport)
+            val filesToDelete = reportFiles.filter { files.find { file -> file.imageId == it.id.toString() } == null }
+            filesToDelete.forEach({ gataReportFileRepository.deleteById(it.id) })
+            newReport.content = ObjectMapper().writeValueAsString(body)
             newReport.lastModifiedBy = user.name
             newReport.lastModifiedDate = Date()
             return gataReportRepository.save(newReport)
