@@ -59,3 +59,7 @@ export const toggleMark = (editor: Editor, type: MarkType) => {
       { match: (n) => Text.isText(n), split: true }
    );
 };
+
+export const insertTab = (editor: Editor) => {
+   Editor.insertText(editor, "    ");
+};

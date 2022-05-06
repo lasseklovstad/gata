@@ -17,7 +17,7 @@ import { Loading, LoadingButton } from "../Loading";
 import { BlockButton } from "./BlockButton";
 import { withImages } from "./withImages";
 import { MarkButton } from "./MarkButton";
-import { toggleMark } from "./RichTextEditor.util";
+import { insertTab, toggleMark } from "./RichTextEditor.util";
 import { RichTextElement } from "./RichTextElement";
 import { RichTextLeaf } from "./RichTextLeaf";
 import { usePostGataReportFile } from "../../api/file.api";
@@ -137,6 +137,11 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                            case "Escape": {
                               event.preventDefault();
                               onCancel();
+                              break;
+                           }
+                           case "Tab": {
+                              event.preventDefault();
+                              insertTab(editor);
                               break;
                            }
                         }
