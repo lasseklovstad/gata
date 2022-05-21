@@ -58,6 +58,11 @@ class GataReportRestController {
     fun getReport(@PathVariable id: String): Optional<GataReport> {
         return gataReportRepository.findById(UUID.fromString(id))
     }
+    @GetMapping("databasesize")
+    @PreAuthorize("hasAuthority('admin')")
+    fun getDatabaseSize(): String {
+        return gataReportRepository.getDatabaseSize()
+    }
 
     @GetMapping("{id}/publish")
     @PreAuthorize("hasAuthority('admin')")

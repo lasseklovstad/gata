@@ -28,6 +28,20 @@ export const useGetGataReport = (id: string) => {
    return { reportResponse, getReport };
 };
 
+export const useDatabaseSize = () => {
+   const [sizeResponse, clientFetch] = useClient<string, never>();
+
+   const getDatabaseSize = useCallback(() => {
+      return clientFetch("report/databasesize");
+   }, [clientFetch]);
+
+   useEffect(() => {
+      getDatabaseSize();
+   }, [getDatabaseSize]);
+
+   return { sizeResponse, getDatabaseSize };
+};
+
 export const usePublishReport = (id: string) => {
    const [publishResponse, clientFetch] = useClient<string[], never>();
 

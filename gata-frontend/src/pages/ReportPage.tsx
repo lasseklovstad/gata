@@ -2,7 +2,7 @@ import { Add } from "@mui/icons-material";
 import { Box, Button, List, ListItem, ListItemButton, ListItemText, Pagination, Typography } from "@mui/material";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useGetGataReports } from "../api/report.api";
+import { useDatabaseSize, useGetGataReports } from "../api/report.api";
 import { GataReportFormDialog } from "../components/GataReportFormDialog";
 import { Loading } from "../components/Loading";
 import { PageLayout } from "../components/PageLayout";
@@ -13,13 +13,22 @@ export const ReportPage = () => {
    const [page, setPage] = useState(1);
    const { reportResponse } = useGetGataReports(page, "DOCUMENT");
    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+   const { sizeResponse } = useDatabaseSize();
    const navigate = useNavigate();
    return (
       <PageLayout>
-         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
+         <Box
+            sx={{
+               display: "flex",
+               justifyContent: "space-between",
+               alignItems: "center",
+               flexWrap: "wrap",
+            }}
+         >
             <Typography variant="h1" id="report-page-title">
                Aktuelle dokumenter
             </Typography>
+            <Typography variant="body1">{sizeResponse.data && `(${sizeResponse.data}/ 1GB)`}</Typography>
             {isAdmin && (
                <Button variant="contained" startIcon={<Add />} onClick={() => setIsReportModalOpen(true)}>
                   Opprett

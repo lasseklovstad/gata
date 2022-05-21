@@ -25,8 +25,10 @@ export const client = <ResponseBody extends unknown, RequestBody extends Request
          if (response.status === 204) {
             // No content
             return undefined;
-         } else {
+         } else if (response.headers.get("Content-Type") === "application/json") {
             return (await response.json()) as ResponseBody;
+         } else if (response.headers.get("Content-Type")?.includes("text/plain")) {
+            return (await response.text()) as ResponseBody;
          }
       } else {
          if (response.status === 401) {
