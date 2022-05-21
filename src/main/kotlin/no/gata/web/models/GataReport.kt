@@ -18,14 +18,19 @@ data class GataReport(
         var content: String?,
         @OneToMany(mappedBy = "report", cascade = [CascadeType.ALL])
         @JsonIgnore
-        var files: List<GataReportFile>
+        var files: List<GataReportFile>,
+        var type: ReportType
 )
 
-interface GataReportSimple{
-        var id: UUID?
-        var title: String
-        var description: String
-        var createdDate: Date
-        var lastModifiedDate: Date
-        var lastModifiedBy: String
+enum class ReportType {
+    DOCUMENT, NEWS
+}
+
+interface GataReportSimple {
+    var id: UUID?
+    var title: String
+    var description: String
+    var createdDate: Date
+    var lastModifiedDate: Date
+    var lastModifiedBy: String
 }

@@ -1,6 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Typography, Button, IconButton, Menu, MenuItem, Avatar } from "@mui/material";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export const UserMenu = () => {
    const { user, isAuthenticated, logout, loginWithRedirect } = useAuth0();
@@ -49,6 +50,9 @@ export const UserMenu = () => {
                >
                   <MenuItem onClick={handleLogout}>
                      <Typography textAlign="center">Logg ut</Typography>
+                  </MenuItem>
+                  <MenuItem component={Link} to="privacy" onClick={handleCloseMenu}>
+                     <Typography textAlign="center">Privacy</Typography>
                   </MenuItem>
                </Menu>
             </>

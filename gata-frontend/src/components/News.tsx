@@ -1,24 +1,25 @@
-import { Add } from "@mui/icons-material";
-import { Box, Button, List, ListItem, ListItemButton, ListItemText, Pagination, Typography } from "@mui/material";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { useGetGataReports } from "../api/report.api";
-import { GataReportFormDialog } from "../components/GataReportFormDialog";
-import { Loading } from "../components/Loading";
-import { PageLayout } from "../components/PageLayout";
-import { useRoles } from "../components/useRoles";
+import { useNavigate } from "react-router-dom";
+import { PageLayout } from "./PageLayout";
+import { Box, Button, List, ListItem, ListItemText, Pagination, Typography } from "@mui/material";
+import { Add } from "@mui/icons-material";
+import { GataReportFormDialog } from "./GataReportFormDialog";
+import { Loading } from "./Loading";
+import { useRoles } from "./useRoles";
+import { NewsItem } from "./NewsItem";
 
-export const ReportPage = () => {
+export const News = () => {
    const { isAdmin } = useRoles();
    const [page, setPage] = useState(1);
-   const { reportResponse } = useGetGataReports(page, "DOCUMENT");
+   const { reportResponse } = useGetGataReports(page, "NEWS");
    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
    const navigate = useNavigate();
    return (
       <PageLayout>
          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
-            <Typography variant="h1" id="report-page-title">
-               Aktuelle dokumenter
+            <Typography variant="h1" id="news-page-title">
+               Nyheter
             </Typography>
             {isAdmin && (
                <Button variant="contained" startIcon={<Add />} onClick={() => setIsReportModalOpen(true)}>
@@ -29,23 +30,23 @@ export const ReportPage = () => {
          {isReportModalOpen && (
             <GataReportFormDialog
                onClose={() => setIsReportModalOpen(false)}
-               onSuccess={(r) => navigate(r.id)}
-               type="DOCUMENT"
+               onSuccess={(r) => navigate(`/report/${r.id}`)}
+               type="NEWS"
             />
          )}
          <Loading response={reportResponse} />
          {reportResponse.data && (
-            <List aria-labelledby="report-page-title">
+            <List aria-labelledby="news-page-title">
                {reportResponse.data.content.map((report) => {
                   return (
-                     <ListItemButton key={report.id} divider component={Link} to={report.id}>
-                        <ListItemText primary={report.title} secondary={report.description} />
-                     </ListItemButton>
+                     <ListItem key={report.id} disableGutters>
+                        <NewsItem simpleReport={report} />
+                     </ListItem>
                   );
                })}
                {reportResponse.data.totalElements === 0 && (
                   <ListItem>
-                     <ListItemText>Det finnes ingen dokumenter enda!</ListItemText>
+                     <ListItemText>Det finnes ingen nyheter</ListItemText>
                   </ListItem>
                )}
             </List>

@@ -18,7 +18,9 @@ data class GataUser(
         @JsonIgnore
         var responsibilities: List<ResponsibilityYear>,
         @ManyToMany()
-        var roles: List<GataRole>
+        var roles: List<GataRole>,
+        @OneToMany(mappedBy = "user")
+        var contingents: List<GataContingent>
 ){
         fun getIsUserMember(): Boolean {
                 return roles.find { it.name=="Medlem" } != null

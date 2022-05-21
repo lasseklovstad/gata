@@ -28,12 +28,12 @@ export const ReportInfoPage = () => {
    const { saveResponse, deleteReport } = useSaveGataReport();
    const navigate = useNavigate();
    const { openConfirmDialog: openConfirmDelete, ConfirmDialogComponent: ConfirmDeleteDialog } = useConfirmDialog({
-      text: "Ved å slette referatet mister du all data",
+      text: "Ved å slette dokumentet mister du all data",
       response: saveResponse,
       onConfirm: async () => {
          const { status } = await deleteReport(reportId!);
          if (status === "success") {
-            navigate("/report", { replace: true });
+            navigate(report?.type === "NEWS" ? "/" : "/report", { replace: true });
          }
       },
    });
@@ -108,6 +108,7 @@ export const ReportInfoPage = () => {
                   setIsReportModalOpen(false);
                }}
                report={report}
+               type={report.type}
             />
          )}
          {ConfirmCancelDialog}

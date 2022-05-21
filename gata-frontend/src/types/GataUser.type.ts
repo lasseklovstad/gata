@@ -1,5 +1,5 @@
 import { IGataRole } from "./GataRole.type";
-import { IResponsibility } from "./Responsibility.type";
+import { IGataContingent } from "./GataContingent.type";
 
 export interface IGataUser {
    email: string;
@@ -10,4 +10,5 @@ export interface IGataUser {
    isUserAdmin: boolean;
    isUserMember: boolean;
    roles: IGataRole[];
+   contingents: IGataContingent[];
 }

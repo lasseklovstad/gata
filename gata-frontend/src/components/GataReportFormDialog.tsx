@@ -2,7 +2,7 @@ import { Save } from "@mui/icons-material";
 import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from "@mui/material";
 import { useState } from "react";
 import { useSaveGataReport } from "../api/report.api";
-import { IGataReport } from "../types/GataReport.type";
+import { GataReportType, IGataReport } from "../types/GataReport.type";
 import { ErrorAlert } from "./ErrorAlert";
 import { LoadingButton } from "./Loading";
 
@@ -10,10 +10,11 @@ type GataReportFormDialogProps = {
    onClose: () => void;
    onSuccess: (report: IGataReport) => void;
    report?: IGataReport;
+   type: GataReportType;
 };
 
-export const GataReportFormDialog = ({ onClose, onSuccess, report }: GataReportFormDialogProps) => {
-   const type = report?.id ? "update" : "create";
+export const GataReportFormDialog = ({ onClose, onSuccess, report, type }: GataReportFormDialogProps) => {
+   const formType = report?.id ? "update" : "create";
    const [title, setTitle] = useState(report?.title || "");
    const [description, setDescription] = useState(report?.description || "");
    const [error, setError] = useState<string>();
@@ -23,8 +24,8 @@ export const GataReportFormDialog = ({ onClose, onSuccess, report }: GataReportF
       ev.preventDefault();
       if (title) {
          const { status, data } = report?.id
-            ? await putReport(report.id, { title, description })
-            : await postReport({ title, description });
+            ? await putReport(report.id, { title, description, type })
+            : await postReport({ title, description, type });
          status === "success" && data && onSuccess(data);
       } else {
          setError("Tittel må fylles ut");
@@ -34,7 +35,7 @@ export const GataReportFormDialog = ({ onClose, onSuccess, report }: GataReportF
    return (
       <Dialog open maxWidth="xs" fullWidth>
          <form onSubmit={handleSubmit}>
-            <DialogTitle>{type === "update" ? "Rediger referat info" : "Nytt referat"}</DialogTitle>
+            <DialogTitle>{formType === "update" ? "Rediger informasjon" : "Nytt dokument"}</DialogTitle>
             <DialogContent sx={{ display: "flex", flexDirection: "column" }}>
                <TextField
                   variant="filled"

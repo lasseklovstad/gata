@@ -1,5 +1,6 @@
 package no.gata.web.controller
 
+import no.gata.web.models.GataContingent
 import no.gata.web.models.GataUser
 import no.gata.web.models.ResponsibilityNote
 import no.gata.web.models.ResponsibilityYear
@@ -23,6 +24,11 @@ data class ResponsibilityNotePayload(
         var text: String,
 )
 
+data class ContingentPayload(
+        var isPaid: Boolean,
+        var year: Year
+)
+
 @RestController
 @RequestMapping("api/user")
 class GataUserRestController {
@@ -39,6 +45,8 @@ class GataUserRestController {
     private lateinit var responsibilityRepository: ResponsibilityRepository
     @Autowired
     private lateinit var gataRoleRepository: GataRoleRepository
+    @Autowired
+    private lateinit var gataContingentRepository: GataContingentRepository
 
     @GetMapping
     @PreAuthorize("hasAuthority('member')")
@@ -137,6 +145,33 @@ class GataUserRestController {
             return responsibilityYearRepository.save(responsibilityYear);
         } else {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Bruker må være medlem for å kunne få ansvarspost.");
+        }
+    }
+
+    @PostMapping("{id}/contingent")
+    @PreAuthorize("hasAuthority('admin')")
+    fun postContingent(@PathVariable id: String, @RequestBody body: ContingentPayload): List<GataContingent> {
+        val userOptional = gataUserRepository.findById(UUID.fromString(id))
+        if(userOptional.isPresent){
+            val user = userOptional.get()
+            if(user.getIsUserMember()){
+                val existingContingentOptional = gataContingentRepository.findByUserAndYear(user,body.year)
+
+                if(existingContingentOptional.isPresent){
+                    val existingContingent = existingContingentOptional.get()
+                    existingContingent.isPaid = body.isPaid
+                    gataContingentRepository.save(existingContingent)
+                }else{
+                    val contingent = GataContingent(id=null, year = body.year, isPaid = body.isPaid, user)
+                    gataContingentRepository.save(contingent)
+                }
+
+
+                return gataContingentRepository.findAllByUser(user)
+            }
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Brukeren er ikke medlem");
+        }else{
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Brukeren finnes ikke");
         }
     }
 }

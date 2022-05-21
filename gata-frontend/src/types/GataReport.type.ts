@@ -1,5 +1,3 @@
-import { Descendant } from "slate";
-
 export interface IGataReport {
    id: string;
    title: string;
@@ -8,9 +6,13 @@ export interface IGataReport {
    lastModifiedDate: string;
    lastModifiedBy: string;
    content: string | null;
+   type: GataReportType;
 }
 
 export interface IGataReportPayload {
    title: string;
    description: string;
+   type: GataReportType;
 }
+
+export type GataReportType = "DOCUMENT" | "NEWS";

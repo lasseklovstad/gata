@@ -16,10 +16,9 @@ import { GataRoleType } from "../types/GataRole.type";
 
 const pages = [
    { name: "Hjem", url: "" },
-   { name: "Privacy", url: "privacy" },
    { name: "Admin", url: "admin", roles: ["Administrator", "Medlem"] },
    { name: "Min side", url: "mypage", roles: ["Medlem"] },
-   { name: "Referat", url: "report", roles: ["Medlem"] },
+   { name: "Aktuelle dokumenter", url: "report", roles: ["Medlem"] },
 ];
 
 export const ResponsiveAppBar = () => {

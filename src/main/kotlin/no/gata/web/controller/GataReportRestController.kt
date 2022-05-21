@@ -1,12 +1,14 @@
 package no.gata.web.controller
 
-import com.fasterxml.jackson.databind.JsonSerializable
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.gata.web.models.*
 import no.gata.web.repository.GataReportFileRepository
 import no.gata.web.repository.GataReportRepository
 import no.gata.web.repository.GataUserRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
@@ -14,9 +16,11 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
+
 data class GataReportPayload(
         var title: String,
         var description: String,
+        var type: ReportType
 )
 
 @RestController
@@ -34,8 +38,9 @@ class GataReportRestController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('member')")
-    fun getReports(): List<GataReportSimple> {
-        return gataReportRepository.findAllByOrderByCreatedDateAsc()
+    fun getReports(@RequestParam page: Int, @RequestParam type: ReportType): Page<GataReportSimple> {
+        val paging: Pageable = PageRequest.of(page, 10)
+        return gataReportRepository.findAllByTypeOrderByCreatedDateDesc(type, paging)
     }
 
     @GetMapping("{id}")
@@ -70,7 +75,7 @@ class GataReportRestController {
                 lastModifiedBy = user.name,
                 createdDate = Date(),
                 lastModifiedDate = Date(),
-                files = emptyList())
+                files = emptyList(), type = body.type)
         return gataReportRepository.save(report)
     }
 

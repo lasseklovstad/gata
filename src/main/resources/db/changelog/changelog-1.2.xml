@@ -1,0 +1,22 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.9.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+    <changeSet author="Lasse" id="2-0">
+        <createTable tableName="gata_contingent">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="gata_contingent_pkey"/>
+            </column>
+            <column name="year" type="BYTEA"/>
+            <column name="gata_user_id" type="UUID"/>
+            <column name="is_paid" type="BOOLEAN"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="Lasse" id="2-1">
+        <addForeignKeyConstraint baseColumnNames="gata_user_id" baseTableName="gata_contingent"
+                                 constraintName="gata_contingent_gata_user_fk" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="gata_user" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

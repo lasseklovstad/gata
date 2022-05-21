@@ -6,6 +6,7 @@ import {
    IResponsibilityYear,
    IResponsibilityYearPayload,
 } from "../types/ResponsibilityYear.type";
+import { IGataContingent, IGataContingentPayload } from "../types/GataContingent.type";
 
 export const useGetUsers = () => {
    const [usersResponse, clientFetch] = useClient<IGataUser[], never>();
@@ -85,4 +86,16 @@ export const usePutResponsibilityNote = (userId: string, responsibilityYearId: s
    };
 
    return { putResponse, putNote };
+};
+
+export const usePostContingent = (userId: string) => {
+   const [postResponse, clientFetch] = useClient<IGataContingent[], IGataContingentPayload>();
+   const postContingent = (year: string, isPaid: boolean) => {
+      return clientFetch(`user/${userId}/contingent`, {
+         method: "POST",
+         body: { year, isPaid },
+      });
+   };
+
+   return { postResponse, postContingent };
 };

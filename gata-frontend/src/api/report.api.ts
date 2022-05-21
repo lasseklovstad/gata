@@ -1,14 +1,15 @@
 import { useCallback, useEffect } from "react";
 import { Descendant } from "slate";
-import { IGataReport, IGataReportPayload } from "../types/GataReport.type";
+import { GataReportType, IGataReport, IGataReportPayload } from "../types/GataReport.type";
 import { useClient } from "./client/useClient";
+import { Page } from "../types/Page.type";
 
-export const useGetGataReports = () => {
-   const [reportResponse, clientFetch] = useClient<IGataReport[], never>();
+export const useGetGataReports = (page: number, type: GataReportType) => {
+   const [reportResponse, clientFetch] = useClient<Page<IGataReport>, never>();
 
    useEffect(() => {
-      clientFetch("report");
-   }, [clientFetch]);
+      clientFetch(`report?page=${page - 1}&type=${type}`);
+   }, [clientFetch, page, type]);
 
    return { reportResponse };
 };
