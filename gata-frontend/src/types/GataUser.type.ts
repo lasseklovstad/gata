@@ -11,4 +11,5 @@ export interface IGataUser {
    isUserMember: boolean;
    roles: IGataRole[];
    contingents: IGataContingent[];
+   subscribe: boolean;
 }

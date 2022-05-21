@@ -19,12 +19,23 @@ const pages = [
    { name: "Admin", url: "admin", roles: ["Administrator", "Medlem"] },
    { name: "Min side", url: "mypage", roles: ["Medlem"] },
    { name: "Aktuelle dokumenter", url: "report", roles: ["Medlem"] },
+   { name: "Arkiv", url: "https://1drv.ms/f/s!Aimiul1gt9LbrA10geM-AnPDKFoY", roles: ["Medlem"] },
 ];
 
 export const ResponsiveAppBar = () => {
    const { roles } = useRoles();
    const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-
+   const filteredPages = pages.filter((page) => {
+      if (!page.roles || page.roles.length === 0) {
+         return true;
+      }
+      for (let pageRole of page.roles) {
+         if (roles.includes(pageRole as GataRoleType)) {
+            return true;
+         }
+      }
+      return false;
+   });
    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
       setAnchorElNav(event.currentTarget);
    };
@@ -69,11 +80,26 @@ export const ResponsiveAppBar = () => {
                         display: { xs: "block", md: "none" },
                      }}
                   >
-                     {pages.map((page) => (
-                        <MenuItem key={page.url} component={Link} to={page.url} onClick={handleCloseNavMenu}>
-                           <Typography textAlign="center">{page.name}</Typography>
-                        </MenuItem>
-                     ))}
+                     {filteredPages.map((page) => {
+                        if (page.url.startsWith("https")) {
+                           return (
+                              <MenuItem
+                                 key={page.url}
+                                 component="a"
+                                 href={page.url}
+                                 target="_blank"
+                                 onClick={handleCloseNavMenu}
+                              >
+                                 <Typography textAlign="center">{page.name}</Typography>
+                              </MenuItem>
+                           );
+                        }
+                        return (
+                           <MenuItem key={page.url} component={Link} to={page.url} onClick={handleCloseNavMenu}>
+                              <Typography textAlign="center">{page.name}</Typography>
+                           </MenuItem>
+                        );
+                     })}
                   </Menu>
                </Box>
                <Typography
@@ -85,19 +111,22 @@ export const ResponsiveAppBar = () => {
                   <img src="logo192.png" style={{ height: "40px" }} alt="Hesten blå" />
                </Typography>
                <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-                  {pages
-                     .filter((page) => {
-                        if (!page.roles || page.roles.length === 0) {
-                           return true;
-                        }
-                        for (let pageRole of page.roles) {
-                           if (roles.includes(pageRole as GataRoleType)) {
-                              return true;
-                           }
-                        }
-                        return false;
-                     })
-                     .map((page) => (
+                  {filteredPages.map((page) => {
+                     if (page.url.startsWith("https")) {
+                        return (
+                           <Button
+                              key={page.url}
+                              component="a"
+                              href={page.url}
+                              onClick={handleCloseNavMenu}
+                              target="_blank"
+                              sx={{ my: 2, color: "white", display: "block" }}
+                           >
+                              {page.name}
+                           </Button>
+                        );
+                     }
+                     return (
                         <Button
                            key={page.url}
                            component={Link}
@@ -107,7 +136,8 @@ export const ResponsiveAppBar = () => {
                         >
                            {page.name}
                         </Button>
-                     ))}
+                     );
+                  })}
                </Box>
 
                <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>

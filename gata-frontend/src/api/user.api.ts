@@ -99,3 +99,14 @@ export const usePostContingent = (userId: string) => {
 
    return { postResponse, postContingent };
 };
+
+export const useUpdateSubscribe = () => {
+   const [updateSubrscribeResponse, clientFetch] = useClient<IGataUser, never>();
+   const updateSubrscribe = (userId: string) => {
+      return clientFetch(`user/${userId}/subscribe`, {
+         method: "PUT",
+      });
+   };
+
+   return { updateSubrscribeResponse, updateSubrscribe };
+};

@@ -174,4 +174,12 @@ class GataUserRestController {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Brukeren finnes ikke");
         }
     }
+
+    @PutMapping("{id}/subscribe")
+    @PreAuthorize("hasAuthority('member')")
+    fun updateSubscribe(@PathVariable id: String): GataUser {
+        val user = gataUserRepository.findById(UUID.fromString(id)).get()
+        user.subscribe = !user.subscribe
+        return gataUserRepository.save(user)
+    }
 }

@@ -7,21 +7,31 @@ import { LoadingButton } from "./Loading";
 type ConfirmDialogProps = {
    onClose: () => void;
    onConfirm: () => Promise<void>;
+   title?: string;
    text: string;
    open: boolean;
    response?: UseClientState<unknown>;
+   showOnlyOk?: boolean;
 };
 
-export const ConfirmDialog = ({ text, onClose, onConfirm, open, response }: ConfirmDialogProps) => {
+export const ConfirmDialog = ({ text, onClose, onConfirm, open, response, title, showOnlyOk }: ConfirmDialogProps) => {
    return (
       <Dialog maxWidth="xs" fullWidth open={open}>
-         <DialogTitle>Er du sikker?</DialogTitle>
+         <DialogTitle>{title || "Er du sikker?"}</DialogTitle>
          <DialogContent>{text}</DialogContent>
          <DialogActions>
-            <Button onClick={onClose}>Avbryt</Button>
-            <LoadingButton response={response} variant="contained" onClick={onConfirm}>
-               Jeg er sikker
-            </LoadingButton>
+            {showOnlyOk ? (
+               <Button onClick={onClose} variant="contained">
+                  Ok
+               </Button>
+            ) : (
+               <>
+                  <Button onClick={onClose}>Avbryt</Button>
+                  <LoadingButton response={response} variant="contained" onClick={onConfirm}>
+                     Jeg er sikker
+                  </LoadingButton>
+               </>
+            )}
          </DialogActions>
          {response && <ErrorAlert response={response} />}
       </Dialog>
@@ -30,9 +40,10 @@ export const ConfirmDialog = ({ text, onClose, onConfirm, open, response }: Conf
 
 type UseConfirmDialogProps = {
    onClose?: () => void;
-} & Pick<ConfirmDialogProps, "onConfirm" | "text" | "response">;
+   onConfirm?: () => Promise<void>;
+} & Pick<ConfirmDialogProps, "text" | "response" | "title" | "showOnlyOk">;
 
-export const useConfirmDialog = ({ onConfirm, text, onClose, response }: UseConfirmDialogProps) => {
+export const useConfirmDialog = ({ onConfirm, text, onClose, response, title, showOnlyOk }: UseConfirmDialogProps) => {
    const [open, setOpen] = useState(false);
    const openConfirmDialog = () => setOpen(true);
    const closeConfirmDialog = () => {
@@ -41,7 +52,7 @@ export const useConfirmDialog = ({ onConfirm, text, onClose, response }: UseConf
    };
 
    const handleConfirm = async () => {
-      await onConfirm();
+      onConfirm && (await onConfirm());
       closeConfirmDialog();
    };
 
@@ -51,7 +62,9 @@ export const useConfirmDialog = ({ onConfirm, text, onClose, response }: UseConf
          onClose={closeConfirmDialog}
          onConfirm={handleConfirm}
          text={text}
+         title={title}
          response={response}
+         showOnlyOk={showOnlyOk}
       />
    );
 

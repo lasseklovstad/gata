@@ -28,6 +28,16 @@ export const useGetGataReport = (id: string) => {
    return { reportResponse, getReport };
 };
 
+export const usePublishReport = (id: string) => {
+   const [publishResponse, clientFetch] = useClient<string[], never>();
+
+   const publishReport = () => {
+      return clientFetch(`report/${id}/publish`);
+   };
+
+   return { publishResponse, publishReport };
+};
+
 export const useSaveGataReport = () => {
    const [saveResponse, clientFetch] = useClient<IGataReport, IGataReportPayload>();
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePostContingent } from "../api/user.api";
 import { LoadingButton } from "./Loading";
 import { ErrorAlert } from "./ErrorAlert";
+import { useRoles } from "./useRoles";
 
 type UserInfoProps = {
    user: IGataUser;
@@ -12,6 +13,7 @@ const numberOfYears = 10;
 const todaysYear = new Date().getFullYear();
 const years = Array.from({ length: numberOfYears }, (v, i) => todaysYear - numberOfYears + 2 + i).reverse();
 export const UserInfo = ({ user }: UserInfoProps) => {
+   const { isAdmin } = useRoles();
    const [selectedYear, setSelectedYear] = useState(todaysYear.toString());
    const [contingents, setContingents] = useState(user.contingents);
    const { postResponse, postContingent } = usePostContingent(user.id);
@@ -29,9 +31,11 @@ export const UserInfo = ({ user }: UserInfoProps) => {
          <Alert
             severity={hasPaid ? "success" : "warning"}
             action={
-               <LoadingButton onClick={markAsPost(!hasPaid)} response={postResponse}>
-                  {hasPaid ? "Marker som ikke betalt" : "Marker som betalt"}
-               </LoadingButton>
+               isAdmin && (
+                  <LoadingButton onClick={markAsPost(!hasPaid)} response={postResponse}>
+                     {hasPaid ? "Marker som ikke betalt" : "Marker som betalt"}
+                  </LoadingButton>
+               )
             }
          >
             Status: {hasPaid ? "Betalt" : "Ikke betalt"}

@@ -4,17 +4,21 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import no.gata.web.models.*
 import no.gata.web.repository.GataReportFileRepository
 import no.gata.web.repository.GataReportRepository
+import no.gata.web.repository.GataRoleRepository
 import no.gata.web.repository.GataUserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
+import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
+import javax.mail.internet.InternetAddress
 
 
 data class GataReportPayload(
@@ -36,6 +40,12 @@ class GataReportRestController {
     @Autowired
     private lateinit var gataReportFileRepository: GataReportFileRepository
 
+    @Autowired
+    private lateinit var javaMailSender: JavaMailSender
+
+    @Autowired
+    private lateinit var gataRoleRepository: GataRoleRepository
+
     @GetMapping
     @PreAuthorize("hasAuthority('member')")
     fun getReports(@RequestParam page: Int, @RequestParam type: ReportType): Page<GataReportSimple> {
@@ -47,6 +57,29 @@ class GataReportRestController {
     @PreAuthorize("hasAuthority('member')")
     fun getReport(@PathVariable id: String): Optional<GataReport> {
         return gataReportRepository.findById(UUID.fromString(id))
+    }
+
+    @GetMapping("{id}/publish")
+    @PreAuthorize("hasAuthority('admin')")
+    fun publishReport(@PathVariable id: String): List<String> {
+        val siteBaseUrl = "https://gataersamla.herokuapp.com"
+        val report = gataReportRepository.findById(UUID.fromString(id))
+        val role = gataRoleRepository.findByName("Medlem")
+        val members =  gataUserRepository.findAllByRolesEquals(role.get()).filter { it.subscribe }
+        if(members.isNotEmpty()){
+            val msg = javaMailSender.createMimeMessage()
+            val helper = MimeMessageHelper(msg, true)
+            helper.setTo(members.map { InternetAddress(it.email)}.toTypedArray())
+
+            helper.setSubject("Nytt fra Gata! ${report.get().title}")
+            helper.setText("<h1>Nytt fra Gata</h1><p>Det har kommet en oppdatering på ${siteBaseUrl}!</p><h2>${report.get().title}</h2>" +
+                    "<p>${report.get().description}</p><p>" +
+                    "<a href='${siteBaseUrl}/#/report/${report.get().id}'>Trykk her for å lese hele saken!</a>" +
+                    "</p>", true)
+
+            javaMailSender.send(msg)
+        }
+        return members.map { it.email }
     }
 
     @DeleteMapping("{id}")

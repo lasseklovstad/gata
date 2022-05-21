@@ -1,12 +1,12 @@
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete, Edit, Email, Publish } from "@mui/icons-material";
 import { Box, Button, IconButton, Paper, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Descendant } from "slate";
-import { useGetGataReport, usePutGataReportContent, useSaveGataReport } from "../api/report.api";
+import { useGetGataReport, usePublishReport, usePutGataReportContent, useSaveGataReport } from "../api/report.api";
 import { useConfirmDialog } from "../components/ConfirmDialog";
 import { GataReportFormDialog } from "../components/GataReportFormDialog";
-import { Loading } from "../components/Loading";
+import { Loading, LoadingButton } from "../components/Loading";
 import { PageLayout } from "../components/PageLayout";
 import { RichTextEditor } from "../components/RichTextEditor/RichTextEditor";
 import { RichTextPreview } from "../components/RichTextEditor/RichTextPreview";
@@ -26,7 +26,15 @@ export const ReportInfoPage = () => {
       },
    });
    const { saveResponse, deleteReport } = useSaveGataReport();
+   const { publishReport, publishResponse } = usePublishReport(reportId!);
    const navigate = useNavigate();
+   const { openConfirmDialog: openConfirmPublish, ConfirmDialogComponent: ConfirmPublishDialog } = useConfirmDialog({
+      text: `Det ble sent en email til: ${
+         publishResponse.data && publishResponse.data.length ? publishResponse.data?.join(", ") : "Ingen"
+      }`,
+      title: "Vellykket",
+      showOnlyOk: true,
+   });
    const { openConfirmDialog: openConfirmDelete, ConfirmDialogComponent: ConfirmDeleteDialog } = useConfirmDialog({
       text: "Ved å slette dokumentet mister du all data",
       response: saveResponse,
@@ -45,6 +53,11 @@ export const ReportInfoPage = () => {
    useEffect(() => {
       setReport(reportResponse.data);
    }, [reportResponse.data]);
+
+   const publish = async () => {
+      const { data } = await publishReport();
+      data && openConfirmPublish();
+   };
 
    const handleSaveContent = async (content: Descendant[] | undefined, close: boolean) => {
       if (content) {
@@ -83,6 +96,15 @@ export const ReportInfoPage = () => {
                   >
                      Slett
                   </Button>
+                  <LoadingButton
+                     response={publishResponse}
+                     variant="text"
+                     startIcon={<Email />}
+                     onClick={publish}
+                     sx={{ mr: 1 }}
+                  >
+                     Publiser
+                  </LoadingButton>
                   <Button
                      variant="text"
                      startIcon={<Edit />}
@@ -113,6 +135,7 @@ export const ReportInfoPage = () => {
          )}
          {ConfirmCancelDialog}
          {ConfirmDeleteDialog}
+         {ConfirmPublishDialog}
          <Typography variant="body1" gutterBottom>
             {report.description}
          </Typography>

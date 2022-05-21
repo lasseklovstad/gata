@@ -154,7 +154,7 @@ class Auth0RestService(private val builder: WebClient.Builder) {
                             picture = externalUser.picture,
                             responsibilities = emptyList(),
                             roles = newUserRoles as ArrayList<GataRole>,
-                            contingents = emptyList())
+                            contingents = emptyList(), subscribe = false)
                     gataUserRepository.save(newUser)
                 }
             }
