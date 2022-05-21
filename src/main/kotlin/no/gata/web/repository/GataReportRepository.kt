@@ -13,7 +13,7 @@ import java.util.*
 interface GataReportRepository: PagingAndSortingRepository<GataReport, UUID> {
     fun findAllByTypeOrderByCreatedDateDesc(type: ReportType,pageable: Pageable): Page<GataReportSimple>
     @Query(
-            value = "SELECT pg_size_pretty(pg_database_size(current_database()))",
+            value = "SELECT pg_database_size(current_database())/1024/1024",
             nativeQuery = true)
     fun getDatabaseSize(): String
 }

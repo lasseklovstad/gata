@@ -28,7 +28,9 @@ export const ReportPage = () => {
             <Typography variant="h1" id="report-page-title">
                Aktuelle dokumenter
             </Typography>
-            <Typography variant="body1">{sizeResponse.data && `(${sizeResponse.data}/ 1GB)`}</Typography>
+            <Typography variant="body1">
+               {sizeResponse.data && `${parseInt(sizeResponse.data) / 10} % brukt`}
+            </Typography>
             {isAdmin && (
                <Button variant="contained" startIcon={<Add />} onClick={() => setIsReportModalOpen(true)}>
                   Opprett
