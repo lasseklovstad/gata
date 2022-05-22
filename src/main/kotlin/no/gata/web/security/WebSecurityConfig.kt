@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator
 import org.springframework.security.oauth2.jwt.*
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
+import org.springframework.security.web.util.matcher.RequestMatcher
+import javax.servlet.http.HttpServletRequest
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -23,8 +25,12 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Override
     override fun configure(http: HttpSecurity) {
+        http.requiresChannel()
+                .requestMatchers(RequestMatcher { r: HttpServletRequest -> r.getHeader("X-Forwarded-Proto") != null })
+                .requiresSecure()
+
         http.authorizeRequests()
-                .mvcMatchers("/api/user", "/api/role", "api/auth0user", "api/report", "api/responsibility")
+                .mvcMatchers("/api/user", "/api/file", "/api/role", "api/auth0user", "api/report", "api/responsibility")
                 .authenticated().and().oauth2ResourceServer().jwt().decoder(jwtDecoder())
                 .jwtAuthenticationConverter(jwtAuthenticationConverter());
     }
