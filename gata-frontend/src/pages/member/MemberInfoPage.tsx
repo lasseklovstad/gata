@@ -9,6 +9,7 @@ import { useRoles } from "../../components/useRoles";
 import { UserResponsibility } from "../../components/UserResponsibilities";
 import { IGataRole } from "../../types/GataRole.type";
 import { IGataUser } from "../../types/GataUser.type";
+import { PageLayout } from "../../components/PageLayout";
 
 export const MemberInfoPage = () => {
    const { isAdmin } = useRoles();
@@ -23,7 +24,7 @@ export const MemberInfoPage = () => {
    }, [userResponse.data]);
 
    return (
-      <>
+      <PageLayout>
          <Box display="flex" alignItems="center">
             <Avatar src={user?.picture} sx={{ mr: 1 }} />
             <Typography variant="h1">Informasjon</Typography>
@@ -48,7 +49,7 @@ export const MemberInfoPage = () => {
          </List>
 
          {user?.isUserMember && <UserResponsibility user={user} />}
-      </>
+      </PageLayout>
    );
 };
 

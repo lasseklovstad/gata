@@ -14,6 +14,7 @@ import { useClearUserCache, useGetUsers } from "../../api/user.api";
 import { Loading } from "../../components/Loading";
 import { useRoles } from "../../components/useRoles";
 import { IGataUser } from "../../types/GataUser.type";
+import { PageLayout } from "../../components/PageLayout";
 
 export const MemberPage = () => {
    const { isAdmin } = useRoles();
@@ -26,7 +27,7 @@ export const MemberPage = () => {
       }
    };
    return (
-      <>
+      <PageLayout>
          <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography variant="h1" id="role-title">
                Medlemmer
@@ -52,7 +53,7 @@ export const MemberPage = () => {
                </ListItem>
             )}
          </List>
-      </>
+      </PageLayout>
    );
 };
 

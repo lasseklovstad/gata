@@ -25,6 +25,7 @@ export const MyPage = () => {
       <>
          <PageLayout>
             <Typography variant="h1">Min side</Typography>
+            <Typography>{!user?.subscribe && "Du kan få tilsendt notifikasjon på epost. "}</Typography>
             {userResponse.data && (
                <LoadingButton
                   response={updateSubrscribeResponse}

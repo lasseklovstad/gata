@@ -43,19 +43,16 @@ export const App = () => {
          <Box sx={{ display: "flex", backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
             <CssBaseline />
             <ResponsiveAppBar />
-            <Container maxWidth="md">
+            <Container maxWidth="md" sx={{ mb: 16 }}>
                <Routes>
                   <Route path="privacy" element={<Privacy />} />
                   <Route path="mypage" element={<MyPage />} />
                   <Route path="report" element={<ReportPage />} />
-                  <Route path="report/:reportId" element={<ReportInfoPage />}></Route>
-                  <Route path="admin" element={<AdminPageLayout />}>
-                     <Route path="responsibility" element={<ResponsibilityPage />} />
-                     <Route path="member" element={<MemberPage />} />
-                     <Route path="member/:memberId" element={<MemberInfoPage />} />
-                     <Route index element={<Admin />} />
-                  </Route>
-                  <Route path="" element={<Home />} />
+                  <Route path="report/:reportId" element={<ReportInfoPage />} />
+                  <Route path="responsibility" element={<ResponsibilityPage />} />
+                  <Route path="member" element={<MemberPage />} />
+                  <Route path="member/:memberId" element={<MemberInfoPage />} />
+                  <Route path="*" element={<Home />} />
                </Routes>
             </Container>
          </Box>

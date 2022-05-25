@@ -1,11 +1,12 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Typography, Button, IconButton, Menu, MenuItem, Avatar } from "@mui/material";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export const UserMenu = () => {
    const { user, isAuthenticated, logout, loginWithRedirect } = useAuth0();
    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+   const location = useLocation();
 
    const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
       setAnchorEl(event.currentTarget);
@@ -59,7 +60,10 @@ export const UserMenu = () => {
          )}
          {!isAuthenticated && (
             <>
-               <Button onClick={() => loginWithRedirect()} sx={{ my: 2, color: "white", display: "block" }}>
+               <Button
+                  onClick={() => loginWithRedirect({ appState: { returnTo: `/${location.hash.replace("#/", "")}` } })}
+                  sx={{ my: 2, color: "white", display: "block" }}
+               >
                   Logg inn
                </Button>
             </>

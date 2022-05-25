@@ -8,6 +8,7 @@ import { Loading } from "../components/Loading";
 import { ResponsibilityDialog } from "../components/ResponsibilityDialog";
 import { useRoles } from "../components/useRoles";
 import { IResponsibility } from "../types/Responsibility.type";
+import { PageLayout } from "../components/PageLayout";
 
 export const ResponsibilityPage = () => {
    const { isAdmin } = useRoles();
@@ -64,7 +65,7 @@ export const ResponsibilityPage = () => {
    }, [responsibilitiesResponse.data]);
 
    return (
-      <>
+      <PageLayout>
          {ConfirmDialogComponent}
          <Box display="flex" justifyContent="space-between" flexWrap="wrap" alignItems="center">
             <Typography variant="h1">Ansvarsposter</Typography>
@@ -105,6 +106,6 @@ export const ResponsibilityPage = () => {
                responsibility={selectedResp}
             />
          )}
-      </>
+      </PageLayout>
    );
 };

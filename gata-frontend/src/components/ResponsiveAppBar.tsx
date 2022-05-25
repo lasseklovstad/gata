@@ -16,8 +16,9 @@ import { GataRoleType } from "../types/GataRole.type";
 
 const pages = [
    { name: "Hjem", url: "" },
-   { name: "Admin", url: "admin", roles: ["Administrator", "Medlem"] },
    { name: "Min side", url: "mypage", roles: ["Medlem"] },
+   { name: "Medlemmer", url: "member", roles: ["Administrator", "Medlem"] },
+   { name: "Ansvarsposter", url: "responsibility", roles: ["Administrator", "Medlem"] },
    { name: "Aktuelle dokumenter", url: "report", roles: ["Medlem"] },
    { name: "Arkiv", url: "https://1drv.ms/f/s!Aimiul1gt9LbrA10geM-AnPDKFoY", roles: ["Medlem"] },
 ];
