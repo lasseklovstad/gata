@@ -3,6 +3,8 @@ Run local db:
 ``docker run --name gata-db-postgres -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres:14.2``
 
 legg til env for java: AUTH0_CLIENT_ID=xxx;AUTH0_CLIENT_SECRET=xxx
+## Local profile
+Legg til profile dev to disable forcing https
 
 #Deploy
 Add heroku remote ``heroku git:remote -a gataersamla`` and push to master of heroku: `git push heroku main`.

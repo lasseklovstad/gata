@@ -1,6 +1,9 @@
 package no.gata.web.security
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Profile
+import org.springframework.core.env.Environment
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -11,6 +14,7 @@ import org.springframework.security.oauth2.jwt.*
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.security.web.util.matcher.RequestMatcher
+import java.util.*
 import javax.servlet.http.HttpServletRequest
 
 @EnableWebSecurity
@@ -23,11 +27,17 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     @Value(value = "\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private lateinit var issuer: String
 
+    @Autowired
+    private lateinit var env: Environment
+
     @Override
     override fun configure(http: HttpSecurity) {
-        http.requiresChannel()
-                .requestMatchers(RequestMatcher { r: HttpServletRequest -> r.getHeader("X-Forwarded-Proto") != null })
-                .requiresSecure()
+        if (!env.activeProfiles.contains("dev")) {
+            http.requiresChannel()
+                    .requestMatchers(RequestMatcher { r: HttpServletRequest -> r.getHeader("X-Forwarded-Proto") != null })
+                    .requiresSecure()
+        }
+
 
         http.authorizeRequests()
                 .mvcMatchers("/api/user", "/api/file", "/api/role", "api/auth0user", "api/report", "api/responsibility")
