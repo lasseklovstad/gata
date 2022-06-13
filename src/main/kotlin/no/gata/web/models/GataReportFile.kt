@@ -14,5 +14,7 @@ data class GataReportFile(
         @JsonIgnore
         var report: GataReport?,
         @Lob
-        var data: String,
+        var data: String?,
+        var cloudId: String?,
+        var cloudUrl: String?
 )

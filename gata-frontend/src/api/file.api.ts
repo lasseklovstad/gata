@@ -20,8 +20,7 @@ export const usePostGataReportFile = (reportId: string) => {
 
    const postReportFile = useCallback(
       (data: string) => {
-         console.log("Post");
-         return clientFetch(`file`, { body: { data, reportId } }).then((response) => response.data);
+         return clientFetch("file/cloud", { body: { data, reportId } }).then((response) => response.data);
       },
       [clientFetch, reportId]
    );

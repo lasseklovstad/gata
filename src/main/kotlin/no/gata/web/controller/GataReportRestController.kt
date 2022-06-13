@@ -6,6 +6,7 @@ import no.gata.web.repository.GataReportFileRepository
 import no.gata.web.repository.GataReportRepository
 import no.gata.web.repository.GataRoleRepository
 import no.gata.web.repository.GataUserRepository
+import no.gata.web.service.CloudinaryService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -46,6 +47,9 @@ class GataReportRestController {
     @Autowired
     private lateinit var gataRoleRepository: GataRoleRepository
 
+    @Autowired
+    private lateinit var cloudinaryService: CloudinaryService
+
     @GetMapping
     @PreAuthorize("hasAuthority('member')")
     fun getReports(@RequestParam page: Int, @RequestParam type: ReportType): Page<GataReportSimple> {
@@ -58,6 +62,7 @@ class GataReportRestController {
     fun getReport(@PathVariable id: String): Optional<GataReport> {
         return gataReportRepository.findById(UUID.fromString(id))
     }
+
     @GetMapping("databasesize")
     @PreAuthorize("hasAuthority('admin')")
     fun getDatabaseSize(): String {
@@ -70,11 +75,11 @@ class GataReportRestController {
         val siteBaseUrl = "https://gataersamla.herokuapp.com"
         val report = gataReportRepository.findById(UUID.fromString(id))
         val role = gataRoleRepository.findByName("Medlem")
-        val members =  gataUserRepository.findAllByRolesEquals(role.get()).filter { it.subscribe }
-        if(members.isNotEmpty()){
+        val members = gataUserRepository.findAllByRolesEquals(role.get()).filter { it.subscribe }
+        if (members.isNotEmpty()) {
             val msg = javaMailSender.createMimeMessage()
             val helper = MimeMessageHelper(msg, true)
-            helper.setTo(members.map { InternetAddress(it.email)}.toTypedArray())
+            helper.setTo(members.map { InternetAddress(it.email) }.toTypedArray())
 
             helper.setSubject("Nytt fra Gata! ${report.get().title}")
             helper.setText("<h1>Nytt fra Gata</h1><p>Det har kommet en oppdatering på ${siteBaseUrl}!</p><h2>${report.get().title}</h2>" +
@@ -91,7 +96,14 @@ class GataReportRestController {
     @PreAuthorize("hasAuthority('admin')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteReport(@PathVariable id: String) {
-        return gataReportRepository.deleteById(UUID.fromString(id))
+        val report = gataReportRepository.findById(UUID.fromString(id))
+        if(report.isPresent){
+            val reportFiles = gataReportFileRepository.findAllByReport(report.get())
+            // Delete all files on cloud first
+            deleteFiles(reportFiles)
+            return gataReportRepository.deleteById(UUID.fromString(id))
+        }
+        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Finner ikke referatet");
     }
 
     fun getLoggedInUser(authentication: Authentication): GataUser {
@@ -106,7 +118,7 @@ class GataReportRestController {
     @PreAuthorize("hasAuthority('member')")
     fun createReport(@RequestBody body: GataReportPayload, authentication: Authentication): GataReport {
         val isAdmin = authentication.authorities.find { it.authority.equals("admin") }
-        if(isAdmin!= null && body.type== ReportType.DOCUMENT){
+        if (isAdmin == null && body.type == ReportType.DOCUMENT) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Du har ikke tilgang til å opprette dokument!");
         }
         val user = getLoggedInUser(authentication)
@@ -148,12 +160,26 @@ class GataReportRestController {
             val newReport = report.get()
             val reportFiles = gataReportFileRepository.findAllByReport(newReport)
             val filesToDelete = reportFiles.filter { files.find { file -> file.imageId == it.id.toString() } == null }
-            filesToDelete.forEach({ gataReportFileRepository.deleteById(it.id) })
+            deleteFiles(filesToDelete)
             newReport.content = ObjectMapper().writeValueAsString(body)
             newReport.lastModifiedBy = user.name
             newReport.lastModifiedDate = Date()
             return gataReportRepository.save(newReport)
         }
         throw ResponseStatusException(HttpStatus.NOT_FOUND, "Finner ikke referatet");
+    }
+
+    fun deleteFiles(files: List<GataId>){
+        files.forEach { fileId ->
+            val file = gataReportFileRepository.findById(fileId.id)
+            if (file.isPresent) {
+                val reportFile = file.get();
+                if (reportFile.cloudId != null) {
+                    cloudinaryService.deleteFile(reportFile.cloudId!!)
+                }
+                gataReportFileRepository.deleteById(fileId.id)
+            }
+
+        }
     }
 }

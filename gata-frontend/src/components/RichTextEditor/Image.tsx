@@ -87,13 +87,14 @@ export const Image = (props: ImageProps) => {
 
 const InternalImage = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
    const { fileResponse } = useGetGataReportFile(id);
+   const imageSrc = fileResponse.data?.data || fileResponse.data?.cloudUrl;
    return (
       <>
          {fileResponse.status === "loading" && <Skeleton variant="rectangular" width={400} height={300} />}
          {fileResponse.data && (
             <CardMedia
                component="img"
-               image={fileResponse.data.data}
+               image={imageSrc}
                sx={{
                   boxShadow: selected && focused ? "0 0 0 3px #B4D5FF" : "none",
                   display: "block",
