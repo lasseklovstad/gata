@@ -1,6 +1,7 @@
 package no.gata.web.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIncludeProperties
 import java.util.*
 import javax.persistence.*
 
@@ -14,6 +15,10 @@ data class GataReport(
         var createdDate: Date,
         var lastModifiedDate: Date,
         var lastModifiedBy: String,
+        @ManyToOne
+        @JoinColumn(name="created_by")
+        @JsonIncludeProperties("id", "name", "externalUserProviderId")
+        var createdBy: GataUser?,
         @Lob
         var content: String?,
         @OneToMany(mappedBy = "report", cascade = [CascadeType.ALL])

@@ -78,7 +78,14 @@ type ImageProps = {
    size?: number;
 };
 
-export const Image = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
+export const Image = (props: ImageProps) => {
+   if (props.id.startsWith("https")) {
+      return <ExternalImage {...props} />;
+   }
+   return <InternalImage {...props} />;
+};
+
+const InternalImage = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
    const { fileResponse } = useGetGataReportFile(id);
    return (
       <>
@@ -97,5 +104,21 @@ export const Image = ({ id, selected = false, focused = false, size = 50 }: Imag
             />
          )}
       </>
+   );
+};
+
+const ExternalImage = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
+   return (
+      <CardMedia
+         component="img"
+         image={id}
+         sx={{
+            boxShadow: selected && focused ? "0 0 0 3px #B4D5FF" : "none",
+            display: "block",
+            maxWidth: `${size}%`,
+            mt: 1,
+            mb: 1,
+         }}
+      />
    );
 };

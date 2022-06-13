@@ -65,7 +65,7 @@ class GataReportRestController {
     }
 
     @GetMapping("{id}/publish")
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('member')")
     fun publishReport(@PathVariable id: String): List<String> {
         val siteBaseUrl = "https://gataersamla.herokuapp.com"
         val report = gataReportRepository.findById(UUID.fromString(id))
@@ -103,8 +103,12 @@ class GataReportRestController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('member')")
     fun createReport(@RequestBody body: GataReportPayload, authentication: Authentication): GataReport {
+        val isAdmin = authentication.authorities.find { it.authority.equals("admin") }
+        if(isAdmin!= null && body.type== ReportType.DOCUMENT){
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Du har ikke tilgang til å opprette dokument!");
+        }
         val user = getLoggedInUser(authentication)
         val report = GataReport(
                 id = null, title = body.title,
@@ -113,12 +117,13 @@ class GataReportRestController {
                 lastModifiedBy = user.name,
                 createdDate = Date(),
                 lastModifiedDate = Date(),
+                createdBy = user,
                 files = emptyList(), type = body.type)
         return gataReportRepository.save(report)
     }
 
     @PutMapping("{id}")
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('member')")
     fun updateReport(@RequestBody body: GataReportPayload, authentication: Authentication, @PathVariable id: String): GataReport {
         val user = getLoggedInUser(authentication)
         val report = gataReportRepository.findById(UUID.fromString(id))
@@ -134,7 +139,7 @@ class GataReportRestController {
     }
 
     @PutMapping("{id}/content")
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('member')")
     fun updateReportContent(@RequestBody body: List<RichTextBlock>, authentication: Authentication, @PathVariable id: String): GataReport {
         val user = getLoggedInUser(authentication)
         val report = gataReportRepository.findById(UUID.fromString(id))

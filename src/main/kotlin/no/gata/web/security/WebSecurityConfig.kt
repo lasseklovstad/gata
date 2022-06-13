@@ -40,7 +40,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
 
         http.authorizeRequests()
-                .mvcMatchers("/api/user", "/api/file", "/api/role", "api/auth0user", "api/report", "api/responsibility")
+                .mvcMatchers("/api/user", "/api/file", "/api/role", "api/auth0user", "api/report", "api/responsibility", "api/contingent")
                 .authenticated().and().oauth2ResourceServer().jwt().decoder(jwtDecoder())
                 .jwtAuthenticationConverter(jwtAuthenticationConverter());
     }

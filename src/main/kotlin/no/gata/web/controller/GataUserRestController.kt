@@ -7,6 +7,8 @@ import no.gata.web.models.ResponsibilityYear
 import no.gata.web.repository.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.time.Year
 import java.util.*
+import javax.mail.internet.InternetAddress
 
 data class ResponsibilityYearPayload(
         var responsibilityId: String,
@@ -43,8 +46,10 @@ class GataUserRestController {
 
     @Autowired
     private lateinit var responsibilityRepository: ResponsibilityRepository
+
     @Autowired
     private lateinit var gataRoleRepository: GataRoleRepository
+
     @Autowired
     private lateinit var gataContingentRepository: GataContingentRepository
 
@@ -52,7 +57,7 @@ class GataUserRestController {
     @PreAuthorize("hasAuthority('member')")
     fun getUsers(authentication: Authentication): List<GataUser> {
         val isAdmin = authentication.authorities.find { it.authority.equals("admin") }
-        if(isAdmin!= null){
+        if (isAdmin != null) {
             return gataUserRepository.findAll()
         }
         val role = gataRoleRepository.findByName("Medlem")
@@ -133,7 +138,7 @@ class GataUserRestController {
                                  @RequestBody noteBody: ResponsibilityNotePayload): ResponsibilityYear {
         val user = gataUserRepository.findById(UUID.fromString(id)).get()
         val loggedInUser = getLoggedInUser(authentication)
-        val isAdmin = authentication.authorities.find { it.authority=="admin" } != null
+        val isAdmin = authentication.authorities.find { it.authority == "admin" } != null
         if (loggedInUser.id != user.id && !isAdmin) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Du kan ikke endre på noen andre sine ansvarsposter!");
         }
@@ -141,7 +146,7 @@ class GataUserRestController {
 
         if (user.getIsUserMember()) {
             val responsibilityYear = responsibilityYearRepository.findById(UUID.fromString(responsibilityYearId)).get()
-            responsibilityYear.note?.update(user,noteBody.text)
+            responsibilityYear.note?.update(user, noteBody.text)
             return responsibilityYearRepository.save(responsibilityYear);
         } else {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Bruker må være medlem for å kunne få ansvarspost.");
@@ -152,17 +157,17 @@ class GataUserRestController {
     @PreAuthorize("hasAuthority('admin')")
     fun postContingent(@PathVariable id: String, @RequestBody body: ContingentPayload): List<GataContingent> {
         val userOptional = gataUserRepository.findById(UUID.fromString(id))
-        if(userOptional.isPresent){
+        if (userOptional.isPresent) {
             val user = userOptional.get()
-            if(user.getIsUserMember()){
-                val existingContingentOptional = gataContingentRepository.findByUserAndYear(user,body.year)
+            if (user.getIsUserMember()) {
+                val existingContingentOptional = gataContingentRepository.findByUserAndYear(user, body.year)
 
-                if(existingContingentOptional.isPresent){
+                if (existingContingentOptional.isPresent) {
                     val existingContingent = existingContingentOptional.get()
                     existingContingent.isPaid = body.isPaid
                     gataContingentRepository.save(existingContingent)
-                }else{
-                    val contingent = GataContingent(id=null, year = body.year, isPaid = body.isPaid, user)
+                } else {
+                    val contingent = GataContingent(id = null, year = body.year, isPaid = body.isPaid, user)
                     gataContingentRepository.save(contingent)
                 }
 
@@ -170,7 +175,7 @@ class GataUserRestController {
                 return gataContingentRepository.findAllByUser(user)
             }
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Brukeren er ikke medlem");
-        }else{
+        } else {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Brukeren finnes ikke");
         }
     }

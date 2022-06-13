@@ -3,6 +3,8 @@ import { Descendant } from "slate";
 import { GataReportType, IGataReport, IGataReportPayload } from "../types/GataReport.type";
 import { useClient } from "./client/useClient";
 import { Page } from "../types/Page.type";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useRoles } from "../components/useRoles";
 
 export const useGetGataReports = (page: number, type: GataReportType) => {
    const [reportResponse, clientFetch] = useClient<Page<IGataReport>, never>();
@@ -15,8 +17,12 @@ export const useGetGataReports = (page: number, type: GataReportType) => {
 };
 
 export const useGetGataReport = (id: string) => {
+   const { user } = useAuth0();
+   const { isAdmin } = useRoles();
    const [reportResponse, clientFetch] = useClient<IGataReport, never>();
-
+   const hasCreated = user?.sub === reportResponse.data?.createdBy?.externalUserProviderId;
+   const isNews = reportResponse.data?.type === "NEWS";
+   const canEdit = isAdmin || (hasCreated && isNews);
    const getReport = useCallback(() => {
       return clientFetch(`report/${id}`);
    }, [clientFetch, id]);
@@ -25,7 +31,7 @@ export const useGetGataReport = (id: string) => {
       getReport();
    }, [getReport]);
 
-   return { reportResponse, getReport };
+   return { reportResponse, getReport, canEdit };
 };
 
 export const useDatabaseSize = () => {

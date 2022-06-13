@@ -16,7 +16,7 @@ import { IGataReport } from "../types/GataReport.type";
 export const ReportInfoPage = () => {
    const { isAdmin } = useRoles();
    const { reportId } = useParams();
-   const { reportResponse } = useGetGataReport(reportId!);
+   const { reportResponse, canEdit } = useGetGataReport(reportId!);
    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
    const [editing, setEditing] = useState(false);
    const { openConfirmDialog: openConfirmCancel, ConfirmDialogComponent: ConfirmCancelDialog } = useConfirmDialog({
@@ -42,7 +42,9 @@ export const ReportInfoPage = () => {
          const { status } = await deleteReport(reportId!);
          if (status === "success") {
             navigate(report?.type === "NEWS" ? "/" : "/report", { replace: true });
+            return true;
          }
+         return false;
       },
    });
 
@@ -86,7 +88,7 @@ export const ReportInfoPage = () => {
             <Typography variant="h1" id="report-page-title">
                {report.title}
             </Typography>
-            {isAdmin && (
+            {canEdit && (
                <Box>
                   <Button
                      variant="text"
@@ -141,7 +143,7 @@ export const ReportInfoPage = () => {
          </Typography>
          {!editing && (
             <>
-               {isAdmin && (
+               {canEdit && (
                   <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                      <Button
                         variant="contained"

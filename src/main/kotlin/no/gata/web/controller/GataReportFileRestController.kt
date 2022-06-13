@@ -25,13 +25,10 @@ class GataReportFileRestController {
     private lateinit var gataReportRepository: GataReportRepository
 
     @Autowired
-    private lateinit var gataUserRepository: GataUserRepository
-
-    @Autowired
     private lateinit var gataReportFileRepository: GataReportFileRepository
 
     @PostMapping()
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('member')")
     fun createReportFile(@RequestBody body: GataReportFilePayload): GataReportFile {
         val report = gataReportRepository.findById(UUID.fromString(body.reportId))
         if (report.isPresent) {

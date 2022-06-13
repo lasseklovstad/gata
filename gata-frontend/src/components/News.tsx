@@ -6,11 +6,9 @@ import { Box, Button, List, ListItem, ListItemText, Pagination, Typography } fro
 import { Add } from "@mui/icons-material";
 import { GataReportFormDialog } from "./GataReportFormDialog";
 import { Loading } from "./Loading";
-import { useRoles } from "./useRoles";
 import { NewsItem } from "./NewsItem";
 
 export const News = () => {
-   const { isAdmin } = useRoles();
    const [page, setPage] = useState(1);
    const { reportResponse } = useGetGataReports(page, "NEWS");
    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -21,11 +19,9 @@ export const News = () => {
             <Typography variant="h1" id="news-page-title">
                Nyheter
             </Typography>
-            {isAdmin && (
-               <Button variant="contained" startIcon={<Add />} onClick={() => setIsReportModalOpen(true)}>
-                  Opprett
-               </Button>
-            )}
+            <Button variant="contained" startIcon={<Add />} onClick={() => setIsReportModalOpen(true)}>
+               Opprett
+            </Button>
          </Box>
          {isReportModalOpen && (
             <GataReportFormDialog

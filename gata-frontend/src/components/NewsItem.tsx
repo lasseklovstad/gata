@@ -4,17 +4,17 @@ import { RichTextPreview } from "./RichTextEditor/RichTextPreview";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useRoles } from "./useRoles";
+import { useAuth0 } from "@auth0/auth0-react";
 
 type NewsItemProps = {
    simpleReport: IGataReport;
 };
 
 export const NewsItem = ({ simpleReport }: NewsItemProps) => {
-   const { isAdmin } = useRoles();
-   const { reportResponse } = useGetGataReport(simpleReport.id);
+   const { reportResponse, canEdit } = useGetGataReport(simpleReport.id);
    return (
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%", alignItems: "flex-end" }}>
-         {isAdmin && (
+         {canEdit && (
             <Button component={Link} to={`report/${simpleReport.id}`}>
                Rediger
             </Button>

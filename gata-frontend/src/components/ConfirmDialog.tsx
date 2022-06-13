@@ -40,7 +40,7 @@ export const ConfirmDialog = ({ text, onClose, onConfirm, open, response, title,
 
 type UseConfirmDialogProps = {
    onClose?: () => void;
-   onConfirm?: () => Promise<void>;
+   onConfirm?: () => Promise<boolean | void>; // Return true if you want to close
 } & Pick<ConfirmDialogProps, "text" | "response" | "title" | "showOnlyOk">;
 
 export const useConfirmDialog = ({ onConfirm, text, onClose, response, title, showOnlyOk }: UseConfirmDialogProps) => {
@@ -52,8 +52,12 @@ export const useConfirmDialog = ({ onConfirm, text, onClose, response, title, sh
    };
 
    const handleConfirm = async () => {
-      onConfirm && (await onConfirm());
-      closeConfirmDialog();
+      if (onConfirm) {
+         const close = await onConfirm();
+         close || (close === undefined && closeConfirmDialog());
+      } else {
+         closeConfirmDialog();
+      }
    };
 
    const ConfirmDialogComponent = (

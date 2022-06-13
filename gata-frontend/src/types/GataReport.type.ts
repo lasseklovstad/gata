@@ -1,3 +1,5 @@
+import { IGataUser } from "./GataUser.type";
+
 export interface IGataReport {
    id: string;
    title: string;
@@ -7,6 +9,7 @@ export interface IGataReport {
    lastModifiedBy: string;
    content: string | null;
    type: GataReportType;
+   createdBy?: Pick<IGataUser, "id" | "name" | "externalUserProviderId">;
 }
 
 export interface IGataReportPayload {

@@ -28,4 +28,8 @@ Prisen inkluderer epost, 5gb lagring,
 SSL, backup, antivirus og spamfilter
 79kr (1år), 369kr (2år)
 
+###proisp
+361,25kr/år
+
+
 

@@ -36,7 +36,7 @@ export const withImages = (editor: Editor, saveImage: (data: string) => Promise<
    return editor;
 };
 
-const insertImage = (editor: Editor, imageId: string | null) => {
+export const insertImage = (editor: Editor, imageId: string | null) => {
    const text = { text: "" };
    const image = [
       { type: "image" as const, imageId, size: 50, children: [text] },

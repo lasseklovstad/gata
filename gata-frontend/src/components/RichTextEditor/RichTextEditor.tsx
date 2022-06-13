@@ -4,23 +4,25 @@ import {
    FormatListBulleted,
    FormatListNumbered,
    FormatUnderlined,
+   Image,
    Save,
    ViewList,
 } from "@mui/icons-material";
 import { Paper, ToggleButtonGroup, Button, Box, Divider } from "@mui/material";
 import { useMemo, useCallback, useRef } from "react";
-import { Descendant, createEditor } from "slate";
+import { Descendant, createEditor, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import { withReact, RenderElementProps, RenderLeafProps, Slate, Editable } from "slate-react";
 import { UseClientState } from "../../api/client/client.types";
 import { Loading, LoadingButton } from "../Loading";
 import { BlockButton } from "./BlockButton";
-import { withImages } from "./withImages";
+import { insertImage, withImages } from "./withImages";
 import { MarkButton } from "./MarkButton";
 import { insertTab, toggleMark } from "./RichTextEditor.util";
 import { RichTextElement } from "./RichTextElement";
 import { RichTextLeaf } from "./RichTextLeaf";
 import { usePostGataReportFile } from "../../api/file.api";
+import { AddImage } from "./AddImage";
 
 type RichTextEditorProps = {
    onCancel: () => void;
@@ -98,6 +100,7 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                            <FormatListNumbered />
                         </BlockButton>
                      </ToggleButtonGroup>
+
                      <ToggleButtonGroup exclusive aria-label="Velg tekststørrelse" sx={{ p: 1 }}>
                         <MarkButton type="bold">
                            <FormatBold />
@@ -109,6 +112,11 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                            <FormatUnderlined />
                         </MarkButton>
                      </ToggleButtonGroup>
+                     <AddImage
+                        onAddImage={(url) => {
+                           insertImage(editor, url);
+                        }}
+                     />
                      <Loading response={fileResponse} />
                      <Loading response={saveResponse} />
                   </Box>
@@ -123,7 +131,7 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                         onClick={() => handleSave(true)}
                         sx={{ mr: 1 }}
                      >
-                        Save
+                        Lagre
                      </LoadingButton>
                   </Box>
                </Box>

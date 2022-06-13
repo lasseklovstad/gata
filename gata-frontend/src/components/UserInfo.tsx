@@ -1,10 +1,11 @@
-import { Alert, Box, MenuItem, Paper, TextField, Typography } from "@mui/material";
+import { Alert, AlertTitle, Box, MenuItem, Paper, TextField, Typography } from "@mui/material";
 import { IGataUser } from "../types/GataUser.type";
 import { useState } from "react";
 import { usePostContingent } from "../api/user.api";
 import { LoadingButton } from "./Loading";
 import { ErrorAlert } from "./ErrorAlert";
 import { useRoles } from "./useRoles";
+import { useGetContingentInfo } from "../api/contingent.api";
 
 type UserInfoProps = {
    user: IGataUser;
@@ -17,6 +18,7 @@ export const UserInfo = ({ user }: UserInfoProps) => {
    const [selectedYear, setSelectedYear] = useState(todaysYear.toString());
    const [contingents, setContingents] = useState(user.contingents);
    const { postResponse, postContingent } = usePostContingent(user.id);
+   const { contingentInfoResponse } = useGetContingentInfo();
 
    const markAsPost = (isPaid: boolean) => async () => {
       const { data } = await postContingent(selectedYear, isPaid);
@@ -38,7 +40,12 @@ export const UserInfo = ({ user }: UserInfoProps) => {
                )
             }
          >
-            Status: {hasPaid ? "Betalt" : "Ikke betalt"}
+            <AlertTitle>Status: {hasPaid ? "Betalt" : "Ikke betalt"}</AlertTitle>
+            {contingentInfoResponse.data && !hasPaid && (
+               <Typography gutterBottom variant="body2">
+                  {contingentInfoResponse.data.size}kr til {contingentInfoResponse.data.bank}
+               </Typography>
+            )}
          </Alert>
       );
    };
