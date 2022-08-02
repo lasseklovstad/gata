@@ -31,5 +31,14 @@ SSL, backup, antivirus og spamfilter
 ###proisp
 361,25kr/år
 
+#Autentisering med Auth0
+Google app er registrert her: https://console.cloud.google.com/
+Facebook app er registrert her: https://developers.facebook.com/apps/406253220837238/settings/basic/
+
+Administrer Auth0 her https://manage.auth0.com/ og log inn med github konto.
+
+Domene er registrert på domeneshop: https://domene.shop/admin
+Gratis https er konfigurert her: https://dash.cloudflare.com/
+
 
 
