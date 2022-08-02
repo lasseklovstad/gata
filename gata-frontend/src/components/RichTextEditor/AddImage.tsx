@@ -31,7 +31,7 @@ export const AddImage = ({ onAddImage }: AddImageProps) => {
                   multiline
                   rows={5}
                   label="Bilde url"
-                  placeholder={"https://am3pap006files.storage.live.com/y4m9oBPr...."}
+                  placeholder="https://am3pap006files.storage.live.com/y4m9oBPr...."
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   error={!!error}

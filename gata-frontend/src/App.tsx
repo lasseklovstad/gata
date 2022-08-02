@@ -1,17 +1,17 @@
 import "./index.css";
-import { Routes, Route } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { Privacy } from "./components/Privacy";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar";
 import { Box, Container, createTheme, CssBaseline, responsiveFontSizes, ThemeProvider } from "@mui/material";
 import { Home } from "./pages/Home";
-import { AdminPageLayout } from "./pages/admin/AdminPageLayout";
 import { MemberPage } from "./pages/member/MemberPage";
-import { Admin } from "./pages/admin/Admin";
 import { MemberInfoPage } from "./pages/member/MemberInfoPage";
 import { ResponsibilityPage } from "./pages/ResponsibilityPage";
 import { MyPage } from "./pages/MyPage";
 import { ReportPage } from "./pages/ReportPage";
 import { ReportInfoPage } from "./pages/ReportInfoPage";
+import Typography from "@mui/material/Typography";
+import * as React from "react";
 
 let theme = createTheme({
    typography: {
@@ -40,7 +40,7 @@ theme = responsiveFontSizes(theme);
 export const App = () => {
    return (
       <ThemeProvider theme={theme}>
-         <Box sx={{ display: "flex", backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
+         <Box sx={{ display: "flex", flexDirection: "column", backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
             <CssBaseline />
             <ResponsiveAppBar />
             <Container maxWidth="md" sx={{ mb: 16 }}>
@@ -55,6 +55,9 @@ export const App = () => {
                   <Route path="*" element={<Home />} />
                </Routes>
             </Container>
+            <Box component="footer" sx={{ marginTop: "auto", p: 1 }}>
+               <Typography>Versjon: {APP_VERSION}</Typography>
+            </Box>
          </Box>
       </ThemeProvider>
    );

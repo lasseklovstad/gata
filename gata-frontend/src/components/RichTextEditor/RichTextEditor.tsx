@@ -4,15 +4,14 @@ import {
    FormatListBulleted,
    FormatListNumbered,
    FormatUnderlined,
-   Image,
    Save,
    ViewList,
 } from "@mui/icons-material";
-import { Paper, ToggleButtonGroup, Button, Box, Divider } from "@mui/material";
-import { useMemo, useCallback, useRef } from "react";
-import { Descendant, createEditor, Transforms } from "slate";
+import { Box, Button, Divider, Paper, ToggleButtonGroup } from "@mui/material";
+import { useCallback, useMemo, useRef } from "react";
+import { createEditor, Descendant } from "slate";
 import { withHistory } from "slate-history";
-import { withReact, RenderElementProps, RenderLeafProps, Slate, Editable } from "slate-react";
+import { Editable, RenderElementProps, RenderLeafProps, Slate, withReact } from "slate-react";
 import { UseClientState } from "../../api/client/client.types";
 import { Loading, LoadingButton } from "../Loading";
 import { BlockButton } from "./BlockButton";
@@ -53,7 +52,6 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
    const content = useRef<Descendant[]>();
 
    const handleSave = (close: boolean) => {
-      console.log(content.current);
       onSave(content.current, close);
    };
 

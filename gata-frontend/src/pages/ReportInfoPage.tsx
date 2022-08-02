@@ -10,11 +10,9 @@ import { Loading, LoadingButton } from "../components/Loading";
 import { PageLayout } from "../components/PageLayout";
 import { RichTextEditor } from "../components/RichTextEditor/RichTextEditor";
 import { RichTextPreview } from "../components/RichTextEditor/RichTextPreview";
-import { useRoles } from "../components/useRoles";
 import { IGataReport } from "../types/GataReport.type";
 
 export const ReportInfoPage = () => {
-   const { isAdmin } = useRoles();
    const { reportId } = useParams();
    const { reportResponse, canEdit } = useGetGataReport(reportId!);
    const [isReportModalOpen, setIsReportModalOpen] = useState(false);

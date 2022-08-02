@@ -3,8 +3,6 @@ import { useGetGataReport } from "../api/report.api";
 import { RichTextPreview } from "./RichTextEditor/RichTextPreview";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import { useRoles } from "./useRoles";
-import { useAuth0 } from "@auth0/auth0-react";
 
 type NewsItemProps = {
    simpleReport: IGataReport;
