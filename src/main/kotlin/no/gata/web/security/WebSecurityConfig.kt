@@ -32,17 +32,18 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Override
     override fun configure(http: HttpSecurity) {
-        if (!env.activeProfiles.contains("dev")) {
-            http.requiresChannel()
-                    .requestMatchers(RequestMatcher { r: HttpServletRequest -> r.getHeader("X-Forwarded-Proto") != null })
-                    .requiresSecure()
-        }
-
-
         http.authorizeRequests()
-                .mvcMatchers("/api/user", "/api/file", "/api/role", "api/auth0user", "api/report", "api/responsibility", "api/contingent")
-                .authenticated().and().oauth2ResourceServer().jwt().decoder(jwtDecoder())
-                .jwtAuthenticationConverter(jwtAuthenticationConverter());
+            .mvcMatchers(
+                "/api/user",
+                "/api/file",
+                "/api/role",
+                "api/auth0user",
+                "api/report",
+                "api/responsibility",
+                "api/contingent"
+            )
+            .authenticated().and().oauth2ResourceServer().jwt().decoder(jwtDecoder())
+            .jwtAuthenticationConverter(jwtAuthenticationConverter());
     }
 
     fun jwtDecoder(): JwtDecoder? {
