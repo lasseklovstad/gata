@@ -10,28 +10,35 @@ Legg til profile dev to disable forcing https
 Add heroku remote ``heroku git:remote -a gataersamla`` and push to master of heroku: `git push heroku main`.
 Get all remotes: ``git remote -v``
 
-#Domene
-###domene.shop.no
+# Apply Database change
+``
+mvn clean install -DskipTests
+mvn liquibase:update
+``
+eller bare start backend :P
+
+# Domene
+### domene.shop.no
 20 epostpakker
 TOTALPRIS: 210kr per år
 https://domene.shop/pricelist
-###syse
+### syse
 60kr (1år), 120kr (2år) en epost: 4kr/måned = 48kr/år 1 epost
 TOTALPRIS: 168kr/år
 SMTP: tornado.mail
-###one.com
+### one.com
 Har kjøpt opp syse, men er litt dyrere
 99kr (1år), 189kr (2år) en epost: 0 kr (1år) , 100kr(2år) 5 eposter
 TOTALPRIS: 289kr/år
-###domene.no 
+### domene.no 
 Prisen inkluderer epost, 5gb lagring,
 SSL, backup, antivirus og spamfilter
 79kr (1år), 369kr (2år)
 
-###proisp
+### proisp
 361,25kr/år
 
-#Autentisering med Auth0
+# Autentisering med Auth0
 Google app er registrert her: https://console.cloud.google.com/
 Facebook app er registrert her: https://developers.facebook.com/apps/406253220837238/settings/basic/
 

@@ -69,17 +69,24 @@ class GataReportRestController {
         return gataReportRepository.getDatabaseSize()
     }
 
+    @GetMapping("publishemails")
+    @PreAuthorize("hasAuthority('member')")
+    fun getEmailsToPublishReport(): List<String> {
+        val role = gataRoleRepository.findByName("Medlem")
+        val members = gataUserRepository.findAllByRolesEquals(role.get()).filter { it.subscribe }
+        return members.map { it.email }
+    }
+
     @GetMapping("{id}/publish")
     @PreAuthorize("hasAuthority('member')")
     fun publishReport(@PathVariable id: String): List<String> {
-        val siteBaseUrl = "https://gataersamla.herokuapp.com"
+        val siteBaseUrl = "https://gataersamla.no"
         val report = gataReportRepository.findById(UUID.fromString(id))
-        val role = gataRoleRepository.findByName("Medlem")
-        val members = gataUserRepository.findAllByRolesEquals(role.get()).filter { it.subscribe }
-        if (members.isNotEmpty()) {
+        val emails = getEmailsToPublishReport()
+        if (emails.isNotEmpty()) {
             val msg = javaMailSender.createMimeMessage()
             val helper = MimeMessageHelper(msg, true)
-            helper.setTo(members.map { InternetAddress(it.email) }.toTypedArray())
+            helper.setTo(emails.map { InternetAddress(it) }.toTypedArray())
 
             helper.setSubject("Nytt fra Gata! ${report.get().title}")
             helper.setText("<h1>Nytt fra Gata</h1><p>Det har kommet en oppdatering på ${siteBaseUrl}!</p><h2>${report.get().title}</h2>" +
@@ -89,7 +96,7 @@ class GataReportRestController {
 
             javaMailSender.send(msg)
         }
-        return members.map { it.email }
+        return emails
     }
 
     @DeleteMapping("{id}")

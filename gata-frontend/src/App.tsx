@@ -9,7 +9,7 @@ import { MemberInfoPage } from "./pages/member/MemberInfoPage";
 import { ResponsibilityPage } from "./pages/ResponsibilityPage";
 import { MyPage } from "./pages/MyPage";
 import { ReportPage } from "./pages/ReportPage";
-import { ReportInfoPage } from "./pages/ReportInfoPage";
+import { ReportInfoPage } from "./pages/ReportInfoPage/ReportInfoPage";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 

@@ -14,6 +14,7 @@ data class GataUser(
         var name: String,
         var email: String,
         var picture: String,
+        var lastLogin: String?,
         @OneToMany(mappedBy = "user")
         @JsonIgnore
         var responsibilities: List<ResponsibilityYear>,

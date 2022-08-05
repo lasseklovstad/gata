@@ -48,6 +48,16 @@ export const useDatabaseSize = () => {
    return { sizeResponse, getDatabaseSize };
 };
 
+export const useGetReportEmails = () => {
+   const [emailsResponse, clientFetch] = useClient<string[], never>();
+
+   useEffect(() => {
+      clientFetch(`report/publishemails`);
+   }, [clientFetch]);
+
+   return { emailsResponse };
+};
+
 export const usePublishReport = (id: string) => {
    const [publishResponse, clientFetch] = useClient<string[], never>();
 

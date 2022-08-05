@@ -12,4 +12,5 @@ export interface IGataUser {
    roles: IGataRole[];
    contingents: IGataContingent[];
    subscribe: boolean;
+   lastLogin: string;
 }

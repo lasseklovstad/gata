@@ -8,7 +8,9 @@ class Auth0User(
         var picture: String,
         @JsonProperty("user_id")
         var userId: String,
-        var roles: List<Auth0Role>?
+        var roles: List<Auth0Role>?,
+        @JsonProperty("last_login")
+        var lastLogin: String
 )
 
 class Auth0Role(

@@ -106,7 +106,7 @@ class Auth0RestService(private val builder: WebClient.Builder) {
         val usersWithoutRole = getUsers(token);
         return usersWithoutRole!!.map {
             val roles = getUserRole(it.userId, token)
-            Auth0User(it.name, it.email, it.picture, it.userId, roles?.toList())
+            Auth0User(it.name, it.email, it.picture, it.userId, roles?.toList(), it.lastLogin)
         }
     }
 
@@ -142,6 +142,7 @@ class Auth0RestService(private val builder: WebClient.Builder) {
                     updatedUser.email = externalUser.email
                     updatedUser.picture = externalUser.picture
                     updatedUser.roles = newUserRoles as ArrayList<GataRole>
+                    updatedUser.lastLogin = externalUser.lastLogin
                     gataUserRepository.save(updatedUser)
                 } else {
                     val newUserRoles = externalUser.roles?.map { gataRoleRepository.findByExternalUserProviderId(it.id).get() }
@@ -154,7 +155,7 @@ class Auth0RestService(private val builder: WebClient.Builder) {
                             picture = externalUser.picture,
                             responsibilities = emptyList(),
                             roles = newUserRoles as ArrayList<GataRole>,
-                            contingents = emptyList(), subscribe = false)
+                            contingents = emptyList(), subscribe = false, lastLogin = externalUser.lastLogin)
                     gataUserRepository.save(newUser)
                 }
             }
