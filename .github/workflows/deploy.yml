@@ -26,7 +26,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ${{ github.repository }}:${{ github.sha }}
+          tags: gata:latest
 
       - name: Push to dokku
         uses: dokku/github-action@master
