@@ -1,0 +1,9 @@
+**/.git
+**/.gitignore
+**/.jpb
+**/.mvn
+**/.idea
+**/node_modules
+**/dist
+/postgres
+README.md
