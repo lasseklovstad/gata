@@ -26,7 +26,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: gata:latest
+          tags: lassekl/gata:${{ github.sha }}
 
       - name: Push to dokku
         uses: dokku/github-action@master
