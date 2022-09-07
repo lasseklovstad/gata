@@ -47,5 +47,15 @@ Administrer Auth0 her https://manage.auth0.com/ og log inn med github konto.
 Domene er registrert på domeneshop: https://domene.shop/admin
 Gratis https er konfigurert her: https://dash.cloudflare.com/
 
+# Dokku
+````bash
+dokku apps:create gata
+dokku config:set DB_HOST=...
+
+dokku config:set --no-restart gata DOKKU_LETSENCRYPT_EMAIL=lasse.klovstad@gmail.com
+dokku letsencrypt:enable gata
+
+````
+
 
 
