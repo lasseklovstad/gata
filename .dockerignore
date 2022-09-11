@@ -4,6 +4,6 @@
 **/.mvn
 **/.idea
 **/node_modules
-**/dist
+**/build
 /postgres
 README.md

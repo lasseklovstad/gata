@@ -13,7 +13,7 @@ services:
     networks:
       - dockernet
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
   app:
     image: ${DOCKER_REGISTRY-}app
@@ -32,7 +32,7 @@ services:
     networks:
       - dockernet
     ports:
-      - "8080:8080"
+      - "8081:8080"
 
 networks:
   dockernet:

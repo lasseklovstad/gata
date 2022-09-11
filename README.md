@@ -54,6 +54,7 @@ dokku config:set DB_HOST=...
 
 dokku config:set --no-restart gata DOKKU_LETSENCRYPT_EMAIL=lasse.klovstad@gmail.com
 dokku letsencrypt:enable gata
+dokku letsencrypt:cron-job --add
 
 
 docker exec "dokku.postgres.gatadatabase" su - postgres -c "dropdb gatadatabase"
