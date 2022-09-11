@@ -7,8 +7,13 @@ legg til env for java: AUTH0_CLIENT_ID=xxx;AUTH0_CLIENT_SECRET=xxx
 Legg til profile dev to disable forcing https
 
 #Deploy
+#### Heroku (Old)
 Add heroku remote ``heroku git:remote -a gataersamla`` and push to master of heroku: `git push heroku main`.
 Get all remotes: ``git remote -v``
+#### Deploy with github actions
+``
+ git push
+``
 
 # Apply Database change
 ``
@@ -45,7 +50,6 @@ Facebook app er registrert her: https://developers.facebook.com/apps/40625322083
 Administrer Auth0 her https://manage.auth0.com/ og log inn med github konto.
 
 Domene er registrert på domeneshop: https://domene.shop/admin
-Gratis https er konfigurert her: https://dash.cloudflare.com/
 
 # Dokku
 ````bash
@@ -59,6 +63,29 @@ dokku letsencrypt:cron-job --add
 
 docker exec "dokku.postgres.gatadatabase" su - postgres -c "dropdb gatadatabase"
 docker exec "dokku.postgres.gatadatabase" su - postgres -c "createdb -E utf8  gatadatabase"
+````
+
+## Connect to db and creating backup
+````bash
+# General db commands
+dokku postgres:info gatadatabase
+dokku postgres:expose gatadatabase
+dokku postgres:unexpose gatadatabase
+
+# Create backup to local machine
+dokku postgres:export gatadatabase > /tmp/gatadatabase-1.export
+scp root@gataersamla.no:/tmp/gatadatabase-1.export C:\pg_dump
+
+# Delete existing backups on server
+ls /tmp
+rm -rf /tmp/gatadatabase*.export
+
+# Upload from local machine and apply backup
+scp C:\pg_dump\gatadatabase-1.export root@gataersamla.no:/tmp
+dokku postgres:import gatadatabase < /tmp/gatadatabase-1.export
+
+# restore backup to local database for development
+pg_restore -h localhost -d postgres -U postgres gatadatabase-1.export
 ````
 
 
