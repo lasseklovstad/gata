@@ -29,7 +29,7 @@ data class ResponsibilityNotePayload(
 
 data class ContingentPayload(
         var isPaid: Boolean,
-        var year: Year
+        var year: Int
 )
 
 @RestController
@@ -111,7 +111,7 @@ class GataUserRestController {
     @PreAuthorize("hasAuthority('admin')")
     fun createResponsibilityForUser(@PathVariable id: String, @RequestBody responsibilityYearPayload: ResponsibilityYearPayload): List<ResponsibilityYear> {
         val user = gataUserRepository.findById(UUID.fromString(id)).get()
-        val year = Year.of(responsibilityYearPayload.year);
+        val year = responsibilityYearPayload.year;
         if (user.getIsUserMember()) {
             val responsibility = responsibilityRepository.findById(UUID.fromString(responsibilityYearPayload.responsibilityId)).get()
             val responsibilityYearCheck = responsibilityYearRepository.findResponsibilityYearsByUserAndYearAndResponsibility(user, year, responsibility)

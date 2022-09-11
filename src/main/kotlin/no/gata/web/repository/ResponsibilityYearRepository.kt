@@ -9,7 +9,7 @@ import java.util.*
 
 interface ResponsibilityYearRepository: JpaRepository<ResponsibilityYear, UUID> {
     fun findResponsibilityYearsByUser(user: GataUser): List<ResponsibilityYear>
-    fun findResponsibilityYearsByUserAndYearAndResponsibility(user: GataUser, year: Year, responsibility: Responsibility): List<ResponsibilityYear>
+    fun findResponsibilityYearsByUserAndYearAndResponsibility(user: GataUser, year: Int, responsibility: Responsibility): List<ResponsibilityYear>
     fun findResponsibilityYearsByUserId(userId: UUID): List<ResponsibilityYear>
     fun findResponsibilityYearsByYearEquals(year: Year): List<ResponsibilityYear>
 }

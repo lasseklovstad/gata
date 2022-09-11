@@ -10,7 +10,8 @@ data class GataContingent(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         var id: UUID?,
-        var year: Year,
+        @Column(columnDefinition = "SMALLINT")
+        var year: Int,
         var isPaid: Boolean,
         @ManyToOne
         @JoinColumn(name = "gata_user_id")

@@ -10,7 +10,8 @@ data class ResponsibilityYear(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         var id: UUID?,
-        var year: Year,
+        @Column(columnDefinition = "SMALLINT")
+        var year: Int,
         @ManyToOne
         @JsonIncludeProperties("id", "name")
         var user: GataUser?,

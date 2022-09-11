@@ -8,5 +8,5 @@ import java.util.*
 
 interface GataContingentRepository: JpaRepository<GataContingent, UUID> {
     fun findAllByUser(user: GataUser): List<GataContingent>
-    fun findByUserAndYear(user:GataUser, year: Year): Optional<GataContingent>
+    fun findByUserAndYear(user:GataUser, year: Int): Optional<GataContingent>
 }
