@@ -1,6 +1,8 @@
 package no.gata.web.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import no.gata.web.controller.dtoInn.DtoInnGataReport
+import no.gata.web.controller.dtoOut.DtoOutGataReport
 import no.gata.web.models.*
 import no.gata.web.repository.GataReportFileRepository
 import no.gata.web.repository.GataReportRepository
@@ -21,12 +23,6 @@ import org.springframework.web.server.ResponseStatusException
 import java.util.*
 import javax.mail.internet.InternetAddress
 
-
-data class GataReportPayload(
-        var title: String,
-        var description: String,
-        var type: ReportType
-)
 
 @RestController
 @RequestMapping("api/report")
@@ -59,8 +55,13 @@ class GataReportRestController {
 
     @GetMapping("{id}")
     @PreAuthorize("hasAuthority('member')")
-    fun getReport(@PathVariable id: String): Optional<GataReport> {
-        return gataReportRepository.findById(UUID.fromString(id))
+    fun getReport(@PathVariable id: String): DtoOutGataReport {
+        val gataReport = gataReportRepository.findById(UUID.fromString(id))
+        if(gataReport.isPresent){
+            return DtoOutGataReport(gataReport.get())
+        }
+        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Finner ikke referatet");
+
     }
 
     @GetMapping("databasesize")
@@ -73,7 +74,9 @@ class GataReportRestController {
     @PreAuthorize("hasAuthority('member')")
     fun getEmailsToPublishReport(): List<String> {
         val role = gataRoleRepository.findByName("Medlem")
-        val members = gataUserRepository.findAllByRolesEquals(role.get()).filter { it.subscribe }
+        val members = gataUserRepository.findAllByRolesEquals(role.get())
+                .filter { it.subscribe }
+                .mapNotNull { it.getPrimaryUser() }
         return members.map { it.email }
     }
 
@@ -104,7 +107,7 @@ class GataReportRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteReport(@PathVariable id: String) {
         val report = gataReportRepository.findById(UUID.fromString(id))
-        if(report.isPresent){
+        if (report.isPresent) {
             val reportFiles = gataReportFileRepository.findAllByReport(report.get())
             // Delete all files on cloud first
             deleteFiles(reportFiles)
@@ -114,7 +117,7 @@ class GataReportRestController {
     }
 
     fun getLoggedInUser(authentication: Authentication): GataUser {
-        val user = gataUserRepository.findByExternalUserProviderId(authentication.name)
+        val user = gataUserRepository.findByExternalUserProvidersId(authentication.name)
         if (user.isPresent) {
             return user.get()
         }
@@ -123,7 +126,7 @@ class GataReportRestController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('member')")
-    fun createReport(@RequestBody body: GataReportPayload, authentication: Authentication): GataReport {
+    fun createReport(@RequestBody body: DtoInnGataReport, authentication: Authentication): DtoOutGataReport {
         val isAdmin = authentication.authorities.find { it.authority.equals("admin") }
         if (isAdmin == null && body.type == ReportType.DOCUMENT) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Du har ikke tilgang til å opprette dokument!");
@@ -133,33 +136,33 @@ class GataReportRestController {
                 id = null, title = body.title,
                 description = body.description,
                 content = null,
-                lastModifiedBy = user.name,
+                lastModifiedBy = user.getPrimaryUser()!!.name,
                 createdDate = Date(),
                 lastModifiedDate = Date(),
                 createdBy = user,
                 files = emptyList(), type = body.type)
-        return gataReportRepository.save(report)
+        return DtoOutGataReport(gataReportRepository.save(report))
     }
 
     @PutMapping("{id}")
     @PreAuthorize("hasAuthority('member')")
-    fun updateReport(@RequestBody body: GataReportPayload, authentication: Authentication, @PathVariable id: String): GataReport {
+    fun updateReport(@RequestBody body: DtoInnGataReport, authentication: Authentication, @PathVariable id: String): DtoOutGataReport {
         val user = getLoggedInUser(authentication)
         val report = gataReportRepository.findById(UUID.fromString(id))
         if (report.isPresent) {
             val newReport = report.get()
             newReport.title = body.title
             newReport.description = body.description
-            newReport.lastModifiedBy = user.name
+            newReport.lastModifiedBy = user.getPrimaryUser()!!.name
             newReport.lastModifiedDate = Date()
-            return gataReportRepository.save(newReport)
+            return DtoOutGataReport(gataReportRepository.save(newReport))
         }
         throw ResponseStatusException(HttpStatus.NOT_FOUND, "Finner ikke referatet");
     }
 
     @PutMapping("{id}/content")
     @PreAuthorize("hasAuthority('member')")
-    fun updateReportContent(@RequestBody body: List<RichTextBlock>, authentication: Authentication, @PathVariable id: String): GataReport {
+    fun updateReportContent(@RequestBody body: List<RichTextBlock>, authentication: Authentication, @PathVariable id: String): DtoOutGataReport {
         val user = getLoggedInUser(authentication)
         val report = gataReportRepository.findById(UUID.fromString(id))
         if (report.isPresent) {
@@ -169,14 +172,14 @@ class GataReportRestController {
             val filesToDelete = reportFiles.filter { files.find { file -> file.imageId == it.id.toString() } == null }
             deleteFiles(filesToDelete)
             newReport.content = ObjectMapper().writeValueAsString(body)
-            newReport.lastModifiedBy = user.name
+            newReport.lastModifiedBy = user.getPrimaryUser()!!.name
             newReport.lastModifiedDate = Date()
-            return gataReportRepository.save(newReport)
+            return DtoOutGataReport(gataReportRepository.save(newReport))
         }
         throw ResponseStatusException(HttpStatus.NOT_FOUND, "Finner ikke referatet");
     }
 
-    fun deleteFiles(files: List<GataId>){
+    fun deleteFiles(files: List<GataId>) {
         files.forEach { fileId ->
             val file = gataReportFileRepository.findById(fileId.id)
             if (file.isPresent) {

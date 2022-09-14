@@ -1,4 +1,4 @@
-import { IGataUser } from "./GataUser.type";
+import { ISimpleGataUser } from "./GataUser.type";
 
 export interface IGataReport {
    id: string;
@@ -9,7 +9,7 @@ export interface IGataReport {
    lastModifiedBy: string;
    content: string | null;
    type: GataReportType;
-   createdBy?: Pick<IGataUser, "id" | "name" | "externalUserProviderId">;
+   createdBy?: ISimpleGataUser;
 }
 
 export interface IGataReportPayload {

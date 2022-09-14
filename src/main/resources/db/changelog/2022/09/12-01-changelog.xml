@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1662999011985-1" author="Lasse (generated)">
+        <createTable tableName="external_user">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_externaluser"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="picture" type="VARCHAR(255)"/>
+            <column name="last_login" type="VARCHAR(255)"/>
+            <column name="user_id" type="UUID"/>
+            <column name="primary_user"
+                    type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1662999011985-2" author="Lasse (generated)">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="external_user"
+                                 constraintName="FK_EXTERNALUSER_ON_USER" referencedColumnNames="id"
+                                 referencedTableName="gata_user"/>
+    </changeSet>
+    <changeSet id="1662999011985-3" author="Lasse (generated)">
+        <sql>
+            insert into external_user(id, email, name, picture, last_login, user_id, primary_user)
+            select external_user_provider_id, email, name, picture, last_login, id, true
+            from gata_user;
+        </sql>
+    </changeSet>
+    <changeSet id="1662999011985-4" author="Lasse (generated)">
+        <dropColumn columnName="email" tableName="gata_user"/>
+
+        <dropColumn columnName="external_user_provider_id" tableName="gata_user"/>
+
+        <dropColumn columnName="last_login" tableName="gata_user"/>
+
+        <dropColumn columnName="name" tableName="gata_user"/>
+
+        <dropColumn columnName="picture" tableName="gata_user"/>
+    </changeSet>
+</databaseChangeLog>

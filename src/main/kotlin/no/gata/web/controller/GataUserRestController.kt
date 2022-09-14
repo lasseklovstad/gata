@@ -1,36 +1,25 @@
 package no.gata.web.controller
 
+import no.gata.web.controller.dtoInn.DtoInnContingent
+import no.gata.web.controller.dtoInn.DtoInnGataUser
+import no.gata.web.controller.dtoInn.DtoInnResponsibilityNote
+import no.gata.web.controller.dtoInn.DtoInnResponsibilityYear
+import no.gata.web.controller.dtoOut.DtoOutGataContingent
+import no.gata.web.controller.dtoOut.DtoOutGataUser
+import no.gata.web.controller.dtoOut.DtoOutResponsibilityYear
 import no.gata.web.models.GataContingent
 import no.gata.web.models.GataUser
 import no.gata.web.models.ResponsibilityNote
 import no.gata.web.models.ResponsibilityYear
 import no.gata.web.repository.*
+import no.gata.web.service.RoleService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
-import org.springframework.mail.javamail.JavaMailSender
-import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-import java.time.Year
 import java.util.*
-import javax.mail.internet.InternetAddress
-
-data class ResponsibilityYearPayload(
-        var responsibilityId: String,
-        var year: Int
-)
-
-data class ResponsibilityNotePayload(
-        var text: String,
-)
-
-data class ContingentPayload(
-        var isPaid: Boolean,
-        var year: Int
-)
 
 @RestController
 @RequestMapping("api/user")
@@ -53,45 +42,86 @@ class GataUserRestController {
     @Autowired
     private lateinit var gataContingentRepository: GataContingentRepository
 
+    @Autowired
+    lateinit var roleService: RoleService
+
+    @Autowired
+    lateinit var externalUserRepository: ExternalUserRepository
+
     @GetMapping
     @PreAuthorize("hasAuthority('member')")
-    fun getUsers(authentication: Authentication): List<GataUser> {
+    fun getUsers(authentication: Authentication): List<DtoOutGataUser> {
         val isAdmin = authentication.authorities.find { it.authority.equals("admin") }
         if (isAdmin != null) {
-            return gataUserRepository.findAll()
+            return gataUserRepository.findAll().map { DtoOutGataUser(it) }
         }
         val role = gataRoleRepository.findByName("Medlem")
-        return gataUserRepository.findAllByRolesEquals(role.get())
+        return gataUserRepository.findAllByRolesEquals(role.get()).map { DtoOutGataUser(it) }
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAuthority('admin')")
+    fun postUser(@RequestBody body: DtoInnGataUser): DtoOutGataUser {
+        val externalUser = externalUserRepository
+                .findById(body.externalUserId)
+                .orElseThrow(({ ResponseStatusException(HttpStatus.NOT_FOUND, "External user with id ${body.externalUserId} not found") }))
+        val newGataUser = gataUserRepository.save(GataUser())
+        externalUser.user = newGataUser
+        externalUserRepository.save(externalUser)
+        newGataUser.externalUserProviders = listOf(externalUser)
+        return DtoOutGataUser(newGataUser)
     }
 
     @GetMapping("loggedin")
     @PreAuthorize("hasAuthority('member')")
-    fun getLoggedInUser(authentication: Authentication): GataUser {
-        val user = gataUserRepository.findByExternalUserProviderId(authentication.name)
+    fun getLoggedInUser(authentication: Authentication): DtoOutGataUser {
+        val user = gataUserRepository.findByExternalUserProvidersId(authentication.name)
         if (user.isPresent) {
-            return user.get()
+            return DtoOutGataUser(user.get())
         }
         throw ResponseStatusException(HttpStatus.NOT_FOUND, "Brukeren finnes ikke!");
     }
 
     @GetMapping("{id}")
     @PreAuthorize("hasAuthority('member')")
-    fun getUser(@PathVariable id: String): GataUser? {
+    fun getUser(@PathVariable id: String): DtoOutGataUser? {
         return gataUserRepository
                 .findById(UUID.fromString(id))
-                .orElseThrow(({ ResponseStatusException(HttpStatus.NOT_FOUND, java.lang.String.format("User with id %d not found", id)) }))
+                .orElseThrow(({ ResponseStatusException(HttpStatus.NOT_FOUND, "User with id $id not found") }))
+                .let { DtoOutGataUser(it) }
+    }
+
+    @DeleteMapping("{id}")
+    @PreAuthorize("hasAuthority('admin')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteUser(@PathVariable id: String) {
+        val gatUser = gataUserRepository
+                .findById(UUID.fromString(id))
+                .orElseThrow(({ ResponseStatusException(HttpStatus.NOT_FOUND, "User with id $id not found") }))
+        // Remove all roles
+        val roles = gataRoleRepository.findAll()
+        roleService.deleteRoles(gatUser, roles.toSet())
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Kunne ikke oppdatere alle roller for bruker")
+        // Remove link to external user
+        gatUser.externalUserProviders = gatUser.externalUserProviders.map {
+            it.user = null
+            it
+        }
+        gataUserRepository.save(gatUser)
+        // Delete user
+        gataUserRepository.delete(gatUser)
     }
 
     @GetMapping("{id}/responsibilityyear")
     @PreAuthorize("hasAuthority('member')")
-    fun getResponsibilitiesByUserId(@PathVariable id: String): List<ResponsibilityYear> {
+    fun getResponsibilitiesByUserId(@PathVariable id: String): List<DtoOutResponsibilityYear> {
         val user = gataUserRepository.findById(UUID.fromString(id)).get()
-        return responsibilityYearRepository.findResponsibilityYearsByUser(user)
+        return responsibilityYearRepository.findResponsibilityYearsByUser(user).map { DtoOutResponsibilityYear(it) }
     }
 
     @DeleteMapping("{id}/responsibilityyear/{responsibilityYearId}")
     @PreAuthorize("hasAuthority('admin')")
-    fun removeResponseibilityForUser(@PathVariable responsibilityYearId: String, @PathVariable id: String): List<ResponsibilityYear> {
+    fun removeResponseibilityForUser(@PathVariable responsibilityYearId: String, @PathVariable id: String): List<DtoOutResponsibilityYear> {
         val user = gataUserRepository.findById(UUID.fromString(id)).get()
         if (user.getIsUserMember()) {
             val responsibilityYear = responsibilityYearRepository.findById(UUID.fromString(responsibilityYearId)).get()
@@ -101,7 +131,7 @@ class GataUserRestController {
             }
             responsibilityYearRepository.delete(responsibilityYear)
 
-            return responsibilityYearRepository.findResponsibilityYearsByUser(user)
+            return responsibilityYearRepository.findResponsibilityYearsByUser(user).map { DtoOutResponsibilityYear(it) }
         } else {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Bruker må være medlem for å kunne få ansvarspost.");
         }
@@ -109,7 +139,7 @@ class GataUserRestController {
 
     @PostMapping("{id}/responsibilityyear")
     @PreAuthorize("hasAuthority('admin')")
-    fun createResponsibilityForUser(@PathVariable id: String, @RequestBody responsibilityYearPayload: ResponsibilityYearPayload): List<ResponsibilityYear> {
+    fun createResponsibilityForUser(@PathVariable id: String, @RequestBody responsibilityYearPayload: DtoInnResponsibilityYear): List<DtoOutResponsibilityYear> {
         val user = gataUserRepository.findById(UUID.fromString(id)).get()
         val year = responsibilityYearPayload.year;
         if (user.getIsUserMember()) {
@@ -121,11 +151,11 @@ class GataUserRestController {
 
 
             val responsibilityYear = ResponsibilityYear(id = null, year = year, user = user, responsibility = responsibility, note = null)
-            val note = ResponsibilityNote(id = null, lastModifiedDate = Date(), lastModifiedBy = user.name, text = "", responsibilityYear = responsibilityYear)
+            val note = ResponsibilityNote(id = null, lastModifiedDate = Date(), lastModifiedBy = user.getPrimaryUser()!!.name, text = "", responsibilityYear = responsibilityYear)
             responsibilityYear.note = note
             responsibilityYearRepository.save(responsibilityYear);
 
-            return responsibilityYearRepository.findResponsibilityYearsByUser(user)
+            return responsibilityYearRepository.findResponsibilityYearsByUser(user).map { DtoOutResponsibilityYear(it) }
         } else {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Bruker må være medlem for å kunne få ansvarspost.");
         }
@@ -135,11 +165,11 @@ class GataUserRestController {
     @PreAuthorize("hasAuthority('member')")
     fun updateResponsibilityNote(@PathVariable responsibilityYearId: String,
                                  @PathVariable id: String, authentication: Authentication,
-                                 @RequestBody noteBody: ResponsibilityNotePayload): ResponsibilityYear {
+                                 @RequestBody noteBody: DtoInnResponsibilityNote): DtoOutResponsibilityYear {
         val user = gataUserRepository.findById(UUID.fromString(id)).get()
         val loggedInUser = getLoggedInUser(authentication)
         val isAdmin = authentication.authorities.find { it.authority == "admin" } != null
-        if (loggedInUser.id != user.id && !isAdmin) {
+        if (loggedInUser.id != user.id.toString() && !isAdmin) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Du kan ikke endre på noen andre sine ansvarsposter!");
         }
 
@@ -147,7 +177,7 @@ class GataUserRestController {
         if (user.getIsUserMember()) {
             val responsibilityYear = responsibilityYearRepository.findById(UUID.fromString(responsibilityYearId)).get()
             responsibilityYear.note?.update(user, noteBody.text)
-            return responsibilityYearRepository.save(responsibilityYear);
+            return DtoOutResponsibilityYear(responsibilityYearRepository.save(responsibilityYear))
         } else {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Bruker må være medlem for å kunne få ansvarspost.");
         }
@@ -155,7 +185,7 @@ class GataUserRestController {
 
     @PostMapping("{id}/contingent")
     @PreAuthorize("hasAuthority('admin')")
-    fun postContingent(@PathVariable id: String, @RequestBody body: ContingentPayload): List<GataContingent> {
+    fun postContingent(@PathVariable id: String, @RequestBody body: DtoInnContingent): List<DtoOutGataContingent> {
         val userOptional = gataUserRepository.findById(UUID.fromString(id))
         if (userOptional.isPresent) {
             val user = userOptional.get()
@@ -172,7 +202,7 @@ class GataUserRestController {
                 }
 
 
-                return gataContingentRepository.findAllByUser(user)
+                return gataContingentRepository.findAllByUser(user).map { DtoOutGataContingent(it) }
             }
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Brukeren er ikke medlem");
         } else {
@@ -182,9 +212,9 @@ class GataUserRestController {
 
     @PutMapping("{id}/subscribe")
     @PreAuthorize("hasAuthority('member')")
-    fun updateSubscribe(@PathVariable id: String): GataUser {
+    fun updateSubscribe(@PathVariable id: String): DtoOutGataUser {
         val user = gataUserRepository.findById(UUID.fromString(id)).get()
         user.subscribe = !user.subscribe
-        return gataUserRepository.save(user)
+        return DtoOutGataUser(gataUserRepository.save(user))
     }
 }

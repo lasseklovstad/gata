@@ -1,7 +1,6 @@
 package no.gata.web.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonManagedReference
 import java.util.*
 import javax.persistence.*
 
@@ -10,11 +9,8 @@ data class GataUser(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         var id: UUID?,
-        var externalUserProviderId: String,
-        var name: String,
-        var email: String,
-        var picture: String,
-        var lastLogin: String?,
+        @OneToMany(mappedBy = "user")
+        var externalUserProviders: List<ExternalUser>,
         @OneToMany(mappedBy = "user")
         @JsonIgnore
         var responsibilities: List<ResponsibilityYear>,
@@ -23,12 +19,24 @@ data class GataUser(
         @OneToMany(mappedBy = "user")
         var contingents: List<GataContingent>,
         var subscribe: Boolean
-){
-        fun getIsUserMember(): Boolean {
-                return roles.find { it.name=="Medlem" } != null
-        }
+) {
+    constructor() : this(
+            id = null,
+            externalUserProviders = emptyList(),
+            responsibilities = emptyList(),
+            roles = emptyList(),
+            contingents = emptyList(),
+            subscribe = false)
 
-        fun getIsUserAdmin(): Boolean {
-                return roles.find { it.name=="Administrator" } != null
-        }
+    fun getIsUserMember(): Boolean {
+        return roles.find { it.name == "Medlem" } != null
+    }
+
+    fun getIsUserAdmin(): Boolean {
+        return roles.find { it.name == "Administrator" } != null
+    }
+
+    fun getPrimaryUser(): ExternalUser? {
+        return this.externalUserProviders.find { it.primary }
+    }
 }

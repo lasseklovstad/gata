@@ -1,10 +1,11 @@
 package no.gata.web.controller
 
+import no.gata.web.controller.dtoOut.DtoOutGataRole
+import no.gata.web.controller.dtoOut.DtoOutGataUser
 import no.gata.web.service.Auth0RestService
-import no.gata.web.models.GataRole
-import no.gata.web.models.GataUser
 import no.gata.web.repository.GataRoleRepository
 import no.gata.web.repository.GataUserRepository
+import no.gata.web.service.RoleService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
@@ -25,36 +26,37 @@ class RoleRestController {
     @Autowired
     lateinit var gataUserRepository: GataUserRepository
 
+    @Autowired
+    lateinit var roleService: RoleService
+
 
     @GetMapping
     @PreAuthorize("hasAuthority('member')")
-    fun getUsers(): List<GataRole> {
-        return roleRepository.findAll();
+    fun getUserRoles(): List<DtoOutGataRole> {
+        return roleRepository.findAll().map { DtoOutGataRole(it) }
     }
 
     @PostMapping("{roleId}/user/{userId}")
     @PreAuthorize("hasAuthority('admin')")
-    fun postRole(@PathVariable roleId:String, @PathVariable userId: String): GataUser {
+    fun postRole(@PathVariable roleId: String, @PathVariable userId: String): DtoOutGataUser {
         val user = gataUserRepository.findById(UUID.fromString(userId)).get()
         val role = roleRepository.findById(UUID.fromString(roleId)).get()
-        val response = auth0RestService.updateRole(user.externalUserProviderId, listOf(role.externalUserProviderId), HttpMethod.POST);
-        if(response?.statusCode == HttpStatus.NO_CONTENT){
-            user.roles = user.roles.plus(role)
-            return gataUserRepository.save(user)
+        val updatedUser = roleService.addRoles(user, setOf(role))
+        if (updatedUser != null) {
+            return DtoOutGataUser(updatedUser);
         }
-        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Finner ikke bruker");
+        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Kunne ikke oppdatere alle roller for bruker");
     }
 
     @DeleteMapping("{roleId}/user/{userId}")
     @PreAuthorize("hasAuthority('admin')")
-    fun deleteRole(@PathVariable roleId:String, @PathVariable userId: String): GataUser {
+    fun deleteRole(@PathVariable roleId: String, @PathVariable userId: String): DtoOutGataUser {
         val user = gataUserRepository.findById(UUID.fromString(userId)).get()
         val role = roleRepository.findById(UUID.fromString(roleId)).get()
-        val response = auth0RestService.updateRole(user.externalUserProviderId, listOf(role.externalUserProviderId), HttpMethod.DELETE);
-        if(response?.statusCode == HttpStatus.NO_CONTENT){
-            user.roles = user.roles.minus(role)
-            return gataUserRepository.save(user)
+        val updatedUser = roleService.deleteRoles(user, setOf(role))
+        if (updatedUser != null) {
+            return DtoOutGataUser(updatedUser);
         }
-        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Finner ikke bruker");
+        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Kunne ikke oppdatere alle roller for bruker");
     }
 }

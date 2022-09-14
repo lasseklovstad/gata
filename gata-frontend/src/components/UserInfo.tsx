@@ -53,10 +53,10 @@ export const UserInfo = ({ user }: UserInfoProps) => {
       <>
          <Box m={1}>
             <Typography variant="body1">
-               <strong>Navn:</strong> {user.name}
+               <strong>Navn:</strong> {user.primaryUser.name}
             </Typography>
             <Typography variant="body1">
-               <strong>Email:</strong> {user.email}
+               <strong>Email:</strong> {user.primaryUser.email}
             </Typography>
          </Box>
          <Typography variant="h2" gutterBottom>

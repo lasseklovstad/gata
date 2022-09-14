@@ -1,29 +1,17 @@
-import {
-   Avatar,
-   Box,
-   Button,
-   List,
-   ListItem,
-   ListItemButton,
-   ListItemIcon,
-   ListItemText,
-   Tooltip,
-   Typography,
-} from "@mui/material";
-import { Link } from "react-router-dom";
+import { Box, Button, List, ListItem, ListItemText, Tooltip, Typography } from "@mui/material";
 import { useClearUserCache, useGetUsers } from "../../api/user.api";
 import { Loading, LoadingButton } from "../../components/Loading";
 import { useRoles } from "../../components/useRoles";
-import { IGataUser } from "../../types/GataUser.type";
 import { PageLayout } from "../../components/PageLayout";
 import { useConfirmDialog } from "../../components/ConfirmDialog";
 import { Email } from "@mui/icons-material";
 import { usePublishKontigentReport } from "../../api/contingent.api";
 import { UserListItem } from "./UserListItem";
+import { ExternalUsersWithNoGataUser } from "./ExternalUsersWithNoGataUser";
 
 export const MemberPage = () => {
    const { isAdmin } = useRoles();
-   const { usersResponse, getUsers } = useGetUsers();
+   const { usersResponse, getUsers, updateUser } = useGetUsers();
    const { cacheResponse, clearCache } = useClearUserCache();
    const { publishContigent, publishContigentResponse } = usePublishKontigentReport();
    const { openConfirmDialog: openConfirmPublishKontigent, ConfirmDialogComponent: ConfirmPublishKontigentDialog } =
@@ -105,19 +93,34 @@ export const MemberPage = () => {
                </ListItem>
             )}
          </List>
-         <Typography variant="h2" id="non-member-title">
-            Ikke medlem
-         </Typography>
-         <List aria-labelledby="non-member-title">
-            {nonMembers?.map((user) => {
-               return <UserListItem key={user.id} user={user} />;
-            })}
-            {nonMembers?.length === 0 && (
-               <ListItem>
-                  <ListItemText>Ingen andre brukere</ListItemText>
-               </ListItem>
-            )}
-         </List>
+         {isAdmin && (
+            <>
+               <Typography variant="h2" id="non-member-title">
+                  Ikke medlem
+               </Typography>
+               <List aria-labelledby="non-member-title">
+                  {nonMembers?.map((user) => {
+                     return <UserListItem key={user.id} user={user} />;
+                  })}
+                  {nonMembers?.length === 0 && (
+                     <ListItem>
+                        <ListItemText>Ingen andre brukere</ListItemText>
+                     </ListItem>
+                  )}
+               </List>
+               <ExternalUsersWithNoGataUser
+                  onAddUser={(newUser) => {
+                     updateUser((users) => {
+                        if (users) {
+                           return [...users, newUser];
+                        } else {
+                           return [newUser];
+                        }
+                     });
+                  }}
+               />
+            </>
+         )}
       </PageLayout>
    );
 };

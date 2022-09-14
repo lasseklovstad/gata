@@ -7,6 +7,6 @@ import java.util.*
 
 interface GataUserRepository: JpaRepository<GataUser, UUID> {
     override fun findById(userId: UUID): Optional<GataUser>
-    fun findByExternalUserProviderId(userId: String): Optional<GataUser>
+    fun findByExternalUserProvidersId(userId: String): Optional<GataUser>
     fun findAllByRolesEquals(role: GataRole): List<GataUser>
 }

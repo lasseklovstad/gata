@@ -1,16 +1,14 @@
-import { IGataUser } from "./GataUser.type";
 import { IResponsibility } from "./Responsibility.type";
 import { IResponsibilityNote } from "./ResponsibilityNote.type";
+import { ISimpleGataUser } from "./GataUser.type";
 
 export interface IResponsibilityYear {
    id: string;
    year: number;
-   user: IResponsibilityYearUser;
+   user: ISimpleGataUser;
    responsibility: IResponsibility;
    note: IResponsibilityNote;
 }
-
-export type IResponsibilityYearUser = Pick<IGataUser, "id" | "name">;
 
 export interface IResponsibilityYearPayload {
    responsibilityId: string;

@@ -10,11 +10,11 @@ export const UserListItem = ({ user }: UserListItemProps) => {
    return (
       <ListItemButton divider component={Link} to={user.id}>
          <ListItemIcon>
-            <Avatar src={user.picture} />
+            <Avatar src={user.primaryUser.picture} />
          </ListItemIcon>
          <ListItemText
-            primary={user.name}
-            secondary={`Sist innlogget: ${new Date(user.lastLogin).toLocaleDateString()}`}
+            primary={user.primaryUser.name}
+            secondary={`Sist innlogget: ${new Date(user.primaryUser.lastLogin).toLocaleDateString()}`}
          />
       </ListItemButton>
    );

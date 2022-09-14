@@ -1,7 +1,6 @@
 package no.gata.web.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import java.time.Year
 import java.util.*
 import javax.persistence.*
 

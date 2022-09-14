@@ -1,13 +1,12 @@
 package no.gata.web.service
 
 import no.gata.web.models.*
+import no.gata.web.repository.ExternalUserRepository
 import no.gata.web.repository.GataRoleRepository
 import no.gata.web.repository.GataUserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.cache.annotation.CacheEvict
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -36,6 +35,9 @@ class Auth0RestService(private val builder: WebClient.Builder) {
 
     @Autowired
     private lateinit var gataUserRepository: GataUserRepository
+
+    @Autowired
+    private lateinit var externalUserRepository: ExternalUserRepository
 
     @Autowired
     private lateinit var gataRoleRepository: GataRoleRepository
@@ -134,29 +136,25 @@ class Auth0RestService(private val builder: WebClient.Builder) {
         val externalUsers = getUsersWithRole();
         externalUsers?.forEach { externalUser ->
             run {
-                val user = gataUserRepository.findByExternalUserProviderId(externalUser.userId)
+                val user = externalUserRepository.findById(externalUser.userId)
                 if (user.isPresent) {
                     val newUserRoles = externalUser.roles?.map { gataRoleRepository.findByExternalUserProviderId(it.id).get() }
                             .orEmpty()
                     val updatedUser = user.get();
                     updatedUser.email = externalUser.email
                     updatedUser.picture = externalUser.picture
-                    updatedUser.roles = newUserRoles as ArrayList<GataRole>
+                    updatedUser.user!!.roles = newUserRoles as ArrayList<GataRole>
                     updatedUser.lastLogin = externalUser.lastLogin
-                    gataUserRepository.save(updatedUser)
+                    externalUserRepository.save(updatedUser)
                 } else {
-                    val newUserRoles = externalUser.roles?.map { gataRoleRepository.findByExternalUserProviderId(it.id).get() }
-                            .orEmpty()
-                    val newUser = GataUser(
-                            id = null,
-                            externalUserProviderId = externalUser.userId,
+                    val newUser = ExternalUser(
+                            id = externalUser.userId,
                             name = externalUser.name,
                             email = externalUser.email,
                             picture = externalUser.picture,
-                            responsibilities = emptyList(),
-                            roles = newUserRoles as ArrayList<GataRole>,
-                            contingents = emptyList(), subscribe = false, lastLogin = externalUser.lastLogin)
-                    gataUserRepository.save(newUser)
+                            lastLogin = externalUser.lastLogin,
+                            user = null, primary = false);
+                    externalUserRepository.save(newUser)
                 }
             }
         }

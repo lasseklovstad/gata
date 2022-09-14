@@ -1,6 +1,6 @@
 import { useClient } from "./client/useClient";
 import { useCallback, useEffect } from "react";
-import { IGataUser } from "../types/GataUser.type";
+import { IExternalUser, IGataUser } from "../types/GataUser.type";
 import {
    IResponsibilityNotePayload,
    IResponsibilityYear,
@@ -9,7 +9,7 @@ import {
 import { IGataContingent, IGataContingentPayload } from "../types/GataContingent.type";
 
 export const useGetUsers = () => {
-   const [usersResponse, clientFetch] = useClient<IGataUser[], never>();
+   const [usersResponse, clientFetch, updateUser] = useClient<IGataUser[], never>();
 
    const getUsers = useCallback(() => {
       return clientFetch("user");
@@ -19,7 +19,41 @@ export const useGetUsers = () => {
       getUsers();
    }, [getUsers]);
 
-   return { usersResponse, getUsers };
+   return { usersResponse, getUsers, updateUser };
+};
+
+export const useDeleteUser = (userId: string) => {
+   const [deleteUserResponse, clientFetch] = useClient<never, never>();
+
+   const deleteUser = () => {
+      return clientFetch(`user/${userId}`, { method: "DELETE" });
+   };
+
+   return { deleteUserResponse, deleteUser };
+};
+
+export const useCreateUser = (externalUserId: string) => {
+   const [userResponse, clientFetch] = useClient<IGataUser, { externalUserId: string }>();
+
+   const createUser = () => {
+      return clientFetch("user", { method: "POST", body: { externalUserId } });
+   };
+
+   return { userResponse, createUser };
+};
+
+export const useGetExternalUsersWithNoGataUser = () => {
+   const [usersResponse, clientFetch, updateExternalUsers] = useClient<IExternalUser[], never>();
+
+   const getUsers = useCallback(() => {
+      return clientFetch("auth0user/nogatauser");
+   }, [clientFetch]);
+
+   useEffect(() => {
+      getUsers();
+   }, [getUsers]);
+
+   return { usersResponse, getUsers, updateExternalUsers };
 };
 
 export const useGetLoggedInUser = () => {

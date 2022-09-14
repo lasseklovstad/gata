@@ -7,6 +7,11 @@ export const useClient = <ResponseBody extends unknown, RequestBody extends Requ
    const [clientState, setClientState] = useState<UseClientState<ResponseBody>>({
       status: "idle",
    });
+
+   const updateData = (callback: (data: ResponseBody | undefined) => ResponseBody) => {
+      setClientState((state) => ({ ...state, data: callback(state.data) }));
+   };
+
    const { getAccessTokenSilently, isAuthenticated } = useAuth0();
    const controller = useRef<AbortController>();
    const fetchClient = useCallback(
@@ -49,5 +54,5 @@ export const useClient = <ResponseBody extends unknown, RequestBody extends Requ
       };
    }, []);
 
-   return [clientState, fetchClient] as const;
+   return [clientState, fetchClient, updateData] as const;
 };

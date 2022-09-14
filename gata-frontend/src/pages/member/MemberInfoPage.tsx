@@ -1,8 +1,8 @@
-import { Avatar, Box, Button, List, ListItem, ListItemSecondaryAction, Typography } from "@mui/material";
+import { Avatar, Box, Button, IconButton, List, ListItem, ListItemSecondaryAction, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetRoles, useUpdateUserRoles } from "../../api/role.api";
-import { useGetUser } from "../../api/user.api";
+import { useDeleteUser, useGetUser } from "../../api/user.api";
 import { Loading } from "../../components/Loading";
 import { UserInfo } from "../../components/UserInfo";
 import { useRoles } from "../../components/useRoles";
@@ -10,11 +10,27 @@ import { UserResponsibility } from "../../components/UserResponsibilities";
 import { IGataRole } from "../../types/GataRole.type";
 import { IGataUser } from "../../types/GataUser.type";
 import { PageLayout } from "../../components/PageLayout";
+import { Delete } from "@mui/icons-material";
+import { useConfirmDialog } from "../../components/ConfirmDialog";
 
 export const MemberInfoPage = () => {
    const { isAdmin } = useRoles();
    const { memberId } = useParams<{ memberId: string }>();
    const { userResponse } = useGetUser(memberId!!);
+   const { deleteUser, deleteUserResponse } = useDeleteUser(memberId!!);
+   const navigate = useNavigate();
+   const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog({
+      text: "Ved å slette mister vi all informasjon knyttet til brukeren",
+      response: deleteUserResponse,
+      onConfirm: async () => {
+         const { status } = await deleteUser();
+         if (status === "success") {
+            navigate("/member");
+            return true;
+         }
+         return false;
+      },
+   });
    const [user, setUser] = useState<IGataUser>();
 
    const { rolesResponse } = useGetRoles();
@@ -26,8 +42,16 @@ export const MemberInfoPage = () => {
    return (
       <PageLayout>
          <Box display="flex" alignItems="center">
-            <Avatar src={user?.picture} sx={{ mr: 1 }} />
+            <Avatar src={user?.primaryUser.picture} sx={{ mr: 1 }} />
             <Typography variant="h1">Informasjon</Typography>
+            {isAdmin && (
+               <>
+                  <IconButton onClick={openConfirmDialog}>
+                     <Delete />
+                  </IconButton>
+                  {ConfirmDialogComponent}
+               </>
+            )}
          </Box>
          <Loading response={userResponse} />
          {user && <UserInfo user={user} />}

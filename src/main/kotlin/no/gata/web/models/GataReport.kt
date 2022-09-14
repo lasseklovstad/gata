@@ -14,7 +14,7 @@ data class GataReport(
         var description: String,
         var createdDate: Date,
         var lastModifiedDate: Date,
-        var lastModifiedBy: String,
+        var lastModifiedBy: String?,
         @ManyToOne
         @JoinColumn(name="created_by")
         @JsonIncludeProperties("id", "name", "externalUserProviderId")

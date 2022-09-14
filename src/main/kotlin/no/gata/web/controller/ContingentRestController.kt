@@ -1,5 +1,6 @@
 package no.gata.web.controller
 
+import no.gata.web.controller.dtoOut.DtoOutGataContingentInfo
 import no.gata.web.repository.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -11,11 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.Year
 import javax.mail.internet.InternetAddress
-
-data class GataContingentInfo(
-        var size: String,
-        var bank: String
-)
 
 @RestController
 @RequestMapping("api/contingent")
@@ -43,7 +39,7 @@ class ContingentRestController {
         val members = gataUserRepository.findAllByRolesEquals(role.get())
         val membersNotPaid = members.filter {
             it.contingents.find { cont -> cont.year.equals(Year.now()) }?.isPaid != true
-        }
+        }.mapNotNull { it.getPrimaryUser() }
         if (membersNotPaid.isNotEmpty()) {
             val msg = javaMailSender.createMimeMessage()
             val helper = MimeMessageHelper(msg, true)
@@ -58,7 +54,7 @@ class ContingentRestController {
 
     @GetMapping()
     @PreAuthorize("hasAuthority('member')")
-    fun getContigent(): GataContingentInfo {
-        return GataContingentInfo(size = contingentSize, bank = contingentBank)
+    fun getContigent(): DtoOutGataContingentInfo {
+        return DtoOutGataContingentInfo(size = contingentSize, bank = contingentBank)
     }
 }

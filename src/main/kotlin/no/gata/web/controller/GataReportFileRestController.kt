@@ -1,24 +1,16 @@
 package no.gata.web.controller
 
-import com.cloudinary.Cloudinary
-import com.cloudinary.utils.ObjectUtils
+import no.gata.web.controller.dtoInn.DtoInnGataReportFile
 import no.gata.web.models.GataReportFile
 import no.gata.web.repository.GataReportFileRepository
 import no.gata.web.repository.GataReportRepository
-import no.gata.web.repository.GataUserRepository
 import no.gata.web.service.CloudinaryService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
-
-data class GataReportFilePayload(
-        var data: String,
-        var reportId: String
-)
 
 @RestController
 @RequestMapping("api/file")
@@ -36,7 +28,7 @@ class GataReportFileRestController {
     // Old upload
     @PostMapping()
     @PreAuthorize("hasAuthority('member')")
-    fun createReportFile(@RequestBody body: GataReportFilePayload): GataReportFile {
+    fun createReportFile(@RequestBody body: DtoInnGataReportFile): GataReportFile {
         val report = gataReportRepository.findById(UUID.fromString(body.reportId))
         if (report.isPresent) {
             val newFile = GataReportFile(id = null, data = body.data, report = report.get(), cloudUrl = null, cloudId = null)
@@ -47,7 +39,7 @@ class GataReportFileRestController {
 
     @PostMapping("cloud")
     @PreAuthorize("hasAuthority('member')")
-    fun createCloudFile(@RequestBody body: GataReportFilePayload): GataReportFile {
+    fun createCloudFile(@RequestBody body: DtoInnGataReportFile): GataReportFile {
         val report = gataReportRepository.findById(UUID.fromString(body.reportId))
         if (report.isPresent) {
             val cloudFile = cloudinaryService.uploadFile(body.data)
