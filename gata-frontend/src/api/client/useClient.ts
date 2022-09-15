@@ -3,13 +3,19 @@ import { client } from "./client";
 import { ClientConfigType, RequestBodyBase, UseClientState } from "./client.types";
 import { useAuth0 } from "@auth0/auth0-react";
 
-export const useClient = <ResponseBody extends unknown, RequestBody extends RequestBodyBase>() => {
+type DefaultResponseTypes = Record<string, any> | number | string | boolean;
+
+export const useClient = <ResponseBody extends DefaultResponseTypes, RequestBody extends RequestBodyBase>() => {
    const [clientState, setClientState] = useState<UseClientState<ResponseBody>>({
       status: "idle",
    });
 
-   const updateData = (callback: (data: ResponseBody | undefined) => ResponseBody) => {
-      setClientState((state) => ({ ...state, data: callback(state.data) }));
+   const updateData = (callback: ResponseBody | ((data: ResponseBody | undefined) => ResponseBody)) => {
+      if (typeof callback === "function") {
+         setClientState((state) => ({ ...state, data: callback(state.data) }));
+      } else {
+         setClientState((state) => ({ ...state, data: callback }));
+      }
    };
 
    const { getAccessTokenSilently, isAuthenticated } = useAuth0();

@@ -12,11 +12,12 @@ import { IGataUser } from "../../types/GataUser.type";
 import { PageLayout } from "../../components/PageLayout";
 import { Delete } from "@mui/icons-material";
 import { useConfirmDialog } from "../../components/ConfirmDialog";
+import { LinkExternalUserToGataUserSelect } from "./LinkExternalUserToGataUserSelect";
 
 export const MemberInfoPage = () => {
    const { isAdmin } = useRoles();
    const { memberId } = useParams<{ memberId: string }>();
-   const { userResponse } = useGetUser(memberId!!);
+   const { userResponse, updateUser } = useGetUser(memberId!!);
    const { deleteUser, deleteUserResponse } = useDeleteUser(memberId!!);
    const navigate = useNavigate();
    const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog({
@@ -31,13 +32,10 @@ export const MemberInfoPage = () => {
          return false;
       },
    });
-   const [user, setUser] = useState<IGataUser>();
+
+   const user = userResponse.data;
 
    const { rolesResponse } = useGetRoles();
-
-   useEffect(() => {
-      userResponse.data && setUser(userResponse.data);
-   }, [userResponse.data]);
 
    return (
       <PageLayout>
@@ -55,6 +53,17 @@ export const MemberInfoPage = () => {
          </Box>
          <Loading response={userResponse} />
          {user && <UserInfo user={user} />}
+         {isAdmin && user && (
+            <LinkExternalUserToGataUserSelect
+               externalUsers={user.externalUserProviders}
+               onChange={(externalUserProviders) =>
+                  updateUser({
+                     ...user,
+                     externalUserProviders,
+                  })
+               }
+            />
+         )}
          <Typography variant="h2">Roller</Typography>
          <Loading response={rolesResponse} />
          <List>
@@ -64,7 +73,7 @@ export const MemberInfoPage = () => {
                      {role.name}
                      {isAdmin && (
                         <ListItemSecondaryAction>
-                           {user && <RoleButton role={role} user={user} onChange={(newUser) => setUser(newUser)} />}
+                           {user && <RoleButton role={role} user={user} onChange={updateUser} />}
                         </ListItemSecondaryAction>
                      )}
                   </ListItem>

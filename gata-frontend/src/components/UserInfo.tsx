@@ -6,6 +6,7 @@ import { LoadingButton } from "./Loading";
 import { ErrorAlert } from "./ErrorAlert";
 import { useRoles } from "./useRoles";
 import { useGetContingentInfo } from "../api/contingent.api";
+import { SelectPrimaryEmail } from "./SelectPrimaryEmail";
 
 type UserInfoProps = {
    user: IGataUser;
@@ -55,9 +56,13 @@ export const UserInfo = ({ user }: UserInfoProps) => {
             <Typography variant="body1">
                <strong>Navn:</strong> {user.primaryUser.name}
             </Typography>
-            <Typography variant="body1">
-               <strong>Email:</strong> {user.primaryUser.email}
-            </Typography>
+            {isAdmin ? (
+               <SelectPrimaryEmail user={user} />
+            ) : (
+               <Typography variant="body1">
+                  <strong>Email:</strong> {user.primaryUser.email}
+               </Typography>
+            )}
          </Box>
          <Typography variant="h2" gutterBottom>
             Kontingent

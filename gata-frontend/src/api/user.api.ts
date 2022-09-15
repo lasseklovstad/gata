@@ -66,12 +66,12 @@ export const useGetLoggedInUser = () => {
 };
 
 export const useGetUser = (userId: string) => {
-   const [userResponse, fetchUsers] = useClient<IGataUser, never>();
+   const [userResponse, fetchUsers, updateUser] = useClient<IGataUser, never>();
    useEffect(() => {
       fetchUsers(`user/${userId}`);
    }, [fetchUsers, userId]);
 
-   return { userResponse };
+   return { userResponse, updateUser };
 };
 
 export const useClearUserCache = () => {

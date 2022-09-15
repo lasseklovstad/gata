@@ -1,9 +1,7 @@
 package no.gata.web.service
 
-import no.gata.web.controller.dtoOut.DtoOutGataUser
 import no.gata.web.models.GataRole
 import no.gata.web.models.GataUser
-import no.gata.web.repository.GataRoleRepository
 import no.gata.web.repository.GataUserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
@@ -15,9 +13,6 @@ class RoleService {
 
     @Autowired
     private lateinit var auth0RestService: Auth0RestService
-
-    @Autowired
-    private lateinit var roleRepository: GataRoleRepository
 
     @Autowired
     private lateinit var gataUserRepository: GataUserRepository
