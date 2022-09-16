@@ -153,7 +153,7 @@ class Auth0RestService(private val builder: WebClient.Builder) {
                             email = externalUser.email,
                             picture = externalUser.picture,
                             lastLogin = externalUser.lastLogin,
-                            user = null, primary = false);
+                            user = null, primary = false)
                     externalUserRepository.save(newUser)
                 }
             }

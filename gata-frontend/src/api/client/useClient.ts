@@ -3,7 +3,7 @@ import { client } from "./client";
 import { ClientConfigType, RequestBodyBase, UseClientState } from "./client.types";
 import { useAuth0 } from "@auth0/auth0-react";
 
-type DefaultResponseTypes = Record<string, any> | number | string | boolean;
+export type DefaultResponseTypes = Record<string, any> | number | string | boolean;
 
 export const useClient = <ResponseBody extends DefaultResponseTypes, RequestBody extends RequestBodyBase>() => {
    const [clientState, setClientState] = useState<UseClientState<ResponseBody>>({

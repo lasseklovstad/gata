@@ -1,26 +1,41 @@
-import { Box, Chip, FormControl, FormHelperText, InputLabel, MenuItem, OutlinedInput, Select } from "@mui/material";
-import { useGetExternalUsersWithNoGataUser } from "../../api/user.api";
-import { IExternalUser } from "../../types/GataUser.type";
+import {
+   Box,
+   Chip,
+   CircularProgress,
+   FormControl,
+   FormHelperText,
+   InputLabel,
+   OutlinedInput,
+   Select,
+} from "@mui/material";
+import { useGetExternalUsersWithNoGataUser, useUpdateExternalUsers } from "../../api/user.api";
+import { IGataUser } from "../../types/GataUser.type";
 import { SelectInputProps } from "@mui/material/Select/SelectInput";
+import { ExternalUserMenuItem } from "../../components/ExternalUserMenuItem";
+import { ExternalUserIcon } from "../../components/ExternalUserIcon";
+import { ErrorAlert } from "../../components/ErrorAlert";
 
 type LinkExternalUserToGataUserSelectProps = {
-   externalUsers: IExternalUser[];
-   onChange: (externalUsers: IExternalUser[]) => void;
+   user: IGataUser;
+   onChange: (user: IGataUser) => void;
 };
 
 export const LinkExternalUserToGataUserSelect = ({
-   externalUsers,
+   user: { externalUserProviders, id },
    onChange,
 }: LinkExternalUserToGataUserSelectProps) => {
-   const { usersResponse, updateExternalUsers } = useGetExternalUsersWithNoGataUser();
+   const { usersResponse, updateExternalUsersWithNoGataUser } = useGetExternalUsersWithNoGataUser();
+   const { updateExternalUsers, updateExternalUsersResponse } = useUpdateExternalUsers(id);
 
-   const handleChange: SelectInputProps<string[]>["onChange"] = (ev) => {
-      const updatedExternalUsers = menuItems.filter(({ id }) => ev.target.value.includes(id)) || [];
-      updateExternalUsers(menuItems?.filter(({ id }) => !ev.target.value.includes(id)) || []);
-      onChange(updatedExternalUsers);
+   const handleChange: SelectInputProps<string[]>["onChange"] = async (ev) => {
+      const { data, status } = await updateExternalUsers(ev.target.value as string[]);
+      if (data && status === "success") {
+         updateExternalUsersWithNoGataUser(menuItems?.filter(({ id }) => !ev.target.value.includes(id)) || []);
+         onChange(data);
+      }
    };
 
-   const menuItems = [...externalUsers, ...(usersResponse.data || [])];
+   const menuItems = [...externalUserProviders, ...(usersResponse.data || [])];
 
    return (
       <>
@@ -30,31 +45,38 @@ export const LinkExternalUserToGataUserSelect = ({
                labelId="demo-multiple-name-label"
                id="demo-multiple-name"
                multiple
-               value={externalUsers.map((user) => user.id)}
+               value={externalUserProviders.map((user) => user.id)}
                onChange={handleChange}
                input={<OutlinedInput label="Epost tilknytninger" />}
                MenuProps={MenuProps}
                renderValue={(selected) => {
                   const items = menuItems.filter((user) => selected.includes(user.id));
                   return (
-                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center" }}>
                         {items.map((user) => (
-                           <Chip key={user.id} label={user.email} />
+                           <Chip
+                              icon={<ExternalUserIcon sx={{ ml: 1 }} user={user} />}
+                              key={user.id}
+                              label={user.email}
+                           />
                         ))}
+                        {updateExternalUsersResponse.status === "loading" && <CircularProgress />}
                      </Box>
                   );
                }}
             >
                {menuItems.map((user) => (
-                  <MenuItem key={user.id} value={user.id}>
-                     {user.email}
-                  </MenuItem>
+                  <ExternalUserMenuItem key={user.id} value={user.id} user={user} disabled={user.primary} />
                ))}
             </Select>
 
             <FormHelperText>
                Hvis en bruker har logget inn med forskjellige tjenester, kan disse kontoene knyttes sammen her!
             </FormHelperText>
+            <ErrorAlert
+               response={updateExternalUsersResponse}
+               alertTitle="Det oppstod en feil ved lagring av eksterne brukere"
+            />
          </FormControl>
       </>
    );

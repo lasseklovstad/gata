@@ -9,7 +9,7 @@ import { IGataUser } from "../types/GataUser.type";
 import { ErrorAlert } from "../components/ErrorAlert";
 
 export const MyPage = () => {
-   const { userResponse } = useGetLoggedInUser();
+   const { userResponse, updateUser } = useGetLoggedInUser();
    const [user, setUser] = useState<IGataUser>();
    const { updateSubrscribe, updateSubrscribeResponse } = useUpdateSubscribe();
 
@@ -37,7 +37,7 @@ export const MyPage = () => {
             )}
             <ErrorAlert response={updateSubrscribeResponse} />
             <Loading response={userResponse} />
-            {userResponse.data && <UserInfo user={userResponse.data} />}
+            {userResponse.data && <UserInfo user={userResponse.data} onChange={updateUser} />}
             {userResponse.data && <UserResponsibility user={userResponse.data} />}
          </PageLayout>
       </>

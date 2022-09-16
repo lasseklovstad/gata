@@ -1,6 +1,7 @@
 import { ClientConfigType, RequestBodyBase } from "./client.types";
+import { DefaultResponseTypes } from "./useClient";
 
-export const client = <ResponseBody extends unknown, RequestBody extends RequestBodyBase>(
+export const client = <ResponseBody extends DefaultResponseTypes, RequestBody extends RequestBodyBase>(
    url: string,
    { body, token, ...customConfig } = {} as ClientConfigType<RequestBody>
 ) => {
@@ -17,7 +18,7 @@ export const client = <ResponseBody extends unknown, RequestBody extends Request
       },
    };
    if (body) {
-      config.body = JSON.stringify(body);
+      config.body = typeof body !== "string" ? JSON.stringify(body) : body;
    }
 
    return window.fetch(`/api/${url}`, config).then(async (response) => {

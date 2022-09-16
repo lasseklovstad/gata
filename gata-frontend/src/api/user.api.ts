@@ -43,7 +43,7 @@ export const useCreateUser = (externalUserId: string) => {
 };
 
 export const useGetExternalUsersWithNoGataUser = () => {
-   const [usersResponse, clientFetch, updateExternalUsers] = useClient<IExternalUser[], never>();
+   const [usersResponse, clientFetch, updateExternalUsersWithNoGataUser] = useClient<IExternalUser[], never>();
 
    const getUsers = useCallback(() => {
       return clientFetch("auth0user/nogatauser");
@@ -53,16 +53,16 @@ export const useGetExternalUsersWithNoGataUser = () => {
       getUsers();
    }, [getUsers]);
 
-   return { usersResponse, getUsers, updateExternalUsers };
+   return { usersResponse, getUsers, updateExternalUsersWithNoGataUser };
 };
 
 export const useGetLoggedInUser = () => {
-   const [userResponse, fetchUsers] = useClient<IGataUser, never>();
+   const [userResponse, fetchUsers, updateUser] = useClient<IGataUser, never>();
    useEffect(() => {
       fetchUsers("user/loggedin");
    }, [fetchUsers]);
 
-   return { userResponse };
+   return { userResponse, updateUser };
 };
 
 export const useGetUser = (userId: string) => {
@@ -143,4 +143,28 @@ export const useUpdateSubscribe = () => {
    };
 
    return { updateSubrscribeResponse, updateSubrscribe };
+};
+
+export const useUpdateExternalUsers = (userId: string) => {
+   const [updateExternalUsersResponse, clientFetch] = useClient<IGataUser, string[]>();
+   const updateExternalUsers = (body: string[]) => {
+      return clientFetch(`user/${userId}/externaluserproviders`, {
+         method: "PUT",
+         body,
+      });
+   };
+
+   return { updateExternalUsersResponse, updateExternalUsers };
+};
+
+export const usePrimaryExternalUser = (userId: string) => {
+   const [updatePrimaryUserResponse, clientFetch] = useClient<IGataUser, string>();
+   const updatePrimaryUser = (body: string) => {
+      return clientFetch(`user/${userId}/primaryuser`, {
+         method: "PUT",
+         body,
+      });
+   };
+
+   return { updatePrimaryUserResponse, updatePrimaryUser };
 };

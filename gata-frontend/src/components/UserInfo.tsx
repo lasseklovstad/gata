@@ -10,11 +10,12 @@ import { SelectPrimaryEmail } from "./SelectPrimaryEmail";
 
 type UserInfoProps = {
    user: IGataUser;
+   onChange: (user: IGataUser) => void;
 };
 const numberOfYears = 10;
 const todaysYear = new Date().getFullYear();
 const years = Array.from({ length: numberOfYears }, (v, i) => todaysYear - numberOfYears + 2 + i).reverse();
-export const UserInfo = ({ user }: UserInfoProps) => {
+export const UserInfo = ({ user, onChange }: UserInfoProps) => {
    const { isAdmin } = useRoles();
    const [selectedYear, setSelectedYear] = useState(todaysYear.toString());
    const [contingents, setContingents] = useState(user.contingents);
@@ -29,7 +30,7 @@ export const UserInfo = ({ user }: UserInfoProps) => {
    };
 
    const getContingent = () => {
-      const hasPaid = contingents.find((c) => c.year === selectedYear)?.isPaid;
+      const hasPaid = contingents.find((c) => c.year.toString(10) === selectedYear)?.isPaid;
       return (
          <Alert
             severity={hasPaid ? "success" : "warning"}
@@ -52,12 +53,12 @@ export const UserInfo = ({ user }: UserInfoProps) => {
    };
    return (
       <>
-         <Box m={1}>
+         <Box my={1}>
             <Typography variant="body1">
                <strong>Navn:</strong> {user.primaryUser.name}
             </Typography>
             {isAdmin ? (
-               <SelectPrimaryEmail user={user} />
+               <SelectPrimaryEmail user={user} onChange={onChange} />
             ) : (
                <Typography variant="body1">
                   <strong>Email:</strong> {user.primaryUser.email}

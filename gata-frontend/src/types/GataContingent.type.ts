@@ -1,6 +1,6 @@
 export interface IGataContingent {
    id: string;
-   year: string;
+   year: number;
    isPaid: boolean;
 }
 

@@ -52,18 +52,8 @@ export const MemberInfoPage = () => {
             )}
          </Box>
          <Loading response={userResponse} />
-         {user && <UserInfo user={user} />}
-         {isAdmin && user && (
-            <LinkExternalUserToGataUserSelect
-               externalUsers={user.externalUserProviders}
-               onChange={(externalUserProviders) =>
-                  updateUser({
-                     ...user,
-                     externalUserProviders,
-                  })
-               }
-            />
-         )}
+         {user && <UserInfo user={user} onChange={updateUser} />}
+         {isAdmin && user && <LinkExternalUserToGataUserSelect user={user} onChange={updateUser} />}
          <Typography variant="h2">Roller</Typography>
          <Loading response={rolesResponse} />
          <List>

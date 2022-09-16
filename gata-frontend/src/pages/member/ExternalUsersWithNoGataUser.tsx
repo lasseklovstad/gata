@@ -9,10 +9,10 @@ type ExternalUsersWithNoGataUserProps = {
 };
 
 export const ExternalUsersWithNoGataUser = ({ onAddUser }: ExternalUsersWithNoGataUserProps) => {
-   const { usersResponse, updateExternalUsers } = useGetExternalUsersWithNoGataUser();
+   const { usersResponse, updateExternalUsersWithNoGataUser } = useGetExternalUsersWithNoGataUser();
 
    const handleAddUser = (newUser: IGataUser) => {
-      updateExternalUsers((externalUsers) => {
+      updateExternalUsersWithNoGataUser((externalUsers) => {
          onAddUser(newUser);
          return externalUsers?.filter((externalUser) => externalUser.id !== newUser.primaryUser.id) || [];
       });

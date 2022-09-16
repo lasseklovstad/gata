@@ -105,6 +105,7 @@ class GataUserRestController {
         // Remove link to external user
         gatUser.externalUserProviders = gatUser.externalUserProviders.map {
             it.user = null
+            it.primary = false
             it
         }
         gataUserRepository.save(gatUser)
@@ -215,6 +216,31 @@ class GataUserRestController {
     fun updateSubscribe(@PathVariable id: String): DtoOutGataUser {
         val user = gataUserRepository.findById(UUID.fromString(id)).get()
         user.subscribe = !user.subscribe
+        return DtoOutGataUser(gataUserRepository.save(user))
+    }
+
+    @PutMapping("{id}/externaluserproviders")
+    @PreAuthorize("hasAuthority('admin')")
+    fun updateExternalUserProviders(@PathVariable id: String, @RequestBody externalUserProviderIds: List<String>): DtoOutGataUser {
+        val user = gataUserRepository
+                .findById(UUID.fromString(id))
+                .orElseThrow(({ ResponseStatusException(HttpStatus.NOT_FOUND, "User with id $id not found") }))
+        val removeExternalUserProviders = user.externalUserProviders.filter { !externalUserProviderIds.contains(it.id) }.onEach { it.user = null }
+        val externalUserProviders = externalUserRepository.findAllById(externalUserProviderIds).onEach { it.user = user }
+        externalUserRepository.saveAll(removeExternalUserProviders)
+        user.externalUserProviders = externalUserProviders
+        return DtoOutGataUser(gataUserRepository.save(user))
+    }
+
+    @PutMapping("{id}/primaryuser")
+    @PreAuthorize("hasAuthority('admin')")
+    fun updatePrimaryExternalUser(@PathVariable id: String, @RequestBody externalUserId: String): DtoOutGataUser {
+        val user = gataUserRepository
+                .findById(UUID.fromString(id))
+                .orElseThrow(({ ResponseStatusException(HttpStatus.NOT_FOUND, "User with id $id not found") }))
+        user.externalUserProviders.onEach {
+            it.primary = it.id == externalUserId
+        }
         return DtoOutGataUser(gataUserRepository.save(user))
     }
 }
