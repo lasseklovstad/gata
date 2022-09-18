@@ -1,5 +1,6 @@
 package no.gata.web.service
 
+import no.gata.web.models.ExternalUser
 import no.gata.web.models.GataRole
 import no.gata.web.models.GataUser
 import no.gata.web.repository.GataUserRepository
@@ -49,5 +50,19 @@ class RoleService {
             return gataUserRepository.save(gataUser)
         }
         return null
+    }
+
+    fun deleteRoles(externalUserProviders: List<ExternalUser>, roles: List<GataRole>) {
+        val roleIds = roles.map { it.externalUserProviderId }
+        externalUserProviders.forEach {
+            auth0RestService.updateRole(it.id, roleIds, HttpMethod.DELETE);
+        }
+    }
+
+    fun addRoles(externalUserProviders: List<ExternalUser>, roles: List<GataRole>) {
+        val roleIds = roles.map { it.externalUserProviderId }
+        externalUserProviders.forEach {
+            auth0RestService.updateRole(it.id, roleIds, HttpMethod.POST);
+        }
     }
 }

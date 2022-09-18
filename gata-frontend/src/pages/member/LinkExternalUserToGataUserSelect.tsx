@@ -48,7 +48,6 @@ export const LinkExternalUserToGataUserSelect = ({
                value={externalUserProviders.map((user) => user.id)}
                onChange={handleChange}
                input={<OutlinedInput label="Epost tilknytninger" />}
-               MenuProps={MenuProps}
                renderValue={(selected) => {
                   const items = menuItems.filter((user) => selected.includes(user.id));
                   return (
@@ -80,15 +79,4 @@ export const LinkExternalUserToGataUserSelect = ({
          </FormControl>
       </>
    );
-};
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-   PaperProps: {
-      style: {
-         maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-         width: 250,
-      },
-   },
 };

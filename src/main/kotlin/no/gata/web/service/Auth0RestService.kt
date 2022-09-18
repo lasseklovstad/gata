@@ -143,7 +143,9 @@ class Auth0RestService(private val builder: WebClient.Builder) {
                     val updatedUser = user.get();
                     updatedUser.email = externalUser.email
                     updatedUser.picture = externalUser.picture
-                    updatedUser.user!!.roles = newUserRoles as ArrayList<GataRole>
+                    if (updatedUser.user != null) {
+                        updatedUser.user!!.roles = newUserRoles as ArrayList<GataRole>
+                    }
                     updatedUser.lastLogin = externalUser.lastLogin
                     externalUserRepository.save(updatedUser)
                 } else {

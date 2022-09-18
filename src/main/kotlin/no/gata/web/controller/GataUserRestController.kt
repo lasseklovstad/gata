@@ -227,6 +227,8 @@ class GataUserRestController {
                 .orElseThrow(({ ResponseStatusException(HttpStatus.NOT_FOUND, "User with id $id not found") }))
         val removeExternalUserProviders = user.externalUserProviders.filter { !externalUserProviderIds.contains(it.id) }.onEach { it.user = null }
         val externalUserProviders = externalUserRepository.findAllById(externalUserProviderIds).onEach { it.user = user }
+        roleService.deleteRoles(removeExternalUserProviders, user.roles)
+        roleService.addRoles(externalUserProviders, user.roles)
         externalUserRepository.saveAll(removeExternalUserProviders)
         user.externalUserProviders = externalUserProviders
         return DtoOutGataUser(gataUserRepository.save(user))
