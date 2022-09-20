@@ -1,8 +1,8 @@
 import { IGataReport } from "../types/GataReport.type";
 import { useGetGataReport } from "../api/report.api";
 import { RichTextPreview } from "./RichTextEditor/RichTextPreview";
-import { Box, Button, Paper, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
+import { Text, Box, Button } from "@chakra-ui/react";
 
 type NewsItemProps = {
    simpleReport: IGataReport;
@@ -13,17 +13,17 @@ export const NewsItem = ({ simpleReport }: NewsItemProps) => {
    return (
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%", alignItems: "flex-end" }}>
          {canEdit && (
-            <Button component={Link} to={`report/${simpleReport.id}`}>
+            <Button as={Link} to={`report/${simpleReport.id}`} variant="ghost">
                Rediger
             </Button>
          )}
-         <Paper variant="outlined" sx={{ p: { xs: 1, md: 2 }, width: "100%" }}>
+         <Box boxShadow="xs" rounded={4} sx={{ p: { base: 1, md: 2 }, width: "100%" }}>
             {reportResponse.data?.content && <RichTextPreview content={reportResponse.data.content} />}
-            {!reportResponse.data?.content && <Typography gutterBottom>Det er ikke lagt til innhold enda.</Typography>}
-         </Paper>
-         <Typography variant="body2" sx={{ color: "text.secondary" }}>
+            {!reportResponse.data?.content && <Text>Det er ikke lagt til innhold enda.</Text>}
+         </Box>
+         <Text fontSize="sm" color="gray">
             Dato endret: {new Date(simpleReport.lastModifiedDate).toLocaleDateString()}
-         </Typography>
+         </Text>
       </Box>
    );
 };

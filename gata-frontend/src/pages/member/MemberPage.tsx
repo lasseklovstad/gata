@@ -1,4 +1,4 @@
-import { Box, Button, List, ListItem, ListItemText, Tooltip, Typography } from "@mui/material";
+import { Box, List, ListItem, Text, Heading } from "@chakra-ui/react";
 import { useClearUserCache, useGetUsers } from "../../api/user.api";
 import { Loading, LoadingButton } from "../../components/Loading";
 import { useRoles } from "../../components/useRoles";
@@ -8,6 +8,7 @@ import { Email } from "@mui/icons-material";
 import { usePublishKontigentReport } from "../../api/contingent.api";
 import { UserListItem } from "./UserListItem";
 import { ExternalUsersWithNoGataUser } from "./ExternalUsersWithNoGataUser";
+import { Button, Tooltip } from "@chakra-ui/react";
 
 export const MemberPage = () => {
    const { isAdmin } = useRoles();
@@ -44,18 +45,22 @@ export const MemberPage = () => {
    return (
       <PageLayout>
          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Typography variant="h1">Brukere</Typography>
+            <Heading as="h1" size="xl">
+               Brukere
+            </Heading>
             {isAdmin && (
-               <Tooltip title={"Hent nye brukere som har logget inn"}>
-                  <Button onClick={handleUpdate}>Oppdater</Button>
+               <Tooltip label="Hent nye brukere som har logget inn">
+                  <Button variant="ghost" onClick={handleUpdate}>
+                     Oppdater
+                  </Button>
                </Tooltip>
             )}
             {isAdmin && (
-               <Tooltip title={"Send påminnelse om betaling til de som ikke har betalt kontigent"}>
+               <Tooltip label="Send påminnelse om betaling til de som ikke har betalt kontigent">
                   <LoadingButton
                      response={publishContigentResponse}
-                     variant="text"
-                     startIcon={<Email />}
+                     variant="ghost"
+                     leftIcon={<Email />}
                      onClick={startPublishContigent}
                      sx={{ mr: 1 }}
                   >
@@ -67,46 +72,34 @@ export const MemberPage = () => {
          {ConfirmPublishKontigentDialog}
          <Loading response={cacheResponse} alertTitle="Det oppstod en feil ved oppdatering av cache" />
          <Loading response={usersResponse} alertTitle="Det oppstod en feil ved henting av medlemer" />
-         <Typography variant="h2" id="admin-title">
+         <Heading as="h2" id="admin-title" size="lg">
             Administratorer
-         </Typography>
+         </Heading>
          <List aria-labelledby="admin-title">
             {admins?.map((user) => {
                return <UserListItem key={user.id} user={user} />;
             })}
-            {admins?.length === 0 && (
-               <ListItem>
-                  <ListItemText>Ingen administratorer funnet</ListItemText>
-               </ListItem>
-            )}
+            {admins?.length === 0 && <ListItem>Ingen administratorer funnet</ListItem>}
          </List>
-         <Typography variant="h2" id="member-title">
+         <Heading as="h2" id="member-title" size="lg">
             Medlemmer
-         </Typography>
+         </Heading>
          <List aria-labelledby="member-title">
             {members?.map((user) => {
                return <UserListItem key={user.id} user={user} />;
             })}
-            {usersResponse.data?.length === 0 && (
-               <ListItem>
-                  <ListItemText>Ingen medlemmer funnet</ListItemText>
-               </ListItem>
-            )}
+            {usersResponse.data?.length === 0 && <ListItem>Ingen medlemmer funnet</ListItem>}
          </List>
          {isAdmin && (
             <>
-               <Typography variant="h2" id="non-member-title">
+               <Heading variant="h2" id="non-member-title" size="lg">
                   Ikke medlem
-               </Typography>
+               </Heading>
                <List aria-labelledby="non-member-title">
                   {nonMembers?.map((user) => {
                      return <UserListItem key={user.id} user={user} />;
                   })}
-                  {nonMembers?.length === 0 && (
-                     <ListItem>
-                        <ListItemText>Ingen andre brukere</ListItemText>
-                     </ListItem>
-                  )}
+                  {nonMembers?.length === 0 && <ListItem>Ingen andre brukere</ListItem>}
                </List>
                <ExternalUsersWithNoGataUser
                   onAddUser={(newUser) => {

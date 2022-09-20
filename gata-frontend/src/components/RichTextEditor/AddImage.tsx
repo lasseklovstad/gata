@@ -1,5 +1,18 @@
 import { Image } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, TextField } from "@mui/material";
+import {
+   Button,
+   FormControl,
+   FormErrorMessage,
+   FormHelperText,
+   FormLabel,
+   Modal,
+   ModalBody,
+   ModalContent,
+   ModalFooter,
+   ModalHeader,
+   ModalOverlay,
+   Textarea,
+} from "@chakra-ui/react";
 import { useState } from "react";
 
 type AddImageProps = {
@@ -19,43 +32,45 @@ export const AddImage = ({ onAddImage }: AddImageProps) => {
 
    return (
       <>
-         <Button startIcon={<Image />} onClick={() => setDialogOpen(true)}>
+         <Button variant="outline" leftIcon={<Image />} onClick={() => setDialogOpen(true)}>
             Bilde
          </Button>
-         <Dialog open={dialogOpen} maxWidth="md" fullWidth>
-            <DialogTitle>Legg til bilde</DialogTitle>
-            <DialogContent>
-               <TextField
-                  fullWidth
-                  variant="filled"
-                  multiline
-                  rows={5}
-                  label="Bilde url"
-                  placeholder="https://am3pap006files.storage.live.com/y4m9oBPr...."
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  error={!!error}
-                  helperText={error}
-               />
-               <FormHelperText>Tips: Last opp filer på One Drive og del bilde med å lage en link</FormHelperText>
-            </DialogContent>
-            <DialogActions>
-               <Button
-                  onClick={() => {
-                     if (url.startsWith("https")) {
-                        reset();
-                        onAddImage(url);
-                     } else {
-                        setError("Url'en må starte med https");
-                     }
-                  }}
-                  variant="contained"
-               >
-                  Lagre
-               </Button>
-               <Button onClick={() => reset()}>Avbryt</Button>
-            </DialogActions>
-         </Dialog>
+         <Modal isOpen={dialogOpen} onClose={() => setDialogOpen(false)}>
+            <ModalOverlay />
+            <ModalContent>
+               <ModalHeader>Legg til bilde</ModalHeader>
+               <ModalBody>
+                  <FormControl isInvalid={!!error}>
+                     <FormLabel>Bilde url</FormLabel>
+                     <Textarea
+                        variant="filled"
+                        placeholder="https://am3pap006files.storage.live.com/y4m9oBPr...."
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                     />
+                     <FormErrorMessage>{error}</FormErrorMessage>
+                     <FormHelperText>Tips: Last opp filer på One Drive og del bilde med å lage en link</FormHelperText>
+                  </FormControl>
+               </ModalBody>
+               <ModalFooter>
+                  <Button
+                     onClick={() => {
+                        if (url.startsWith("https")) {
+                           reset();
+                           onAddImage(url);
+                        } else {
+                           setError("Url'en må starte med https");
+                        }
+                     }}
+                  >
+                     Lagre
+                  </Button>
+                  <Button onClick={() => reset()} variant="ghost">
+                     Avbryt
+                  </Button>
+               </ModalFooter>
+            </ModalContent>
+         </Modal>
       </>
    );
 };

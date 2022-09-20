@@ -1,12 +1,12 @@
-import { Delete, Edit, Email } from "@mui/icons-material";
-import { Box, Button, IconButton, Paper, Typography } from "@mui/material";
+import { Delete, Edit } from "@mui/icons-material";
+import { Box, Button, IconButton, Text, Heading } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Descendant } from "slate";
-import { useGetGataReport, usePublishReport, usePutGataReportContent, useSaveGataReport } from "../../api/report.api";
+import { useGetGataReport, usePutGataReportContent, useSaveGataReport } from "../../api/report.api";
 import { useConfirmDialog } from "../../components/ConfirmDialog";
 import { GataReportFormDialog } from "../../components/GataReportFormDialog";
-import { Loading, LoadingButton } from "../../components/Loading";
+import { Loading } from "../../components/Loading";
 import { PageLayout } from "../../components/PageLayout";
 import { RichTextEditor } from "../../components/RichTextEditor/RichTextEditor";
 import { RichTextPreview } from "../../components/RichTextEditor/RichTextPreview";
@@ -72,34 +72,42 @@ export const ReportInfoPage = () => {
    return (
       <PageLayout>
          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
-            <Typography variant="h1" id="report-page-title">
+            <Heading as="h1" id="report-page-title">
                {report.title}
-            </Typography>
+            </Heading>
             {canEdit && (
                <Box>
                   <Button
-                     variant="text"
-                     startIcon={<Delete />}
+                     variant="ghost"
+                     leftIcon={<Delete />}
                      onClick={openConfirmDelete}
-                     sx={{ mr: 1, display: { xs: "none", md: "inline-flex" } }}
+                     sx={{ mr: 1, display: { base: "none", md: "inline-flex" } }}
                   >
                      Slett
                   </Button>
                   <PublishButton reportId={reportId!} />
                   <Button
-                     variant="text"
-                     startIcon={<Edit />}
+                     variant="ghost"
+                     leftIcon={<Edit />}
                      onClick={() => setIsReportModalOpen(true)}
-                     sx={{ display: { xs: "none", md: "inline-flex" } }}
+                     sx={{ display: { base: "none", md: "inline-flex" } }}
                   >
                      Rediger info
                   </Button>
-                  <IconButton onClick={openConfirmDelete} sx={{ mr: 1, display: { md: "none" } }}>
-                     <Delete />
-                  </IconButton>
-                  <IconButton onClick={() => setIsReportModalOpen(true)} sx={{ display: { md: "none" } }}>
-                     <Edit />
-                  </IconButton>
+                  <IconButton
+                     variant="ghost"
+                     onClick={openConfirmDelete}
+                     sx={{ mr: 1, display: { md: "none" } }}
+                     icon={<Delete />}
+                     aria-label="Slett"
+                  />
+                  <IconButton
+                     variant="ghost"
+                     onClick={() => setIsReportModalOpen(true)}
+                     sx={{ display: { md: "none" } }}
+                     icon={<Edit />}
+                     aria-label="Rediger"
+                  />
                </Box>
             )}
          </Box>
@@ -116,30 +124,37 @@ export const ReportInfoPage = () => {
          )}
          {ConfirmCancelDialog}
          {ConfirmDeleteDialog}
-         <Typography variant="body1" gutterBottom>
-            {report.description}
-         </Typography>
+         <Text mb={2}>{report.description}</Text>
          {!editing && (
             <>
                {canEdit && (
                   <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                      <Button
-                        variant="contained"
-                        startIcon={<Edit />}
+                        leftIcon={<Edit />}
                         onClick={() => setEditing(true)}
-                        sx={{ display: { xs: "none", md: "inline-flex" } }}
+                        sx={{ display: { base: "none", md: "flex" } }}
                      >
                         Rediger innhold
                      </Button>
-                     <IconButton color="primary" onClick={() => setEditing(true)} sx={{ display: { md: "none" } }}>
-                        <Edit />
-                     </IconButton>
+                     <IconButton
+                        variant="ghost"
+                        onClick={() => setEditing(true)}
+                        sx={{ display: { md: "none" } }}
+                        aria-label="Rediger"
+                        icon={<Edit />}
+                     />
                   </Box>
                )}
-               <Paper variant="outlined" sx={{ p: { xs: 1, md: 2 } }} onDoubleClick={() => setEditing(true)}>
+               <Box
+                  boxShadow="xs"
+                  rounded={4}
+                  bg="white"
+                  sx={{ p: { base: 1, md: 2 } }}
+                  onDoubleClick={() => setEditing(true)}
+               >
                   {report.content && <RichTextPreview content={report.content} />}
-                  {!report.content && <Typography gutterBottom>Det er ikke lagt til innhold enda.</Typography>}
-               </Paper>
+                  {!report.content && <Text>Det er ikke lagt til innhold enda.</Text>}
+               </Box>
             </>
          )}
          {editing && (
@@ -153,10 +168,10 @@ export const ReportInfoPage = () => {
                />
             </>
          )}
-         <Typography variant="body2" sx={{ color: "text.secondary", mt: 1, mb: 10 }}>
+         <Text fontSize="sm" color="gray" sx={{ mt: 1, mb: 10 }}>
             Sist redigert av: {report.lastModifiedBy}, {lastModifiedDate.toLocaleDateString()}{" "}
             {lastModifiedDate.toLocaleTimeString()}
-         </Typography>
+         </Text>
       </PageLayout>
    );
 };

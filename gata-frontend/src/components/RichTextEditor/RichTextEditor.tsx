@@ -7,7 +7,7 @@ import {
    Save,
    ViewList,
 } from "@mui/icons-material";
-import { Box, Button, Divider, Paper, ToggleButtonGroup } from "@mui/material";
+import { Box, Button, ButtonGroup, Divider } from "@chakra-ui/react";
 import { useCallback, useMemo, useRef } from "react";
 import { createEditor, Descendant } from "slate";
 import { withHistory } from "slate-history";
@@ -68,8 +68,9 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                }
             }}
          >
-            <Paper sx={{ mt: 1 }}>
+            <Box boxShadow="xl" sx={{ mt: 1 }}>
                <Box
+                  bg="white"
                   sx={{
                      display: "flex",
                      justifyContent: "space-between",
@@ -77,29 +78,24 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                      alignItems: "center",
                      position: "sticky",
                      top: "66px",
-                     zIndex: (theme) => theme.zIndex.drawer + 1,
-                     backgroundColor: (theme) => theme.palette.background.paper,
                   }}
                >
                   <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center" }}>
-                     <ToggleButtonGroup exclusive aria-label="Velg tekststørrelse" sx={{ p: 1 }}>
+                     <ButtonGroup isAttached aria-label="Velg tekststørrelse" sx={{ p: 1 }}>
                         <BlockButton type="h2">H2</BlockButton>
                         <BlockButton type="h3">H3</BlockButton>
                         <BlockButton type="h4">H4</BlockButton>
                         <BlockButton type="body1">Normal</BlockButton>
                         <BlockButton type="body2">Liten</BlockButton>
-                        <BlockButton type="mui-list">
-                           <ViewList />
-                        </BlockButton>
                         <BlockButton type="bulleted-list">
                            <FormatListBulleted />
                         </BlockButton>
                         <BlockButton type="numbered-list">
                            <FormatListNumbered />
                         </BlockButton>
-                     </ToggleButtonGroup>
+                     </ButtonGroup>
 
-                     <ToggleButtonGroup exclusive aria-label="Velg tekststørrelse" sx={{ p: 1 }}>
+                     <ButtonGroup isAttached aria-label="Velg tekststørrelse" sx={{ p: 1 }}>
                         <MarkButton type="bold">
                            <FormatBold />
                         </MarkButton>
@@ -109,7 +105,7 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                         <MarkButton type="underline">
                            <FormatUnderlined />
                         </MarkButton>
-                     </ToggleButtonGroup>
+                     </ButtonGroup>
                      <AddImage
                         onAddImage={(url) => {
                            insertImage(editor, url);
@@ -119,13 +115,12 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                      <Loading response={saveResponse} />
                   </Box>
                   <Box sx={{ p: 1 }}>
-                     <Button variant="text" onClick={() => onCancel()} sx={{ mr: 1 }}>
+                     <Button variant="ghost" onClick={() => onCancel()} sx={{ mr: 1 }}>
                         Avbryt
                      </Button>
                      <LoadingButton
-                        startIcon={<Save />}
+                        leftIcon={<Save />}
                         response={saveResponse}
-                        variant="contained"
                         onClick={() => handleSave(true)}
                         sx={{ mr: 1 }}
                      >
@@ -183,7 +178,7 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                      }}
                   />
                </Box>
-            </Paper>
+            </Box>
          </Slate>
       </>
    );

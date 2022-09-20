@@ -1,6 +1,5 @@
 import { Add, Delete, Edit } from "@mui/icons-material";
-import { Button, IconButton, List, ListItem, ListItemSecondaryAction, ListItemText, Typography } from "@mui/material";
-import { Box } from "@mui/system";
+import { Button, IconButton, List, ListItem, Text, Heading, Divider, Box } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useDeleteResponsibility, useGetResponisibilies } from "../api/responsibility.api";
 import { useConfirmDialog } from "../components/ConfirmDialog";
@@ -68,31 +67,41 @@ export const ResponsibilityPage = () => {
       <PageLayout>
          {ConfirmDialogComponent}
          <Box display="flex" justifyContent="space-between" flexWrap="wrap" alignItems="center">
-            <Typography variant="h1">Ansvarsposter</Typography>
+            <Heading as="h1">Ansvarsposter</Heading>
             {isAdmin && (
-               <Button variant="contained" startIcon={<Add />} onClick={() => openModal()}>
+               <Button leftIcon={<Add />} onClick={() => openModal()}>
                   Legg til
                </Button>
             )}
          </Box>
          <Loading response={responsibilitiesResponse} />
          {responsibilitiesResponse.status === "success" && (
-            <List>
+            <List my={4}>
                {responsibilities.map((resp) => {
                   const { name, id, description } = resp;
                   return (
-                     <ListItem key={id} divider>
-                        <ListItemText primary={name} secondary={description} />
-                        {isAdmin && (
-                           <ListItemSecondaryAction>
-                              <IconButton onClick={() => openModal(resp)}>
-                                 <Edit />
-                              </IconButton>
-                              <IconButton onClick={() => handleDelete(resp)}>
-                                 <Delete />
-                              </IconButton>
-                           </ListItemSecondaryAction>
-                        )}
+                     <ListItem key={id}>
+                        <Box display="flex" py={2}>
+                           <Box flex={1}>
+                              <Text>{name}</Text>
+                              <Text color="gray" fontSize="sm">
+                                 {description}
+                              </Text>
+                           </Box>
+                           <IconButton
+                              variant="ghost"
+                              onClick={() => openModal(resp)}
+                              icon={<Edit />}
+                              aria-label="Rediger"
+                           />
+                           <IconButton
+                              variant="ghost"
+                              onClick={() => handleDelete(resp)}
+                              icon={<Delete />}
+                              aria-label="Slett"
+                           />
+                        </Box>
+                        <Divider />
                      </ListItem>
                   );
                })}

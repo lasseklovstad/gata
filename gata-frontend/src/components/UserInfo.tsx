@@ -1,4 +1,16 @@
-import { Alert, AlertTitle, Box, MenuItem, Paper, TextField, Typography } from "@mui/material";
+import {
+   Alert,
+   AlertDescription,
+   AlertTitle,
+   Box,
+   FormControl,
+   FormLabel,
+   Heading,
+   Select,
+   Text,
+   AlertIcon,
+   Flex,
+} from "@chakra-ui/react";
 import { IGataUser } from "../types/GataUser.type";
 import { useState } from "react";
 import { usePostContingent } from "../api/user.api";
@@ -32,64 +44,65 @@ export const UserInfo = ({ user, onChange }: UserInfoProps) => {
    const getContingent = () => {
       const hasPaid = contingents.find((c) => c.year.toString(10) === selectedYear)?.isPaid;
       return (
-         <Alert
-            severity={hasPaid ? "success" : "warning"}
-            action={
-               isAdmin && (
-                  <LoadingButton onClick={markAsPost(!hasPaid)} response={postResponse}>
-                     {hasPaid ? "Marker som ikke betalt" : "Marker som betalt"}
-                  </LoadingButton>
-               )
-            }
-         >
-            <AlertTitle>Status: {hasPaid ? "Betalt" : "Ikke betalt"}</AlertTitle>
-            {contingentInfoResponse.data && !hasPaid && (
-               <Typography gutterBottom variant="body2">
-                  {contingentInfoResponse.data.size}kr til {contingentInfoResponse.data.bank}
-               </Typography>
+         <Alert status={hasPaid ? "success" : "warning"} sx={{ justifyContent: "space-between", flexWrap: "wrap" }}>
+            <Flex>
+               <AlertIcon />
+               <Box>
+                  <AlertTitle>Status: {hasPaid ? "Betalt" : "Ikke betalt"}</AlertTitle>
+                  {contingentInfoResponse.data && !hasPaid && (
+                     <AlertDescription>
+                        {contingentInfoResponse.data.size}kr til {contingentInfoResponse.data.bank}
+                     </AlertDescription>
+                  )}
+               </Box>
+            </Flex>
+            {isAdmin && (
+               <LoadingButton variant="outline" onClick={markAsPost(!hasPaid)} response={postResponse}>
+                  {hasPaid ? "Marker som ikke betalt" : "Marker som betalt"}
+               </LoadingButton>
             )}
          </Alert>
       );
    };
    return (
       <>
-         <Box my={1}>
-            <Typography variant="body1">
+         <Box my={4}>
+            <Text variant="body1">
                <strong>Navn:</strong> {user.primaryUser.name}
-            </Typography>
+            </Text>
             {isAdmin ? (
                <SelectPrimaryEmail user={user} onChange={onChange} />
             ) : (
-               <Typography variant="body1">
+               <Text variant="body1">
                   <strong>Email:</strong> {user.primaryUser.email}
-               </Typography>
+               </Text>
             )}
          </Box>
-         <Typography variant="h2" gutterBottom>
+         <Heading as="h2" size="lg" mb={2}>
             Kontingent
-         </Typography>
+         </Heading>
 
-         <Paper sx={{ p: 2, mb: 1 }}>
-            <TextField
-               variant="standard"
-               label="Velg år"
-               placeholder="Velg år"
-               select
-               onChange={(ev) => setSelectedYear(ev.target.value.toString())}
-               value={selectedYear}
-               sx={{ width: "200px", mb: 1 }}
-            >
-               {years.map((year) => {
-                  return (
-                     <MenuItem value={year} key={year}>
-                        {year}
-                     </MenuItem>
-                  );
-               })}
-            </TextField>
+         <Box boxShadow="md" bg="white" rounded={4} sx={{ p: 2, mb: 4 }}>
+            <FormControl mb={1}>
+               <FormLabel>Velg år</FormLabel>
+               <Select
+                  width={100}
+                  placeholder="Velg år"
+                  onChange={(ev) => setSelectedYear(ev.target.value.toString())}
+                  value={selectedYear}
+               >
+                  {years.map((year) => {
+                     return (
+                        <option value={year} key={year}>
+                           {year}
+                        </option>
+                     );
+                  })}
+               </Select>
+            </FormControl>
             {getContingent()}
             <ErrorAlert response={postResponse} />
-         </Paper>
+         </Box>
       </>
    );
 };

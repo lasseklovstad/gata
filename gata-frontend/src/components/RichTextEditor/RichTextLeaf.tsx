@@ -1,18 +1,16 @@
-import { Typography } from "@mui/material";
 import { RenderLeafProps } from "slate-react";
+import { Text } from "@chakra-ui/react";
 
 export const RichTextLeaf = ({ leaf, attributes, children }: Partial<RenderLeafProps>) => {
    return (
-      <Typography
+      <Text
          {...attributes}
-         component="span"
+         as="span"
          variant="inherit"
-         fontWeight={({ typography: { fontWeightBold, fontWeightRegular } }) =>
-            leaf?.bold ? fontWeightBold : fontWeightRegular
-         }
+         fontWeight={leaf?.bold ? "bold" : "normal"}
          sx={{ textDecoration: leaf?.underline ? "underline" : "none", fontStyle: leaf?.italic ? "italic" : "none" }}
       >
          {children}
-      </Typography>
+      </Text>
    );
 };

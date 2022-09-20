@@ -1,4 +1,4 @@
-import { Alert, AlertTitle } from "@mui/material";
+import { Alert, AlertDescription, AlertIcon, AlertTitle, Box } from "@chakra-ui/react";
 import { UseClientState } from "../api/client/client.types";
 
 type ErrorAlertProps = {
@@ -10,9 +10,12 @@ export const ErrorAlert = ({ response, alertTitle = "Det oppstod en feil" }: Err
    return (
       <>
          {response.status === "error" && (
-            <Alert severity="error">
-               <AlertTitle>{alertTitle}</AlertTitle>
-               {response.error?.message}
+            <Alert status="error">
+               <AlertIcon />
+               <Box>
+                  <AlertTitle>{alertTitle}</AlertTitle>
+                  <AlertDescription>{response.error?.message}</AlertDescription>
+               </Box>
             </Alert>
          )}
       </>

@@ -1,4 +1,4 @@
-import { List, ListItem, ListItemText, Typography } from "@mui/material";
+import { List, ListItem, Text, Heading } from "@chakra-ui/react";
 import { useGetExternalUsersWithNoGataUser } from "../../api/user.api";
 import { Loading } from "../../components/Loading";
 import { ExternalUsersWithNoGataUserListItem } from "./ExternalUsersWithNoGataUserListItem";
@@ -20,19 +20,15 @@ export const ExternalUsersWithNoGataUser = ({ onAddUser }: ExternalUsersWithNoGa
 
    return (
       <>
-         <Typography variant="h2" id="external-user-title">
+         <Heading as="h2" id="external-user-title" size="lg">
             Andre pålogginger
-         </Typography>
+         </Heading>
          <Loading response={usersResponse} />
          <List aria-labelledby="external-user-title">
             {usersResponse.data?.map((user) => {
                return <ExternalUsersWithNoGataUserListItem key={user.id} user={user} onAddUser={handleAddUser} />;
             })}
-            {usersResponse.data?.length === 0 && (
-               <ListItem>
-                  <ListItemText>Ingen andre brukere</ListItemText>
-               </ListItem>
-            )}
+            {usersResponse.data?.length === 0 && <ListItem>Ingen andre brukere</ListItem>}
          </List>
       </>
    );

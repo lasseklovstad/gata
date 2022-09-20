@@ -37,8 +37,8 @@ export const PublishButton = ({ reportId }: PublishButtonProps) => {
          {ConfirmBeforePublishDialog}
          <LoadingButton
             response={publishResponse}
-            variant="text"
-            startIcon={<Email />}
+            variant="ghost"
+            leftIcon={<Email />}
             onClick={openConfirmBeforePublish}
             sx={{ mr: 1 }}
          >

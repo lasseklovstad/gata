@@ -1,18 +1,22 @@
 import * as React from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import Button from "@mui/material/Button";
-import MenuItem from "@mui/material/MenuItem";
 import { Link } from "react-router-dom";
 import { UserMenu } from "./UserMenu";
 import { useRoles } from "./useRoles";
 import { GataRoleType } from "../types/GataRole.type";
+import MenuIcon from "@mui/icons-material/Menu";
+import {
+   Button,
+   Container,
+   Text,
+   Box,
+   IconButton,
+   Menu,
+   MenuItem,
+   MenuButton,
+   MenuList,
+   Flex,
+   Img,
+} from "@chakra-ui/react";
 
 const pages = [
    { name: "Hjem", url: "" },
@@ -25,7 +29,6 @@ const pages = [
 
 export const ResponsiveAppBar = () => {
    const { roles } = useRoles();
-   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
    const filteredPages = pages.filter((page) => {
       if (!page.roles || page.roles.length === 0) {
          return true;
@@ -37,115 +40,62 @@ export const ResponsiveAppBar = () => {
       }
       return false;
    });
-   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-      setAnchorElNav(event.currentTarget);
-   };
-
-   const handleCloseNavMenu = () => {
-      setAnchorElNav(null);
-   };
 
    return (
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, maxHeight: "64px" }}>
-         <Container maxWidth="md">
-            <Toolbar disableGutters>
-               <Typography variant="h6" noWrap component="div" sx={{ mr: 2, display: { xs: "none", md: "flex" } }}>
-                  <img src="logo192.png" style={{ height: "40px" }} alt="Hesten blå" />
-               </Typography>
+      <Box as="header" bg="blue.500" boxShadow="xl">
+         <Container maxW="6xl" my={2}>
+            <Flex align="center">
+               <Img
+                  src="logo192.png"
+                  height="40px"
+                  alt="Hesten blå"
+                  sx={{ mr: 2, display: { base: "none", md: "block" } }}
+               />
 
-               <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-                  <IconButton
-                     aria-label="account of current user"
-                     aria-controls="menu-appbar"
-                     aria-haspopup="true"
-                     onClick={handleOpenNavMenu}
-                     color="inherit"
-                  >
-                     <MenuIcon />
-                  </IconButton>
-                  <Menu
-                     id="menu-appbar"
-                     anchorEl={anchorElNav}
-                     anchorOrigin={{
-                        vertical: "bottom",
-                        horizontal: "left",
-                     }}
-                     keepMounted
-                     transformOrigin={{
-                        vertical: "top",
-                        horizontal: "left",
-                     }}
-                     open={Boolean(anchorElNav)}
-                     onClose={handleCloseNavMenu}
-                     sx={{
-                        display: { xs: "block", md: "none" },
-                     }}
-                  >
-                     {filteredPages.map((page) => {
-                        if (page.url.startsWith("https")) {
+               <Box sx={{ flexGrow: 1, display: { base: "flex", md: "none" } }}>
+                  <Menu>
+                     <MenuButton as={IconButton} icon={<MenuIcon />} />
+                     <MenuList>
+                        {filteredPages.map((page) => {
+                           if (page.url.startsWith("https")) {
+                              return (
+                                 <MenuItem key={page.url} as="a" href={page.url} target="_blank">
+                                    <Text textAlign="center">{page.name}</Text>
+                                 </MenuItem>
+                              );
+                           }
                            return (
-                              <MenuItem
-                                 key={page.url}
-                                 component="a"
-                                 href={page.url}
-                                 target="_blank"
-                                 onClick={handleCloseNavMenu}
-                              >
-                                 <Typography textAlign="center">{page.name}</Typography>
+                              <MenuItem key={page.url} as={Link} to={page.url}>
+                                 {page.name}
                               </MenuItem>
                            );
-                        }
-                        return (
-                           <MenuItem key={page.url} component={Link} to={page.url} onClick={handleCloseNavMenu}>
-                              <Typography textAlign="center">{page.name}</Typography>
-                           </MenuItem>
-                        );
-                     })}
+                        })}
+                     </MenuList>
                   </Menu>
                </Box>
-               <Typography
-                  variant="h6"
-                  noWrap
-                  component="div"
-                  sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}
-               >
+               <Text sx={{ flexGrow: 1, display: { base: "flex", md: "none" } }}>
                   <img src="logo192.png" style={{ height: "40px" }} alt="Hesten blå" />
-               </Typography>
-               <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+               </Text>
+               <Flex sx={{ flexGrow: 1, flexWrap: "wrap", display: { base: "none", md: "flex" }, gap: 1 }}>
                   {filteredPages.map((page) => {
                      if (page.url.startsWith("https")) {
                         return (
-                           <Button
-                              key={page.url}
-                              component="a"
-                              href={page.url}
-                              onClick={handleCloseNavMenu}
-                              target="_blank"
-                              sx={{ my: 2, color: "white", display: "block" }}
-                           >
+                           <Button key={page.url} as="a" href={page.url} target="_blank">
                               {page.name}
                            </Button>
                         );
                      }
                      return (
-                        <Button
-                           key={page.url}
-                           component={Link}
-                           to={page.url}
-                           onClick={handleCloseNavMenu}
-                           sx={{ my: 2, color: "white", display: "block" }}
-                        >
+                        <Button key={page.url} as={Link} to={page.url}>
                            {page.name}
                         </Button>
                      );
                   })}
-               </Box>
+               </Flex>
 
-               <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>
-                  <UserMenu />
-               </Box>
-            </Toolbar>
+               <UserMenu />
+            </Flex>
          </Container>
-      </AppBar>
+      </Box>
    );
 };

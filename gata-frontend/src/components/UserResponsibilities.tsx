@@ -1,5 +1,5 @@
 import { Add } from "@mui/icons-material";
-import { Box, Button, Typography } from "@mui/material";
+import { Accordion, Box, Button, Heading, Text } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useGetUserResponsitbilityYears } from "../api/user.api";
 import { IGataUser } from "../types/GataUser.type";
@@ -17,16 +17,11 @@ export const UserResponsibility = ({ user }: UserResponsibilityProps) => {
    const { isAdmin } = useRoles();
    const { responsibilityYearResponse } = useGetUserResponsitbilityYears(user.id);
    const [userResponsibilities, setUserResponsibilities] = useState<IResponsibilityYear[]>();
-   const [expanded, setExpanded] = useState<string>();
    const [addResponsibilityModalOpen, setAddResponsibilityModalOpen] = useState(false);
 
    useEffect(() => {
       setUserResponsibilities(responsibilityYearResponse.data);
    }, [responsibilityYearResponse.data]);
-
-   const handleExpand = (id: string) => {
-      setExpanded(id === expanded ? undefined : id);
-   };
 
    const handleDelete = (id: string) => {
       setUserResponsibilities(userResponsibilities?.filter((r) => r.id !== id));
@@ -40,10 +35,12 @@ export const UserResponsibility = ({ user }: UserResponsibilityProps) => {
 
    return (
       <>
-         <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1, flexWrap: "wrap" }}>
-            <Typography variant="h2">Ansvarsposter</Typography>
+         <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 2, flexWrap: "wrap" }}>
+            <Heading as="h2" size="lg">
+               Ansvarsposter
+            </Heading>
             {isAdmin && (
-               <Button variant="contained" startIcon={<Add />} onClick={() => setAddResponsibilityModalOpen(true)}>
+               <Button leftIcon={<Add />} onClick={() => setAddResponsibilityModalOpen(true)}>
                   Legg til ansvarspost
                </Button>
             )}
@@ -60,22 +57,23 @@ export const UserResponsibility = ({ user }: UserResponsibilityProps) => {
          )}
          <Box>
             <Loading response={responsibilityYearResponse} />
-            {userResponsibilities?.map((responsibilityYear) => {
-               return (
-                  <ResponsibilityForm
-                     key={responsibilityYear.id}
-                     expanded={expanded === responsibilityYear.id}
-                     onChange={handleChange}
-                     onDelete={handleDelete}
-                     onExpand={handleExpand}
-                     responsibilityYear={responsibilityYear}
-                     user={user}
-                  />
-               );
-            })}
-            {userResponsibilities?.length === 0 && (
-               <Typography variant="body1">Ingen ansvarsposter lagt til.</Typography>
-            )}
+            <Box boxShadow="md" rounded={4} bg="white">
+               <Accordion allowToggle>
+                  {userResponsibilities?.map((responsibilityYear) => {
+                     return (
+                        <ResponsibilityForm
+                           key={responsibilityYear.id}
+                           onChange={handleChange}
+                           onDelete={handleDelete}
+                           responsibilityYear={responsibilityYear}
+                           user={user}
+                        />
+                     );
+                  })}
+               </Accordion>
+            </Box>
+
+            {userResponsibilities?.length === 0 && <Text variant="body1">Ingen ansvarsposter lagt til.</Text>}
          </Box>
       </>
    );

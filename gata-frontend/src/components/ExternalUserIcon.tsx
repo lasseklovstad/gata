@@ -1,18 +1,17 @@
 import { Facebook, Google, Security } from "@mui/icons-material";
 import { IExternalUser } from "../types/GataUser.type";
-import { SxProps } from "@mui/material";
+import { Icon, IconProps } from "@chakra-ui/react";
 
 type ExternalUserIconProps = {
    user: IExternalUser;
-   sx?: SxProps;
-};
+} & IconProps;
 
-export const ExternalUserIcon = ({ user, sx }: ExternalUserIconProps) => {
+export const ExternalUserIcon = ({ user, ...iconProps }: ExternalUserIconProps) => {
    return (
       <>
-         {user.id.includes("facebook") && <Facebook color="primary" sx={sx} />}
-         {user.id.includes("google") && <Google color="primary" sx={sx} />}
-         {user.id.includes("auth0") && <Security color="primary" sx={sx} />}
+         {user.id.includes("facebook") && <Icon as={Facebook} color="blue.500" {...iconProps} />}
+         {user.id.includes("google") && <Icon as={Google} color="blue.500" {...iconProps} />}
+         {user.id.includes("auth0") && <Icon as={Security} color="blue.500" {...iconProps} />}
       </>
    );
 };

@@ -1,5 +1,5 @@
 import { Add } from "@mui/icons-material";
-import { Box, Button, List, ListItem, ListItemButton, ListItemText, Pagination, Typography } from "@mui/material";
+import { Box, Button, List, ListItem, Heading, Text, Divider } from "@chakra-ui/react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDatabaseSize, useGetGataReports } from "../api/report.api";
@@ -7,6 +7,7 @@ import { GataReportFormDialog } from "../components/GataReportFormDialog";
 import { Loading } from "../components/Loading";
 import { PageLayout } from "../components/PageLayout";
 import { useRoles } from "../components/useRoles";
+import { ListItemLink } from "../components/ListItemLink";
 
 export const ReportPage = () => {
    const { isAdmin } = useRoles();
@@ -25,14 +26,12 @@ export const ReportPage = () => {
                flexWrap: "wrap",
             }}
          >
-            <Typography variant="h1" id="report-page-title">
+            <Heading variant="h1" id="report-page-title">
                Aktuelle dokumenter
-            </Typography>
-            <Typography variant="body1">
-               {sizeResponse.data && `${parseInt(sizeResponse.data) / 10} % brukt`}
-            </Typography>
+            </Heading>
+            <Text>{sizeResponse.data && `${parseInt(sizeResponse.data) / 10} % brukt`}</Text>
             {isAdmin && (
-               <Button variant="contained" startIcon={<Add />} onClick={() => setIsReportModalOpen(true)}>
+               <Button leftIcon={<Add />} onClick={() => setIsReportModalOpen(true)}>
                   Opprett
                </Button>
             )}
@@ -49,19 +48,24 @@ export const ReportPage = () => {
             <List aria-labelledby="report-page-title">
                {reportResponse.data.content.map((report) => {
                   return (
-                     <ListItemButton key={report.id} divider component={Link} to={report.id}>
-                        <ListItemText primary={report.title} secondary={report.description} />
-                     </ListItemButton>
+                     <ListItemLink key={report.id} to={report.id}>
+                        <Box py={2}>
+                           <Text>{report.title}</Text>
+                           <Text color="gray" fontSize="sm">
+                              {report.description}
+                           </Text>
+                        </Box>
+                        <Divider />
+                     </ListItemLink>
                   );
                })}
                {reportResponse.data.totalElements === 0 && (
                   <ListItem>
-                     <ListItemText>Det finnes ingen dokumenter enda!</ListItemText>
+                     <Text>Det finnes ingen dokumenter enda!</Text>
                   </ListItem>
                )}
             </List>
          )}
-         <Pagination count={reportResponse.data?.totalPages || 0} page={page} onChange={(_, value) => setPage(value)} />
       </PageLayout>
    );
 };

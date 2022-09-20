@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
-import { Avatar, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { Avatar, Box, Divider, Flex, Text } from "@chakra-ui/react";
 import { IGataUser } from "../../types/GataUser.type";
+import { ListItemLink } from "../../components/ListItemLink";
 
 type UserListItemProps = {
    user: IGataUser;
@@ -8,14 +8,17 @@ type UserListItemProps = {
 
 export const UserListItem = ({ user }: UserListItemProps) => {
    return (
-      <ListItemButton divider component={Link} to={user.id}>
-         <ListItemIcon>
+      <ListItemLink to={user.id}>
+         <Flex gap={2} p={2}>
             <Avatar src={user.primaryUser.picture} />
-         </ListItemIcon>
-         <ListItemText
-            primary={user.primaryUser.name}
-            secondary={`Sist innlogget: ${new Date(user.primaryUser.lastLogin).toLocaleDateString()}`}
-         />
-      </ListItemButton>
+            <Box>
+               <Text>{user.primaryUser.name}</Text>
+               <Text color="gray" fontSize="sm">
+                  Sist innlogget: {new Date(user.primaryUser.lastLogin).toLocaleDateString()}
+               </Text>
+            </Box>
+         </Flex>
+         <Divider />
+      </ListItemLink>
    );
 };

@@ -1,19 +1,10 @@
-import {
-   Box,
-   Chip,
-   CircularProgress,
-   FormControl,
-   FormHelperText,
-   InputLabel,
-   OutlinedInput,
-   Select,
-} from "@mui/material";
+import { Flex, FormControl, FormHelperText, FormLabel, Text } from "@chakra-ui/react";
 import { useGetExternalUsersWithNoGataUser, useUpdateExternalUsers } from "../../api/user.api";
 import { IGataUser } from "../../types/GataUser.type";
-import { SelectInputProps } from "@mui/material/Select/SelectInput";
-import { ExternalUserMenuItem } from "../../components/ExternalUserMenuItem";
 import { ExternalUserIcon } from "../../components/ExternalUserIcon";
 import { ErrorAlert } from "../../components/ErrorAlert";
+import { chakraComponents, ChakraStylesConfig, OptionBase, Props, Select } from "chakra-react-select";
+import { ReactNode } from "react";
 
 type LinkExternalUserToGataUserSelectProps = {
    user: IGataUser;
@@ -27,48 +18,40 @@ export const LinkExternalUserToGataUserSelect = ({
    const { usersResponse, updateExternalUsersWithNoGataUser } = useGetExternalUsersWithNoGataUser();
    const { updateExternalUsers, updateExternalUsersResponse } = useUpdateExternalUsers(id);
 
-   const handleChange: SelectInputProps<string[]>["onChange"] = async (ev) => {
-      const { data, status } = await updateExternalUsers(ev.target.value as string[]);
+   const handleChange: Props<ColorOption, true>["onChange"] = async (options) => {
+      const userIds = options.map((o) => o.value);
+      const { data, status } = await updateExternalUsers(userIds);
       if (data && status === "success") {
-         updateExternalUsersWithNoGataUser(menuItems?.filter(({ id }) => !ev.target.value.includes(id)) || []);
+         updateExternalUsersWithNoGataUser(menuItems?.filter(({ id }) => !userIds.includes(id)) || []);
          onChange(data);
       }
    };
 
    const menuItems = [...externalUserProviders, ...(usersResponse.data || [])];
 
+   const options = menuItems.map((user) => ({
+      label: user.email,
+      value: user.id,
+      icon: <ExternalUserIcon user={user} sx={{ mr: 1 }} />,
+      isClearable: !user.primary,
+   }));
+
+   const selectedOption = options.filter((option) => !!externalUserProviders.find((user) => user.id === option.value));
+
    return (
       <>
-         <FormControl sx={{ mt: 1, mb: 1 }} fullWidth>
-            <InputLabel id="demo-multiple-name-label">Epost tilknytninger</InputLabel>
-            <Select
-               labelId="demo-multiple-name-label"
-               id="demo-multiple-name"
-               multiple
-               value={externalUserProviders.map((user) => user.id)}
+         <FormControl sx={{ mt: 1, mb: 1 }}>
+            <FormLabel>Epost tilknytninger</FormLabel>
+            <Select<ColorOption, true, never>
+               value={selectedOption}
+               isMulti
                onChange={handleChange}
-               input={<OutlinedInput label="Epost tilknytninger" />}
-               renderValue={(selected) => {
-                  const items = menuItems.filter((user) => selected.includes(user.id));
-                  return (
-                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center" }}>
-                        {items.map((user) => (
-                           <Chip
-                              icon={<ExternalUserIcon sx={{ ml: 1 }} user={user} />}
-                              key={user.id}
-                              label={user.email}
-                           />
-                        ))}
-                        {updateExternalUsersResponse.status === "loading" && <CircularProgress />}
-                     </Box>
-                  );
-               }}
-            >
-               {menuItems.map((user) => (
-                  <ExternalUserMenuItem key={user.id} value={user.id} user={user} disabled={user.primary} />
-               ))}
-            </Select>
-
+               components={customComponents}
+               options={options}
+               isClearable={false}
+               chakraStyles={chakraStyles}
+               isLoading={updateExternalUsersResponse.status === "loading"}
+            />
             <FormHelperText>
                Hvis en bruker har logget inn med forskjellige tjenester, kan disse kontoene knyttes sammen her!
             </FormHelperText>
@@ -79,4 +62,32 @@ export const LinkExternalUserToGataUserSelect = ({
          </FormControl>
       </>
    );
+};
+
+interface ColorOption extends OptionBase {
+   label: string;
+   value: string;
+   icon: ReactNode;
+   isClearable: boolean;
+}
+
+const customComponents: Props<ColorOption, true, never>["components"] = {
+   Option: ({ children, ...props }) => (
+      <chakraComponents.Option {...props}>
+         {props.data.icon} {children}
+      </chakraComponents.Option>
+   ),
+   MultiValue: ({ children, ...props }) => (
+      <chakraComponents.MultiValue {...props}>
+         <Flex alignItems="center">
+            {props.data.icon} <Text>{children}</Text>
+         </Flex>
+      </chakraComponents.MultiValue>
+   ),
+};
+
+const chakraStyles: ChakraStylesConfig<ColorOption, true, never> = {
+   multiValueRemove: (provided, state) => {
+      return state.data.isClearable ? provided : { ...provided, display: "none" };
+   },
 };

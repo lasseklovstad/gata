@@ -1,5 +1,18 @@
 import { Save } from "@mui/icons-material";
-import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from "@mui/material";
+import {
+   Modal,
+   ModalHeader,
+   ModalBody,
+   ModalContent,
+   ModalOverlay,
+   Textarea,
+   Button,
+   ModalFooter,
+   FormControl,
+   FormLabel,
+   FormErrorMessage,
+   Input,
+} from "@chakra-ui/react";
 import { useState } from "react";
 import { useSaveResponsibility } from "../api/responsibility.api";
 import { IResponsibility } from "../types/Responsibility.type";
@@ -32,39 +45,38 @@ export const ResponsibilityDialog = ({ onClose, onSuccess, responsibility }: Res
    };
 
    return (
-      <Dialog open maxWidth="xs" fullWidth>
-         <form onSubmit={handleSubmit}>
-            <DialogTitle>{type === "update" ? "Rediger Ansvarspost" : "Ny Ansvarspost"}</DialogTitle>
-            <DialogContent sx={{ display: "flex", flexDirection: "column" }}>
-               <TextField
-                  variant="filled"
-                  autoFocus
-                  sx={{ mb: 2 }}
-                  label="Navn"
-                  value={name}
-                  inputProps={{ maxLength: 255 }}
-                  onChange={(ev) => setName(ev.target.value)}
-                  error={!!error}
-                  helperText={error}
-               />
-               <TextField
-                  variant="filled"
-                  multiline
-                  rows={3}
-                  inputProps={{ maxLength: 255 }}
-                  label="Beskrivelse (Valgfri)"
-                  value={description}
-                  onChange={(ev) => setDescription(ev.target.value)}
-               />
-            </DialogContent>
-            <DialogActions>
-               <Button onClick={onClose}>Avbryt</Button>
-               <LoadingButton type="submit" response={response} variant="contained" startIcon={<Save />}>
-                  Lagre
-               </LoadingButton>
-            </DialogActions>
-            <ErrorAlert response={response} />
-         </form>
-      </Dialog>
+      <Modal isOpen onClose={onClose}>
+         <ModalOverlay />
+         <ModalContent>
+            <form onSubmit={handleSubmit}>
+               <ModalHeader>{type === "update" ? "Rediger Ansvarspost" : "Ny Ansvarspost"}</ModalHeader>
+               <ModalBody sx={{ display: "flex", flexDirection: "column" }}>
+                  <FormControl isInvalid={!!error} mb={2}>
+                     <FormLabel>Navn</FormLabel>
+                     <Input variant="filled" value={name} onChange={(ev) => setName(ev.target.value)} />
+                     <FormErrorMessage>{error}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl>
+                     <FormLabel>Beskrivelse</FormLabel>
+                     <Textarea
+                        variant="filled"
+                        value={description}
+                        onChange={(ev) => setDescription(ev.target.value)}
+                     />
+                  </FormControl>
+               </ModalBody>
+               <ModalFooter>
+                  <LoadingButton type="submit" response={response} leftIcon={<Save />}>
+                     Lagre
+                  </LoadingButton>
+                  <Button onClick={onClose} variant="ghost">
+                     Avbryt
+                  </Button>
+               </ModalFooter>
+               <ErrorAlert response={response} />
+            </form>
+         </ModalContent>
+      </Modal>
    );
 };

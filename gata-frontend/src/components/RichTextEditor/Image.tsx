@@ -1,5 +1,5 @@
 import { Add, Delete, Remove } from "@mui/icons-material";
-import { Box, IconButton, CardMedia, Skeleton } from "@mui/material";
+import { Box, IconButton, Skeleton, Image as ChakraImage, ButtonGroup } from "@chakra-ui/react";
 import { Transforms, Element } from "slate";
 import { RenderElementProps, useSlateStatic, ReactEditor, useSelected, useFocused } from "slate-react";
 import { useGetGataReportFile } from "../../api/file.api";
@@ -29,43 +29,39 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
                   left: "0.5em",
                   zIndex: 100,
                }}
+               icon={<Delete />}
+               aria-label="Slett bilde"
+            />
+            <ButtonGroup
+               sx={{
+                  display: selected && focused ? undefined : "none",
+                  position: "absolute",
+                  top: "0.5em",
+                  right: "0.5em",
+                  zIndex: 100,
+               }}
             >
-               <Delete />
-            </IconButton>
-            {element?.size && element.size > 10 && (
-               <IconButton
-                  onMouseDown={(ev) => ev.preventDefault()}
-                  onClick={(ev) => {
-                     Transforms.setNodes<Element>(editor, { type: "image", size: (element?.size || 0) - 10 });
-                  }}
-                  sx={{
-                     display: selected && focused ? undefined : "none",
-                     position: "absolute",
-                     top: "0.5em",
-                     right: "2em",
-                     zIndex: 100,
-                  }}
-               >
-                  <Remove />
-               </IconButton>
-            )}
-            {element?.size && element.size < 100 && (
-               <IconButton
-                  onMouseDown={(ev) => ev.preventDefault()}
-                  onClick={(ev) => {
-                     Transforms.setNodes<Element>(editor, { type: "image", size: (element?.size || 0) + 10 });
-                  }}
-                  sx={{
-                     display: selected && focused ? undefined : "none",
-                     position: "absolute",
-                     top: "0.5em",
-                     right: "0.5em",
-                     zIndex: 100,
-                  }}
-               >
-                  <Add />
-               </IconButton>
-            )}
+               {element?.size && element.size > 10 && (
+                  <IconButton
+                     onMouseDown={(ev) => ev.preventDefault()}
+                     onClick={(ev) => {
+                        Transforms.setNodes<Element>(editor, { type: "image", size: (element?.size || 0) - 10 });
+                     }}
+                     icon={<Remove />}
+                     aria-label="Reduser størrelse"
+                  />
+               )}
+               {element?.size && element.size < 100 && (
+                  <IconButton
+                     onMouseDown={(ev) => ev.preventDefault()}
+                     onClick={(ev) => {
+                        Transforms.setNodes<Element>(editor, { type: "image", size: (element?.size || 0) + 10 });
+                     }}
+                     icon={<Add />}
+                     aria-label="Øk størrelse"
+                  />
+               )}
+            </ButtonGroup>
          </Box>
       </div>
    );
@@ -92,13 +88,12 @@ const InternalImage = ({ id, selected = false, focused = false, size = 50 }: Ima
       <>
          {fileResponse.status === "loading" && <Skeleton variant="rectangular" width={400} height={300} />}
          {fileResponse.data && (
-            <CardMedia
-               component="img"
-               image={imageSrc}
+            <ChakraImage
+               src={imageSrc}
                sx={{
                   boxShadow: selected && focused ? "0 0 0 3px #B4D5FF" : "none",
                   display: "block",
-                  maxWidth: `${size}%`,
+                  width: `${size}%`,
                   mt: 1,
                   mb: 1,
                }}
@@ -110,13 +105,12 @@ const InternalImage = ({ id, selected = false, focused = false, size = 50 }: Ima
 
 const ExternalImage = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
    return (
-      <CardMedia
-         component="img"
-         image={id}
+      <ChakraImage
+         src={id}
          sx={{
             boxShadow: selected && focused ? "0 0 0 3px #B4D5FF" : "none",
             display: "block",
-            maxWidth: `${size}%`,
+            width: `${size}%`,
             mt: 1,
             mb: 1,
          }}

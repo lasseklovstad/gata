@@ -1,8 +1,8 @@
-import { ToggleButton } from "@mui/material";
 import { ReactNode } from "react";
 import { useSlate } from "slate-react";
 import { MarkType } from "./RichTextEditor.types";
 import { isMarkActive, toggleMark } from "./RichTextEditor.util";
+import { Button } from "@chakra-ui/react";
 
 type MarkButtonProps = {
    type: MarkType;
@@ -14,18 +14,16 @@ export const MarkButton = (props: MarkButtonProps) => {
    const { type, children, ...rest } = props;
    const editor = useSlate();
    return (
-      <ToggleButton
+      <Button
          {...rest}
          sx={{ textTransform: "none" }}
-         size="small"
-         value={type}
-         selected={isMarkActive(editor, type)}
+         colorScheme={isMarkActive(editor, type) ? "blue" : "gray"}
          onMouseDown={(event) => {
             event.preventDefault();
             toggleMark(editor, type);
          }}
       >
          {children}
-      </ToggleButton>
+      </Button>
    );
 };

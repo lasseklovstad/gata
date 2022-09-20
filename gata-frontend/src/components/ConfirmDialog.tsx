@@ -1,8 +1,8 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import { useState } from "react";
 import { UseClientState } from "../api/client/client.types";
 import { ErrorAlert } from "./ErrorAlert";
 import { LoadingButton } from "./Loading";
+import { Modal, ModalBody, ModalFooter, ModalHeader, ModalOverlay, Button, ModalContent } from "@chakra-ui/react";
 
 type ConfirmDialogProps = {
    onClose: () => void;
@@ -16,25 +16,28 @@ type ConfirmDialogProps = {
 
 export const ConfirmDialog = ({ text, onClose, onConfirm, open, response, title, showOnlyOk }: ConfirmDialogProps) => {
    return (
-      <Dialog maxWidth="xs" fullWidth open={open}>
-         <DialogTitle>{title || "Er du sikker?"}</DialogTitle>
-         <DialogContent>{text}</DialogContent>
-         <DialogActions>
-            {showOnlyOk ? (
-               <Button onClick={onClose} variant="contained">
-                  Ok
-               </Button>
-            ) : (
-               <>
-                  <Button onClick={onClose}>Avbryt</Button>
-                  <LoadingButton response={response} variant="contained" onClick={onConfirm}>
-                     Jeg er sikker
-                  </LoadingButton>
-               </>
-            )}
-         </DialogActions>
-         {response && <ErrorAlert response={response} />}
-      </Dialog>
+      <Modal isOpen={open} onClose={onClose}>
+         <ModalOverlay />
+         <ModalContent>
+            <ModalHeader>{title || "Er du sikker?"}</ModalHeader>
+            <ModalBody>{text}</ModalBody>
+            <ModalFooter gap={2}>
+               {showOnlyOk ? (
+                  <Button onClick={onClose}>Ok</Button>
+               ) : (
+                  <>
+                     <LoadingButton response={response} onClick={onConfirm}>
+                        Jeg er sikker
+                     </LoadingButton>
+                     <Button onClick={onClose} variant="ghost">
+                        Avbryt
+                     </Button>
+                  </>
+               )}
+            </ModalFooter>
+            {response && <ErrorAlert response={response} />}
+         </ModalContent>
+      </Modal>
    );
 };
 

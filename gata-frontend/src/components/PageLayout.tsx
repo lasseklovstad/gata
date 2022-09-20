@@ -1,4 +1,4 @@
-import { Container, Toolbar } from "@mui/material";
+import { Box } from "@chakra-ui/react";
 import { ReactNode } from "react";
 
 type PageLayoutProps = {
@@ -7,9 +7,8 @@ type PageLayoutProps = {
 
 export const PageLayout = ({ children }: PageLayoutProps) => {
    return (
-      <Container component="main" sx={{ p: { xs: 0, md: 2 } }}>
-         <Toolbar sx={{ minHeight: "64px", mb: 1 }} />
+      <Box as="main" py={4} px={{ base: 0, md: 4 }}>
          {children}
-      </Container>
+      </Box>
    );
 };

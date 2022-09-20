@@ -1,5 +1,17 @@
 import { Delete, ExpandMore, Save } from "@mui/icons-material";
-import { Box, Accordion, AccordionSummary, Typography, AccordionDetails, TextField } from "@mui/material";
+import {
+   Box,
+   AccordionIcon,
+   Textarea,
+   AccordionPanel,
+   AccordionItem,
+   AccordionButton,
+   Text,
+   FormControl,
+   FormLabel,
+   Flex,
+   Heading,
+} from "@chakra-ui/react";
 import { useState } from "react";
 import { useDeleteResponsibilityForUser, usePutResponsibilityNote } from "../api/user.api";
 import { IGataUser } from "../types/GataUser.type";
@@ -13,16 +25,12 @@ import { useConfirmDialog } from "./ConfirmDialog";
 type ResponsibilityFormProps = {
    responsibilityYear: IResponsibilityYear;
    user: IGataUser;
-   expanded: boolean;
-   onExpand: (id: string) => void;
    onDelete: (id: string) => void;
    onChange: (responsibilityYear: IResponsibilityYear) => void;
 };
 
 export const ResponsibilityForm = ({
    responsibilityYear: { id, year, responsibility, note },
-   onExpand,
-   expanded,
    onChange,
    onDelete,
    user,
@@ -56,49 +64,48 @@ export const ResponsibilityForm = ({
    return (
       <>
          {ConfirmDialogComponent}
-         <Accordion expanded={expanded} onChange={() => onExpand(id)}>
-            <AccordionSummary expandIcon={<ExpandMore />} aria-controls={`${id}-content`} id={`${id}-header`}>
-               <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
-                  <Typography variant={expanded ? "h6" : "body1"} component="div">
+         <AccordionItem>
+            <AccordionButton>
+               <Flex flex={1}>
+                  <Text as="h3" fontSize="lg">
                      {responsibility.name}
-                  </Typography>
-                  <Typography sx={{ color: "text.secondary", mr: 2 }}>{year}</Typography>
-               </Box>
-            </AccordionSummary>
-            <AccordionDetails>
-               <Typography sx={{ color: "text.secondary" }} gutterBottom>
-                  Beskrivelse: {responsibility.description || "Ingen beskrivelse på ansvarspost"}
-               </Typography>
+                  </Text>
+               </Flex>
+               <Text sx={{ color: "text.secondary", mr: 2 }}>{year}</Text>
+               <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel>
+               <Text color="gray">Beskrivelse: {responsibility.description || "Ingen beskrivelse på ansvarspost"}</Text>
                <form onSubmit={handleSubmit}>
-                  <TextField
-                     fullWidth
-                     variant="filled"
-                     multiline
-                     minRows={3}
-                     label="Notat"
-                     disabled={!canEditNote}
-                     value={text}
-                     onChange={(ev) => setText(ev.target.value)}
-                     placeholder="Skriv hva du har gjort dette året innenfor din ansvarspost"
-                     sx={{ mb: 1 }}
-                  />
-                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  <FormControl>
+                     <FormLabel>Notat</FormLabel>
+                     <Textarea
+                        variant="filled"
+                        disabled={!canEditNote}
+                        value={text}
+                        onChange={(ev) => setText(ev.target.value)}
+                        placeholder="Skriv hva du har gjort dette året innenfor din ansvarspost"
+                        sx={{ mb: 1 }}
+                     />
+                  </FormControl>
+                  <Text fontSize="sm" color="gray">
                      Sist redigert av: {note.lastModifiedBy}, {lastModifiedDate.toLocaleDateString()}{" "}
                      {lastModifiedDate.toLocaleTimeString()}
-                  </Typography>
+                  </Text>
                   <Box sx={{ mt: 2 }}>
                      {isAdmin && (
                         <LoadingButton
                            sx={{ mr: 1 }}
                            response={deleteResponse}
-                           startIcon={<Delete />}
+                           leftIcon={<Delete />}
                            onClick={() => openConfirmDialog()}
+                           variant="ghost"
                         >
                            Fjern ansvarspost
                         </LoadingButton>
                      )}
                      {canEditNote && (
-                        <LoadingButton response={putResponse} variant="contained" startIcon={<Save />} type="submit">
+                        <LoadingButton response={putResponse} leftIcon={<Save />} type="submit">
                            Lagre
                         </LoadingButton>
                      )}
@@ -106,8 +113,8 @@ export const ResponsibilityForm = ({
                </form>
                <ErrorAlert response={putResponse} />
                <ErrorAlert response={deleteResponse} />
-            </AccordionDetails>
-         </Accordion>
+            </AccordionPanel>
+         </AccordionItem>
       </>
    );
 };

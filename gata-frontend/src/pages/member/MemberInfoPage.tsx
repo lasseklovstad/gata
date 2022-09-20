@@ -1,5 +1,4 @@
-import { Avatar, Box, Button, IconButton, List, ListItem, ListItemSecondaryAction, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Avatar, Box, Button, IconButton, List, ListItem, Heading, Text, Flex, Divider } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetRoles, useUpdateUserRoles } from "../../api/role.api";
 import { useDeleteUser, useGetUser } from "../../api/user.api";
@@ -41,12 +40,12 @@ export const MemberInfoPage = () => {
       <PageLayout>
          <Box display="flex" alignItems="center">
             <Avatar src={user?.primaryUser.picture} sx={{ mr: 1 }} />
-            <Typography variant="h1">Informasjon</Typography>
+            <Heading as="h1" flex={1}>
+               Informasjon
+            </Heading>
             {isAdmin && (
                <>
-                  <IconButton onClick={openConfirmDialog}>
-                     <Delete />
-                  </IconButton>
+                  <IconButton variant="ghost" onClick={openConfirmDialog} icon={<Delete />} aria-label="Slett" />
                   {ConfirmDialogComponent}
                </>
             )}
@@ -54,18 +53,17 @@ export const MemberInfoPage = () => {
          <Loading response={userResponse} />
          {user && <UserInfo user={user} onChange={updateUser} />}
          {isAdmin && user && <LinkExternalUserToGataUserSelect user={user} onChange={updateUser} />}
-         <Typography variant="h2">Roller</Typography>
+         <Heading as="h2">Roller</Heading>
          <Loading response={rolesResponse} />
          <List>
             {rolesResponse.data?.map((role) => {
                return (
-                  <ListItem divider key={role.id}>
-                     {role.name}
-                     {isAdmin && (
-                        <ListItemSecondaryAction>
-                           {user && <RoleButton role={role} user={user} onChange={updateUser} />}
-                        </ListItemSecondaryAction>
-                     )}
+                  <ListItem key={role.id}>
+                     <Flex p={2} alignItems="center">
+                        <Box flex={1}>{role.name}</Box>
+                        {isAdmin && user && <RoleButton role={role} user={user} onChange={updateUser} />}
+                     </Flex>
+                     <Divider />
                   </ListItem>
                );
             })}
@@ -92,7 +90,7 @@ const RoleButton = ({ role, user, onChange }: RoleButtonProps) => {
       }
    };
    return (
-      <Button variant="outlined" onClick={handleClick} disabled={postRoleResponse.status === "loading"}>
+      <Button variant="outline" onClick={handleClick} isLoading={postRoleResponse.status === "loading"}>
          {hasRole ? "Fjern rolle" : "Legg til rolle"}
       </Button>
    );

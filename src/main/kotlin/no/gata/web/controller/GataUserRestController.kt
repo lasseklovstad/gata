@@ -67,6 +67,7 @@ class GataUserRestController {
                 .orElseThrow(({ ResponseStatusException(HttpStatus.NOT_FOUND, "External user with id ${body.externalUserId} not found") }))
         val newGataUser = gataUserRepository.save(GataUser())
         externalUser.user = newGataUser
+        externalUser.primary = true
         externalUserRepository.save(externalUser)
         newGataUser.externalUserProviders = listOf(externalUser)
         return DtoOutGataUser(newGataUser)

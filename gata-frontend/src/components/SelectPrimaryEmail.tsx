@@ -1,10 +1,10 @@
-import { IGataUser } from "../types/GataUser.type";
-import { Box, CircularProgress, FormControl, FormHelperText, InputLabel, OutlinedInput, Select } from "@mui/material";
-import { SelectInputProps } from "@mui/material/Select/SelectInput";
-import { ExternalUserMenuItem } from "./ExternalUserMenuItem";
+import { IExternalUser, IGataUser } from "../types/GataUser.type";
+import { Box, Flex, FormControl, FormHelperText, FormLabel } from "@chakra-ui/react";
 import { usePrimaryExternalUser } from "../api/user.api";
 import { ErrorAlert } from "./ErrorAlert";
+import { chakraComponents, OptionBase, Props, Select } from "chakra-react-select";
 import { ExternalUserIcon } from "./ExternalUserIcon";
+import { ReactNode } from "react";
 
 type SelectPrimaryEmailProps = {
    user: IGataUser;
@@ -13,44 +13,33 @@ type SelectPrimaryEmailProps = {
 
 export const SelectPrimaryEmail = ({ user, onChange }: SelectPrimaryEmailProps) => {
    const { updatePrimaryUserResponse, updatePrimaryUser } = usePrimaryExternalUser(user.id);
-   const handleChange: SelectInputProps<string>["onChange"] = async (ev) => {
-      const { data, status } = await updatePrimaryUser(ev.target.value);
-      if (data && status === "success") {
-         onChange(data);
+   const handleChange: Props<ColorOption, false>["onChange"] = async (option) => {
+      if (option?.value) {
+         const { data, status } = await updatePrimaryUser(option.value);
+         if (data && status === "success") {
+            onChange(data);
+         }
       }
    };
 
-   const getSelectedUser = (id: string) => {
-      return user.externalUserProviders.find((user) => id === user.id);
-   };
+   const options = user.externalUserProviders.map((user) => ({
+      label: user.email,
+      value: user.id,
+      user: user,
+   }));
+
+   const selectedOption = options.find((option) => option.value === user.primaryUser.id);
 
    return (
-      <FormControl sx={{ mt: 1, mb: 1 }}>
-         <InputLabel id="primary-user-select-label">Primær epost</InputLabel>
-         <Select
-            labelId="primary-user-select-label"
-            id="primary-user-select"
-            value={user.primaryUser.id}
-            input={<OutlinedInput label="Primær epost" />}
+      <FormControl width={400} sx={{ mt: 1, mb: 1 }}>
+         <FormLabel>Primær epost</FormLabel>
+         <Select<ColorOption, false, never>
+            value={selectedOption}
             onChange={handleChange}
-            renderValue={(selected) => {
-               const selectedUser = getSelectedUser(selected);
-               if (!selectedUser) {
-                  return "";
-               }
-               return (
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                     <ExternalUserIcon user={selectedUser} />
-                     {selectedUser?.email}
-                     {updatePrimaryUserResponse.status === "loading" && <CircularProgress size={20} />}
-                  </Box>
-               );
-            }}
-         >
-            {user.externalUserProviders.map((user) => (
-               <ExternalUserMenuItem key={user.id} value={user.id} user={user} />
-            ))}
-         </Select>
+            components={customComponents}
+            options={options}
+            isLoading={updatePrimaryUserResponse.status === "loading"}
+         />
          <FormHelperText>Denne eposten blir brukt til å sende ut informasjon</FormHelperText>
          <ErrorAlert
             response={updatePrimaryUserResponse}
@@ -58,4 +47,26 @@ export const SelectPrimaryEmail = ({ user, onChange }: SelectPrimaryEmailProps) 
          />
       </FormControl>
    );
+};
+
+interface ColorOption extends OptionBase {
+   label: string;
+   value: string;
+   user: IExternalUser;
+}
+
+const customComponents: Props<ColorOption, false, never>["components"] = {
+   Option: ({ children, ...props }) => (
+      <chakraComponents.Option {...props}>
+         <ExternalUserIcon user={props.data.user} sx={{ mr: 1 }} color={props.isSelected ? "white" : "blue.500"} />{" "}
+         {children}
+      </chakraComponents.Option>
+   ),
+   SingleValue: ({ children, ...props }) => (
+      <chakraComponents.SingleValue {...props}>
+         <Flex>
+            <ExternalUserIcon user={props.data.user} sx={{ mr: 1 }} /> {children}
+         </Flex>
+      </chakraComponents.SingleValue>
+   ),
 };
