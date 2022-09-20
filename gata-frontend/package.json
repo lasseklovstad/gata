@@ -36,6 +36,8 @@
    },
    "scripts": {
       "dev": "vite",
-      "build": "tsc && vite build"
+      "build": "tsc && vite build",
+      "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.mjs,.cjs",
+      "lint:fix": "npm run lint -- --fix"
    }
 }

@@ -21,6 +21,7 @@ services:
       - db
     environment:
       - DB_HOST=db
+      - DB_PORT=5432
       - AUTH0_CLIENT_ID=123123
       - AUTH0_CLIENT_SECRET=123
       - GMAIL_USER_NAME=test@gmail.com

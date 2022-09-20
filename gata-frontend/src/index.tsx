@@ -1,13 +1,13 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { Auth0Provider } from "@auth0/auth0-react";
-import { HashRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 
 const container = document.getElementById("root");
 if (container) {
    const root = createRoot(container);
    root.render(
-      <HashRouter>
+      <BrowserRouter>
          <Auth0Provider
             domain={import.meta.env.VITE_AUTH0_DOMAIN || ""}
             clientId={import.meta.env.VITE_AUTH0_CLIENT_ID || ""}
@@ -16,6 +16,6 @@ if (container) {
          >
             <App />
          </Auth0Provider>
-      </HashRouter>
+      </BrowserRouter>
    );
 }
