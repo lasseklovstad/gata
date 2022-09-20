@@ -46,7 +46,7 @@ export const ResponsiveAppBar = () => {
          <Container maxW="6xl" my={2}>
             <Flex align="center">
                <Img
-                  src="logo192.png"
+                  src="/logo192.png"
                   height="40px"
                   alt="Hesten blå"
                   sx={{ mr: 2, display: { base: "none", md: "block" } }}
@@ -74,7 +74,7 @@ export const ResponsiveAppBar = () => {
                   </Menu>
                </Box>
                <Text sx={{ flexGrow: 1, display: { base: "flex", md: "none" } }}>
-                  <img src="logo192.png" style={{ height: "40px" }} alt="Hesten blå" />
+                  <img src="/logo192.png" style={{ height: "40px" }} alt="Hesten blå" />
                </Text>
                <Flex sx={{ flexGrow: 1, flexWrap: "wrap", display: { base: "none", md: "flex" }, gap: 1 }}>
                   {filteredPages.map((page) => {
