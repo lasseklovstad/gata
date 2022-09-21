@@ -3,12 +3,14 @@ package no.gata.web.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.gata.web.controller.dtoInn.DtoInnGataReport
 import no.gata.web.controller.dtoOut.DtoOutGataReport
+import no.gata.web.exception.GataUserNotFound
 import no.gata.web.models.*
 import no.gata.web.repository.GataReportFileRepository
 import no.gata.web.repository.GataReportRepository
 import no.gata.web.repository.GataRoleRepository
 import no.gata.web.repository.GataUserRepository
 import no.gata.web.service.CloudinaryService
+import no.gata.web.service.GataReportService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -46,6 +48,9 @@ class GataReportRestController {
     @Autowired
     private lateinit var cloudinaryService: CloudinaryService
 
+    @Autowired
+    private lateinit var gataReportService: GataReportService
+
     @GetMapping
     @PreAuthorize("hasAuthority('member')")
     fun getReports(@RequestParam page: Int, @RequestParam type: ReportType): Page<GataReportSimple> {
@@ -56,12 +61,7 @@ class GataReportRestController {
     @GetMapping("{id}")
     @PreAuthorize("hasAuthority('member')")
     fun getReport(@PathVariable id: String): DtoOutGataReport {
-        val gataReport = gataReportRepository.findById(UUID.fromString(id))
-        if(gataReport.isPresent){
-            return DtoOutGataReport(gataReport.get())
-        }
-        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Finner ikke referatet");
-
+        return DtoOutGataReport(gataReportService.getReport(id))
     }
 
     @GetMapping("databasesize")
@@ -84,17 +84,17 @@ class GataReportRestController {
     @PreAuthorize("hasAuthority('member')")
     fun publishReport(@PathVariable id: String): List<String> {
         val siteBaseUrl = "https://gataersamla.no"
-        val report = gataReportRepository.findById(UUID.fromString(id))
+        val report = gataReportService.getReport(id)
         val emails = getEmailsToPublishReport()
         if (emails.isNotEmpty()) {
             val msg = javaMailSender.createMimeMessage()
             val helper = MimeMessageHelper(msg, true)
             helper.setTo(emails.map { InternetAddress(it) }.toTypedArray())
 
-            helper.setSubject("Nytt fra Gata! ${report.get().title}")
-            helper.setText("<h1>Nytt fra Gata</h1><p>Det har kommet en oppdatering på ${siteBaseUrl}!</p><h2>${report.get().title}</h2>" +
-                    "<p>${report.get().description}</p><p>" +
-                    "<a href='${siteBaseUrl}/#/report/${report.get().id}'>Trykk her for å lese hele saken!</a>" +
+            helper.setSubject("Nytt fra Gata! ${report.title}")
+            helper.setText("<h1>Nytt fra Gata</h1><p>Det har kommet en oppdatering på ${siteBaseUrl}!</p><h2>${report.title}</h2>" +
+                    "<p>${report.description}</p><p>" +
+                    "<a href='${siteBaseUrl}/#/report/${report.id}'>Trykk her for å lese hele saken!</a>" +
                     "</p>", true)
 
             javaMailSender.send(msg)
@@ -106,22 +106,15 @@ class GataReportRestController {
     @PreAuthorize("hasAuthority('admin')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteReport(@PathVariable id: String) {
-        val report = gataReportRepository.findById(UUID.fromString(id))
-        if (report.isPresent) {
-            val reportFiles = gataReportFileRepository.findAllByReport(report.get())
-            // Delete all files on cloud first
-            deleteFiles(reportFiles)
-            return gataReportRepository.deleteById(UUID.fromString(id))
-        }
-        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Finner ikke referatet");
+        val report = gataReportService.getReport(id)
+        val reportFiles = gataReportFileRepository.findAllByReport(report)
+        // Delete all files on cloud first
+        deleteFiles(reportFiles)
+        return gataReportRepository.deleteById(UUID.fromString(id))
     }
 
     fun getLoggedInUser(authentication: Authentication): GataUser {
-        val user = gataUserRepository.findByExternalUserProvidersId(authentication.name)
-        if (user.isPresent) {
-            return user.get()
-        }
-        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Brukeren finnes ikke!");
+        return gataUserRepository.findByExternalUserProvidersId(authentication.name).orElseThrow { GataUserNotFound(authentication.name) }
     }
 
     @PostMapping
@@ -148,35 +141,29 @@ class GataReportRestController {
     @PreAuthorize("hasAuthority('member')")
     fun updateReport(@RequestBody body: DtoInnGataReport, authentication: Authentication, @PathVariable id: String): DtoOutGataReport {
         val user = getLoggedInUser(authentication)
-        val report = gataReportRepository.findById(UUID.fromString(id))
-        if (report.isPresent) {
-            val newReport = report.get()
-            newReport.title = body.title
-            newReport.description = body.description
-            newReport.lastModifiedBy = user.getPrimaryUser()!!.name
-            newReport.lastModifiedDate = Date()
-            return DtoOutGataReport(gataReportRepository.save(newReport))
-        }
-        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Finner ikke referatet");
+        val report = gataReportService.getReport(id)
+
+        report.title = body.title
+        report.description = body.description
+        report.lastModifiedBy = user.getPrimaryUser()!!.name
+        report.lastModifiedDate = Date()
+        return DtoOutGataReport(gataReportRepository.save(report))
     }
 
     @PutMapping("{id}/content")
     @PreAuthorize("hasAuthority('member')")
     fun updateReportContent(@RequestBody body: List<RichTextBlock>, authentication: Authentication, @PathVariable id: String): DtoOutGataReport {
         val user = getLoggedInUser(authentication)
-        val report = gataReportRepository.findById(UUID.fromString(id))
-        if (report.isPresent) {
-            val files = body.filter { it.type == "image" }
-            val newReport = report.get()
-            val reportFiles = gataReportFileRepository.findAllByReport(newReport)
-            val filesToDelete = reportFiles.filter { files.find { file -> file.imageId == it.id.toString() } == null }
-            deleteFiles(filesToDelete)
-            newReport.content = ObjectMapper().writeValueAsString(body)
-            newReport.lastModifiedBy = user.getPrimaryUser()!!.name
-            newReport.lastModifiedDate = Date()
-            return DtoOutGataReport(gataReportRepository.save(newReport))
-        }
-        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Finner ikke referatet");
+        val report = gataReportService.getReport(id)
+        val files = body.filter { it.type == "image" }
+        val reportFiles = gataReportFileRepository.findAllByReport(report)
+        val filesToDelete = reportFiles.filter { files.find { file -> file.imageId == it.id.toString() } == null }
+        deleteFiles(filesToDelete)
+        report.content = ObjectMapper().writeValueAsString(body)
+        report.lastModifiedBy = user.getPrimaryUser()!!.name
+        report.lastModifiedDate = Date()
+        return DtoOutGataReport(gataReportRepository.save(report))
+
     }
 
     fun deleteFiles(files: List<GataId>) {
