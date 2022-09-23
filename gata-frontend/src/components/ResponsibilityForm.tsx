@@ -1,4 +1,4 @@
-import { Delete, ExpandMore, Save } from "@mui/icons-material";
+import { Delete, Save } from "@mui/icons-material";
 import {
    Box,
    AccordionIcon,
@@ -10,7 +10,6 @@ import {
    FormControl,
    FormLabel,
    Flex,
-   Heading,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useDeleteResponsibilityForUser, usePutResponsibilityNote } from "../api/user.api";

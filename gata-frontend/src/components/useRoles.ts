@@ -1,13 +1,9 @@
-import { useAuth0 } from "@auth0/auth0-react";
-import { GataRoleType } from "../types/GataRole.type";
-
-const namespace = "http://gataersamla.no";
+import { useGetLoggedInUser } from "../api/user.api";
 
 export const useRoles = () => {
-   const { user } = useAuth0();
-   const roles: GataRoleType[] = user ? user[`${namespace}/roles`] : [];
-   const isAdmin = roles.includes("Administrator");
-   const isMember = roles.includes("Medlem");
+   const { userResponse } = useGetLoggedInUser();
+   const isAdmin = !!userResponse.data?.isUserAdmin;
+   const isMember = !!userResponse.data?.isUserMember;
 
-   return { isAdmin, isMember, roles };
+   return { isAdmin, isMember };
 };

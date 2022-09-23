@@ -11,7 +11,7 @@ import { ReportPage } from "./pages/ReportPage";
 import { ReportInfoPage } from "./pages/ReportInfoPage/ReportInfoPage";
 import * as React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Box, ChakraProvider, ComponentStyleConfig, Container, extendTheme, Text } from "@chakra-ui/react";
+import { Box, ChakraProvider, Container, extendTheme, Text } from "@chakra-ui/react";
 
 const chakraTheme = extendTheme({
    components: {

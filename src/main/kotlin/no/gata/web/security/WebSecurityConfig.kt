@@ -1,8 +1,6 @@
 package no.gata.web.security
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.env.Environment
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -22,9 +20,6 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Value(value = "\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private lateinit var issuer: String
-
-    @Autowired
-    private lateinit var env: Environment
 
     @Override
     override fun configure(http: HttpSecurity) {

@@ -20,25 +20,17 @@ import {
 
 const pages = [
    { name: "Hjem", url: "" },
-   { name: "Min side", url: "mypage", roles: ["Medlem"] },
-   { name: "Medlemmer", url: "member", roles: ["Administrator", "Medlem"] },
-   { name: "Ansvarsposter", url: "responsibility", roles: ["Administrator", "Medlem"] },
-   { name: "Aktuelle dokumenter", url: "report", roles: ["Medlem"] },
-   { name: "Arkiv", url: "https://1drv.ms/f/s!Aimiul1gt9LbrA10geM-AnPDKFoY", roles: ["Medlem"] },
+   { name: "Min side", url: "mypage", isMember: true },
+   { name: "Medlemmer", url: "member", isMember: true },
+   { name: "Ansvarsposter", url: "responsibility", isMember: true },
+   { name: "Aktuelle dokumenter", url: "report", isMember: true },
+   { name: "Arkiv", url: "https://1drv.ms/f/s!Aimiul1gt9LbrA10geM-AnPDKFoY", isMember: true },
 ];
 
 export const ResponsiveAppBar = () => {
-   const { roles } = useRoles();
+   const { isAdmin, isMember } = useRoles();
    const filteredPages = pages.filter((page) => {
-      if (!page.roles || page.roles.length === 0) {
-         return true;
-      }
-      for (let pageRole of page.roles) {
-         if (roles.includes(pageRole as GataRoleType)) {
-            return true;
-         }
-      }
-      return false;
+      return !page.isMember || isMember || isAdmin;
    });
 
    return (

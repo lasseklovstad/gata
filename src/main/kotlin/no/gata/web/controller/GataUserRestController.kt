@@ -82,7 +82,6 @@ class GataUserRestController {
     }
 
     @GetMapping("loggedin")
-    @PreAuthorize("hasAuthority('member')")
     fun getLoggedInUser(authentication: Authentication): DtoOutGataUser {
         val user = gataUserRepository.findByExternalUserProvidersId(authentication.name).orElseThrow { GataUserNotFound(authentication.name) }
         return DtoOutGataUser(user)

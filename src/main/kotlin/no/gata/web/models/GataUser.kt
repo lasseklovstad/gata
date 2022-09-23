@@ -27,13 +27,20 @@ data class GataUser(
             roles = emptyList(),
             contingents = emptyList(),
             subscribe = false)
+    constructor(role: GataRole) : this(
+            id = null,
+            externalUserProviders = emptyList(),
+            responsibilities = emptyList(),
+            roles = listOf(role),
+            contingents = emptyList(),
+            subscribe = false)
 
     fun getIsUserMember(): Boolean {
-        return roles.find { it.name == "Medlem" } != null
+        return roles.find { it.name == GataRoleName.Medlem.name } != null
     }
 
     fun getIsUserAdmin(): Boolean {
-        return roles.find { it.name == "Administrator" } != null
+        return roles.find { it.name == GataRoleName.Administrator.name } != null
     }
 
     fun getPrimaryUser(): ExternalUser? {

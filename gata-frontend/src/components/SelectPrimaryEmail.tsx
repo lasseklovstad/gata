@@ -1,10 +1,9 @@
 import { IExternalUser, IGataUser } from "../types/GataUser.type";
-import { Box, Flex, FormControl, FormHelperText, FormLabel } from "@chakra-ui/react";
+import { Flex, FormControl, FormHelperText, FormLabel } from "@chakra-ui/react";
 import { usePrimaryExternalUser } from "../api/user.api";
 import { ErrorAlert } from "./ErrorAlert";
 import { chakraComponents, OptionBase, Props, Select } from "chakra-react-select";
 import { ExternalUserIcon } from "./ExternalUserIcon";
-import { ReactNode } from "react";
 
 type SelectPrimaryEmailProps = {
    user: IGataUser;
