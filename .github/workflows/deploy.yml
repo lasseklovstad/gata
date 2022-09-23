@@ -31,9 +31,9 @@ jobs:
           push: true
           tags: lassekl/gata:${{ github.sha }}
           build-args: |
-            VITE_AUTH0_CLIENT_ID=${{VITE_AUTH0_CLIENT_ID}}
-            VITE_AUTH0_DOMAIN=${{VITE_AUTH0_DOMAIN}}
-            VITE_AUTH0_AUDIENCE=${{VITE_AUTH0_AUDIENCE}}
+            VITE_AUTH0_CLIENT_ID=${{secrets.VITE_AUTH0_CLIENT_ID}}
+            VITE_AUTH0_DOMAIN=${{secrets.VITE_AUTH0_DOMAIN}}
+            VITE_AUTH0_AUDIENCE=${{secrets.VITE_AUTH0_AUDIENCE}}
 
       - name: Push to dokku
         uses: dokku/github-action@master
