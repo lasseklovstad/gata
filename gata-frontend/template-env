@@ -1,0 +1,3 @@
+VITE_AUTH0_DOMAIN=https://xxx.com
+VITE_AUTH0_CLIENT_ID=secret
+VITE_AUTH0_AUDIENCE=https://xxx.no

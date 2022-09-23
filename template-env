@@ -1,0 +1,5 @@
+AUTH0_DOMAIN=https://xxxx.com
+AUTH0_AUDIENCE=https://xxx.no
+VITE_AUTH0_CLIENT_ID=secret
+API_AUTH0_CLIENT_ID=secret
+API_AUTH0_CLIENT_SECRET=secret

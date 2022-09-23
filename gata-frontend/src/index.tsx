@@ -4,7 +4,6 @@ import { Auth0Provider } from "@auth0/auth0-react";
 import { BrowserRouter } from "react-router-dom";
 
 const container = document.getElementById("root");
-
 if (container) {
    const root = createRoot(container);
    root.render(

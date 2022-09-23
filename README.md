@@ -94,5 +94,13 @@ dokku nginx:set gata client-max-body-size 50m
 dokku proxy:build-config gata
 ```
 
+# Docker compose
+````bash
+# run with custom env file for prod
+docker compose --env-file ./.env.prod up --build -d
+
+
+````
+
 
 
