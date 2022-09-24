@@ -1,13 +1,13 @@
 import { test, expect } from "@playwright/test";
-import { GataHeader } from "../pages/GataHeader";
-import { HomePage } from "../pages/HomePage";
+import { GataHeader } from "../../pages/GataHeader";
+import { HomePage } from "../../pages/HomePage";
 
 test.use({ storageState: "adminStorageState.json" });
 
 test("Should have welcome title", async ({ page }) => {
   await page.goto("/");
-  const gataHeader = GataHeader(page);
-  const homePage = HomePage(page);
+  const gataHeader = new GataHeader(page);
+  const homePage = new HomePage(page);
   await expect(page).toHaveTitle(/Gata/);
 
   await expect(homePage.welcomeTitle).toBeVisible();

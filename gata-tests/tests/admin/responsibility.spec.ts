@@ -1,6 +1,6 @@
 import { test as base, expect } from "@playwright/test";
-import { GataHeader } from "../pages/GataHeader";
-import { ResponsibilityPage } from "../pages/ResponsibilityPage";
+import { GataHeader } from "../../pages/GataHeader";
+import { ResponsibilityPage } from "../../pages/ResponsibilityPage";
 
 base.use({ storageState: "adminStorageState.json" });
 
@@ -12,7 +12,7 @@ const preAddedResponsibilities = [
 
 const test = base.extend<{ responsibilityPage: ResponsibilityPage }>({
   responsibilityPage: async ({ page }, use) => {
-    const gataHeader = GataHeader(page);
+    const gataHeader = new GataHeader(page);
     const responsibilityPage = new ResponsibilityPage(page);
     // Navigate
     await page.goto("/");
