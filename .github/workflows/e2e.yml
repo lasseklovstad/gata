@@ -32,6 +32,6 @@ jobs:
          PLAYWRIGHT_ADMIN_USERNAME: ${{secrets.E2E_PLAYWRIGHT_ADMIN_USERNAME}}
          PLAYWRIGHT_ADMIN_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_ADMIN_PASSWORD}}
          PLAYWRIGHT_BASE_URL: http://localhost:8080
-         DEBUG: pw:api
+         DEBUG: pw:webserver
         run: |
           npx playwright test --project=chromium

@@ -105,6 +105,7 @@ const config: PlaywrightTestConfig = {
     command: "docker-compose up --build",
     cwd: "../",
     url: process.env.PLAYWRIGHT_BASE_URL,
+    reuseExistingServer: !process.env.CI,
   },
 };
 
