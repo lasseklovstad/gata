@@ -16,7 +16,7 @@ services:
       - "5433:5432"
 
   app:
-    image: lassekl/gata
+    image: lassekl/gata:test
     environment:
       - DB_HOST=db
       - DB_PORT=5432
