@@ -1,53 +1,96 @@
-import { test as base, expect } from "@playwright/test";
-import { GataHeader } from "../pages/GataHeader";
+import { Page, test } from "@playwright/test";
+import { getAdminPage, getMemberPage, getNonMemberPage } from "../utils/page";
 import { ResponsibilityPage } from "../pages/ResponsibilityPage";
+import { MemberOverviewPage } from "../pages/MemberOverviewPage";
+import { MemberPage } from "../pages/MemberPage";
+import { Environment } from "../pages/Environment";
+import { GataHeader } from "../pages/GataHeader";
+import {
+  addLinkedUserWithAdmin,
+  removeLinkedUserWithAdmin,
+} from "../utils/linkUser";
 
-base.use({ storageState: "adminStorageState.json" });
+const env = new Environment();
 
-const preAddedResponsibilities = [
-  { name: "Aktivitetsansvarlig", description: "Planlegg aktiviteter" },
-  { name: "Kultur", description: "Vedlikeholder gatas kultur og historie" },
-  { name: "Musikk", description: "Ordner musikk til arangement" },
-];
-
-const test = base.extend<{ responsibilityPage: ResponsibilityPage }>({
-  responsibilityPage: async ({ page }, use) => {
-    const gataHeader = GataHeader(page);
-    const responsibilityPage = new ResponsibilityPage(page);
-    // Navigate
-    await page.goto("/");
-    await gataHeader.responsibilityLink.click();
-    for (let res of preAddedResponsibilities) {
-      await responsibilityPage.createNewResponsibility(
-        res.name,
-        res.description
-      );
-    }
-
-    await use(responsibilityPage);
-    // Optional cleanup
-
-    await responsibilityPage.deleteAllResponsibilities();
-  },
-});
-
-test("Should create responsibility", async ({ responsibilityPage }) => {
-  await responsibilityPage.createNewResponsibility(
-    "Formann",
-    "Formann av Gata"
+test("linked member should be able to edit responsibility", async ({
+  browser,
+}) => {
+  const adminPage = await getAdminPage(browser);
+  const memberPage = await getMemberPage(browser);
+  const nonMemberPage = await getNonMemberPage(browser);
+  const responsibilityName = "Aktivitetsansvarlig";
+  await addResponsibilityToMember(adminPage, responsibilityName);
+  await editResponsibility(memberPage, responsibilityName, "Jeg er medlem");
+  await addLinkedUserWithAdmin(adminPage);
+  await editResponsibility(
+    nonMemberPage,
+    responsibilityName,
+    "Jeg er ikke medlem"
   );
+
+  await removeResponsibilityFromMember(adminPage, responsibilityName);
+  await removeResponsibility(adminPage, responsibilityName);
+  await removeLinkedUserWithAdmin(adminPage);
 });
 
-test("Should edit responsibility", async ({ responsibilityPage }) => {
-  await responsibilityPage.editResponsibility(
-    preAddedResponsibilities[0].name,
-    "Tim",
-    "Ikke gunstig å ha denne."
-  );
-});
+const editResponsibility = async (
+  page: Page,
+  name: string,
+  content: string
+) => {
+  const memberPage = new MemberPage(page);
+  const header = new GataHeader(page);
+  await page.goto("/");
+  await header.myPageLink.click();
+  await memberPage.editResponsibiblity(name, content);
+};
 
-test("Should delete responsibility", async ({ responsibilityPage }) => {
-  await responsibilityPage.deleteResponsibility(
-    preAddedResponsibilities[0].name
+const removeResponsibility = async (page: Page, responsibilityName: string) => {
+  const responsibilityPage = new ResponsibilityPage(page);
+
+  await page.goto("/");
+  await responsibilityPage.goto();
+  await responsibilityPage.deleteResponsibility(responsibilityName);
+};
+
+const removeResponsibilityFromMember = async (
+  page: Page,
+  responsibilityName: string
+) => {
+  const memberOverviewPage = new MemberOverviewPage(page);
+  const memberPage = new MemberPage(page);
+
+  await page.goto("/");
+  await memberOverviewPage.goto();
+  await memberOverviewPage.goToMember(env.memberUsername);
+  await memberPage.deleteResponsibility(responsibilityName);
+};
+
+const addResponsibilityToMember = async (
+  page: Page,
+  responsibilitName: string
+) => {
+  const respPage = new ResponsibilityPage(page);
+  await page.goto("/");
+  await respPage.goto();
+  await respPage.createNewResponsibility(responsibilitName, "Han er kul");
+  await assignResponsibilityToMember(
+    page,
+    env.memberUsername,
+    responsibilitName
   );
-});
+};
+
+const assignResponsibilityToMember = async (
+  page: Page,
+  username: string,
+  responsibilityName: string
+) => {
+  const memberOverviewPage = new MemberOverviewPage(page);
+  const memberPage = new MemberPage(page);
+
+  await page.goto("/");
+  await memberOverviewPage.goto();
+  await memberOverviewPage.goToMember(username);
+  await memberPage.addResponsibility(responsibilityName);
+};

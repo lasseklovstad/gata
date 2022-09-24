@@ -71,13 +71,14 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
             <Box boxShadow="xl" sx={{ mt: 1 }}>
                <Box
                   bg="white"
+                  zIndex={1}
                   sx={{
                      display: "flex",
                      justifyContent: "space-between",
                      flexWrap: "wrap-reverse",
                      alignItems: "center",
                      position: "sticky",
-                     top: "66px",
+                     top: "0",
                   }}
                >
                   <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center" }}>
@@ -131,6 +132,8 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                <Divider />
                <Box sx={{ p: 2, minHeight: "600px" }}>
                   <Editable
+                     aria-label={"Rediger innhold"}
+                     style={{ minHeight: "600px" }}
                      renderElement={renderElement}
                      renderLeaf={renderLeaf}
                      onKeyDown={(event) => {

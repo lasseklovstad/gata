@@ -84,6 +84,12 @@ const customComponents: Props<ColorOption, true, never>["components"] = {
          </Flex>
       </chakraComponents.MultiValue>
    ),
+   MultiValueRemove: (props) => (
+      <chakraComponents.MultiValueRemove
+         {...props}
+         innerProps={{ ...props.innerProps, "aria-label": `Fjern ${props.data.label}` }}
+      />
+   ),
 };
 
 const chakraStyles: ChakraStylesConfig<ColorOption, true, never> = {

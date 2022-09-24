@@ -1,4 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test";
+import { ConfirmModal } from "./ConfirmModal";
+import { GataHeader } from "./GataHeader";
 
 class ResponsibilityFormModal {
   modal: Locator;
@@ -14,28 +16,20 @@ class ResponsibilityFormModal {
   }
 }
 
-class ResponsibilityDeleteModal {
-  modal: Locator;
-  confirmButton: Locator;
-
-  constructor(page: Page) {
-    this.modal = page.locator("role=dialog[name=/er du sikker/i]");
-    this.confirmButton = page.locator("role=button[name=/jeg er sikker/i]");
-  }
-}
-
 export class ResponsibilityPage {
   page: Page;
-  heading: Locator;
+  pageTitle: Locator;
   addButton: Locator;
   responsibilityFormModal: ResponsibilityFormModal;
-  confirmDeleteModal: ResponsibilityDeleteModal;
+  confirmDeleteModal: ConfirmModal;
+  header: GataHeader;
 
   constructor(page: Page) {
-    this.heading = page.locator("role=heading[name=Ansvarsposter]");
+    this.pageTitle = page.locator("role=heading[name=Ansvarsposter]");
     this.addButton = page.locator("role=button[name=/legg til/i]");
     this.responsibilityFormModal = new ResponsibilityFormModal(page);
-    this.confirmDeleteModal = new ResponsibilityDeleteModal(page);
+    this.confirmDeleteModal = new ConfirmModal(page);
+    this.header = new GataHeader(page);
     this.page = page;
   }
 
@@ -56,6 +50,10 @@ export class ResponsibilityPage {
     await expect(originalItem.listItem).toBeVisible();
   }
 
+  async goto() {
+    await this.header.responsibilityLink.click();
+  }
+
   async editResponsibility(
     originalName: string,
     name: string,
@@ -73,7 +71,7 @@ export class ResponsibilityPage {
   async deleteResponsibility(name: string) {
     const item = this.getResponsibilityListItem(name);
     await item.deleteButton.click();
-    await this.confirmDelete();
+    await this.confirmDeleteModal.confirm();
     await expect(item.listItem).toBeHidden();
   }
 
@@ -86,7 +84,7 @@ export class ResponsibilityPage {
       await expect(item).toBeVisible();
       const { deleteButton } = this.getListItemButtons(item);
       await deleteButton.click();
-      await this.confirmDelete();
+      await this.confirmDeleteModal.confirm();
     }
   }
 
@@ -100,11 +98,5 @@ export class ResponsibilityPage {
     const listItem = this.page.locator("role=listitem", { hasText: name });
     const buttons = this.getListItemButtons(listItem);
     return { listItem, ...buttons };
-  }
-
-  async confirmDelete() {
-    await expect(this.confirmDeleteModal.modal).toBeVisible();
-    await this.confirmDeleteModal.confirmButton.click();
-    await expect(this.confirmDeleteModal.modal).toBeHidden();
   }
 }

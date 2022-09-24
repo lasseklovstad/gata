@@ -2,7 +2,11 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Text, Button, IconButton, Menu, MenuItem, Avatar, MenuList, MenuButton } from "@chakra-ui/react";
 import { Link, useLocation } from "react-router-dom";
 
-export const UserMenu = () => {
+type UserMenuProps = {
+   roleText: string;
+};
+
+export const UserMenu = ({ roleText }: UserMenuProps) => {
    const { user, isAuthenticated, logout, loginWithRedirect } = useAuth0();
    const location = useLocation();
 
@@ -15,7 +19,7 @@ export const UserMenu = () => {
          {isAuthenticated && (
             <>
                <Menu>
-                  <MenuButton as={IconButton} icon={<Avatar src={user?.picture} size="sm" />} />
+                  <MenuButton aria-label="Åpne meny" as={IconButton} icon={<Avatar src={user?.picture} size="sm" />} />
                   <MenuList>
                      <MenuItem onClick={handleLogout}>
                         <Text textAlign="center">Logg ut</Text>
@@ -23,6 +27,7 @@ export const UserMenu = () => {
                      <MenuItem as={Link} to="privacy">
                         <Text textAlign="center">Privacy</Text>
                      </MenuItem>
+                     <MenuItem>Rolle: {roleText}</MenuItem>
                   </MenuList>
                </Menu>
             </>

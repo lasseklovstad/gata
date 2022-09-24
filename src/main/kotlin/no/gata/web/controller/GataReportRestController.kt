@@ -103,7 +103,7 @@ class GataReportRestController {
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('member')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteReport(@PathVariable id: String) {
         val report = gataReportService.getReport(id)

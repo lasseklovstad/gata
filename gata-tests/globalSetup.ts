@@ -1,21 +1,47 @@
 // global-setup.ts
-import { chromium, expect, FullConfig } from "@playwright/test";
+import { Browser, chromium, expect, FullConfig } from "@playwright/test";
+import { LoginPage } from "./pages/LoginPage";
+import { Environment } from "./pages/Environment";
 
 async function globalSetup(config: FullConfig) {
-  const browser = await chromium.launch();
-  const adminPage = await browser.newPage();
-  await adminPage.goto(process.env.PLAYWRIGHT_BASE_URL);
-  await adminPage.locator("role=button[name=/logg inn/i]").click();
-  await adminPage
-    .locator("role=textbox[name=/email address/i]")
-    .type(process.env.PLAYWRIGHT_ADMIN_USERNAME);
-  await adminPage
-    .locator("role=textbox[name=/password/i]")
-    .type(process.env.PLAYWRIGHT_ADMIN_PASSWORD);
-  await adminPage.locator("role=button[name=/continue/i]").click();
-  await expect(adminPage.locator("role=heading[name=Velkommen]")).toBeVisible();
-  await adminPage.context().storageState({ path: "adminStorageState.json" });
+  const browser = await chromium.launch({
+    headless: !!process.env.CI,
+  });
+  const env = new Environment();
+
+  await login(
+    browser,
+    env.nonMemberUsername,
+    env.nonMemberPassword,
+    "nonMemberStorageState.json"
+  );
+
+  await login(
+    browser,
+    env.adminUsername,
+    env.adminPassword,
+    "adminStorageState.json"
+  );
+  await login(
+    browser,
+    env.memberUsername,
+    env.memberPassword,
+    "memberStorageState.json"
+  );
+
   await browser.close();
 }
+
+const login = async (
+  browser: Browser,
+  username: string,
+  password: string,
+  path: string
+) => {
+  const memberPage = await browser.newPage();
+  const memberLogin = new LoginPage(memberPage);
+  await memberLogin.login(username, password);
+  await memberPage.context().storageState({ path });
+};
 
 export default globalSetup;

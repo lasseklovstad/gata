@@ -51,7 +51,7 @@ export const ResponsibilityForm = ({
    const { putNote, putResponse } = usePutResponsibilityNote(user.id, id);
    const [text, setText] = useState(note.text);
    const lastModifiedDate = new Date(note.lastModifiedDate);
-   const canEditNote = auth0User?.sub === user.primaryUser.id || isAdmin;
+   const canEditNote = user.externalUserProviders.find((externalUser) => externalUser.id === auth0User?.sub) || isAdmin;
 
    const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (ev) => {
       ev.preventDefault();

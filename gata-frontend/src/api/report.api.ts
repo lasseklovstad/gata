@@ -17,10 +17,11 @@ export const useGetGataReports = (page: number, type: GataReportType) => {
 };
 
 export const useGetGataReport = (id: string) => {
-   const { user } = useAuth0();
-   const { isAdmin } = useRoles();
+   const { isAdmin, user } = useRoles();
    const [reportResponse, clientFetch] = useClient<IGataReport, never>();
-   const hasCreated = user?.sub === reportResponse.data?.createdBy?.externalUserProviderId;
+   const hasCreated = user?.externalUserProviders.find(
+      (externalUser) => externalUser.id === reportResponse.data?.createdBy?.externalUserProviderId
+   );
    const isNews = reportResponse.data?.type === "NEWS";
    const canEdit = isAdmin || (hasCreated && isNews);
    const getReport = useCallback(() => {
