@@ -1,0 +1,37 @@
+name: 'e2e'
+
+on:
+  push:
+    branches:
+      - '**'
+      - '!main'
+  workflow_dispatch:
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cloning repo
+        uses: actions/checkout@v2
+
+      - name: Install playwright
+        working-directory: ./gata-tests
+        run: |
+         npm install
+         npx playwright install --with-deps
+
+      - name: Run E2E tests
+        working-directory: ./gata-tests
+        env:
+         AUTH0_DOMAIN: ${{secrets.E2E_AUTH0_DOMAIN}}
+         AUTH0_AUDIENCE: ${{secrets.E2E_AUTH0_AUDIENCE}}
+         VITE_AUTH0_CLIENT_ID: ${{secrets.E2E_VITE_AUTH0_CLIENT_ID}}
+         API_AUTH0_CLIENT_ID: ${{secrets.E2E_API_AUTH0_CLIENT_ID}}
+         API_AUTH0_CLIENT_SECRET: ${{secrets.E2E_API_AUTH0_CLIENT_SECRET}}
+         PLAYWRIGHT_ADMIN_USERNAME: ${{secrets.E2E_PLAYWRIGHT_ADMIN_USERNAME}}
+         PLAYWRIGHT_ADMIN_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_ADMIN_PASSWORD}}
+         PLAYWRIGHT_BASE_URL: http://localhost:8080
+         DEBUG: pw:api
+        run: |
+          npx playwright test --project=chromium
