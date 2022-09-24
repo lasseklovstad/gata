@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test";
 import { ConfirmModal } from "./ConfirmModal";
+import { GataHeader } from "./GataHeader";
 
 class ResponsibilityFormModal {
   modal: Locator;
@@ -17,16 +18,18 @@ class ResponsibilityFormModal {
 
 export class ResponsibilityPage {
   page: Page;
-  heading: Locator;
+  pageTitle: Locator;
   addButton: Locator;
   responsibilityFormModal: ResponsibilityFormModal;
   confirmDeleteModal: ConfirmModal;
+  header: GataHeader;
 
   constructor(page: Page) {
-    this.heading = page.locator("role=heading[name=Ansvarsposter]");
+    this.pageTitle = page.locator("role=heading[name=Ansvarsposter]");
     this.addButton = page.locator("role=button[name=/legg til/i]");
     this.responsibilityFormModal = new ResponsibilityFormModal(page);
     this.confirmDeleteModal = new ConfirmModal(page);
+    this.header = new GataHeader(page);
     this.page = page;
   }
 
@@ -45,6 +48,10 @@ export class ResponsibilityPage {
     await this.fillResponsibilityFormAndSave(name, description);
     const originalItem = this.getResponsibilityListItem(name);
     await expect(originalItem.listItem).toBeVisible();
+  }
+
+  async goto() {
+    await this.header.responsibilityLink.click();
   }
 
   async editResponsibility(

@@ -5,18 +5,17 @@ import { MemberPage } from "../pages/MemberPage";
 import { GataHeader } from "../pages/GataHeader";
 import { HomePage } from "../pages/HomePage";
 import { DocumentPage } from "../pages/DocumentPage";
+import { getAdminPage, getMemberPage, getNonMemberPage } from "../utils/page";
+import {
+  addLinkedUserWithAdmin,
+  removeLinkedUserWithAdmin,
+} from "../utils/linkUser";
 
 const env = new Environment();
 test("link non member to member and unlink", async ({ browser }) => {
-  const adminPage = await getPageFromStorageState(
-    browser,
-    "adminStorageState.json"
-  );
+  const adminPage = await getAdminPage(browser);
   await addLinkedUserWithAdmin(adminPage);
-  const nonMemberPage = await getPageFromStorageState(
-    browser,
-    "nonMemberStorageState.json"
-  );
+  const nonMemberPage = await getNonMemberPage(browser);
   await assertThatNonMemberIsLinked(nonMemberPage);
 
   await removeLinkedUserWithAdmin(adminPage);
@@ -24,24 +23,18 @@ test("link non member to member and unlink", async ({ browser }) => {
   await assertThatNonMemberIsNotMember(nonMemberPage);
 });
 
-test.only("linked member should be able to edit news", async ({ browser }) => {
-  const adminPage = await getPageFromStorageState(
-    browser,
-    "adminStorageState.json"
-  );
+test("linked member should be able to edit news", async ({ browser }) => {
+  const adminPage = await getAdminPage(browser);
+  const nonMemberPage = await getNonMemberPage(browser);
+  const memberPage = await getMemberPage(browser);
+
   await addLinkedUserWithAdmin(adminPage);
-  const memberPage = await getPageFromStorageState(
-    browser,
-    "memberStorageState.json"
-  );
+
   const title = "Members are awesome";
   const description = "This is made by a member";
   const editContent = "Nå kan medlemmer linkes med andre medlemmer";
+
   await addNewsAsMember(memberPage, title, description);
-  const nonMemberPage = await getPageFromStorageState(
-    browser,
-    "nonMemberStorageState.json"
-  );
 
   await editNewsAsNonMember(nonMemberPage, title, editContent);
   await assertEditNewsAsMember(memberPage, title, editContent);
@@ -95,40 +88,6 @@ const assertThatNonMemberIsNotMember = async (page: Page) => {
 
   const header = new GataHeader(page);
   await header.validateRoleInMenu("ingen");
-};
-
-const addLinkedUserWithAdmin = async (page: Page) => {
-  const memberPage = new MemberPage(page);
-  await goToMemberPageWithAdmin(page);
-  await memberPage.linkUser(env.nonMemberUsername);
-};
-
-const getPageFromStorageState = async (
-  browser: Browser,
-  storageState: string
-) => {
-  const context = await browser.newContext({
-    storageState,
-  });
-  return context.newPage();
-};
-
-const goToMemberPageWithAdmin = async (page: Page) => {
-  const memberOverviewPage = new MemberOverviewPage(page);
-  const memberPage = new MemberPage(page);
-
-  // Navigate
-  await page.goto("/");
-  await memberOverviewPage.goto();
-  await memberOverviewPage.goToMember(env.memberUsername);
-
-  await expect(memberPage.pageTitle).toBeVisible();
-};
-
-const removeLinkedUserWithAdmin = async (page: Page) => {
-  const memberPage = new MemberPage(page);
-  await goToMemberPageWithAdmin(page);
-  await memberPage.removeLinkedUser(env.nonMemberUsername);
 };
 
 const assertThatNonMemberIsLinked = async (page: Page) => {
