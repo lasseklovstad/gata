@@ -9,7 +9,7 @@ on:
 
 
 jobs:
-  deploy:
+  playwright:
     runs-on: ubuntu-latest
     steps:
       - name: Cloning repo

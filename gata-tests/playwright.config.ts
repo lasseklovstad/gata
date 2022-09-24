@@ -101,6 +101,7 @@ const config: PlaywrightTestConfig = {
 
   /* Run your local dev server before starting the tests */
   webServer: {
+    timeout: 10 * 60 * 1000,
     command: "docker-compose up --build",
     cwd: "../",
     url: process.env.PLAYWRIGHT_BASE_URL,
