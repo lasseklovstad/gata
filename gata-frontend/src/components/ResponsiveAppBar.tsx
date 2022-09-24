@@ -33,6 +33,17 @@ export const ResponsiveAppBar = () => {
       return !page.isMember || isMember || isAdmin;
    });
 
+   const getRole = () => {
+      if (isAdmin && isMember) {
+         return "admin og medlem";
+      } else if (isMember) {
+         return "medlem";
+      } else if (isAdmin) {
+         return "admin";
+      }
+      return "ingen";
+   };
+
    return (
       <Box as="header" bg="blue.500" boxShadow="xl">
          <Container maxW="6xl" my={2}>
@@ -46,7 +57,7 @@ export const ResponsiveAppBar = () => {
 
                <Box sx={{ flexGrow: 1, display: { base: "flex", md: "none" } }}>
                   <Menu>
-                     <MenuButton as={IconButton} icon={<MenuIcon />} />
+                     <MenuButton as={IconButton} icon={<MenuIcon />} aria-label="Åpne meny" />
                      <MenuList>
                         {filteredPages.map((page) => {
                            if (page.url.startsWith("https")) {
@@ -62,6 +73,7 @@ export const ResponsiveAppBar = () => {
                               </MenuItem>
                            );
                         })}
+                        <MenuItem>Rolle: {getRole()}</MenuItem>
                      </MenuList>
                   </Menu>
                </Box>
@@ -85,7 +97,7 @@ export const ResponsiveAppBar = () => {
                   })}
                </Flex>
 
-               <UserMenu />
+               <UserMenu roleText={getRole()} />
             </Flex>
          </Container>
       </Box>

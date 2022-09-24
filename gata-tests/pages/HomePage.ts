@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { ConfirmModal } from "./ConfirmModal";
+import { DocumentPage } from "./DocumentPage";
 
 class DocumentModal {
   modal: Locator;
@@ -23,33 +23,10 @@ class DocumentModal {
   }
 }
 
-class DocumentPage {
-  page: Page;
-  deleteButton: Locator;
-  confirmDeleteModal: ConfirmModal;
-
-  constructor(page: Page) {
-    this.page = page;
-    this.deleteButton = page.locator("role=button[name=/slett/i]");
-    this.confirmDeleteModal = new ConfirmModal(page);
-  }
-
-  async validateTitleAndDescription(title: string, description: string) {
-    await expect(
-      this.page.locator(`role=heading[name='${title}']`)
-    ).toBeVisible();
-    await expect(this.page.locator(`text='${description}'`)).toBeVisible();
-  }
-
-  async deleteDocument() {
-    await this.deleteButton.click();
-    await this.confirmDeleteModal.confirm();
-  }
-}
-
 export class HomePage {
   page: Page;
   welcomeTitle: Locator;
+  nonMemberInformationText: Locator;
   memberWelcomeTitle: Locator;
   addNewsButton: Locator;
   addNewsModal: DocumentModal;
@@ -62,6 +39,9 @@ export class HomePage {
     this.memberWelcomeTitle = page.locator("role=heading[name=Nyheter]");
     this.newsList = page.locator("role=list[name=Nyheter]");
     this.addNewsButton = page.locator("role=button[name=Opprett]");
+    this.nonMemberInformationText = page.locator(
+      "text=Du må være medlem for å se nyheter"
+    );
     this.addNewsModal = new DocumentModal(page);
     this.documentPage = new DocumentPage(page);
   }
@@ -75,6 +55,22 @@ export class HomePage {
   getListItemButtons(listItem: Locator) {
     const editButton = listItem.locator("role=link[name=/rediger/i]");
     return { editButton };
+  }
+
+  getNewsListItem(title: string) {
+    return this.page.locator("role=listitem", { hasText: title });
+  }
+
+  async assertNewsHasContent(title: string, content: string) {
+    const item = this.getNewsListItem(title);
+    await expect(item).toContainText(content);
+  }
+
+  async clickEditNewsItem(title: string) {
+    const item = this.getNewsListItem(title);
+    const { editButton } = this.getListItemButtons(item);
+    await editButton.click();
+    await this.documentPage.validateTitle(title);
   }
 
   async deleteAllNews() {

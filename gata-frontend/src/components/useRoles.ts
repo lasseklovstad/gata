@@ -5,5 +5,5 @@ export const useRoles = () => {
    const isAdmin = !!userResponse.data?.isUserAdmin;
    const isMember = !!userResponse.data?.isUserMember;
 
-   return { isAdmin, isMember };
+   return { isAdmin, isMember, user: userResponse.data };
 };
