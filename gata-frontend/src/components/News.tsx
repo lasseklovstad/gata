@@ -9,7 +9,7 @@ import { NewsItem } from "./NewsItem";
 import { Box, Button, Heading, List, ListItem, Text } from "@chakra-ui/react";
 
 export const News = () => {
-   const [page, setPage] = useState(1);
+   const [page] = useState(1);
    const { reportResponse } = useGetGataReports(page, "NEWS");
    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
    const navigate = useNavigate();

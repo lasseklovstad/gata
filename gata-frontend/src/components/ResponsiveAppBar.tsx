@@ -2,20 +2,19 @@ import * as React from "react";
 import { Link } from "react-router-dom";
 import { UserMenu } from "./UserMenu";
 import { useRoles } from "./useRoles";
-import { GataRoleType } from "../types/GataRole.type";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
+   Box,
    Button,
    Container,
-   Text,
-   Box,
-   IconButton,
-   Menu,
-   MenuItem,
-   MenuButton,
-   MenuList,
    Flex,
+   IconButton,
    Img,
+   Menu,
+   MenuButton,
+   MenuItem,
+   MenuList,
+   Text,
 } from "@chakra-ui/react";
 
 const pages = [

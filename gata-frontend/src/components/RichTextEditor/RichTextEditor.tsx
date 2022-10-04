@@ -5,7 +5,6 @@ import {
    FormatListNumbered,
    FormatUnderlined,
    Save,
-   ViewList,
 } from "@mui/icons-material";
 import { Box, Button, ButtonGroup, Divider } from "@chakra-ui/react";
 import { useCallback, useMemo, useRef } from "react";
@@ -132,7 +131,7 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                <Divider />
                <Box sx={{ p: 2, minHeight: "600px" }}>
                   <Editable
-                     aria-label={"Rediger innhold"}
+                     aria-label="Rediger innhold"
                      style={{ minHeight: "600px" }}
                      renderElement={renderElement}
                      renderLeaf={renderLeaf}
