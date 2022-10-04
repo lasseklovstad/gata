@@ -1,4 +1,4 @@
-FROM node:16 AS build-frontend
+FROM node:18 AS build-frontend
 ENV HOME=/usr/src/app
 WORKDIR $HOME
 COPY ./gata-frontend/package*.json ./
