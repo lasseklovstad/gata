@@ -14,6 +14,16 @@
       ],
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch"
+    },
+    {
+      "matchPackageNames": ["node"],
+      "matchManagers": ["dockerfile"],
+      "enabled": false
+    },
+    {
+      "matchPackageNames": ["openjdk"],
+      "matchManagers": ["dockerfile"],
+      "enabled": false
     }
   ]
 }
