@@ -15,7 +15,7 @@ ENV VITE_AUTH0_DOMAIN=${VITE_AUTH0_DOMAIN}
 ENV VITE_AUTH0_AUDIENCE=${VITE_AUTH0_AUDIENCE}
 RUN npm run build
 
-FROM maven:3.6-openjdk-17 AS build-backend
+FROM maven:3.8-openjdk-17 AS build-backend
 ENV HOME=/usr/src/app
 COPY src $HOME/src
 COPY pom.xml $HOME
