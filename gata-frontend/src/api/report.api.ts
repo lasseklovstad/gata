@@ -3,7 +3,6 @@ import { Descendant } from "slate";
 import { GataReportType, IGataReport, IGataReportPayload } from "../types/GataReport.type";
 import { useClient } from "./client/useClient";
 import { Page } from "../types/Page.type";
-import { useAuth0 } from "@auth0/auth0-react";
 import { useRoles } from "../components/useRoles";
 
 export const useGetGataReports = (page: number, type: GataReportType) => {

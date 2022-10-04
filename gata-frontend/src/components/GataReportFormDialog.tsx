@@ -5,19 +5,18 @@ import { GataReportType, IGataReport } from "../types/GataReport.type";
 import { ErrorAlert } from "./ErrorAlert";
 import { LoadingButton } from "./Loading";
 import {
+   Button,
+   FormControl,
+   FormErrorMessage,
+   FormLabel,
+   Input,
    Modal,
    ModalBody,
    ModalContent,
    ModalFooter,
    ModalHeader,
    ModalOverlay,
-   Button,
-   FormControl,
-   FormLabel,
-   Input,
-   FormHelperText,
    Textarea,
-   FormErrorMessage,
 } from "@chakra-ui/react";
 
 type GataReportFormDialogProps = {

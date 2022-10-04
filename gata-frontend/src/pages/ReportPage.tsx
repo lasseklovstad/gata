@@ -1,7 +1,7 @@
 import { Add } from "@mui/icons-material";
-import { Box, Button, List, ListItem, Heading, Text, Divider } from "@chakra-ui/react";
+import { Box, Button, Divider, Heading, List, ListItem, Text } from "@chakra-ui/react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDatabaseSize, useGetGataReports } from "../api/report.api";
 import { GataReportFormDialog } from "../components/GataReportFormDialog";
 import { Loading } from "../components/Loading";
@@ -11,7 +11,7 @@ import { ListItemLink } from "../components/ListItemLink";
 
 export const ReportPage = () => {
    const { isAdmin } = useRoles();
-   const [page, setPage] = useState(1);
+   const [page] = useState(1);
    const { reportResponse } = useGetGataReports(page, "DOCUMENT");
    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
    const { sizeResponse } = useDatabaseSize();

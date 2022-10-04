@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, IconButton, List, ListItem, Heading, Text, Flex, Divider } from "@chakra-ui/react";
+import { Avatar, Box, Button, Divider, Flex, Heading, IconButton, List, ListItem } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetRoles, useUpdateUserRoles } from "../../api/role.api";
 import { useDeleteUser, useGetUser } from "../../api/user.api";
