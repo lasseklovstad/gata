@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.client.ClientRequest
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
+import java.time.Duration
 import java.util.ArrayList
 
 
@@ -50,7 +51,7 @@ class Auth0RestService(private val builder: WebClient.Builder) {
 
         val body = Auth0TokenPayload(clientId, clientSecret, audience, "client_credentials")
         val token = client.post().uri("/oauth/token").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(body))
-                .retrieve().toEntity(Auth0Token::class.java).block();
+                .retrieve().toEntity(Auth0Token::class.java).delayElement(Duration.ofMillis(500)).block();
         return token!!.body!!.access_token
     }
 
@@ -72,7 +73,7 @@ class Auth0RestService(private val builder: WebClient.Builder) {
     private fun getUsers(token: String): Array<Auth0User>? {
         val client = getClient();
         val response = client.get().uri("/api/v2/users").accept(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token)
-                .retrieve().bodyToMono(Array<Auth0User>::class.java);
+                .retrieve().bodyToMono(Array<Auth0User>::class.java).delayElement(Duration.ofSeconds(1))
         return response.block()
     }
 
@@ -80,7 +81,7 @@ class Auth0RestService(private val builder: WebClient.Builder) {
         val client = getClient();
         val token = getToken();
         val response = client.get().uri("/api/v2/roles").accept(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token)
-                .retrieve().bodyToMono(Array<Auth0Role>::class.java);
+                .retrieve().bodyToMono(Array<Auth0Role>::class.java).delayElement(Duration.ofSeconds(1))
         return response.block()
     }
 
@@ -98,7 +99,7 @@ class Auth0RestService(private val builder: WebClient.Builder) {
     private fun getUserRole(userId: String, token: String): Array<Auth0Role>? {
         val client = getClient();
         val response = client.get().uri("/api/v2/users/${userId}/roles").accept(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token)
-                .retrieve().bodyToMono(Array<Auth0Role>::class.java);
+                .retrieve().bodyToMono(Array<Auth0Role>::class.java).delayElement(Duration.ofSeconds(1))
         return response.block()
     }
 

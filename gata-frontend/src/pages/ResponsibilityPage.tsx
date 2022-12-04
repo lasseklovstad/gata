@@ -88,18 +88,22 @@ export const ResponsibilityPage = () => {
                                  {description}
                               </Text>
                            </Box>
-                           <IconButton
-                              variant="ghost"
-                              onClick={() => openModal(resp)}
-                              icon={<Edit />}
-                              aria-label="Rediger"
-                           />
-                           <IconButton
-                              variant="ghost"
-                              onClick={() => handleDelete(resp)}
-                              icon={<Delete />}
-                              aria-label="Slett"
-                           />
+                           {isAdmin && (
+                              <>
+                                 <IconButton
+                                    variant="ghost"
+                                    onClick={() => openModal(resp)}
+                                    icon={<Edit />}
+                                    aria-label="Rediger"
+                                 />
+                                 <IconButton
+                                    variant="ghost"
+                                    onClick={() => handleDelete(resp)}
+                                    icon={<Delete />}
+                                    aria-label="Slett"
+                                 />
+                              </>
+                           )}
                         </Box>
                         <Divider />
                      </ListItem>
