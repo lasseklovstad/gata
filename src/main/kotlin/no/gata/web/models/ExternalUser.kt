@@ -12,6 +12,7 @@ data class ExternalUser (
     var id: String,
     var name: String?,
     var email: String,
+    @Column(length = 500)
     var picture: String?,
     var lastLogin: String?,
     @Column(name="primary_user")
