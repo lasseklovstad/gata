@@ -1,6 +1,6 @@
 # Local development
 Run local db: 
-``docker run --name gata-db-postgres -e POSTGRES_PASSWORD=password -d -p 5432:5432 postgres:14.2``
+``docker run --name gata-db-postgres -e POSTGRES_PASSWORD=password -d -p 5433:5432 postgres:14.2``
 
 legg til env for java: AUTH0_CLIENT_ID=xxx;AUTH0_CLIENT_SECRET=xxx
 ## Local profile
@@ -53,6 +53,7 @@ Domene er registrert på domeneshop: https://domene.shop/admin
 
 # Dokku
 ````bash
+ssh root@gataersamla.no
 dokku apps:create gata
 dokku config:set DB_HOST=...
 
@@ -73,8 +74,8 @@ dokku postgres:expose gatadatabase
 dokku postgres:unexpose gatadatabase
 
 # Create backup to local machine
-dokku postgres:export gatadatabase > /tmp/gatadatabase-2.export
-scp root@gataersamla.no:/tmp/gatadatabase-2.export C:\pg_dump
+dokku postgres:export gatadatabase > /tmp/gatadatabase-4.export
+scp root@gataersamla.no:/tmp/gatadatabase-4.export C:\pg_dump
 
 # Delete existing backups on server
 ls /tmp
@@ -85,7 +86,7 @@ scp C:\pg_dump\gatadatabase-1.export root@gataersamla.no:/tmp
 dokku postgres:import gatadatabase < /tmp/gatadatabase-1.export
 
 # restore backup to local database for development
-pg_restore -p 5433 -h localhost -d postgres -U postgres gatadatabase-2.export
+pg_restore -p 5433 -h localhost -d postgres -U postgres gatadatabase-4.export
 ````
 
 ## Max upload size nginx
