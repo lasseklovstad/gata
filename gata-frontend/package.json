@@ -30,7 +30,7 @@
       "vite-plugin-eslint": "1.8.1"
    },
    "scripts": {
-      "dev": "vite",
+      "start": "vite",
       "build": "tsc && vite build",
       "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx,.mjs,.cjs",
       "lint:fix": "npm run lint -- --fix"

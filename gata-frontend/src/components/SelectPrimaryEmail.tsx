@@ -30,7 +30,7 @@ export const SelectPrimaryEmail = ({ user, onChange }: SelectPrimaryEmailProps) 
    const selectedOption = options.find((option) => option.value === user.primaryUser.id);
 
    return (
-      <FormControl width={400} sx={{ mt: 1, mb: 1 }}>
+      <FormControl sx={{ mt: 1, mb: 1, maxWidth: "400px" }}>
          <FormLabel>Primær epost</FormLabel>
          <Select<ColorOption, false, never>
             value={selectedOption}
