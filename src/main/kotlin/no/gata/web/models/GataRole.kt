@@ -2,17 +2,17 @@ package no.gata.web.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.*
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 data class GataRole(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        var id: UUID?,
+        var id: UUID? = null,
         @JsonIgnore
-        var externalUserProviderId: String,
-        var name: String,
+        var externalUserProviderId: String = "",
+        var name: String = "",
         @ManyToMany(mappedBy = "roles")
         @JsonIgnore
-        var users: List<GataUser>?
+        var users: List<GataUser>? = emptyList()
 )

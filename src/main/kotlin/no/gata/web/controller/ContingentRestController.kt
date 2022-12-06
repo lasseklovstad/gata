@@ -1,5 +1,6 @@
 package no.gata.web.controller
 
+import jakarta.mail.internet.InternetAddress
 import no.gata.web.controller.dtoOut.DtoOutGataContingentInfo
 import no.gata.web.repository.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.Year
-import javax.mail.internet.InternetAddress
 
 @RestController
 @RequestMapping("api/contingent")

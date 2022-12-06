@@ -33,7 +33,7 @@ class ResponsibilityRestController {
         val year = if (yearParam == null) Year.now() else Year.of(yearParam.toInt());
         val responsibilityYears = responsibilityYearRepository.findResponsibilityYearsByYearEquals(year);
         return allResponsibilities
-                .filter { responsibilityYears.find { responsibilityYear -> responsibilityYear.responsibility.id == it.id } == null }
+                .filter { responsibilityYears.find { responsibilityYear -> responsibilityYear.responsibility?.id == it.id } == null }
                 .map { DtoOutResponsibility(it) }
     }
 
