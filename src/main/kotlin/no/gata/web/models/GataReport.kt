@@ -6,7 +6,7 @@ import java.util.*
 import jakarta.persistence.*
 
 @Entity
-data class GataReport(
+class GataReport (
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         var id: UUID? = null,

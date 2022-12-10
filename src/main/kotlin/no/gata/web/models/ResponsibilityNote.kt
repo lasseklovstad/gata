@@ -5,7 +5,7 @@ import java.util.*
 import jakarta.persistence.*
 
 @Entity
-data class ResponsibilityNote(
+class ResponsibilityNote(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         var id: UUID? = null,

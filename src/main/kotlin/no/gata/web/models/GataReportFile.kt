@@ -5,7 +5,7 @@ import java.util.*
 import jakarta.persistence.*
 
 @Entity
-data class GataReportFile(
+class GataReportFile (
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         var id: UUID? = null,
