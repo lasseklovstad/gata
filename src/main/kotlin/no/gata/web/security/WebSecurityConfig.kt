@@ -37,7 +37,7 @@ class WebSecurityConfig() {
                     "/api/report/**",
                     "/api/responsibility/**",
                     "/api/contingent/**"
-            ).authenticated()
+            ).authenticated().anyRequest().permitAll()
         }.oauth2ResourceServer().jwt().decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter())
         return http.build()
     }
