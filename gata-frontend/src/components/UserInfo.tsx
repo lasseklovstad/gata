@@ -41,6 +41,10 @@ export const UserInfo = ({ user, onChange }: UserInfoProps) => {
       }
    };
 
+   const notPaidYears = years
+      .filter((y) => y <= todaysYear)
+      .filter((y) => !contingents.find((c) => c.year === y)?.isPaid);
+
    const getContingent = () => {
       const hasPaid = contingents.find((c) => c.year.toString(10) === selectedYear)?.isPaid;
       return (
@@ -101,6 +105,13 @@ export const UserInfo = ({ user, onChange }: UserInfoProps) => {
                </Select>
             </FormControl>
             {getContingent()}
+            {notPaidYears.length > 0 ? (
+               <Alert status="error">
+                  Du har gjenstående betalinger for følgende år: {notPaidYears.sort().join(", ")}
+               </Alert>
+            ) : (
+               <Alert status="success">Du har ingen gjenstående betalinger</Alert>
+            )}
             <ErrorAlert response={postResponse} />
          </Box>
       </>
