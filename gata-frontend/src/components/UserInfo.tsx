@@ -110,9 +110,7 @@ export const UserInfo = ({ user, onChange }: UserInfoProps) => {
                   Du har gjenstående betalinger for følgende år: {notPaidYears.sort().join(", ")}
                </Alert>
             ) : (
-               <Alert status="error">
-                  Du har gjenstående betalinger for følgende år: {notPaidYears.sort().join(", ")}
-               </Alert>
+               <Alert status="success">Du har ingen gjenstående betalinger</Alert>
             )}
             <ErrorAlert response={postResponse} />
          </Box>
