@@ -2,21 +2,21 @@ package no.gata.web.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.*
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
-data class ResponsibilityNote(
+class ResponsibilityNote(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        var id: UUID?,
-        var lastModifiedDate: Date,
-        var lastModifiedBy: String?,
+        var id: UUID? = null,
+        var lastModifiedDate: Date = Date(),
+        var lastModifiedBy: String? = null,
         @Column(columnDefinition = "TEXT")
-        var text: String,
+        var text: String = "",
         @OneToOne
         @JoinColumn(name = "resonsibility_year_id", referencedColumnName = "id")
         @JsonIgnore
-        val responsibilityYear: ResponsibilityYear?
+        val responsibilityYear: ResponsibilityYear? = null
 ) {
     fun update(user: GataUser, text: String) {
         val primaryUser = user.getPrimaryUser()

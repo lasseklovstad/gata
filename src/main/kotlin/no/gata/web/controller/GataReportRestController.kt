@@ -1,6 +1,7 @@
 package no.gata.web.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.mail.internet.InternetAddress
 import no.gata.web.controller.dtoInn.DtoInnGataReport
 import no.gata.web.controller.dtoOut.DtoOutGataReport
 import no.gata.web.exception.GataUserNotFound
@@ -23,7 +24,6 @@ import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
-import javax.mail.internet.InternetAddress
 
 
 @RestController
