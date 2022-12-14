@@ -2,18 +2,18 @@ package no.gata.web.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.*
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
-data class GataContingent(
+class GataContingent(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        var id: UUID?,
+        var id: UUID? = null,
         @Column(columnDefinition = "SMALLINT")
-        var year: Int,
-        var isPaid: Boolean,
+        var year: Int = 0,
+        var isPaid: Boolean = false,
         @ManyToOne
         @JoinColumn(name = "gata_user_id")
         @JsonIgnore
-        var user: GataUser
+        var user: GataUser? = null
 )
