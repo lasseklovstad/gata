@@ -22,7 +22,7 @@ export const ExternalUsersWithNoGataUserListItem = ({ user, onAddUser }: Externa
       <ListItem>
          <Flex gap={2} p={2}>
             <Avatar src={user.picture} />
-            <Box flex={1}>
+            <Box flex={1} overflow="hidden">
                <Text>{user.name}</Text>
                <Text color="gray" fontSize="sm">
                   Sist innlogget: {new Date(user.lastLogin).toLocaleDateString()}
