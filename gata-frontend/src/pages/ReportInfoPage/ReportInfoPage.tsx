@@ -122,7 +122,11 @@ export const ReportInfoPage = () => {
                   rounded={4}
                   bg="white"
                   sx={{ p: { base: 1, md: 2 } }}
-                  onDoubleClick={() => setEditing(true)}
+                  onDoubleClick={() => {
+                     if (canEdit) {
+                        setEditing(true);
+                     }
+                  }}
                >
                   {report.content && <RichTextPreview content={report.content} />}
                   {!report.content && <Text>Det er ikke lagt til innhold enda.</Text>}
