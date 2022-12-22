@@ -12,7 +12,7 @@ import {
 
 const env = new Environment();
 
-test.only("linked member should be able to edit responsibility", async ({
+test("linked member should be able to edit responsibility", async ({
   browser,
 }) => {
   const adminPage = await getAdminPage(browser);
