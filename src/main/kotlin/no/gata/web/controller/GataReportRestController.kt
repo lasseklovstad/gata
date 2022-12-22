@@ -86,7 +86,7 @@ class GataReportRestController {
     }
 
     @GetMapping("databasesize")
-    @PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('member')")
     fun getDatabaseSize(): String {
         return gataReportRepository.getDatabaseSize()
     }
