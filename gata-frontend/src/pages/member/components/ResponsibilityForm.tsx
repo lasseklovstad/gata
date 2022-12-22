@@ -10,59 +10,37 @@ import {
    FormControl,
    FormLabel,
    Flex,
+   Button,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useDeleteResponsibilityForUser, usePutResponsibilityNote } from "../api/user.api";
-import { IGataUser } from "../types/GataUser.type";
-import { IResponsibilityYear } from "../types/ResponsibilityYear.type";
-import { ErrorAlert } from "./ErrorAlert";
-import { LoadingButton } from "./Loading";
-import { useRoles } from "./useRoles";
+import { useDeleteResponsibilityForUser, usePutResponsibilityNote } from "../../../api/user.api";
+import { IGataUser } from "../../../types/GataUser.type";
+import { IResponsibilityYear } from "../../../types/ResponsibilityYear.type";
+import { ErrorAlert } from "../../../components/ErrorAlert";
+import { LoadingButton } from "../../../components/Loading";
+import { isAdmin, useRoles } from "../../../components/useRoles";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useConfirmDialog } from "./ConfirmDialog";
+import { useConfirmDialog } from "../../../components/ConfirmDialog";
+import { Link, useFetcher } from "react-router-dom";
 
 type ResponsibilityFormProps = {
    responsibilityYear: IResponsibilityYear;
    user: IGataUser;
-   onDelete: (id: string) => void;
-   onChange: (responsibilityYear: IResponsibilityYear) => void;
+   loggedInUser: IGataUser;
 };
 
 export const ResponsibilityForm = ({
    responsibilityYear: { id, year, responsibility, note },
-   onChange,
-   onDelete,
    user,
+   loggedInUser,
 }: ResponsibilityFormProps) => {
-   const { isAdmin } = useRoles();
-   const { user: auth0User } = useAuth0();
-   const { deleteResponse, deleteResponsibility } = useDeleteResponsibilityForUser(user.id);
-   const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog({
-      text: "Ved å slette mister brukeren ansvarsposten",
-      response: deleteResponse,
-      onConfirm: async () => {
-         const { status, data } = await deleteResponsibility(id);
-         if (status === "success" && data) {
-            onDelete(id);
-         }
-      },
-   });
-
-   const { putNote, putResponse } = usePutResponsibilityNote(user.id, id);
+   const fetcher = useFetcher();
    const [text, setText] = useState(note.text);
    const lastModifiedDate = new Date(note.lastModifiedDate);
-   const canEditNote = user.externalUserProviders.find((externalUser) => externalUser.id === auth0User?.sub) || isAdmin;
-
-   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (ev) => {
-      ev.preventDefault();
-
-      const { status, data } = await putNote(text);
-      status === "success" && data && onChange(data);
-   };
+   const canEditNote = loggedInUser.id === user.id || isAdmin(loggedInUser);
 
    return (
       <>
-         {ConfirmDialogComponent}
          <AccordionItem>
             <AccordionButton>
                <Flex flex={1}>
@@ -75,11 +53,12 @@ export const ResponsibilityForm = ({
             </AccordionButton>
             <AccordionPanel>
                <Text color="gray">Beskrivelse: {responsibility.description || "Ingen beskrivelse på ansvarspost"}</Text>
-               <form onSubmit={handleSubmit}>
+               <fetcher.Form method="put" action={id}>
                   <FormControl>
                      <FormLabel>Notat</FormLabel>
                      <Textarea
                         variant="filled"
+                        name="text"
                         disabled={!canEditNote}
                         value={text}
                         onChange={(ev) => setText(ev.target.value)}
@@ -92,26 +71,18 @@ export const ResponsibilityForm = ({
                      {lastModifiedDate.toLocaleTimeString()}
                   </Text>
                   <Box sx={{ mt: 2 }}>
-                     {isAdmin && (
-                        <LoadingButton
-                           sx={{ mr: 1 }}
-                           response={deleteResponse}
-                           leftIcon={<Delete />}
-                           onClick={() => openConfirmDialog()}
-                           variant="ghost"
-                        >
+                     {isAdmin(loggedInUser) && (
+                        <Button sx={{ mr: 1 }} leftIcon={<Delete />} as={Link} to={`${id}/delete`}>
                            Fjern ansvarspost
-                        </LoadingButton>
+                        </Button>
                      )}
                      {canEditNote && (
-                        <LoadingButton response={putResponse} leftIcon={<Save />} type="submit">
+                        <Button isLoading={fetcher.state !== "idle"} leftIcon={<Save />} type="submit">
                            Lagre
-                        </LoadingButton>
+                        </Button>
                      )}
                   </Box>
-               </form>
-               <ErrorAlert response={putResponse} />
-               <ErrorAlert response={deleteResponse} />
+               </fetcher.Form>
             </AccordionPanel>
          </AccordionItem>
       </>

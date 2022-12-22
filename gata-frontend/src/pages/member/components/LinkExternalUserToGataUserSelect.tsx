@@ -1,33 +1,43 @@
 import { Flex, FormControl, FormHelperText, FormLabel, Text } from "@chakra-ui/react";
-import { useGetExternalUsersWithNoGataUser, useUpdateExternalUsers } from "../../api/user.api";
-import { IGataUser } from "../../types/GataUser.type";
-import { ExternalUserIcon } from "../../components/ExternalUserIcon";
-import { ErrorAlert } from "../../components/ErrorAlert";
+import { IExternalUser, IGataUser } from "../../../types/GataUser.type";
+import { ExternalUserIcon } from "../../../components/ExternalUserIcon";
 import { chakraComponents, ChakraStylesConfig, OptionBase, Props, Select } from "chakra-react-select";
 import { ReactNode } from "react";
+import { ActionFunction, useFetcher, useFormAction } from "react-router-dom";
+import { client } from "../../../api/client/client";
+import { getRequiredAccessToken } from "../../../auth0Client";
+
+export const externalUserProvidersAction: ActionFunction = async ({ request }) => {
+   const token = await getRequiredAccessToken();
+   const form = await request.formData();
+   await client<undefined>(`user/${form.get("userId")}/externaluserproviders`, {
+      method: "PUT",
+      body: form.getAll("externalUserId"),
+      token,
+   });
+   return new Response("", { status: 200 });
+};
 
 type LinkExternalUserToGataUserSelectProps = {
    user: IGataUser;
-   onChange: (user: IGataUser) => void;
+   notMemberUsers: IExternalUser[];
 };
 
 export const LinkExternalUserToGataUserSelect = ({
    user: { externalUserProviders, id },
-   onChange,
+   notMemberUsers,
 }: LinkExternalUserToGataUserSelectProps) => {
-   const { usersResponse, updateExternalUsersWithNoGataUser } = useGetExternalUsersWithNoGataUser();
-   const { updateExternalUsers, updateExternalUsersResponse } = useUpdateExternalUsers(id);
-
+   const fetcher = useFetcher();
+   const action = useFormAction();
    const handleChange: Props<ColorOption, true>["onChange"] = async (options) => {
       const userIds = options.map((o) => o.value);
-      const { data, status } = await updateExternalUsers(userIds);
-      if (data && status === "success") {
-         updateExternalUsersWithNoGataUser(menuItems?.filter(({ id }) => !userIds.includes(id)) || []);
-         onChange(data);
-      }
+      const formData = new FormData();
+      formData.set("userId", id);
+      userIds.forEach((userId) => formData.append("externalUserId", userId));
+      fetcher.submit(formData, { action: `${action}/externaluserproviders`, method: "put" });
    };
 
-   const menuItems = [...externalUserProviders, ...(usersResponse.data || [])];
+   const menuItems = [...externalUserProviders, ...notMemberUsers];
 
    const options = menuItems.map((user) => ({
       label: user.email,
@@ -50,15 +60,11 @@ export const LinkExternalUserToGataUserSelect = ({
                options={options}
                isClearable={false}
                chakraStyles={chakraStyles}
-               isLoading={updateExternalUsersResponse.status === "loading"}
+               isLoading={fetcher.state !== "idle"}
             />
             <FormHelperText>
                Hvis en bruker har logget inn med forskjellige tjenester, kan disse kontoene knyttes sammen her!
             </FormHelperText>
-            <ErrorAlert
-               response={updateExternalUsersResponse}
-               alertTitle="Det oppstod en feil ved lagring av eksterne brukere"
-            />
          </FormControl>
       </>
    );

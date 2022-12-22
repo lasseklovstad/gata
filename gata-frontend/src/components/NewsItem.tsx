@@ -1,31 +1,32 @@
 import { IGataReport } from "../types/GataReport.type";
-import { useGetGataReport } from "../api/report.api";
 import { RichTextPreview } from "./RichTextEditor/RichTextPreview";
 import { Link } from "react-router-dom";
-import { Text, Box, Button, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { IGataUser } from "../types/GataUser.type";
 
 type NewsItemProps = {
-   simpleReport: IGataReport;
+   report: IGataReport;
+   loggedInUser: IGataUser;
 };
 
-export const NewsItem = ({ simpleReport }: NewsItemProps) => {
-   const { reportResponse, canEdit } = useGetGataReport(simpleReport.id);
+export const NewsItem = ({ report, loggedInUser }: NewsItemProps) => {
+   const canEdit = loggedInUser.id === report.createdBy?.id;
    return (
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%", alignItems: "flex-end" }}>
          <Flex alignItems="center" width="100%">
-            <Text flex={1}>{reportResponse.data?.title}</Text>
+            <Text flex={1}>{report.title}</Text>
             {canEdit && (
-               <Button as={Link} to={`report/${simpleReport.id}`} variant="ghost">
+               <Button as={Link} to={`/reportInfo/${report.id}`} variant="ghost">
                   Rediger
                </Button>
             )}
          </Flex>
          <Box boxShadow="xs" rounded={4} sx={{ p: { base: 1, md: 2 }, width: "100%" }}>
-            {reportResponse.data?.content && <RichTextPreview content={reportResponse.data.content} />}
-            {!reportResponse.data?.content && <Text>Det er ikke lagt til innhold enda.</Text>}
+            {report.content && <RichTextPreview content={report.content} />}
+            {!report.content && <Text>Det er ikke lagt til innhold enda.</Text>}
          </Box>
          <Text fontSize="sm" color="gray">
-            Dato endret: {new Date(simpleReport.lastModifiedDate).toLocaleDateString()}
+            Dato endret: {new Date(report.lastModifiedDate).toLocaleDateString()}
          </Text>
       </Box>
    );

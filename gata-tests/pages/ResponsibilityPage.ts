@@ -26,7 +26,7 @@ export class ResponsibilityPage {
 
   constructor(page: Page) {
     this.pageTitle = page.locator("role=heading[name=Ansvarsposter]");
-    this.addButton = page.locator("role=button[name=/legg til/i]");
+    this.addButton = page.locator("role=link[name=/legg til/i]");
     this.responsibilityFormModal = new ResponsibilityFormModal(page);
     this.confirmDeleteModal = new ConfirmModal(page);
     this.header = new GataHeader(page);
@@ -89,8 +89,8 @@ export class ResponsibilityPage {
   }
 
   getListItemButtons(listItem: Locator) {
-    const deleteButton = listItem.locator("role=button[name=/slett/i]");
-    const editButton = listItem.locator("role=button[name=/rediger/i]");
+    const deleteButton = listItem.locator("role=link[name=/slett/i]");
+    const editButton = listItem.locator("role=link[name=/rediger/i]");
     return { deleteButton, editButton };
   }
 

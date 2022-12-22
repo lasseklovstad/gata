@@ -1,25 +1,29 @@
 import { IExternalUser, IGataUser } from "../types/GataUser.type";
 import { Flex, FormControl, FormHelperText, FormLabel } from "@chakra-ui/react";
-import { usePrimaryExternalUser } from "../api/user.api";
-import { ErrorAlert } from "./ErrorAlert";
 import { chakraComponents, OptionBase, Props, Select } from "chakra-react-select";
 import { ExternalUserIcon } from "./ExternalUserIcon";
+import { ActionFunction, useFetcher, useFormAction } from "react-router-dom";
+import { client } from "../api/client/client";
+import { getRequiredAccessToken } from "../auth0Client";
+
+export const primaryUserEmailAction: ActionFunction = async ({ request, params }) => {
+   const token = await getRequiredAccessToken();
+   const form = Object.fromEntries(await request.formData());
+   await client(`user/${params.memberId}/primaryuser`, {
+      method: "PUT",
+      body: form.primaryUserEmail,
+      token,
+   });
+   return {};
+};
 
 type SelectPrimaryEmailProps = {
    user: IGataUser;
-   onChange: (user: IGataUser) => void;
 };
 
-export const SelectPrimaryEmail = ({ user, onChange }: SelectPrimaryEmailProps) => {
-   const { updatePrimaryUserResponse, updatePrimaryUser } = usePrimaryExternalUser(user.id);
-   const handleChange: Props<ColorOption, false>["onChange"] = async (option) => {
-      if (option?.value) {
-         const { data, status } = await updatePrimaryUser(option.value);
-         if (data && status === "success") {
-            onChange(data);
-         }
-      }
-   };
+export const SelectPrimaryEmail = ({ user }: SelectPrimaryEmailProps) => {
+   const fetcher = useFetcher();
+   const action = useFormAction();
 
    const options = user.externalUserProviders.map((user) => ({
       label: user.email,
@@ -30,21 +34,25 @@ export const SelectPrimaryEmail = ({ user, onChange }: SelectPrimaryEmailProps) 
    const selectedOption = options.find((option) => option.value === user.primaryUser.id);
 
    return (
-      <FormControl maxWidth={400} sx={{ mt: 1, mb: 1 }}>
-         <FormLabel>Primær epost</FormLabel>
-         <Select<ColorOption, false, never>
-            value={selectedOption}
-            onChange={handleChange}
-            components={customComponents}
-            options={options}
-            isLoading={updatePrimaryUserResponse.status === "loading"}
-         />
-         <FormHelperText>Denne eposten blir brukt til å sende ut informasjon</FormHelperText>
-         <ErrorAlert
-            response={updatePrimaryUserResponse}
-            alertTitle="Det oppstod en feil ved lagring av primær bruker"
-         />
-      </FormControl>
+      <fetcher.Form>
+         <FormControl maxWidth={400} sx={{ mt: 1, mb: 1 }}>
+            <FormLabel>Primær epost</FormLabel>
+            <Select<ColorOption, false, never>
+               name="primaryUserEmail"
+               value={selectedOption}
+               components={customComponents}
+               onChange={(option) => {
+                  fetcher.submit(
+                     { primaryUserEmail: option?.value || "" },
+                     { action: `${action}/primaryUserEmail`, method: "post" }
+                  );
+               }}
+               options={options}
+               isLoading={fetcher.state !== "idle"}
+            />
+            <FormHelperText>Denne eposten blir brukt til å sende ut informasjon</FormHelperText>
+         </FormControl>
+      </fetcher.Form>
    );
 };
 

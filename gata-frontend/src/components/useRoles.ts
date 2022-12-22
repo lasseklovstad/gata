@@ -1,9 +1,9 @@
-import { useGetLoggedInUser } from "../api/user.api";
+import { IGataUser } from "../types/GataUser.type";
 
-export const useRoles = () => {
-   const { userResponse } = useGetLoggedInUser();
-   const isAdmin = !!userResponse.data?.isUserAdmin;
-   const isMember = !!userResponse.data?.isUserMember;
+export const isMember = (user?: IGataUser) => {
+   return !!user?.isUserMember;
+};
 
-   return { isAdmin, isMember, user: userResponse.data };
+export const isAdmin = (user?: IGataUser) => {
+   return !!user?.isUserAdmin;
 };

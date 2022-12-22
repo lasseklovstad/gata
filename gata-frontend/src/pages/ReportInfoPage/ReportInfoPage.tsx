@@ -1,72 +1,53 @@
 import { Delete, Edit } from "@mui/icons-material";
-import { Box, Button, IconButton, Text, Heading } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Descendant } from "slate";
-import { useGetGataReport, usePutGataReportContent, useSaveGataReport } from "../../api/report.api";
-import { useConfirmDialog } from "../../components/ConfirmDialog";
-import { GataReportFormDialog } from "../../components/GataReportFormDialog";
-import { Loading } from "../../components/Loading";
+import { Box, Button, Heading, IconButton, Text } from "@chakra-ui/react";
+import { useState } from "react";
+import { ActionFunction, json, Link, LoaderFunction, Outlet, useLoaderData, useSubmit } from "react-router-dom";
+import { usePutGataReportContent } from "../../api/report.api";
 import { PageLayout } from "../../components/PageLayout";
 import { RichTextEditor } from "../../components/RichTextEditor/RichTextEditor";
 import { RichTextPreview } from "../../components/RichTextEditor/RichTextPreview";
 import { IGataReport } from "../../types/GataReport.type";
+import { getRequiredAccessToken } from "../../auth0Client";
+import { client } from "../../api/client/client";
+import { IGataUser } from "../../types/GataUser.type";
+import { Descendant } from "slate";
 import { PublishButton } from "./PublishButton";
 
+export const reportInfoPageLoader: LoaderFunction = async ({ request: { signal }, params }) => {
+   const token = await getRequiredAccessToken();
+   const report = await client<IGataReport>(`report/${params.reportId}`, { token, signal });
+   const loggedInUser = await client<IGataUser>("user/loggedin", { token, signal });
+   return json<ReportInfoPageLoaderData>({ report, loggedInUser });
+};
+
+export const reportInfoPageAction: ActionFunction = () => {
+   return json({});
+};
+
+interface ReportInfoPageLoaderData {
+   report: IGataReport;
+   loggedInUser: IGataUser;
+}
+
 export const ReportInfoPage = () => {
-   const { reportId } = useParams();
-   const { reportResponse, canEdit } = useGetGataReport(reportId!);
-   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+   const { report, loggedInUser } = useLoaderData() as ReportInfoPageLoaderData;
+   const canEdit = report.createdBy?.id === loggedInUser.id;
    const [editing, setEditing] = useState(false);
-   const { openConfirmDialog: openConfirmCancel, ConfirmDialogComponent: ConfirmCancelDialog } = useConfirmDialog({
-      text: "Ved å avbryte mister du alle endringene",
-      onConfirm: async () => {
-         setEditing(false);
-      },
-   });
-   const { saveResponse, deleteReport } = useSaveGataReport();
+   const submit = useSubmit();
 
-   const navigate = useNavigate();
-   const { openConfirmDialog: openConfirmDelete, ConfirmDialogComponent: ConfirmDeleteDialog } = useConfirmDialog({
-      text: "Ved å slette dokumentet mister du all data",
-      response: saveResponse,
-      onConfirm: async () => {
-         const { status } = await deleteReport(reportId!);
-         if (status === "success") {
-            navigate(report?.type === "NEWS" ? "/" : "/report", { replace: true });
-            return true;
-         }
-         return false;
-      },
-   });
-
-   const { putReportResponse, putReportContent } = usePutGataReportContent(reportId!);
-
-   const [report, setReport] = useState<IGataReport>();
-
-   useEffect(() => {
-      setReport(reportResponse.data);
-   }, [reportResponse.data]);
+   const { putReportResponse, putReportContent } = usePutGataReportContent(report.id);
 
    const handleSaveContent = async (content: Descendant[] | undefined, close: boolean) => {
       if (content) {
          const { data } = await putReportContent(content);
          if (data) {
-            setReport(data);
+            submit({}, { method: "put", action: `/reportInfo/${report.id}` });
             close && setEditing(false);
          }
       } else {
          close && setEditing(false);
       }
    };
-
-   if (!report || reportResponse.status !== "success") {
-      return (
-         <PageLayout>
-            <Loading response={reportResponse} />
-         </PageLayout>
-      );
-   }
    const lastModifiedDate = new Date(report.lastModifiedDate);
 
    return (
@@ -80,30 +61,34 @@ export const ReportInfoPage = () => {
                   <Button
                      variant="ghost"
                      leftIcon={<Delete />}
-                     onClick={openConfirmDelete}
+                     as={Link}
+                     to={`${report.type}/delete`}
                      sx={{ mr: 1, display: { base: "none", md: "inline-flex" } }}
                   >
                      Slett
                   </Button>
-                  <PublishButton reportId={reportId!} />
+                  <PublishButton reportId={report.id} />
                   <Button
                      variant="ghost"
                      leftIcon={<Edit />}
-                     onClick={() => setIsReportModalOpen(true)}
+                     as={Link}
+                     to="edit"
                      sx={{ display: { base: "none", md: "inline-flex" } }}
                   >
                      Rediger info
                   </Button>
                   <IconButton
                      variant="ghost"
-                     onClick={openConfirmDelete}
+                     as={Link}
+                     to="delete"
                      sx={{ mr: 1, display: { md: "none" } }}
                      icon={<Delete />}
                      aria-label="Slett"
                   />
                   <IconButton
                      variant="ghost"
-                     onClick={() => setIsReportModalOpen(true)}
+                     as={Link}
+                     to="edit"
                      sx={{ display: { md: "none" } }}
                      icon={<Edit />}
                      aria-label="Rediger"
@@ -111,19 +96,6 @@ export const ReportInfoPage = () => {
                </Box>
             )}
          </Box>
-         {isReportModalOpen && report && (
-            <GataReportFormDialog
-               onClose={() => setIsReportModalOpen(false)}
-               onSuccess={(r) => {
-                  setReport(r);
-                  setIsReportModalOpen(false);
-               }}
-               report={report}
-               type={report.type}
-            />
-         )}
-         {ConfirmCancelDialog}
-         {ConfirmDeleteDialog}
          <Text mb={2}>{report.description}</Text>
          {!editing && (
             <>
@@ -161,10 +133,10 @@ export const ReportInfoPage = () => {
             <>
                <RichTextEditor
                   initialContent={report.content}
-                  onCancel={openConfirmCancel}
+                  onCancel={() => setEditing(false)}
                   onSave={handleSaveContent}
                   saveResponse={putReportResponse}
-                  reportId={reportId!!}
+                  reportId={report.id}
                />
             </>
          )}
@@ -172,6 +144,7 @@ export const ReportInfoPage = () => {
             Sist redigert av: {report.lastModifiedBy}, {lastModifiedDate.toLocaleDateString()}{" "}
             {lastModifiedDate.toLocaleTimeString()}
          </Text>
+         <Outlet />
       </PageLayout>
    );
 };

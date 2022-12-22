@@ -47,11 +47,11 @@ export class MemberPage {
     );
     this.responsibilityModal = new MemberResponsibilityModal(page);
     this.addResponsibilityButton = page.locator(
-      "role=button[name=/legg til ansvarspost/i]"
+      "role=link[name=/legg til ansvarspost/i]"
     );
     this.confirmDeleteResponsibilityModal = new ConfirmModal(page);
     this.deleteResponsibilityButton = page.locator(
-      "role=button[name=/fjern ansvarspost/i]"
+      "role=link[name=/fjern ansvarspost/i]"
     );
     this.responsibilityContentTextBox = this.page.locator(
       "role=textbox[name=/notat/i]"
@@ -82,6 +82,10 @@ export class MemberPage {
 
   getResponsibilityButton(name: string) {
     return this.page.locator(`role=button[name=/${name}/i]`);
+  }
+
+  goToResponsibilityTab() {
+    return this.page.locator(`role=tab[name=/ansvarsposter/i]`).click();
   }
 
   async addResponsibility(name: string) {

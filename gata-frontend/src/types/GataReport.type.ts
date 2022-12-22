@@ -6,10 +6,20 @@ export interface IGataReport {
    description: string;
    createdDate: string;
    lastModifiedDate: string;
-   lastModifiedBy: string;
+   lastModifiedBy: string | null;
    content: string | null;
    type: GataReportType;
    createdBy?: ISimpleGataUser;
+}
+
+export interface IGataReportSimple {
+   id: string;
+   title: string;
+   description: string;
+   createdDate: string;
+   lastModifiedDate: string;
+   lastModifiedBy: string | null;
+   type: GataReportType;
 }
 
 export interface IGataReportPayload {

@@ -11,7 +11,7 @@ export class DocumentPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.deleteButton = page.locator("role=button[name=/slett/i]");
+    this.deleteButton = page.locator("role=link[name=/slett/i]");
     this.editContentButton = page.locator(
       "role=button[name=/rediger innhold/i]"
     );

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.mail.internet.InternetAddress
 import no.gata.web.controller.dtoInn.DtoInnGataReport
 import no.gata.web.controller.dtoOut.DtoOutGataReport
+import no.gata.web.controller.dtoOut.DtoOutGataReportSimple
 import no.gata.web.exception.GataUserNotFound
 import no.gata.web.models.*
 import no.gata.web.repository.GataReportFileRepository
@@ -21,6 +22,7 @@ import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
@@ -51,11 +53,30 @@ class GataReportRestController {
     @Autowired
     private lateinit var gataReportService: GataReportService
 
-    @GetMapping
+    @GetMapping()
     @PreAuthorize("hasAuthority('member')")
-    fun getReports(@RequestParam page: Int, @RequestParam type: ReportType): Page<GataReportSimple> {
+    @Transactional
+    fun getReports(@RequestParam page: Int, @RequestParam type: ReportType): Page<DtoOutGataReport> {
         val paging: Pageable = PageRequest.of(page, 10)
-        return gataReportRepository.findAllByTypeOrderByCreatedDateDesc(type, paging)
+        val page = gataReportRepository.findAllByTypeOrderByCreatedDateDesc(type, paging)
+        val detailedPage = page.map { DtoOutGataReport(it) }
+        return detailedPage
+    }
+
+    @GetMapping("simple")
+    @PreAuthorize("hasAuthority('member')")
+    @Transactional
+    fun getReportsSimple(@RequestParam page: Int, @RequestParam type: ReportType): Page<DtoOutGataReportSimple> {
+        val paging: Pageable = PageRequest.of(page, 10)
+        val page = gataReportRepository.findAllByTypeOrderByCreatedDateDesc(type, paging)
+        val simplePage = page.map { DtoOutGataReportSimple(it) }
+        return simplePage
+    }
+
+    @GetMapping("{id}/simple")
+    @PreAuthorize("hasAuthority('member')")
+    fun getReportSimple(@PathVariable id: String): DtoOutGataReportSimple {
+        return DtoOutGataReportSimple(gataReportService.getReport(id))
     }
 
     @GetMapping("{id}")
@@ -119,7 +140,7 @@ class GataReportRestController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('member')")
-    fun createReport(@RequestBody body: DtoInnGataReport, authentication: Authentication): DtoOutGataReport {
+    fun createReport(@RequestBody body: DtoInnGataReport, authentication: Authentication): DtoOutGataReportSimple {
         val isAdmin = authentication.authorities.find { it.authority.equals("admin") }
         if (isAdmin == null && body.type == ReportType.DOCUMENT) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Du har ikke tilgang til å opprette dokument!");
@@ -134,7 +155,7 @@ class GataReportRestController {
                 lastModifiedDate = Date(),
                 createdBy = user,
                 files = emptyList(), type = body.type)
-        return DtoOutGataReport(gataReportRepository.save(report))
+        return DtoOutGataReportSimple(gataReportRepository.save(report))
     }
 
     @PutMapping("{id}")
