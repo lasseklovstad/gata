@@ -1,26 +1,21 @@
 import { Delete, Save } from "@mui/icons-material";
 import {
-   Box,
-   AccordionIcon,
-   Textarea,
-   AccordionPanel,
-   AccordionItem,
    AccordionButton,
-   Text,
+   AccordionIcon,
+   AccordionItem,
+   AccordionPanel,
+   Box,
+   Button,
+   Flex,
    FormControl,
    FormLabel,
-   Flex,
-   Button,
+   Text,
+   Textarea,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useDeleteResponsibilityForUser, usePutResponsibilityNote } from "../../../api/user.api";
 import { IGataUser } from "../../../types/GataUser.type";
 import { IResponsibilityYear } from "../../../types/ResponsibilityYear.type";
-import { ErrorAlert } from "../../../components/ErrorAlert";
-import { LoadingButton } from "../../../components/Loading";
-import { isAdmin, useRoles } from "../../../components/useRoles";
-import { useAuth0 } from "@auth0/auth0-react";
-import { useConfirmDialog } from "../../../components/ConfirmDialog";
+import { isAdmin } from "../../../components/useRoles";
 import { Link, useFetcher } from "react-router-dom";
 
 type ResponsibilityFormProps = {
