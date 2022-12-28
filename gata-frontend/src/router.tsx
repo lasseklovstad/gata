@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertTitle, Box, Container, Text } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertTitle, Box, Container, Progress, Text } from "@chakra-ui/react";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar";
 import {
    createBrowserRouter,
@@ -10,6 +10,7 @@ import {
    redirect,
    Route,
    useLoaderData,
+   useNavigation,
    useRouteError,
 } from "react-router-dom";
 import { Privacy } from "./components/Privacy";
@@ -82,9 +83,11 @@ export interface RootLoaderData {
 
 const Root = () => {
    const { loggedInUser, isAuthenticated, user } = useLoaderData() as RootLoaderData;
+   const { state } = useNavigation();
    return (
       <Box sx={{ display: "flex", flexDirection: "column", backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
          <ResponsiveAppBar loggedInUser={loggedInUser} isAuthenticated={isAuthenticated} user={user} />
+         <Progress size="xs" colorScheme="blue" isIndeterminate={state === "loading"} hasStripe />
          <Container as="main" maxW="6xl" sx={{ mb: 16 }}>
             <Outlet />
          </Container>
@@ -239,6 +242,6 @@ export const router = createBrowserRouter(
             </Route>
             <Route path="" loader={memberInfoPageLoader} action={memberInfoPageAction} element={<MemberInfoPage />} />
          </Route>
-      </Route>
-   )
+      </Route>,
+   ),
 );
