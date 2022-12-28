@@ -1,6 +1,6 @@
 {
    "name": "gata-frontend",
-   "version": "0.2.2",
+   "version": "0.2.3",
    "private": true,
    "dependencies": {
       "@auth0/auth0-spa-js": "2.0.1",
