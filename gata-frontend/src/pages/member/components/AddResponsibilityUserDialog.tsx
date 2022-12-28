@@ -1,10 +1,5 @@
 import { Save } from "@mui/icons-material";
 import { useState } from "react";
-import { useGetResponisibilies } from "../api/responsibility.api";
-import { useSaveResponsibilityForUser } from "../api/user.api";
-import { IResponsibilityYear } from "../types/ResponsibilityYear.type";
-import { ErrorAlert } from "./ErrorAlert";
-import { LoadingButton } from "./Loading";
 import {
    Button,
    FormControl,
@@ -17,12 +12,23 @@ import {
    ModalOverlay,
 } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
+import { IResponsibility } from "../../../types/Responsibility.type";
+import { json, Link, LoaderFunction, useFetcher, useLoaderData, useNavigate } from "react-router-dom";
+import { client } from "../../../api/client/client";
+import { getRequiredAccessToken } from "../../../auth0Client";
 
-type AddResponsibilityUserDialogProps = {
-   onClose: () => void;
-   onSuccess: (responsibility: IResponsibilityYear[]) => void;
-   userId: string;
+export const addResponsibilityUserDialogLoader: LoaderFunction = async ({ request: { signal }, params }) => {
+   const token = await getRequiredAccessToken();
+   const responsibilities = await client<IResponsibility[]>("responsibility", {
+      token,
+      signal,
+   });
+   return json<AddResponsibilityUserDialogLoaderData>({ responsibilities });
 };
+
+interface AddResponsibilityUserDialogLoaderData {
+   responsibilities: IResponsibility[];
+}
 
 type IOption = { value: string; label: string };
 
@@ -30,37 +36,28 @@ const numberOfYears = 10;
 const todaysYear = new Date().getFullYear();
 const years = Array.from({ length: numberOfYears }, (v, i) => todaysYear - numberOfYears + 2 + i).reverse();
 
-export const AddResponsibilityUserDialog = ({ onClose, onSuccess, userId }: AddResponsibilityUserDialogProps) => {
-   const { responsibilitiesResponse } = useGetResponisibilies();
+export const AddResponsibilityUserDialog = () => {
+   const { responsibilities } = useLoaderData() as AddResponsibilityUserDialogLoaderData;
+   const navigate = useNavigate();
    const [selectedResp, setSelectedResp] = useState<IOption | null>();
    const [selectedYear, setSelectedYear] = useState<IOption | null>();
-   const { response, postResponsibility } = useSaveResponsibilityForUser(userId);
+   const fetcher = useFetcher();
 
-   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (ev) => {
-      ev.preventDefault();
-      if (!selectedResp || !selectedYear) {
-         return;
-      }
-      const { status, data } = await postResponsibility(selectedResp.value, parseInt(selectedYear.value));
-      if (status === "success" && data) {
-         onSuccess(data);
-      }
-   };
-
-   const responsibilityOptions = responsibilitiesResponse.data?.map((res) => {
+   const responsibilityOptions = responsibilities.map((res) => {
       return { label: res.name, value: res.id };
    });
 
    return (
-      <Modal isOpen onClose={onClose}>
+      <Modal isOpen onClose={() => navigate("..")}>
          <ModalOverlay />
          <ModalContent>
-            <form onSubmit={handleSubmit}>
+            <fetcher.Form method="post" action="..">
                <ModalHeader>Legg til ansvarspost</ModalHeader>
                <ModalBody>
                   <FormControl>
                      <FormLabel>Velg ansvarspost</FormLabel>
                      <Select<IOption, false, never>
+                        name="responsibilityId"
                         variant="filled"
                         placeholder="Velg ansvarspost"
                         onChange={(ev) => setSelectedResp(ev)}
@@ -72,6 +69,7 @@ export const AddResponsibilityUserDialog = ({ onClose, onSuccess, userId }: AddR
                      <FormLabel>Velg år</FormLabel>
                      <Select<{ value: string; label: string }, false, never>
                         placeholder="Velg år"
+                        name="year"
                         onChange={(ev) => setSelectedYear(ev)}
                         value={selectedYear}
                         options={years.map((res) => {
@@ -81,15 +79,14 @@ export const AddResponsibilityUserDialog = ({ onClose, onSuccess, userId }: AddR
                   </FormControl>
                </ModalBody>
                <ModalFooter gap={2}>
-                  <LoadingButton type="submit" response={response} leftIcon={<Save />}>
+                  <Button type="submit" isLoading={fetcher.state !== "idle"} leftIcon={<Save />}>
                      Lagre
-                  </LoadingButton>
-                  <Button onClick={onClose} variant="ghost">
+                  </Button>
+                  <Button as={Link} to=".." variant="ghost">
                      Avbryt
                   </Button>
                </ModalFooter>
-               <ErrorAlert response={response} />
-            </form>
+            </fetcher.Form>
          </ModalContent>
       </Modal>
    );

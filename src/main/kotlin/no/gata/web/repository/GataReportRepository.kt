@@ -12,7 +12,7 @@ import java.util.*
 
 
 interface GataReportRepository: PagingAndSortingRepository<GataReport, UUID>, JpaRepository<GataReport, UUID> {
-    fun findAllByTypeOrderByCreatedDateDesc(type: ReportType,pageable: Pageable): Page<GataReportSimple>
+    fun findAllByTypeOrderByCreatedDateDesc(type: ReportType,pageable: Pageable): Page<GataReport>
     @Query(
             value = "SELECT pg_database_size(current_database())/1024/1024",
             nativeQuery = true)

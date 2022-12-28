@@ -42,6 +42,7 @@ const editResponsibility = async (
   const header = new GataHeader(page);
   await page.goto("/");
   await header.myPageLink.click();
+  await memberPage.goToResponsibilityTab();
   await memberPage.editResponsibiblity(name, content);
 };
 
@@ -63,6 +64,7 @@ const removeResponsibilityFromMember = async (
   await page.goto("/");
   await memberOverviewPage.goto();
   await memberOverviewPage.goToMember(env.memberUsername);
+  await memberPage.goToResponsibilityTab();
   await memberPage.deleteResponsibility(responsibilityName);
 };
 
@@ -92,5 +94,6 @@ const assignResponsibilityToMember = async (
   await page.goto("/");
   await memberOverviewPage.goto();
   await memberOverviewPage.goToMember(username);
+  await memberPage.goToResponsibilityTab();
   await memberPage.addResponsibility(responsibilityName);
 };
