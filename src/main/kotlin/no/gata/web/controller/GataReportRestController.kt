@@ -115,7 +115,7 @@ class GataReportRestController {
             helper.setSubject("Nytt fra Gata! ${report.title}")
             helper.setText("<h1>Nytt fra Gata</h1><p>Det har kommet en oppdatering på ${siteBaseUrl}!</p><h2>${report.title}</h2>" +
                     "<p>${report.description}</p><p>" +
-                    "<a href='${siteBaseUrl}/#/report/${report.id}'>Trykk her for å lese hele saken!</a>" +
+                    "<a href='${siteBaseUrl}/reportInfo/${report.id}'>Trykk her for å lese hele saken!</a>" +
                     "</p>", true)
 
             javaMailSender.send(msg)
