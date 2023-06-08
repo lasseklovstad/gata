@@ -22,14 +22,14 @@ COPY pom.xml $HOME
 
 RUN --mount=type=cache,target=/root/.m2 mvn -f $HOME/pom.xml clean package -DskipTests
 
-FROM openjdk:17-jdk-alpine as stage
+FROM eclipse-temurin:17-jdk-alpine as stage
 ENV HOME=/usr/src/app
 RUN mkdir -p application
 WORKDIR application
 COPY --from=build-backend $HOME/target/*.jar app.jar
 RUN java -Djarmode=layertools -jar app.jar extract
 
-FROM gcr.io/distroless/java17-debian11
+FROM eclipse-temurin:17-jdk-alpine
 WORKDIR application
 COPY --from=stage application/dependencies/ ./
 COPY --from=stage application/spring-boot-loader/ ./

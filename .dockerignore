@@ -1,11 +1,14 @@
 **/.git
 **/.gitignore
+**/.github
 **/.jpb
 **/.mvn
 **/.idea
 **/node_modules
 **/build
-/postgres
+target
+postgres
+gata-tests
 README.md
 
 ## Env files
