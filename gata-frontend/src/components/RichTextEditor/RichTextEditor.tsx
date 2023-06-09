@@ -58,7 +58,7 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
       <>
          <Slate
             editor={editor}
-            value={initialValue}
+            initialValue={initialValue}
             onChange={(value) => {
                const isAstChange = editor.operations.some((op) => "set_selection" !== op.type);
                if (isAstChange) {
