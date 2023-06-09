@@ -5,23 +5,25 @@
   ],
   "packageRules": [
     {
-      "matchPackagePatterns": [
-        "*"
-      ],
+      "matchManagers": ["maven"],
       "matchUpdateTypes": [
         "minor",
         "patch"
       ],
-      "groupName": "all non-major dependencies",
-      "groupSlug": "all-minor-patch"
+      "groupName": "Maven non-major dependencies",
+      "groupSlug": "maven-minor-patch"
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "Npm non-major dependencies",
+      "groupSlug": "npm-minor-patch"
     },
     {
       "matchPackageNames": ["node"],
-      "matchManagers": ["dockerfile"],
-      "enabled": false
-    },
-    {
-      "matchPackageNames": ["openjdk"],
       "matchManagers": ["dockerfile"],
       "enabled": false
     }
