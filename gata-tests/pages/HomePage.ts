@@ -38,7 +38,7 @@ export class HomePage {
     this.welcomeTitle = page.locator("role=heading[name=Velkommen]");
     this.memberWelcomeTitle = page.locator("role=heading[name=Nyheter]");
     this.newsList = page.locator("role=list[name=Nyheter]");
-    this.addNewsButton = page.locator("role=link[name=Opprett]");
+    this.addNewsButton = page.locator("role=button[name=Opprett]");
     this.nonMemberInformationText = page.locator(
       "text=Du må være medlem for å se nyheter"
     );

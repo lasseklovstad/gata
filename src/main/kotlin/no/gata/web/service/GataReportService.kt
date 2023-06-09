@@ -1,7 +1,6 @@
 package no.gata.web.service
 
 import no.gata.web.models.GataReport
-import no.gata.web.models.GataReportSimple
 import no.gata.web.repository.GataReportRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus

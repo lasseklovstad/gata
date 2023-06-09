@@ -23,6 +23,6 @@ export interface IExternalUser {
    id: string;
    lastLogin: string;
    name: string;
-   picture: string | null;
+   picture: string;
    primary: boolean;
 }

@@ -6,7 +6,6 @@ import no.gata.web.service.Auth0RestService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
 
@@ -26,12 +25,8 @@ class Auth0UserRestController {
     }
 
     @GetMapping("nogatauser")
-    @PreAuthorize("hasAuthority('member')")
-    fun getExternalUsersWithNoGataUser(authentication: Authentication): List<DtoOutExternalUser> {
-        val isAdmin = authentication.authorities.find { it.authority == "admin" } != null
-        if(isAdmin){
-            return externalUserRepository.findAllByUserIsNull().map { DtoOutExternalUser(it) }
-        }
-        return emptyList()
+    @PreAuthorize("hasAuthority('admin')")
+    fun getExternalUsersWithNoGataUser(): List<DtoOutExternalUser> {
+        return externalUserRepository.findAllByUserIsNull().map { DtoOutExternalUser(it) }
     }
 }

@@ -1,9 +1,10 @@
-import { ClientConfigType } from "./client.types";
+import { ClientConfigType, RequestBodyBase } from "./client.types";
+import { DefaultResponseTypes } from "./useClient";
 
-export const client = <ResponseBody extends unknown = unknown, RequestBody extends unknown = unknown>(
+export const client = <ResponseBody extends DefaultResponseTypes, RequestBody extends RequestBodyBase>(
    url: string,
    { body, token, ...customConfig } = {} as ClientConfigType<RequestBody>
-): Promise<ResponseBody> => {
+) => {
    const headers: HeadersInit = { "content-type": "application/json" };
    if (token) {
       headers.Authorization = `Bearer ${token}`;
@@ -24,22 +25,21 @@ export const client = <ResponseBody extends unknown = unknown, RequestBody exten
       if (response.ok) {
          if (response.status === 204) {
             // No content
-            return undefined as ResponseBody;
+            return undefined;
          } else if (response.headers.get("Content-Type") === "application/json") {
             return (await response.json()) as ResponseBody;
          } else if (response.headers.get("Content-Type")?.includes("text/plain")) {
             return (await response.text()) as ResponseBody;
          }
-         return undefined as ResponseBody;
       } else {
          if (response.status === 401) {
-            throw new Error("Du er ikke logget in");
+            return Promise.reject(new Error("Du er ikke logget in"));
          }
          if (response.status === 403) {
-            throw new Error("Du har ikke tilgang");
+            return Promise.reject(new Error("Du har ikke tilgang"));
          }
          const errorMessage = await response.json();
-         throw new Error(errorMessage.message || response.status);
+         return Promise.reject(new Error(errorMessage.message));
       }
    });
 };

@@ -2,21 +2,21 @@ package no.gata.web.models
 
 import com.fasterxml.jackson.annotation.JsonIncludeProperties
 import java.util.*
-import jakarta.persistence.*
+import javax.persistence.*
 
 @Entity
-class ResponsibilityYear (
+data class ResponsibilityYear(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        var id: UUID? = null,
+        var id: UUID?,
         @Column(columnDefinition = "SMALLINT")
-        var year: Int = 0,
+        var year: Int,
         @ManyToOne
         @JsonIncludeProperties("id", "name")
-        var user: GataUser? = null,
+        var user: GataUser?,
         @ManyToOne
         @JoinColumn(name = "responsibility_id", referencedColumnName = "id")
-        var responsibility: Responsibility? =  null,
+        var responsibility: Responsibility,
         @OneToOne(mappedBy = "responsibilityYear", cascade = [CascadeType.ALL])
-        var note: ResponsibilityNote? = null
+        var note: ResponsibilityNote?
 )

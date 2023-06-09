@@ -206,15 +206,15 @@ class GataUserRestController {
 
     @PutMapping("{id}/subscribe")
     @PreAuthorize("hasAuthority('member')")
-    fun updateSubscribe(@PathVariable id: String) {
+    fun updateSubscribe(@PathVariable id: String): DtoOutGataUser {
         val user = gataUserService.getUser(id)
         user.subscribe = !user.subscribe
-        gataUserRepository.save(user)
+        return DtoOutGataUser(gataUserRepository.save(user))
     }
 
     @PutMapping("{id}/externaluserproviders")
     @PreAuthorize("hasAuthority('admin')")
-    fun updateExternalUserProviders(@PathVariable id: String, @RequestBody externalUserProviderIds: List<String>) {
+    fun updateExternalUserProviders(@PathVariable id: String, @RequestBody externalUserProviderIds: List<String>): DtoOutGataUser {
         val user = gataUserService.getUser(id)
         val removeExternalUserProviders = user.externalUserProviders.filter { !externalUserProviderIds.contains(it.id) }.onEach { it.user = null }
         val externalUserProviders = externalUserRepository.findAllById(externalUserProviderIds).onEach { it.user = user }
@@ -222,16 +222,16 @@ class GataUserRestController {
         roleService.addRoles(externalUserProviders, user.roles)
         externalUserRepository.saveAll(removeExternalUserProviders)
         user.externalUserProviders = externalUserProviders
-        gataUserRepository.save(user)
+        return DtoOutGataUser(gataUserRepository.save(user))
     }
 
     @PutMapping("{id}/primaryuser")
     @PreAuthorize("hasAuthority('admin')")
-    fun updatePrimaryExternalUser(@PathVariable id: String, @RequestBody externalUserId: String) {
+    fun updatePrimaryExternalUser(@PathVariable id: String, @RequestBody externalUserId: String): DtoOutGataUser {
         val user = gataUserService.getUser(id)
         user.externalUserProviders.onEach {
             it.primary = it.id == externalUserId
         }
-        gataUserRepository.save(user)
+        return DtoOutGataUser(gataUserRepository.save(user))
     }
 }

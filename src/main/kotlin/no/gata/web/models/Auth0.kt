@@ -5,12 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 class Auth0User(
         var name: String,
         var email: String,
-        var picture: String?,
+        var picture: String,
         @JsonProperty("user_id")
         var userId: String,
         var roles: List<Auth0Role>?,
         @JsonProperty("last_login")
-        var lastLogin: String?
+        var lastLogin: String
 )
 
 class Auth0Role(

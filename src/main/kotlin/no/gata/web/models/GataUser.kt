@@ -2,10 +2,10 @@ package no.gata.web.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.*
-import jakarta.persistence.*
+import javax.persistence.*
 
 @Entity
-class GataUser (
+data class GataUser(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         var id: UUID?,

@@ -1,50 +1,44 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { UserMenu } from "./UserMenu";
-import { isAdmin, isMember } from "./useRoles";
+import { useRoles } from "./useRoles";
+import { GataRoleType } from "../types/GataRole.type";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
-   Box,
    Button,
    Container,
-   Flex,
-   IconButton,
-   Img,
-   Menu,
-   MenuButton,
-   MenuItem,
-   MenuList,
    Text,
+   Box,
+   IconButton,
+   Menu,
+   MenuItem,
+   MenuButton,
+   MenuList,
+   Flex,
+   Img,
 } from "@chakra-ui/react";
-import { IGataUser } from "../types/GataUser.type";
-import { User } from "@auth0/auth0-spa-js";
 
-type ResponsiveAppBarProps = {
-   loggedInUser: IGataUser | undefined;
-   isAuthenticated: boolean;
-   user: User | undefined;
-};
+const pages = [
+   { name: "Hjem", url: "" },
+   { name: "Min side", url: "mypage", isMember: true },
+   { name: "Medlemmer", url: "member", isMember: true },
+   { name: "Ansvarsposter", url: "responsibility", isMember: true },
+   { name: "Aktuelle dokumenter", url: "report", isMember: true },
+   { name: "Arkiv", url: "https://1drv.ms/f/s!Aimiul1gt9LbrA10geM-AnPDKFoY", isMember: true },
+];
 
-export const ResponsiveAppBar = ({ loggedInUser, user, isAuthenticated }: ResponsiveAppBarProps) => {
-   const isUserMember = isMember(loggedInUser);
-   const isUserAdmin = isAdmin(loggedInUser);
-   const filteredPages = [
-      { name: "Hjem", url: "" },
-      { name: "Min side", url: `member/${loggedInUser?.id}`, isMember: true },
-      { name: "Medlemmer", url: "member", isMember: true },
-      { name: "Ansvarsposter", url: "responsibility", isMember: true },
-      { name: "Aktuelle dokumenter", url: "report", isMember: true },
-      { name: "Arkiv", url: "https://1drv.ms/f/s!Aimiul1gt9LbrA10geM-AnPDKFoY", isMember: true },
-   ].filter((page) => {
-      return !page.isMember || isUserMember || isUserAdmin;
+export const ResponsiveAppBar = () => {
+   const { isAdmin, isMember } = useRoles();
+   const filteredPages = pages.filter((page) => {
+      return !page.isMember || isMember || isAdmin;
    });
 
    const getRole = () => {
-      if (isUserAdmin && isUserMember) {
+      if (isAdmin && isMember) {
          return "admin og medlem";
-      } else if (isUserMember) {
+      } else if (isMember) {
          return "medlem";
-      } else if (isUserAdmin) {
+      } else if (isAdmin) {
          return "admin";
       }
       return "ingen";
@@ -103,7 +97,7 @@ export const ResponsiveAppBar = ({ loggedInUser, user, isAuthenticated }: Respon
                   })}
                </Flex>
 
-               <UserMenu roleText={getRole()} user={user} isAuthenticated={isAuthenticated} />
+               <UserMenu roleText={getRole()} />
             </Flex>
          </Container>
       </Box>

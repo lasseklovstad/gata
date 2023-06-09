@@ -43,7 +43,7 @@ export const ConfirmDialog = ({ text, onClose, onConfirm, open, response, title,
 
 type UseConfirmDialogProps = {
    onClose?: () => void;
-   onConfirm?: () => Promise<boolean | void> | void; // Return true if you want to close
+   onConfirm?: () => Promise<boolean | void>; // Return true if you want to close
 } & Pick<ConfirmDialogProps, "text" | "response" | "title" | "showOnlyOk">;
 
 export const useConfirmDialog = ({ onConfirm, text, onClose, response, title, showOnlyOk }: UseConfirmDialogProps) => {

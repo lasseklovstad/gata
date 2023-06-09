@@ -2,19 +2,19 @@ package no.gata.web.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.*
-import jakarta.persistence.*
+import javax.persistence.*
 
 @Entity
-class GataReportFile (
+data class GataReportFile(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        var id: UUID? = null,
+        var id: UUID?,
         @ManyToOne
         @JoinColumn(name = "report_id", referencedColumnName = "id")
         @JsonIgnore
-        var report: GataReport? = null,
+        var report: GataReport?,
         @Lob
-        var data: String? = null,
-        var cloudId: String? = null,
-        var cloudUrl: String? = null
+        var data: String?,
+        var cloudId: String?,
+        var cloudUrl: String?
 )

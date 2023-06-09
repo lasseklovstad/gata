@@ -30,7 +30,7 @@ class ControllerAdvisor : ResponseEntityExceptionHandler() {
     @ExceptionHandler(value = [ResponseStatusException::class])
     protected fun handleResponseStatusException(
             ex: ResponseStatusException, request: WebRequest): ResponseEntity<ErrorResponse> {
-        return ResponseEntity(ErrorResponse(ex.message), ex.statusCode)
+        return ResponseEntity(ErrorResponse(ex.message), ex.status)
     }
 
     @ExceptionHandler(RuntimeException::class)

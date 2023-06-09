@@ -1,43 +1,20 @@
-import { Box, Button, Heading, List, ListItem, Tooltip } from "@chakra-ui/react";
-import { useClearUserCache } from "../../api/user.api";
+import { Box, List, ListItem, Text, Heading } from "@chakra-ui/react";
+import { useClearUserCache, useGetUsers } from "../../api/user.api";
 import { Loading, LoadingButton } from "../../components/Loading";
-import { isAdmin } from "../../components/useRoles";
+import { useRoles } from "../../components/useRoles";
 import { PageLayout } from "../../components/PageLayout";
 import { useConfirmDialog } from "../../components/ConfirmDialog";
 import { Email } from "@mui/icons-material";
 import { usePublishKontigentReport } from "../../api/contingent.api";
-import { UserListItem } from "./components/UserListItem";
-import { ExternalUsersWithNoGataUser } from "./components/ExternalUsersWithNoGataUser";
-import { ActionFunction, LoaderFunction, useLoaderData, useSubmit } from "react-router-dom";
-import { client } from "../../api/client/client";
-import { IExternalUser, IGataUser } from "../../types/GataUser.type";
-import { getRequiredAccessToken } from "../../auth0Client";
-
-export const memberPageLoader: LoaderFunction = async ({ request: { signal } }) => {
-   const token = await getRequiredAccessToken();
-   const loggedInUser = await client("user/loggedin", { token, signal });
-   const users = await client("user", { token, signal });
-   const externalUsers = await client("auth0user/nogatauser", { token, signal });
-   return { loggedInUser, users, externalUsers };
-};
-
-export const memberPageAction: ActionFunction = async ({ request }) => {
-   const token = await getRequiredAccessToken();
-   const form = Object.fromEntries(await request.formData());
-   return client("user", { method: "POST", body: form, token });
-};
-
-export interface MemberPageLoaderData {
-   loggedInUser: IGataUser;
-   users: IGataUser[];
-   externalUsers: IExternalUser[];
-}
+import { UserListItem } from "./UserListItem";
+import { ExternalUsersWithNoGataUser } from "./ExternalUsersWithNoGataUser";
+import { Button, Tooltip } from "@chakra-ui/react";
 
 export const MemberPage = () => {
-   const { loggedInUser, users, externalUsers } = useLoaderData() as MemberPageLoaderData;
+   const { isAdmin } = useRoles();
+   const { usersResponse, getUsers, updateUser } = useGetUsers();
    const { cacheResponse, clearCache } = useClearUserCache();
    const { publishContigent, publishContigentResponse } = usePublishKontigentReport();
-   const submit = useSubmit();
    const { openConfirmDialog: openConfirmPublishKontigent, ConfirmDialogComponent: ConfirmPublishKontigentDialog } =
       useConfirmDialog({
          text: `Det ble sent en email til: ${
@@ -52,7 +29,7 @@ export const MemberPage = () => {
    const handleUpdate = async () => {
       const { status } = await clearCache();
       if (status === "success") {
-         submit({}, { method: "get", action: "member" });
+         getUsers();
       }
    };
 
@@ -61,9 +38,9 @@ export const MemberPage = () => {
       data && openConfirmPublishKontigent();
    };
 
-   const admins = users.filter((user) => user.isUserAdmin);
-   const members = users.filter((user) => user.isUserMember && !user.isUserAdmin);
-   const nonMembers = users.filter((user) => !user.isUserMember && !user.isUserAdmin);
+   const admins = usersResponse.data?.filter((user) => user.isUserAdmin);
+   const members = usersResponse.data?.filter((user) => user.isUserMember && !user.isUserAdmin);
+   const nonMembers = usersResponse.data?.filter((user) => !user.isUserMember && !user.isUserAdmin);
 
    return (
       <PageLayout>
@@ -71,14 +48,14 @@ export const MemberPage = () => {
             <Heading as="h1" size="xl">
                Brukere
             </Heading>
-            {isAdmin(loggedInUser) && (
+            {isAdmin && (
                <Tooltip label="Hent nye brukere som har logget inn">
                   <Button variant="ghost" onClick={handleUpdate}>
                      Oppdater
                   </Button>
                </Tooltip>
             )}
-            {isAdmin(loggedInUser) && (
+            {isAdmin && (
                <Tooltip label="Send påminnelse om betaling til de som ikke har betalt kontigent">
                   <LoadingButton
                      response={publishContigentResponse}
@@ -94,14 +71,15 @@ export const MemberPage = () => {
          </Box>
          {ConfirmPublishKontigentDialog}
          <Loading response={cacheResponse} alertTitle="Det oppstod en feil ved oppdatering av cache" />
+         <Loading response={usersResponse} alertTitle="Det oppstod en feil ved henting av medlemer" />
          <Heading as="h2" id="admin-title" size="lg">
             Administratorer
          </Heading>
          <List aria-labelledby="admin-title">
-            {admins.map((user) => {
+            {admins?.map((user) => {
                return <UserListItem key={user.id} user={user} />;
             })}
-            {admins.length === 0 && <ListItem>Ingen administratorer funnet</ListItem>}
+            {admins?.length === 0 && <ListItem>Ingen administratorer funnet</ListItem>}
          </List>
          <Heading as="h2" id="member-title" size="lg">
             Medlemmer
@@ -110,9 +88,9 @@ export const MemberPage = () => {
             {members?.map((user) => {
                return <UserListItem key={user.id} user={user} />;
             })}
-            {members.length === 0 && <ListItem>Ingen medlemmer funnet</ListItem>}
+            {usersResponse.data?.length === 0 && <ListItem>Ingen medlemmer funnet</ListItem>}
          </List>
-         {isAdmin(loggedInUser) && (
+         {isAdmin && (
             <>
                <Heading variant="h2" id="non-member-title" size="lg">
                   Ikke medlem
@@ -123,7 +101,17 @@ export const MemberPage = () => {
                   })}
                   {nonMembers?.length === 0 && <ListItem>Ingen andre brukere</ListItem>}
                </List>
-               <ExternalUsersWithNoGataUser externalUsers={externalUsers} />
+               <ExternalUsersWithNoGataUser
+                  onAddUser={(newUser) => {
+                     updateUser((users) => {
+                        if (users) {
+                           return [...users, newUser];
+                        } else {
+                           return [newUser];
+                        }
+                     });
+                  }}
+               />
             </>
          )}
       </PageLayout>

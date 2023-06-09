@@ -1,17 +1,17 @@
-import { User } from "@auth0/auth0-spa-js";
+import { useAuth0 } from "@auth0/auth0-react";
 import { Text, Button, IconButton, Menu, MenuItem, Avatar, MenuList, MenuButton } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
-import { loginWithRedirect, logout } from "../auth0Client";
+import { Link, useLocation } from "react-router-dom";
 
 type UserMenuProps = {
    roleText: string;
-   isAuthenticated: boolean;
-   user: User | undefined;
 };
 
-export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => {
+export const UserMenu = ({ roleText }: UserMenuProps) => {
+   const { user, isAuthenticated, logout, loginWithRedirect } = useAuth0();
+   const location = useLocation();
+
    const handleLogout = () => {
-      logout();
+      logout({ returnTo: window.location.origin });
    };
 
    return (
@@ -34,7 +34,10 @@ export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => 
          )}
          {!isAuthenticated && (
             <>
-               <Button onClick={() => loginWithRedirect()} sx={{ my: 2, color: "white", display: "block" }}>
+               <Button
+                  onClick={() => loginWithRedirect({ appState: { returnTo: `/${location.hash.replace("#/", "")}` } })}
+                  sx={{ my: 2, color: "white", display: "block" }}
+               >
                   Logg inn
                </Button>
             </>
