@@ -27,11 +27,22 @@
       "typescript": "4.9.5",
       "vite": "4.3.9",
       "vite-plugin-checker": "0.6.0",
-      "vite-plugin-eslint": "1.8.1"
+      "vite-plugin-eslint": "1.8.1",
+      "@remix-run/node": "^1.17.0",
+      "@remix-run/react": "^1.17.0",
+      "@remix-run/serve": "^1.17.0",
+      "isbot": "^3.6.10"
+   },
+   "devDependencies": {
+      "@remix-run/dev": "^1.17.0",
+      "@remix-run/eslint-config": "^1.17.0"
    },
    "scripts": {
-      "start": "vite",
-      "build": "tsc && vite build",
+      "build": "remix build",
+      "dev": "remix dev",
+      "start": "remix-serve build",
+      "start-vite": "vite",
+      "build-vite": "tsc && vite build",
       "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx,.mjs,.cjs",
       "lint:fix": "npm run lint -- --fix"
    }
