@@ -1,19 +1,14 @@
-import { User } from "@auth0/auth0-spa-js";
 import { Text, Button, IconButton, Menu, MenuItem, Avatar, MenuList, MenuButton } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
-import { loginWithRedirect, logout } from "../auth0Client";
+import { Link } from "@remix-run/react";
+import type { Auth0Profile } from "remix-auth-auth0";
 
 type UserMenuProps = {
    roleText: string;
    isAuthenticated: boolean;
-   user: User | undefined;
+   user: Auth0Profile | undefined;
 };
 
 export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => {
-   const handleLogout = () => {
-      logout();
-   };
-
    return (
       <>
          {isAuthenticated && (
@@ -21,7 +16,7 @@ export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => 
                <Menu>
                   <MenuButton aria-label="Åpne meny" as={IconButton} icon={<Avatar src={user?.picture} size="sm" />} />
                   <MenuList>
-                     <MenuItem onClick={handleLogout}>
+                     <MenuItem as={Link} to="logout">
                         <Text textAlign="center">Logg ut</Text>
                      </MenuItem>
                      <MenuItem as={Link} to="privacy">
@@ -34,7 +29,7 @@ export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => 
          )}
          {!isAuthenticated && (
             <>
-               <Button onClick={() => loginWithRedirect()} sx={{ my: 2, color: "white", display: "block" }}>
+               <Button as={Link} to="login" sx={{ my: 2, color: "white", display: "block" }}>
                   Logg inn
                </Button>
             </>

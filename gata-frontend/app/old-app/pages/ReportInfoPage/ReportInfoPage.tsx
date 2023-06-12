@@ -12,6 +12,7 @@ import { client } from "../../api/client/client";
 import { IGataUser } from "../../types/GataUser.type";
 import { Descendant } from "slate";
 import { PublishButton } from "./PublishButton";
+import { ClientOnly } from "~/old-app/components/ClientOnly";
 
 export const reportInfoPageLoader: LoaderFunction = async ({ request: { signal }, params }) => {
    const token = await getRequiredAccessToken();
@@ -128,13 +129,17 @@ export const ReportInfoPage = () => {
                      }
                   }}
                >
-                  {report.content && <RichTextPreview content={report.content} />}
+                  {report.content && (
+                     <ClientOnly>
+                        <RichTextPreview content={report.content} />
+                     </ClientOnly>
+                  )}
                   {!report.content && <Text>Det er ikke lagt til innhold enda.</Text>}
                </Box>
             </>
          )}
          {editing && (
-            <>
+            <ClientOnly>
                <RichTextEditor
                   initialContent={report.content}
                   onCancel={() => setEditing(false)}
@@ -142,7 +147,7 @@ export const ReportInfoPage = () => {
                   saveResponse={putReportResponse}
                   reportId={report.id}
                />
-            </>
+            </ClientOnly>
          )}
          <Text fontSize="sm" color="gray" sx={{ mt: 1, mb: 10 }}>
             Sist redigert av: {report.lastModifiedBy}, {lastModifiedDate.toLocaleDateString()}{" "}

@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
 import { UserMenu } from "./UserMenu";
 import { isAdmin, isMember } from "./useRoles";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -16,13 +15,14 @@ import {
    MenuList,
    Text,
 } from "@chakra-ui/react";
-import { IGataUser } from "../types/GataUser.type";
-import { User } from "@auth0/auth0-spa-js";
+import type { IGataUser } from "../types/GataUser.type";
+import type { Auth0Profile } from "remix-auth-auth0";
+import { Link } from "@remix-run/react";
 
 type ResponsiveAppBarProps = {
    loggedInUser: IGataUser | undefined;
    isAuthenticated: boolean;
-   user: User | undefined;
+   user: Auth0Profile | undefined;
 };
 
 export const ResponsiveAppBar = ({ loggedInUser, user, isAuthenticated }: ResponsiveAppBarProps) => {

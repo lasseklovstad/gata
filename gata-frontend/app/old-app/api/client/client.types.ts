@@ -3,8 +3,8 @@ export type RequestBodyBase = any;
 export type ClientConfigType<RequestBody extends RequestBodyBase> = {
    body?: RequestBody;
    headers?: HeadersInit;
-   signal?: AbortSignal;
-   method?: "POST" | "GET" | "PUT" | "PATCH" | "DELETE";
+   signal?: Request["signal"];
+   method?: Request["method"];
    token?: string;
 };
 
