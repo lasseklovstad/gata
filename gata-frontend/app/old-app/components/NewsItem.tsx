@@ -3,6 +3,7 @@ import { RichTextPreview } from "./RichTextEditor/RichTextPreview";
 import { Link } from "react-router-dom";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { IGataUser } from "../types/GataUser.type";
+import { ClientOnly } from "./ClientOnly";
 
 type NewsItemProps = {
    report: IGataReport;
@@ -22,7 +23,11 @@ export const NewsItem = ({ report, loggedInUser }: NewsItemProps) => {
             )}
          </Flex>
          <Box boxShadow="xs" rounded={4} sx={{ p: { base: 1, md: 2 }, width: "100%" }}>
-            {report.content && <RichTextPreview content={report.content} />}
+            {report.content && (
+               <ClientOnly>
+                  <RichTextPreview content={report.content} />
+               </ClientOnly>
+            )}
             {!report.content && <Text>Det er ikke lagt til innhold enda.</Text>}
          </Box>
          <Text fontSize="sm" color="gray">

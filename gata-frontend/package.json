@@ -6,6 +6,7 @@
       "@auth0/auth0-spa-js": "2.0.7",
       "@chakra-ui/react": "2.7.0",
       "@emotion/react": "11.11.1",
+      "@emotion/server": "^11.11.0",
       "@emotion/styled": "11.11.0",
       "@mui/icons-material": "5.11.16",
       "@remix-run/node": "^1.17.0",

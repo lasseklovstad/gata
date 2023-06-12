@@ -12,9 +12,10 @@ import {
 import { authenticator } from "./utils/auth.server";
 import { IGataUser } from "./old-app/types/GataUser.type";
 import { client } from "./old-app/api/client/client";
-import { Progress, Container, Box, Text } from "@chakra-ui/react";
+import { Progress, Container, Box, Text, ChakraProvider } from "@chakra-ui/react";
 import { ResponsiveAppBar } from "./old-app/components/ResponsiveAppBar";
 import { Auth0Profile } from "remix-auth-auth0";
+import { chakraTheme } from "./old-app/chakraTheme";
 
 export const meta: V2_MetaFunction = () => {
    return [{ title: "Gata" }];
@@ -35,7 +36,9 @@ export default function App() {
             <Links />
          </head>
          <body>
-            <Root />
+            <ChakraProvider theme={chakraTheme}>
+               <Root />
+            </ChakraProvider>
             <ScrollRestoration />
             <Scripts />
             <LiveReload />
@@ -46,25 +49,27 @@ export default function App() {
 
 export const loader: LoaderFunction = async ({ request }) => {
    const auth = await authenticator.isAuthenticated(request);
+   const version = process.env.npm_package_version || "0.0.0";
    if (auth) {
       const user = auth.profile;
       const loggedInUser = await client<IGataUser>("user/loggedin", {
          token: auth.accessToken,
          signal: request.signal,
       });
-      return json<RootLoaderData>({ isAuthenticated: true, loggedInUser, user });
+      return json<RootLoaderData>({ isAuthenticated: true, loggedInUser, user, version });
    }
-   return json<RootLoaderData>({ isAuthenticated: false });
+   return json<RootLoaderData>({ isAuthenticated: false, version });
 };
 
 export interface RootLoaderData {
    loggedInUser?: IGataUser;
    isAuthenticated: boolean;
    user?: Auth0Profile;
+   version: string;
 }
 
 function Root() {
-   const { loggedInUser, isAuthenticated, user } = useLoaderData<typeof loader>();
+   const { loggedInUser, isAuthenticated, user, version } = useLoaderData<typeof loader>();
    const { state } = useNavigation();
    return (
       <Box sx={{ display: "flex", flexDirection: "column", backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
@@ -74,7 +79,7 @@ function Root() {
             <Outlet />
          </Container>
          <Box as="footer" sx={{ marginTop: "auto", p: 1 }}>
-            <Text>Versjon: {process.env.npm_package_version}</Text>
+            <Text>Versjon: {version}</Text>
          </Box>
       </Box>
    );

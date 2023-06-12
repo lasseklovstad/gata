@@ -1,5 +1,5 @@
 import { Text, Button, IconButton, Menu, MenuItem, Avatar, MenuList, MenuButton } from "@chakra-ui/react";
-import { Link } from "@remix-run/react";
+import { Form, Link } from "@remix-run/react";
 import type { Auth0Profile } from "remix-auth-auth0";
 
 type UserMenuProps = {
@@ -28,11 +28,11 @@ export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => 
             </>
          )}
          {!isAuthenticated && (
-            <>
-               <Button as={Link} to="login" sx={{ my: 2, color: "white", display: "block" }}>
+            <Form method="POST" action="/login">
+               <Button type="submit" sx={{ my: 2 }}>
                   Logg inn
                </Button>
-            </>
+            </Form>
          )}
       </>
    );

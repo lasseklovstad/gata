@@ -5,15 +5,20 @@
  */
 
 import { RemixBrowser } from "@remix-run/react";
-import React from "react";
 import { startTransition, StrictMode } from "react";
+import createEmotionCache from "./createEmotionCache";
 import { hydrateRoot } from "react-dom/client";
 
+import { CacheProvider } from "@emotion/react";
+
 startTransition(() => {
+   const emotionCache = createEmotionCache();
    hydrateRoot(
       document,
       <StrictMode>
-         <RemixBrowser />
+         <CacheProvider value={emotionCache}>
+            <RemixBrowser />
+         </CacheProvider>
       </StrictMode>
    );
 });
