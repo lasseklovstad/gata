@@ -12,6 +12,7 @@ import { client } from "../../api/client/client";
 import { IGataUser } from "../../types/GataUser.type";
 import { Descendant } from "slate";
 import { PublishButton } from "./PublishButton";
+import { isAdmin } from "../../components/useRoles";
 
 export const reportInfoPageLoader: LoaderFunction = async ({ request: { signal }, params }) => {
    const token = await getRequiredAccessToken();
@@ -31,7 +32,7 @@ interface ReportInfoPageLoaderData {
 
 export const ReportInfoPage = () => {
    const { report, loggedInUser } = useLoaderData() as ReportInfoPageLoaderData;
-   const canEdit = report.createdBy?.id === loggedInUser.id;
+   const canEdit = report.createdBy?.id === loggedInUser.id || isAdmin(loggedInUser);
    const [editing, setEditing] = useState(false);
    const submit = useSubmit();
 

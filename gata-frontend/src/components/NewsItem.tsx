@@ -3,6 +3,7 @@ import { RichTextPreview } from "./RichTextEditor/RichTextPreview";
 import { Link } from "react-router-dom";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { IGataUser } from "../types/GataUser.type";
+import { isAdmin } from "./useRoles";
 
 type NewsItemProps = {
    report: IGataReport;
@@ -10,7 +11,7 @@ type NewsItemProps = {
 };
 
 export const NewsItem = ({ report, loggedInUser }: NewsItemProps) => {
-   const canEdit = loggedInUser.id === report.createdBy?.id;
+   const canEdit = loggedInUser.id === report.createdBy?.id || isAdmin(loggedInUser);
    return (
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%", alignItems: "flex-end" }}>
          <Flex alignItems="center" width="100%">
