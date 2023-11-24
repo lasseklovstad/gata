@@ -1,11 +1,11 @@
 import { Flex, FormControl, FormHelperText, FormLabel, Text } from "@chakra-ui/react";
-import { IExternalUser, IGataUser } from "../../../types/GataUser.type";
-import { ExternalUserIcon } from "../../../components/ExternalUserIcon";
-import { chakraComponents, ChakraStylesConfig, OptionBase, Props, Select } from "chakra-react-select";
+import { ChakraStylesConfig, OptionBase, Props, Select, chakraComponents } from "chakra-react-select";
 import { ReactNode } from "react";
-import { ActionFunction, useFetcher, useFormAction } from "react-router-dom";
+import { ActionFunction, useFetcher } from "react-router-dom";
 import { client } from "../../../api/client/client";
 import { getRequiredAccessToken } from "../../../auth0Client";
+import { ExternalUserIcon } from "../../../components/ExternalUserIcon";
+import { IExternalUser, IGataUser } from "../../../types/GataUser.type";
 
 export const externalUserProvidersAction: ActionFunction = async ({ request }) => {
    const token = await getRequiredAccessToken();
@@ -28,13 +28,12 @@ export const LinkExternalUserToGataUserSelect = ({
    notMemberUsers,
 }: LinkExternalUserToGataUserSelectProps) => {
    const fetcher = useFetcher();
-   const action = useFormAction();
    const handleChange: Props<ColorOption, true>["onChange"] = async (options) => {
       const userIds = options.map((o) => o.value);
       const formData = new FormData();
       formData.set("userId", id);
       userIds.forEach((userId) => formData.append("externalUserId", userId));
-      fetcher.submit(formData, { action: `${action}/externaluserproviders`, method: "put" });
+      fetcher.submit(formData, { action: "externaluserproviders", method: "PUT" });
    };
 
    const menuItems = [...externalUserProviders, ...notMemberUsers];

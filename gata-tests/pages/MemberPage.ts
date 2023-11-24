@@ -10,12 +10,12 @@ class MemberResponsibilityModal {
   page: Page;
 
   constructor(page: Page) {
-    this.responsibilityCombobox = page.locator(
-      "role=combobox[name=/Velg ansvarspost/i]"
-    );
-    this.yearCombobox = page.locator("role=combobox[name=/velg år/i]");
-    this.saveButton = page.locator("role=button[name=/lagre/i]");
-    this.modal = page.locator("role=dialog[name=/Legg til ansvarspost/i]");
+    this.responsibilityCombobox = page.getByRole("combobox", {
+      name: "Velg ansvarspost",
+    });
+    this.yearCombobox = page.getByRole("combobox", { name: "Velg år" });
+    this.saveButton = page.getByRole("button", { name: "Lagre" });
+    this.modal = page.getByRole("dialog", { name: "Legg til ansvarspost" });
     this.page = page;
   }
 
@@ -41,28 +41,28 @@ export class MemberPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.pageTitle = page.locator("role=heading[name=/informasjon/i]");
-    this.linkUserSelect = page.locator(
-      "role=combobox[name=/Epost tilknytninger/i]"
-    );
+    this.pageTitle = page.getByRole("heading", { name: "Informasjon" });
+    this.linkUserSelect = page.getByRole("combobox", {
+      name: "Epost tilknytninger",
+    });
     this.responsibilityModal = new MemberResponsibilityModal(page);
-    this.addResponsibilityButton = page.locator(
-      "role=link[name=/legg til ansvarspost/i]"
-    );
+    this.addResponsibilityButton = page.getByRole("link", {
+      name: "Legg til ansvarspost",
+    });
     this.confirmDeleteResponsibilityModal = new ConfirmModal(page);
-    this.deleteResponsibilityButton = page.locator(
-      "role=link[name=/fjern ansvarspost/i]"
-    );
-    this.responsibilityContentTextBox = this.page.locator(
-      "role=textbox[name=/notat/i]"
-    );
-    this.saveResonsibilityButton = this.page.locator(
-      "role=button[name=/lagre/i]"
-    );
+    this.deleteResponsibilityButton = page.getByRole("link", {
+      name: "Fjern ansvarspost",
+    });
+    this.responsibilityContentTextBox = page.getByRole("textbox", {
+      name: "Notat",
+    });
+    this.saveResonsibilityButton = page.getByRole("button", {
+      name: "Lagre",
+    });
   }
 
   getRemoveLinkedUserButton(name: string) {
-    return this.page.locator(`role=button[name=/fjern ${name}/i]`);
+    return this.page.getByRole("button", { name: `Fjern ${name}` });
   }
 
   async linkUser(name: string) {
@@ -77,15 +77,15 @@ export class MemberPage {
   }
 
   async assertPrimaryEmail(email: string) {
-    await expect(this.page.locator(`text=Email: ${email}`)).toBeVisible();
+    await expect(this.page.getByText(`Email: ${email}`)).toBeVisible();
   }
 
   getResponsibilityButton(name: string) {
-    return this.page.locator(`role=button[name=/${name}/i]`);
+    return this.page.getByRole("button", { name });
   }
 
   goToResponsibilityTab() {
-    return this.page.locator(`role=tab[name=/ansvarsposter/i]`).click();
+    return this.page.getByRole("tab", { name: "Ansvarsposter" }).click();
   }
 
   async addResponsibility(name: string) {

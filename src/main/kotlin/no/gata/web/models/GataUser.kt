@@ -3,6 +3,7 @@ package no.gata.web.models
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.util.*
 import jakarta.persistence.*
+import org.hibernate.annotations.Cascade
 
 @Entity
 class GataUser (
@@ -11,7 +12,7 @@ class GataUser (
         var id: UUID?,
         @OneToMany(mappedBy = "user")
         var externalUserProviders: List<ExternalUser>,
-        @OneToMany(mappedBy = "user")
+        @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
         @JsonIgnore
         var responsibilities: List<ResponsibilityYear>,
         @ManyToMany()

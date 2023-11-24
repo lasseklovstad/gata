@@ -8,8 +8,8 @@ export class MemberOverviewPage {
 
   constructor(page: Page) {
     this.header = new GataHeader(page);
-    this.pageTitle = page.locator("role=heading[name=/brukere/i]");
-    this.memberList = page.locator("role=list[name=/medlemmer/i]");
+    this.pageTitle = page.getByRole("heading", { name: "Brukere" });
+    this.memberList = page.getByRole("list", { name: "Medlemmer" });
   }
 
   async goto() {
@@ -18,6 +18,9 @@ export class MemberOverviewPage {
   }
 
   async goToMember(name: string) {
-    await this.memberList.locator("role=listitem", { hasText: name }).click();
+    await this.memberList
+      .getByRole("listitem")
+      .filter({ hasText: name })
+      .click();
   }
 }

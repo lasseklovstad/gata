@@ -8,7 +8,7 @@ import { Email } from "@mui/icons-material";
 import { usePublishKontigentReport } from "../../api/contingent.api";
 import { UserListItem } from "./components/UserListItem";
 import { ExternalUsersWithNoGataUser } from "./components/ExternalUsersWithNoGataUser";
-import { ActionFunction, LoaderFunction, useLoaderData, useSubmit } from "react-router-dom";
+import { ActionFunction, LoaderFunction, useLoaderData, useRevalidator, useSubmit } from "react-router-dom";
 import { client } from "../../api/client/client";
 import { IExternalUser, IGataUser } from "../../types/GataUser.type";
 import { getRequiredAccessToken } from "../../auth0Client";
@@ -37,7 +37,7 @@ export const MemberPage = () => {
    const { loggedInUser, users, externalUsers } = useLoaderData() as MemberPageLoaderData;
    const { cacheResponse, clearCache } = useClearUserCache();
    const { publishContigent, publishContigentResponse } = usePublishKontigentReport();
-   const submit = useSubmit();
+   const revalidate = useRevalidator();
    const { openConfirmDialog: openConfirmPublishKontigent, ConfirmDialogComponent: ConfirmPublishKontigentDialog } =
       useConfirmDialog({
          text: `Det ble sent en email til: ${
@@ -52,7 +52,7 @@ export const MemberPage = () => {
    const handleUpdate = async () => {
       const { status } = await clearCache();
       if (status === "success") {
-         submit({}, { method: "get", action: "member" });
+         revalidate.revalidate();
       }
    };
 

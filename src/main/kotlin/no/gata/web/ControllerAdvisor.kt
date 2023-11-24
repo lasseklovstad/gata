@@ -38,6 +38,7 @@ class ControllerAdvisor : ResponseEntityExceptionHandler() {
             exception: RuntimeException,
             request: WebRequest
     ): ResponseEntity<ErrorResponse> {
+        logger.error(exception)
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponse(exception.message))
     }
 }

@@ -100,7 +100,7 @@ const Root = () => {
 
 export const ErrorBoundary = () => {
    let error = useRouteError();
-
+   console.error(error);
    if (isRouteErrorResponse(error)) {
       // the response json is automatically parsed to
       // `error.data`, you also have access to the status
@@ -240,8 +240,8 @@ export const router = createBrowserRouter(
                   }
                />
             </Route>
-            <Route path="" loader={memberInfoPageLoader} action={memberInfoPageAction} element={<MemberInfoPage />} />
+            <Route index loader={memberInfoPageLoader} action={memberInfoPageAction} element={<MemberInfoPage />} />
          </Route>
-      </Route>,
-   ),
+      </Route>
+   )
 );
