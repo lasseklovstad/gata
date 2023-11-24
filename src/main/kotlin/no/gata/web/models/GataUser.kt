@@ -12,12 +12,15 @@ class GataUser (
         var id: UUID?,
         @OneToMany(mappedBy = "user")
         var externalUserProviders: List<ExternalUser>,
+        @OneToMany(mappedBy = "createdBy")
+        @JsonIgnore
+        var reports: List<GataReport>,
         @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
         @JsonIgnore
         var responsibilities: List<ResponsibilityYear>,
         @ManyToMany()
         var roles: List<GataRole>,
-        @OneToMany(mappedBy = "user")
+        @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
         var contingents: List<GataContingent>,
         var subscribe: Boolean
 ) {
@@ -25,6 +28,7 @@ class GataUser (
             id = null,
             externalUserProviders = emptyList(),
             responsibilities = emptyList(),
+            reports= emptyList(),
             roles = emptyList(),
             contingents = emptyList(),
             subscribe = false)
@@ -32,6 +36,7 @@ class GataUser (
             id = null,
             externalUserProviders = emptyList(),
             responsibilities = emptyList(),
+            reports= emptyList(),
             roles = listOf(role),
             contingents = emptyList(),
             subscribe = false)
