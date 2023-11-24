@@ -166,7 +166,8 @@ class Auth0RestService(private val builder: WebClient.Builder) {
                             picture = externalUser.picture,
                             lastLogin = externalUser.lastLogin,
                             user = null, primary = false)
-                    if (externalUser.roles != null) {
+                    // If the user from auth0 has roles create a gata user with those roles
+                    if (externalUser.roles != null && externalUser.roles!!.isNotEmpty()) {
                         val newGataUser = GataUser()
                         newGataUser.roles = externalUser.roles?.map { gataRoleRepository.findByExternalUserProviderId(it.id).get() }
                             .orEmpty()
