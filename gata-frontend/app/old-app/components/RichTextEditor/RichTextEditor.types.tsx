@@ -5,9 +5,22 @@ export type ListTypes = "numbered-list" | "bulleted-list" | "list-item" | "mui-l
 export const LIST_TYPES: ListTypes[] = ["numbered-list", "bulleted-list", "mui-list"];
 
 export type CustomElement = {
-   type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "body1" | "body2" | "paragraph" | "image" | ListTypes;
+   type:
+      | "h1"
+      | "h2"
+      | "h3"
+      | "h4"
+      | "h5"
+      | "h6"
+      | "body1"
+      | "body2"
+      | "paragraph"
+      | "image"
+      | "saving-image"
+      | ListTypes;
    children: CustomText[];
    imageId?: string | null;
+   savingImageData?: string;
    size?: number;
 };
 

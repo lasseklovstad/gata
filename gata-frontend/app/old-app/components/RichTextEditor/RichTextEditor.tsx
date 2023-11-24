@@ -1,3 +1,4 @@
+import { Box, Button, ButtonGroup, CircularProgress, Divider } from "@chakra-ui/react";
 import {
    FormatBold,
    FormatItalic,
@@ -6,33 +7,31 @@ import {
    FormatUnderlined,
    Save,
 } from "@mui/icons-material";
-import { Box, Button, ButtonGroup, Divider } from "@chakra-ui/react";
 import { useCallback, useMemo, useRef } from "react";
-import { createEditor, Descendant } from "slate";
+import type { Descendant } from "slate";
+import { createEditor } from "slate";
 import { withHistory } from "slate-history";
-import { Editable, RenderElementProps, RenderLeafProps, Slate, withReact } from "slate-react";
-import { UseClientState } from "../../api/client/client.types";
-import { Loading, LoadingButton } from "../Loading";
+import type { RenderElementProps, RenderLeafProps } from "slate-react";
+import { Editable, Slate, withReact } from "slate-react";
+import { LoadingButton } from "../Loading";
+import { AddImage } from "./AddImage";
 import { BlockButton } from "./BlockButton";
-import { insertImage, withImages } from "./withImages";
 import { MarkButton } from "./MarkButton";
 import { insertTab, toggleMark } from "./RichTextEditor.util";
 import { RichTextElement } from "./RichTextElement";
 import { RichTextLeaf } from "./RichTextLeaf";
-import { usePostGataReportFile } from "../../api/file.api";
-import { AddImage } from "./AddImage";
+import { insertImage, withImages } from "./withImages";
 
 type RichTextEditorProps = {
    onCancel: () => void;
    onSave: (content: Descendant[] | undefined, close: boolean) => void;
    initialContent?: string | null;
-   saveResponse: UseClientState<unknown>;
+   isLoading: boolean;
    reportId: string;
 };
 
-export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent, reportId }: RichTextEditorProps) => {
-   const { postReportFile, fileResponse } = usePostGataReportFile(reportId);
-   const editor = useMemo(() => withImages(withHistory(withReact(createEditor())), postReportFile), [postReportFile]);
+export const RichTextEditor = ({ onCancel, onSave, isLoading, initialContent, reportId }: RichTextEditorProps) => {
+   const editor = useMemo(() => withImages(withHistory(withReact(createEditor()))), []);
    const renderElement = useCallback((props: RenderElementProps) => <RichTextElement {...props} />, []);
    const renderLeaf = useCallback((props: RenderLeafProps) => {
       return <RichTextLeaf {...props} />;
@@ -111,8 +110,7 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                            insertImage(editor, url);
                         }}
                      />
-                     <Loading response={fileResponse} />
-                     <Loading response={saveResponse} />
+                     {isLoading && <CircularProgress isIndeterminate />}
                   </Box>
                   <Box sx={{ p: 1 }}>
                      <Button variant="ghost" onClick={() => onCancel()} sx={{ mr: 1 }}>
@@ -120,7 +118,7 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                      </Button>
                      <LoadingButton
                         leftIcon={<Save />}
-                        response={saveResponse}
+                        isLoading={isLoading}
                         onClick={() => handleSave(true)}
                         sx={{ mr: 1 }}
                      >
@@ -132,7 +130,7 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                <Box sx={{ p: 2, minHeight: "600px" }}>
                   <Editable
                      aria-label="Rediger innhold"
-                     style={{ minHeight: "600px" }}
+                     style={{ minHeight: "600px", padding: "6px" }}
                      renderElement={renderElement}
                      renderLeaf={renderLeaf}
                      onKeyDown={(event) => {

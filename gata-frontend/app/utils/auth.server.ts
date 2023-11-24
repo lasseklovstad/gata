@@ -32,3 +32,11 @@ const auth0Strategy = new Auth0Strategy(
 authenticator.use(auth0Strategy);
 
 export const { getSession, commitSession, destroySession } = sessionStorage;
+
+export const getRequiredAuthToken = async (request: Request) => {
+   const auth = await authenticator.isAuthenticated(request);
+   if (auth === null) {
+      throw new Error("Du er ikke logget inn");
+   }
+   return auth.accessToken;
+};

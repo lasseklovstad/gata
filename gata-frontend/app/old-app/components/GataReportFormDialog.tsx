@@ -15,24 +15,17 @@ import {
    ModalOverlay,
    Textarea,
 } from "@chakra-ui/react";
-import {
-   ActionFunction,
-   json,
-   LoaderFunction,
-   redirect,
-   useFetcher,
-   useLoaderData,
-   useNavigate,
-} from "react-router-dom";
-import { getRequiredAccessToken } from "../auth0Client";
 import { client } from "../api/client/client";
+import { getRequiredAuthToken } from "~/utils/auth.server";
+import type { LoaderFunction, ActionFunction } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
+import { useLoaderData, useFetcher, useNavigate } from "@remix-run/react";
 
-export const gataReportFormDialogLoader: LoaderFunction = async ({ request: { signal }, params }) => {
-   const token = await getRequiredAccessToken();
+export const gataReportFormDialogLoader: LoaderFunction = async ({ request, params }) => {
+   const token = await getRequiredAuthToken(request);
    if (params.reportId) {
       const report = await client<IGataReportSimple>(`report/${params.reportId}/simple`, {
          token,
-         signal,
       });
       return json<GataReportFormDialogLoaderData>({ report });
    }
@@ -40,7 +33,7 @@ export const gataReportFormDialogLoader: LoaderFunction = async ({ request: { si
 };
 
 export const gataReportFormDialogAction: ActionFunction = async ({ request, params }) => {
-   const token = await getRequiredAccessToken();
+   const token = await getRequiredAuthToken(request);
    const body = Object.fromEntries(await request.formData());
    if (!body.title) {
       return json({ error: { title: "Tittel må fylles ut" } }, { status: 400 });

@@ -20,7 +20,7 @@ export const client = <ResponseBody extends unknown = unknown, RequestBody exten
       config.body = typeof body !== "string" ? JSON.stringify(body) : body;
    }
 
-   return fetch(`/api/${url}`, config).then(async (response) => {
+   return fetch(`${process.env.BACKEND_BASE_URL}/api/${url}`, config).then(async (response) => {
       if (response.ok) {
          if (response.status === 204) {
             // No content

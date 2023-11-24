@@ -158,19 +158,15 @@ class Auth0RestService(private val builder: WebClient.Builder) {
                             picture = externalUser.picture,
                             lastLogin = externalUser.lastLogin,
                             user = null, primary = false)
-                    if (externalUser.roles?.find { it.name == GataRoleName.Administrator.name } != null) {
-                        val role = gataRoleRepository.findByName(GataRoleName.Administrator.name)
-                        val newGataUser = gataUserRepository.save(GataUser(role.get()))
+                    if (externalUser.roles != null) {
+                        val newGataUser = GataUser()
+                        newGataUser.roles = externalUser.roles?.map { gataRoleRepository.findByExternalUserProviderId(it.id).get() }
+                            .orEmpty()
+                        gataUserRepository.save(newGataUser)
                         newExternalUser.primary = true
                         newExternalUser.user = newGataUser
                         externalUserRepository.save(newExternalUser)
-                    } else if (externalUser.roles?.find { it.name == GataRoleName.Medlem.name } != null) {
-                        val role = gataRoleRepository.findByName(GataRoleName.Medlem.name)
-                        val newGataUser = gataUserRepository.save(GataUser(role.get()))
-                        newExternalUser.primary = true
-                        newExternalUser.user = newGataUser
-                        externalUserRepository.save(newExternalUser)
-                    } else {
+                    }  else {
                         externalUserRepository.save(newExternalUser)
                     }
 

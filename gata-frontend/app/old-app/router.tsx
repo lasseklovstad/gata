@@ -1,64 +1,62 @@
+import { User } from "@auth0/auth0-spa-js";
 import { Alert, AlertDescription, AlertTitle, Box, Container, Progress, Text } from "@chakra-ui/react";
-import { ResponsiveAppBar } from "./components/ResponsiveAppBar";
 import {
+   LoaderFunction,
+   Outlet,
+   Route,
    createBrowserRouter,
    createRoutesFromElements,
    isRouteErrorResponse,
    json,
-   LoaderFunction,
-   Outlet,
    redirect,
-   Route,
    useLoaderData,
    useNavigation,
    useRouteError,
 } from "react-router-dom";
-import { Privacy } from "./components/Privacy";
-import { userSubscribeAction } from "./pages/member/MemberInfo/UserSubscribe";
-import { ReportPage, reportPageLoader } from "./pages/Report/ReportPage";
-import { ReportInfoPage, reportInfoPageAction, reportInfoPageLoader } from "./pages/ReportInfoPage/ReportInfoPage";
-import { ResponsibilityPage, responsibilityPageLoader } from "./pages/Responsibility/ResponsibilityPage";
-import { MemberPage, memberPageAction, memberPageLoader } from "./pages/member/MemberPage";
-import {
-   MemberInfoPage,
-   memberInfoPageAction,
-   memberInfoPageLoader,
-   memberRoleAction,
-} from "./pages/member/MemberInfo/MemberInfoPage";
-import { Home, homeLoader } from "./pages/Home";
-import * as React from "react";
-import { contingentAction } from "./pages/member/components/UserInfo";
-import { primaryUserEmailAction } from "./components/SelectPrimaryEmail";
-import { externalUserProvidersAction } from "./pages/member/components/LinkExternalUserToGataUserSelect";
-import { MemberLayout } from "./pages/member/MemberLayout";
-import { client } from "./api/client/client";
-import { IGataUser } from "./types/GataUser.type";
-import {
-   MemberResponsibility,
-   memberResponsibilityAction,
-   memberResponsibilityLoader,
-} from "./pages/member/MemberInfo/MemberResponsibility";
-import {
-   AddResponsibilityUserDialog,
-   addResponsibilityUserDialogLoader,
-} from "./pages/member/components/AddResponsibilityUserDialog";
 import { RouteConfirmFormDialog } from "./RouteConfirmFormDialog";
-import { deleteResponsibilityYearAction } from "./pages/member/MemberInfo/deleteResponsibilityYearAction";
-import { putResponsibilityYearAction } from "./pages/member/MemberInfo/putResponsibilityYearAction";
-import {
-   ResponsibilityDialog,
-   responsibilityDialogAction,
-   responsibilityDialogLoader,
-} from "./pages/Responsibility/ResponsibilityDialog";
-import { deleteResponsibilityAction } from "./pages/Responsibility/deleteResponsibilityAction";
+import { client } from "./api/client/client";
 import { getIsAuthenticated, getRequiredAccessToken, getUser, handleRedirectCallback } from "./auth0Client";
 import {
    GataReportFormDialog,
    gataReportFormDialogAction,
    gataReportFormDialogLoader,
 } from "./components/GataReportFormDialog";
+import { ResponsiveAppBar } from "./components/ResponsiveAppBar";
+import { primaryUserEmailAction } from "./components/SelectPrimaryEmail";
+import { Home, homeLoader } from "./pages/Home";
+import { ReportPage, reportPageLoader } from "./pages/Report/ReportPage";
+import { ReportInfoPage, reportInfoPageAction, reportInfoPageLoader } from "./pages/ReportInfoPage/ReportInfoPage";
 import { deleteReportAction } from "./pages/ReportInfoPage/deleteReportAction";
-import { User } from "@auth0/auth0-spa-js";
+import {
+   ResponsibilityDialog,
+   responsibilityDialogAction,
+   responsibilityDialogLoader,
+} from "./pages/Responsibility/ResponsibilityDialog";
+import { ResponsibilityPage, responsibilityPageLoader } from "./pages/Responsibility/ResponsibilityPage";
+import { deleteResponsibilityAction } from "./pages/Responsibility/deleteResponsibilityAction";
+import {
+   MemberInfoPage,
+   memberInfoPageAction,
+   memberInfoPageLoader,
+   memberRoleAction,
+} from "./pages/member/MemberInfo/MemberInfoPage";
+import {
+   MemberResponsibility,
+   memberResponsibilityAction,
+   memberResponsibilityLoader,
+} from "./pages/member/MemberInfo/MemberResponsibility";
+import { userSubscribeAction } from "./pages/member/MemberInfo/UserSubscribe";
+import { deleteResponsibilityYearAction } from "./pages/member/MemberInfo/deleteResponsibilityYearAction";
+import { putResponsibilityYearAction } from "./pages/member/MemberInfo/putResponsibilityYearAction";
+import { MemberLayout } from "./pages/member/MemberLayout";
+import { MemberPage, memberPageAction, memberPageLoader } from "./pages/member/MemberPage";
+import {
+   AddResponsibilityUserDialog,
+   addResponsibilityUserDialogLoader,
+} from "./pages/member/components/AddResponsibilityUserDialog";
+import { externalUserProvidersAction } from "./pages/member/components/LinkExternalUserToGataUserSelect";
+import { contingentAction } from "./pages/member/components/UserInfo";
+import { IGataUser } from "./types/GataUser.type";
 
 export const rootLoader: LoaderFunction = async ({ request: { signal } }) => {
    const isAuthenticated = await getIsAuthenticated();
@@ -156,7 +154,6 @@ export const router = createBrowserRouter(
                return redirect("/");
             }}
          />
-         <Route path="privacy" element={<Privacy />} />
          <Route path="" loader={homeLoader} element={<Home />}>
             <Route
                path="new"
@@ -242,6 +239,6 @@ export const router = createBrowserRouter(
             </Route>
             <Route path="" loader={memberInfoPageLoader} action={memberInfoPageAction} element={<MemberInfoPage />} />
          </Route>
-      </Route>,
-   ),
+      </Route>
+   )
 );

@@ -1,6 +1,6 @@
 import { Heading, ListItem, OrderedList, Text, UnorderedList } from "@chakra-ui/react";
 import { RenderElementProps } from "slate-react";
-import { SlateImage, Image } from "./Image";
+import { SlateImage, Image, SavingImage } from "./Image";
 
 type RichTextElementProps = {
    outsideContext?: boolean;
@@ -62,6 +62,8 @@ export const RichTextElement = ({ attributes, children, element, outsideContext 
                {children}
             </OrderedList>
          );
+      case "saving-image":
+         return <SavingImage data={element.savingImageData!} oldId={element.imageId!} />;
       case "image":
          return !outsideContext ? (
             <SlateImage attributes={attributes} element={element}>

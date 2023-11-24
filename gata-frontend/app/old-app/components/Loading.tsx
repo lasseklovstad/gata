@@ -18,9 +18,9 @@ export const Loading = ({ response, alertTitle }: LoadingProps) => {
 };
 
 type LoadingButtonProps = {
-   response?: UseClientState<unknown>;
+   isLoading: boolean;
 } & Omit<ButtonProps, "disabled">;
 
-export const LoadingButton = forwardRef<HTMLButtonElement, LoadingButtonProps>(({ response, ...buttonProps }, ref) => {
-   return <Button isLoading={response?.status === "loading"} ref={ref} {...buttonProps} />;
+export const LoadingButton = forwardRef<HTMLButtonElement, LoadingButtonProps>(({ isLoading, ...buttonProps }, ref) => {
+   return <Button isLoading={isLoading} ref={ref} {...buttonProps} />;
 });

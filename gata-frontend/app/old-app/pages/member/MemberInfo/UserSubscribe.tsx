@@ -1,17 +1,6 @@
-import { IGataUser } from "../../../types/GataUser.type";
+import { useFetcher } from "@remix-run/react";
+import type { IGataUser } from "../../../types/GataUser.type";
 import { Box, Button, Text } from "@chakra-ui/react";
-import { ActionFunction, useFetcher } from "react-router-dom";
-import { client } from "../../../api/client/client";
-import { getRequiredAccessToken } from "../../../auth0Client";
-
-export const userSubscribeAction: ActionFunction = async ({ params }) => {
-   const token = await getRequiredAccessToken();
-   await client(`user/${params.memberId}/subscribe`, {
-      method: "PUT",
-      token,
-   });
-   return {};
-};
 
 export interface UserSubscribeProps {
    user: IGataUser;

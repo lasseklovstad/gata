@@ -1,10 +1,13 @@
-import { Editor, Element, Transforms } from "slate";
+import { Editor, Element, Text, Transforms } from "slate";
 
-export const withImages = (editor: Editor, saveImage: (data: string) => Promise<{ id: string } | undefined>) => {
+let counter = 0;
+const generateId = () => (counter++).toString();
+
+export const withImages = (editor: Editor) => {
    const { isVoid, insertData } = editor;
 
    editor.isVoid = (element: Element) => {
-      return element.type === "image" ? true : isVoid(element);
+      return element.type === "image" || element.type === "saving-image" ? true : isVoid(element);
    };
 
    editor.insertData = (data) => {
@@ -19,11 +22,8 @@ export const withImages = (editor: Editor, saveImage: (data: string) => Promise<
             if (mime === "image") {
                reader.addEventListener("load", () => {
                   const url = reader.result;
-                  saveImage(url as string).then((body) => {
-                     if (body) {
-                        insertImage(editor, body.id);
-                     }
-                  });
+                  console.log(url);
+                  typeof url === "string" && insertSavingImage(editor, generateId(), url);
                });
 
                reader.readAsDataURL(file!);
@@ -43,4 +43,25 @@ export const insertImage = (editor: Editor, imageId: string | null) => {
       { type: "body2" as const, children: [text] },
    ];
    Transforms.insertNodes(editor, image);
+};
+
+export const insertSavingImage = (editor: Editor, imageId: string, data: string) => {
+   const text = { text: "" };
+   const image = [
+      { type: "saving-image" as const, imageId, savingImageData: data, size: 50, children: [text] },
+      { type: "body2" as const, children: [text] },
+   ];
+   Transforms.insertNodes(editor, image);
+};
+
+export const replaceSavingImage = (editor: Editor, imageId: string, oldId: string) => {
+   const image = { type: "image" as const, imageId };
+   Transforms.setNodes(editor, image, {
+      at: [],
+      match: (n) => {
+         console.log("Node", n);
+         return !Editor.isEditor(n) && Element.isElement(n) && n.type === "saving-image" && n.imageId === oldId;
+      },
+      mode: "all",
+   });
 };

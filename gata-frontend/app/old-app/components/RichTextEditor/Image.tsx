@@ -1,8 +1,13 @@
+import { Box, ButtonGroup, Image as ChakraImage, IconButton, Skeleton } from "@chakra-ui/react";
 import { Add, Delete, Remove } from "@mui/icons-material";
-import { Box, IconButton, Skeleton, Image as ChakraImage, ButtonGroup } from "@chakra-ui/react";
-import { Transforms, Element } from "slate";
-import { RenderElementProps, useSlateStatic, ReactEditor, useSelected, useFocused } from "slate-react";
-import { useGetGataReportFile } from "../../api/file.api";
+import { useFetcher, useFormAction } from "@remix-run/react";
+import { useEffect } from "react";
+import type { Element } from "slate";
+import { Transforms } from "slate";
+import type { RenderElementProps } from "slate-react";
+import { ReactEditor, useFocused, useSelected, useSlate, useSlateStatic } from "slate-react";
+import type { IGataReportFile } from "~/old-app/types/GataReportFile.type";
+import { replaceSavingImage } from "./withImages";
 
 export const SlateImage = ({ attributes, children, element }: Partial<RenderElementProps>) => {
    const editor = useSlateStatic();
@@ -72,6 +77,7 @@ type ImageProps = {
    selected?: boolean;
    focused?: boolean;
    size?: number;
+   savingImageData?: string;
 };
 
 export const Image = (props: ImageProps) => {
@@ -82,12 +88,17 @@ export const Image = (props: ImageProps) => {
 };
 
 const InternalImage = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
-   const { fileResponse } = useGetGataReportFile(id);
-   const imageSrc = fileResponse.data?.data || fileResponse.data?.cloudUrl;
+   const fetcher = useFetcher<IGataReportFile>();
+
+   useEffect(() => {
+      fetcher.load(`/file/${id}`);
+   }, [id]);
+
+   const imageSrc = fetcher.data?.data || fetcher.data?.cloudUrl;
    return (
       <>
-         {fileResponse.status === "loading" && <Skeleton variant="rectangular" width={400} height={300} />}
-         {fileResponse.data && (
+         {fetcher.state !== "idle" && <Skeleton variant="rectangular" width={400} height={300} />}
+         {fetcher.data && (
             <ChakraImage
                src={imageSrc}
                sx={{
@@ -116,4 +127,22 @@ const ExternalImage = ({ id, selected = false, focused = false, size = 50 }: Ima
          }}
       />
    );
+};
+
+export const SavingImage = ({ data, oldId }: { data: string; oldId: string }) => {
+   const fetcher = useFetcher<{ id: string }>();
+   const action = useFormAction("file");
+   const editor = useSlate();
+
+   useEffect(() => {
+      if (fetcher.type === "init" && fetcher.state === "idle") {
+         console.log("Submit");
+         fetcher.submit({ data }, { action, method: "POST" });
+      }
+      if (fetcher.state === "idle" && fetcher.type === "done" && fetcher.data) {
+         console.log("Done", fetcher.data);
+         replaceSavingImage(editor, fetcher.data.id, oldId);
+      }
+   }, [action, data, editor, fetcher, oldId]);
+   return <Skeleton variant="rectangular" width={400} height={300} />;
 };

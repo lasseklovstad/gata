@@ -3,6 +3,8 @@ package no.gata.web
 import no.gata.web.exception.ExternalUserNotFound
 import no.gata.web.exception.GataUserNoSufficientRole
 import no.gata.web.exception.GataUserNotFound
+import no.gata.web.service.Auth0RestService
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -15,6 +17,8 @@ data class ErrorResponse(val message: String?)
 
 @ControllerAdvice
 class ControllerAdvisor : ResponseEntityExceptionHandler() {
+
+    private var logger = LoggerFactory.getLogger(ControllerAdvisor::class.java)
     @ExceptionHandler(value = [GataUserNotFound::class, ExternalUserNotFound::class])
     protected fun handleNotFound(
             ex: RuntimeException, request: WebRequest): ResponseEntity<ErrorResponse> {
@@ -38,6 +42,7 @@ class ControllerAdvisor : ResponseEntityExceptionHandler() {
             exception: RuntimeException,
             request: WebRequest
     ): ResponseEntity<ErrorResponse> {
+        logger.error(exception)
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponse(exception.message))
     }
 }

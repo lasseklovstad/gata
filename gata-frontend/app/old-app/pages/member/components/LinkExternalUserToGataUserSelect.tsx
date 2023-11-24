@@ -1,22 +1,10 @@
 import { Flex, FormControl, FormHelperText, FormLabel, Text } from "@chakra-ui/react";
-import { IExternalUser, IGataUser } from "../../../types/GataUser.type";
+import type { IExternalUser, IGataUser } from "../../../types/GataUser.type";
 import { ExternalUserIcon } from "../../../components/ExternalUserIcon";
-import { chakraComponents, ChakraStylesConfig, OptionBase, Props, Select } from "chakra-react-select";
-import { ReactNode } from "react";
-import { ActionFunction, useFetcher, useFormAction } from "react-router-dom";
-import { client } from "../../../api/client/client";
-import { getRequiredAccessToken } from "../../../auth0Client";
-
-export const externalUserProvidersAction: ActionFunction = async ({ request }) => {
-   const token = await getRequiredAccessToken();
-   const form = await request.formData();
-   await client<undefined>(`user/${form.get("userId")}/externaluserproviders`, {
-      method: "PUT",
-      body: form.getAll("externalUserId"),
-      token,
-   });
-   return new Response("", { status: 200 });
-};
+import type { ChakraStylesConfig, OptionBase, Props } from "chakra-react-select";
+import { chakraComponents, Select } from "chakra-react-select";
+import type { ReactNode } from "react";
+import { useFetcher, useFormAction } from "@remix-run/react";
 
 type LinkExternalUserToGataUserSelectProps = {
    user: IGataUser;
