@@ -9,10 +9,14 @@ class ResponsibilityFormModal {
   saveButton: Locator;
 
   constructor(page: Page) {
-    this.modal = page.locator("role=dialog[name=/(Ny|Rediger) Ansvarspost/i]");
-    this.nameTextbox = page.locator("role=textbox[name=/Navn/i]");
-    this.descriptionTextbox = page.locator("role=textbox[name=/beskrivelse/i]");
-    this.saveButton = page.locator("role=button[name=/lagre/i]");
+    this.modal = page.getByRole("dialog", {
+      name: /(Ny|Rediger) Ansvarspost/i,
+    });
+    this.nameTextbox = page.getByRole("textbox", { name: "Navn" });
+    this.descriptionTextbox = page.getByRole("textbox", {
+      name: "Beskrivelse",
+    });
+    this.saveButton = page.getByRole("button", { name: "Lagre" });
   }
 }
 
@@ -25,8 +29,8 @@ export class ResponsibilityPage {
   header: GataHeader;
 
   constructor(page: Page) {
-    this.pageTitle = page.locator("role=heading[name=Ansvarsposter]");
-    this.addButton = page.locator("role=link[name=/legg til/i]");
+    this.pageTitle = page.getByRole("heading", { name: "Ansvarsposter" });
+    this.addButton = page.getByRole("link", { name: "Legg til" });
     this.responsibilityFormModal = new ResponsibilityFormModal(page);
     this.confirmDeleteModal = new ConfirmModal(page);
     this.header = new GataHeader(page);
@@ -51,7 +55,9 @@ export class ResponsibilityPage {
   }
 
   async goto() {
+    await this.page.goto("/");
     await this.header.responsibilityLink.click();
+    await expect(this.pageTitle).toBeVisible();
   }
 
   async editResponsibility(
@@ -76,7 +82,7 @@ export class ResponsibilityPage {
   }
 
   async deleteAllResponsibilities() {
-    const items = this.page.locator("role=listitem");
+    const items = this.page.getByRole("listitem");
     const count = await items.count();
     // Iterate backwards
     for (let i = count - 1; i >= 0; i--) {
@@ -89,13 +95,13 @@ export class ResponsibilityPage {
   }
 
   getListItemButtons(listItem: Locator) {
-    const deleteButton = listItem.locator("role=link[name=/slett/i]");
-    const editButton = listItem.locator("role=link[name=/rediger/i]");
+    const deleteButton = listItem.getByRole("link", { name: "Slett" });
+    const editButton = listItem.getByRole("link", { name: "Rediger" });
     return { deleteButton, editButton };
   }
 
   getResponsibilityListItem(name: RegExp | string) {
-    const listItem = this.page.locator("role=listitem", { hasText: name });
+    const listItem = this.page.getByRole("listitem").filter({ hasText: name });
     const buttons = this.getListItemButtons(listItem);
     return { listItem, ...buttons };
   }

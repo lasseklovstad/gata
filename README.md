@@ -14,13 +14,27 @@ Get all remotes: ``git remote -v``
 ``
  git push
 ``
-
-# Apply Database change
+# Database
+## Apply Database change
 ``
 mvn clean install -DskipTests
 mvn liquibase:update
 ``
+
 eller bare start backend :P
+
+## Generate a changelog From Diffs Between a Database and Persistence Entities
+Start med å endre ``diffChangeLogFile`` i `liquibase.properties` til riktig nummer.
+Det kan være fordelaktig å hente ut databasen fra prod og starte docker databasen på riktig port.
+Deretter kjør:
+``
+mvn clean install -DskipTests
+mvn liquibase:diff
+``
+Legg til filen i ``db.changelog-master.xml``
+
+## Generate changelog
+``mvn liquibase:generateChangeLog``
 
 # Domene
 ### domene.shop.no
@@ -74,8 +88,8 @@ dokku postgres:expose gatadatabase
 dokku postgres:unexpose gatadatabase
 
 # Create backup to local machine
-dokku postgres:export gatadatabase > /tmp/gatadatabase-4.export
-scp root@gataersamla.no:/tmp/gatadatabase-4.export C:\pg_dump
+dokku postgres:export gatadatabase > /tmp/gatadatabase-7.export
+scp root@gataersamla.no:/tmp/gatadatabase-7.export C:\pg_dump
 
 # Delete existing backups on server
 ls /tmp
@@ -86,7 +100,7 @@ scp C:\pg_dump\gatadatabase-1.export root@gataersamla.no:/tmp
 dokku postgres:import gatadatabase < /tmp/gatadatabase-1.export
 
 # restore backup to local database for development
-pg_restore -p 5433 -h localhost -d postgres -U postgres gatadatabase-4.export
+pg_restore -p 5433 -h localhost -d postgres -U postgres gatadatabase-7.export
 ````
 
 ## Max upload size nginx
@@ -102,6 +116,10 @@ docker compose --env-file ./.env.prod up --build -d
 
 
 ````
+
+## Kotlin info
+### Lambda
+In Kotlin, lambda always goes in curly braces. https://medium.com/@s.badamestani/lambda-in-kotlin-a6fc055a2c88
 
 
 

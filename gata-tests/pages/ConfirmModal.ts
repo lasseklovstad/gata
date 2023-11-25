@@ -5,8 +5,8 @@ export class ConfirmModal {
   confirmButton: Locator;
 
   constructor(page: Page) {
-    this.modal = page.locator("role=dialog[name=/er du sikker/i]");
-    this.confirmButton = page.locator("role=button[name=/jeg er sikker/i]");
+    this.modal = page.getByRole("dialog", { name: "Er du sikker?" });
+    this.confirmButton = page.getByRole("button", { name: "Jeg er sikker" });
   }
 
   async confirm() {

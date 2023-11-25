@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.client.HttpClientErrorException.BadRequest
 import org.springframework.web.server.ResponseStatusException
 import java.time.Year
 import java.util.*
@@ -68,6 +69,10 @@ class ResponsibilityRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteResponsibility(@PathVariable responsibilityId: String) {
         val responsibility = responsibilityRepository.findById(UUID.fromString(responsibilityId)).orElseThrow { ResponsibilityNotFound(responsibilityId) }
+        val responsibilityYears  = responsibilityYearRepository.findResponsibilityYearsByResponsibility(responsibility)
+        if(responsibilityYears.isNotEmpty()){
+            throw throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Ansvarsposten er i bruk")
+        }
         responsibilityRepository.delete(responsibility)
     }
 

@@ -10,10 +10,7 @@ import no.gata.web.controller.dtoOut.DtoOutResponsibilityYear
 import no.gata.web.exception.ExternalUserNotFound
 import no.gata.web.exception.GataUserNoSufficientRole
 import no.gata.web.exception.GataUserNotFound
-import no.gata.web.models.GataContingent
-import no.gata.web.models.GataUser
-import no.gata.web.models.ResponsibilityNote
-import no.gata.web.models.ResponsibilityYear
+import no.gata.web.models.*
 import no.gata.web.repository.*
 import no.gata.web.service.GataReportService
 import no.gata.web.service.GataUserService
@@ -97,20 +94,24 @@ class GataUserRestController {
     @PreAuthorize("hasAuthority('admin')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteUser(@PathVariable id: String) {
-        val gatUser = gataUserService.getUser(id)
+        val gataUser = gataUserService.getUser(id)
         // Remove all roles
         val roles = gataRoleRepository.findAll()
-        roleService.deleteRoles(gatUser, roles.toSet())
+        roleService.deleteRoles(gataUser, roles.toSet())
                 ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Kunne ikke oppdatere alle roller for bruker")
         // Remove link to external user
-        gatUser.externalUserProviders = gatUser.externalUserProviders.map {
+        gataUser.externalUserProviders = gataUser.externalUserProviders.map {
             it.user = null
             it.primary = false
             it
         }
-        gataUserRepository.save(gatUser)
+        gataUser.reports = gataUser.reports.map{
+            it.createdBy = null
+            it
+        }
+        gataUserRepository.save(gataUser)
         // Delete user
-        gataUserRepository.delete(gatUser)
+        gataUserRepository.delete(gataUser)
     }
 
     @GetMapping("{id}/responsibilityyear")

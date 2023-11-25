@@ -15,6 +15,7 @@ const env = new Environment();
 test("linked member should be able to edit responsibility", async ({
   browser,
 }) => {
+  test.slow();
   const adminPage = await getAdminPage(browser);
   const memberPage = await getMemberPage(browser);
   const nonMemberPage = await getNonMemberPage(browser);

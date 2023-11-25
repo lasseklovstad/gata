@@ -11,13 +11,15 @@ export class GataHeader {
   menu: Locator;
 
   constructor(page: Page) {
-    this.responsibilityLink = page.locator("role=link[name=/ansvarsposter/i]");
-    this.homeLink = page.locator("role=link[name=/Hjem/i]");
-    this.myPageLink = page.locator("role=link[name=/Min side/i]");
-    this.memberLink = page.locator("role=link[name=/medlemmer/i]");
-    this.documentsLink = page.locator("role=link[name=/aktuelle dokumenter/i]");
-    this.menuButton = page.locator("role=button[name=/åpne meny/i]");
-    this.menu = page.locator("role=banner").locator("role=menu");
+    this.responsibilityLink = page.getByRole("link", { name: "Ansvarsposter" });
+    this.homeLink = page.getByRole("link", { name: "Hjem" });
+    this.myPageLink = page.getByRole("link", { name: "Min side" });
+    this.memberLink = page.getByRole("link", { name: "Medlemmer" });
+    this.documentsLink = page.getByRole("link", {
+      name: "Aktuelle dokumenter",
+    });
+    this.menuButton = page.getByRole("button", { name: "Åpne meny" });
+    this.menu = page.getByRole("banner").getByRole("menu");
     this.page = page;
   }
 
@@ -26,7 +28,9 @@ export class GataHeader {
   ) {
     await this.menuButton.click();
     await expect(this.menu).toBeVisible();
-    const roleButton = this.menu.locator("role=menuitem", { hasText: role });
+    const roleButton = this.menu
+      .getByRole("menuitem")
+      .filter({ hasText: role });
     await expect(roleButton).toBeVisible();
     await roleButton.click();
     await expect(this.menu).toBeHidden();
