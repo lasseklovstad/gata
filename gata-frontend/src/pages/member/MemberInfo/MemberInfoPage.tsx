@@ -45,7 +45,7 @@ export const MemberInfoPage = () => {
    const { member, contingentInfo, loggedInUser, roles, notMemberUsers } = useLoaderData() as MemberInfoPageLoaderData;
    const fetcher = useFetcher();
    const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog({
-      text: "Ved å slette mister vi all informasjon knyttet til brukeren",
+      text: "Ved å slette fjernes all historikk for ansvarsposter og kontigent. Knytningen mellom en artikkel laget og brukeren blir også fjernet.",
       onConfirm: () => {
          fetcher.submit(null, { method: "delete" });
       },
