@@ -24,7 +24,7 @@ test("link non member to member and unlink", async ({ browser }) => {
   await assertThatNonMemberIsNotMember(nonMemberPage);
 });
 
-test.only("link non member to member and change primary user", async ({
+test("link non member to member and change primary user", async ({
   browser,
 }) => {
   const adminPage = await getAdminPage(browser);
