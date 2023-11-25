@@ -9,6 +9,12 @@ export const addLinkedUserWithAdmin = async (page: Page) => {
   await memberPage.linkUser(env.nonMemberUsername);
 };
 
+export const changePrimaryUser = async (page: Page, username: string) => {
+  const memberPage = new MemberPage(page);
+  await goToMemberPageWithAdmin(page);
+  await memberPage.changePrimaryUser(username);
+};
+
 const goToMemberPageWithAdmin = async (page: Page) => {
   const memberOverviewPage = new MemberOverviewPage(page);
   const memberPage = new MemberPage(page);

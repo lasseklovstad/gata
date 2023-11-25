@@ -3,6 +3,11 @@ Run local db:
 ``docker run --name gata-db-postgres -e POSTGRES_PASSWORD=password -d -p 5433:5432 postgres:14.2``
 
 legg til env for java: AUTH0_CLIENT_ID=xxx;AUTH0_CLIENT_SECRET=xxx
+
+```bash
+AUTH0_AUDIENCE=https://gataersamla.no;AUTH0_DOMAIN=https://gataersamla.eu.auth0.com;AUTH0_CLIENT_ID=xxx;AUTH0_CLIENT_SECRET=xxxx;GMAIL_PASSWORD=123;GMAIL_USER_NAME=lasse.klovstad@gmail.com;CLOUDINARY_URL=123
+```
+
 ## Local profile
 Legg til profile dev to disable forcing https
 
@@ -78,6 +83,9 @@ dokku letsencrypt:cron-job --add
 
 docker exec "dokku.postgres.gatadatabase" su - postgres -c "dropdb gatadatabase"
 docker exec "dokku.postgres.gatadatabase" su - postgres -c "createdb -E utf8  gatadatabase"
+
+# Recent logs
+dokku logs gata
 ````
 
 ## Connect to db and creating backup
