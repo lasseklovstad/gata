@@ -7,6 +7,7 @@ import { DocumentPage } from "../pages/DocumentPage";
 import { getAdminPage, getMemberPage, getNonMemberPage } from "../utils/page";
 import {
   addLinkedUserWithAdmin,
+  changePrimaryUser,
   removeLinkedUserWithAdmin,
 } from "../utils/linkUser";
 
@@ -15,7 +16,25 @@ test("link non member to member and unlink", async ({ browser }) => {
   const adminPage = await getAdminPage(browser);
   await addLinkedUserWithAdmin(adminPage);
   const nonMemberPage = await getNonMemberPage(browser);
-  await assertThatNonMemberIsLinked(nonMemberPage);
+  await assertThatNonMemberIsLinked(nonMemberPage, env.memberUsername);
+
+  await removeLinkedUserWithAdmin(adminPage);
+
+  await assertThatNonMemberIsNotMember(nonMemberPage);
+});
+
+test("link non member to member and change primary user", async ({
+  browser,
+}) => {
+  const adminPage = await getAdminPage(browser);
+  await addLinkedUserWithAdmin(adminPage);
+  const nonMemberPage = await getNonMemberPage(browser);
+
+  await assertThatNonMemberIsLinked(nonMemberPage, env.memberUsername);
+  await changePrimaryUser(adminPage, env.nonMemberUsername);
+  await assertThatNonMemberIsLinked(nonMemberPage, env.nonMemberUsername);
+  // Change back
+  await changePrimaryUser(adminPage, env.memberUsername);
 
   await removeLinkedUserWithAdmin(adminPage);
 
@@ -89,7 +108,10 @@ const assertThatNonMemberIsNotMember = async (page: Page) => {
   await header.validateRoleInMenu("ingen");
 };
 
-const assertThatNonMemberIsLinked = async (page: Page) => {
+const assertThatNonMemberIsLinked = async (
+  page: Page,
+  primaryUsername: string
+) => {
   const memberPage = new MemberPage(page);
   const header = new GataHeader(page);
 
@@ -97,5 +119,5 @@ const assertThatNonMemberIsLinked = async (page: Page) => {
   await page.goto("/");
   await header.validateRoleInMenu("medlem");
   await header.myPageLink.click();
-  await memberPage.assertPrimaryEmail(env.memberUsername);
+  await memberPage.assertPrimaryEmail(primaryUsername);
 };
