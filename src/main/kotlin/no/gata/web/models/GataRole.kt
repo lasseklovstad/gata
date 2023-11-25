@@ -14,5 +14,5 @@ class GataRole (
         var name: String = "",
         @ManyToMany(mappedBy = "roles")
         @JsonIgnore
-        var users: List<GataUser>? = emptyList()
+        var users: List<GataUser> = emptyList()
 )
