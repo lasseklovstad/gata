@@ -1,5 +1,4 @@
-import { Browser, expect, Page, test } from "@playwright/test";
-import { MemberOverviewPage } from "../pages/MemberOverviewPage";
+import { expect, Page, test } from "@playwright/test";
 import { Environment } from "../pages/Environment";
 import { MemberPage } from "../pages/MemberPage";
 import { GataHeader } from "../pages/GataHeader";
