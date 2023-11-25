@@ -1,10 +1,10 @@
-import { IExternalUser, IGataUser } from "../types/GataUser.type";
 import { Flex, FormControl, FormHelperText, FormLabel } from "@chakra-ui/react";
-import { chakraComponents, OptionBase, Props, Select } from "chakra-react-select";
-import { ExternalUserIcon } from "./ExternalUserIcon";
-import { ActionFunction, useFetcher, useFormAction } from "react-router-dom";
+import { OptionBase, Props, Select, chakraComponents } from "chakra-react-select";
+import { ActionFunction, useFetcher } from "react-router-dom";
 import { client } from "../api/client/client";
 import { getRequiredAccessToken } from "../auth0Client";
+import { IExternalUser, IGataUser } from "../types/GataUser.type";
+import { ExternalUserIcon } from "./ExternalUserIcon";
 
 export const primaryUserEmailAction: ActionFunction = async ({ request, params }) => {
    const token = await getRequiredAccessToken();
@@ -23,7 +23,6 @@ type SelectPrimaryEmailProps = {
 
 export const SelectPrimaryEmail = ({ user }: SelectPrimaryEmailProps) => {
    const fetcher = useFetcher();
-   const action = useFormAction();
 
    const options = user.externalUserProviders.map((user) => ({
       label: user.email,
@@ -44,7 +43,7 @@ export const SelectPrimaryEmail = ({ user }: SelectPrimaryEmailProps) => {
                onChange={(option) => {
                   fetcher.submit(
                      { primaryUserEmail: option?.value || "" },
-                     { action: `${action}/primaryUserEmail`, method: "post" }
+                     { action: "primaryUserEmail", method: "post" }
                   );
                }}
                options={options}

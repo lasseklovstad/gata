@@ -1,5 +1,8 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { selectComboboxOption } from "../utils/combobox";
+import {
+  selectComboBoxOption,
+  selectSingleComboBoxOption,
+} from "../utils/combobox";
 import { ConfirmModal } from "./ConfirmModal";
 
 class MemberResponsibilityModal {
@@ -21,8 +24,8 @@ class MemberResponsibilityModal {
 
   async fillForm(name: string, year: string) {
     await expect(this.modal).toBeVisible();
-    await selectComboboxOption(this.page, this.responsibilityCombobox, name);
-    await selectComboboxOption(this.page, this.yearCombobox, year);
+    await selectComboBoxOption(this.page, this.responsibilityCombobox, name);
+    await selectComboBoxOption(this.page, this.yearCombobox, year);
     await this.saveButton.click();
     await expect(this.modal).toBeHidden();
   }
@@ -31,6 +34,7 @@ class MemberResponsibilityModal {
 export class MemberPage {
   pageTitle: Locator;
   linkUserSelect: Locator;
+  primaryUserSelect: Locator;
   page: Page;
   responsibilityModal: MemberResponsibilityModal;
   addResponsibilityButton: Locator;
@@ -44,6 +48,9 @@ export class MemberPage {
     this.pageTitle = page.getByRole("heading", { name: "Informasjon" });
     this.linkUserSelect = page.getByRole("combobox", {
       name: "Epost tilknytninger",
+    });
+    this.primaryUserSelect = page.getByRole("combobox", {
+      name: "Primær epost",
     });
     this.responsibilityModal = new MemberResponsibilityModal(page);
     this.addResponsibilityButton = page.getByRole("link", {
@@ -66,8 +73,13 @@ export class MemberPage {
   }
 
   async linkUser(name: string) {
-    await selectComboboxOption(this.page, this.linkUserSelect, name);
+    await selectComboBoxOption(this.page, this.linkUserSelect, name);
     await expect(this.getRemoveLinkedUserButton(name)).toBeVisible();
+  }
+
+  async changePrimaryUser(name: string) {
+    await selectSingleComboBoxOption(this.page, this.primaryUserSelect, name);
+    await expect(this.page.getByText(`Navn: ${name}`)).toBeVisible();
   }
 
   async removeLinkedUser(name: string) {
