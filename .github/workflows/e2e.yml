@@ -9,11 +9,58 @@ on:
 
 
 jobs:
+  lint-fe:
+    name: Lint Frontend
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Download deps
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: gata-frontend
+
+      - name: Run frontend tests
+        working-directory: gata-frontend
+        run: |
+          npm run lint:ci
+  knip-fe:
+    name: Knip Frontend
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Download deps
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: gata-frontend
+
+      - name: Run frontend tests
+        working-directory: gata-frontend
+        run: |
+          npm run knip          
+
   playwright:
     runs-on: ubuntu-latest
     steps:
       - name: Cloning repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup node
         uses: actions/setup-node@v4

@@ -1,6 +1,7 @@
 import { Avatar, Box, Divider, Flex, Text } from "@chakra-ui/react";
-import { IGataUser } from "../../../types/GataUser.type";
+
 import { ListItemLink } from "../../../components/ListItemLink";
+import { IGataUser } from "../../../types/GataUser.type";
 
 type UserListItemProps = {
    user: IGataUser;

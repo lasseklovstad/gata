@@ -1,7 +1,8 @@
-import { Add, Delete, Remove } from "@mui/icons-material";
 import { Box, IconButton, Skeleton, Image as ChakraImage, ButtonGroup } from "@chakra-ui/react";
+import { Add, Delete, Remove } from "@mui/icons-material";
 import { Transforms, Element } from "slate";
 import { RenderElementProps, useSlateStatic, ReactEditor, useSelected, useFocused } from "slate-react";
+
 import { useGetGataReportFile } from "../../api/file.api";
 
 export const SlateImage = ({ attributes, children, element }: Partial<RenderElementProps>) => {
@@ -15,11 +16,11 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
          {children}
 
          <Box contentEditable={false} position="relative">
-            <Image id={element?.imageId!} selected={selected} focused={focused} size={element?.size} />
+            <Image id={element?.imageId || ""} selected={selected} focused={focused} size={element?.size} />
 
             <IconButton
                onMouseDown={(ev) => ev.preventDefault()}
-               onClick={(ev) => {
+               onClick={() => {
                   Transforms.removeNodes(editor, { at: path });
                }}
                sx={{
@@ -44,7 +45,7 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
                {element?.size && element.size > 10 && (
                   <IconButton
                      onMouseDown={(ev) => ev.preventDefault()}
-                     onClick={(ev) => {
+                     onClick={() => {
                         Transforms.setNodes<Element>(editor, { type: "image", size: (element?.size || 0) - 10 });
                      }}
                      icon={<Remove />}
@@ -54,7 +55,7 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
                {element?.size && element.size < 100 && (
                   <IconButton
                      onMouseDown={(ev) => ev.preventDefault()}
-                     onClick={(ev) => {
+                     onClick={() => {
                         Transforms.setNodes<Element>(editor, { type: "image", size: (element?.size || 0) + 10 });
                      }}
                      icon={<Add />}

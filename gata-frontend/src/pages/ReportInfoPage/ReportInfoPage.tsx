@@ -1,18 +1,19 @@
-import { Delete, Edit } from "@mui/icons-material";
 import { Box, Button, Heading, IconButton, Text } from "@chakra-ui/react";
+import { Delete, Edit } from "@mui/icons-material";
 import { useState } from "react";
 import { ActionFunction, json, Link, LoaderFunction, Outlet, useLoaderData, useSubmit } from "react-router-dom";
+import { Descendant } from "slate";
+
+import { PublishButton } from "./PublishButton";
+import { client } from "../../api/client/client";
 import { usePutGataReportContent } from "../../api/report.api";
+import { getRequiredAccessToken } from "../../auth0Client";
 import { PageLayout } from "../../components/PageLayout";
 import { RichTextEditor } from "../../components/RichTextEditor/RichTextEditor";
 import { RichTextPreview } from "../../components/RichTextEditor/RichTextPreview";
-import { IGataReport } from "../../types/GataReport.type";
-import { getRequiredAccessToken } from "../../auth0Client";
-import { client } from "../../api/client/client";
-import { IGataUser } from "../../types/GataUser.type";
-import { Descendant } from "slate";
-import { PublishButton } from "./PublishButton";
 import { isAdmin } from "../../components/useRoles";
+import { IGataReport } from "../../types/GataReport.type";
+import { IGataUser } from "../../types/GataUser.type";
 
 export const reportInfoPageLoader: LoaderFunction = async ({ request: { signal }, params }) => {
    const token = await getRequiredAccessToken();

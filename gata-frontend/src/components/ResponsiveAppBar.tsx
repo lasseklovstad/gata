@@ -1,8 +1,4 @@
-import * as React from "react";
-import { Link } from "react-router-dom";
-import { UserMenu } from "./UserMenu";
-import { isAdmin, isMember } from "./useRoles";
-import MenuIcon from "@mui/icons-material/Menu";
+import { User } from "@auth0/auth0-spa-js";
 import {
    Box,
    Button,
@@ -16,8 +12,12 @@ import {
    MenuList,
    Text,
 } from "@chakra-ui/react";
+import MenuIcon from "@mui/icons-material/Menu";
+import { Link } from "react-router-dom";
+
+import { UserMenu } from "./UserMenu";
+import { isAdmin, isMember } from "./useRoles";
 import { IGataUser } from "../types/GataUser.type";
-import { User } from "@auth0/auth0-spa-js";
 
 type ResponsiveAppBarProps = {
    loggedInUser: IGataUser | undefined;

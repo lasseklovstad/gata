@@ -1,6 +1,7 @@
 import { User } from "@auth0/auth0-spa-js";
 import { Text, Button, IconButton, Menu, MenuItem, Avatar, MenuList, MenuButton } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+
 import { loginWithRedirect, logout } from "../auth0Client";
 
 type UserMenuProps = {
@@ -10,8 +11,8 @@ type UserMenuProps = {
 };
 
 export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => {
-   const handleLogout = () => {
-      logout();
+   const handleLogout = async () => {
+      await logout();
    };
 
    return (

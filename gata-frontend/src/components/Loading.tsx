@@ -1,7 +1,8 @@
 import { CircularProgress, ButtonProps, Button } from "@chakra-ui/react";
-import { UseClientState } from "../api/client/client.types";
-import { ErrorAlert } from "./ErrorAlert";
 import { forwardRef } from "react";
+
+import { ErrorAlert } from "./ErrorAlert";
+import { UseClientState } from "../api/client/client.types";
 
 type LoadingProps = {
    response: UseClientState<unknown>;

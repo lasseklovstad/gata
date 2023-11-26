@@ -12,14 +12,15 @@ import {
    Select,
    Text,
 } from "@chakra-ui/react";
-import { IGataUser } from "../../../types/GataUser.type";
 import { useState } from "react";
-import { isAdmin, isMember } from "../../../components/useRoles";
-import { SelectPrimaryEmail } from "../../../components/SelectPrimaryEmail";
 import { ActionFunction, useFetcher } from "react-router-dom";
+
 import { client } from "../../../api/client/client";
-import { IContingentInfo } from "../../../types/ContingentInfo.type";
 import { getRequiredAccessToken } from "../../../auth0Client";
+import { SelectPrimaryEmail } from "../../../components/SelectPrimaryEmail";
+import { isAdmin, isMember } from "../../../components/useRoles";
+import { IContingentInfo } from "../../../types/ContingentInfo.type";
+import { IGataUser } from "../../../types/GataUser.type";
 
 type UserInfoProps = {
    user: IGataUser;

@@ -1,14 +1,15 @@
-import { Add } from "@mui/icons-material";
 import { Box, Button, Divider, Heading, List, ListItem, Text } from "@chakra-ui/react";
+import { Add } from "@mui/icons-material";
 import { json, Link, LoaderFunction, Outlet, useLoaderData } from "react-router-dom";
+
+import { client } from "../../api/client/client";
+import { getRequiredAccessToken } from "../../auth0Client";
+import { ListItemLink } from "../../components/ListItemLink";
 import { PageLayout } from "../../components/PageLayout";
 import { isAdmin } from "../../components/useRoles";
-import { ListItemLink } from "../../components/ListItemLink";
-import { getRequiredAccessToken } from "../../auth0Client";
-import { client } from "../../api/client/client";
+import { IGataReportSimple } from "../../types/GataReport.type";
 import { IGataUser } from "../../types/GataUser.type";
 import { Page } from "../../types/Page.type";
-import { IGataReportSimple } from "../../types/GataReport.type";
 
 export const reportPageLoader: LoaderFunction = async ({ request: { signal } }) => {
    const token = await getRequiredAccessToken();

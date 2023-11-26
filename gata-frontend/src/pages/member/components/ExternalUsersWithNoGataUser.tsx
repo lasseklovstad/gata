@@ -1,4 +1,5 @@
 import { Heading, List, ListItem } from "@chakra-ui/react";
+
 import { ExternalUsersWithNoGataUserListItem } from "./ExternalUsersWithNoGataUserListItem";
 import { IExternalUser } from "../../../types/GataUser.type";
 

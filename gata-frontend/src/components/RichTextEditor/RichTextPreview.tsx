@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Descendant, Element } from "slate";
+
 import { RichTextElement } from "./RichTextElement";
 import { RichTextLeaf } from "./RichTextLeaf";
 

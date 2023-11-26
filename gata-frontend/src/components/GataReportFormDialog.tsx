@@ -1,6 +1,3 @@
-import { Save } from "@mui/icons-material";
-import { useState } from "react";
-import { GataReportType, IGataReportSimple } from "../types/GataReport.type";
 import {
    Button,
    FormControl,
@@ -15,6 +12,8 @@ import {
    ModalOverlay,
    Textarea,
 } from "@chakra-ui/react";
+import { Save } from "@mui/icons-material";
+import { useState } from "react";
 import {
    ActionFunction,
    json,
@@ -24,8 +23,10 @@ import {
    useLoaderData,
    useNavigate,
 } from "react-router-dom";
-import { getRequiredAccessToken } from "../auth0Client";
+
 import { client } from "../api/client/client";
+import { getRequiredAccessToken } from "../auth0Client";
+import { GataReportType, IGataReportSimple } from "../types/GataReport.type";
 
 export const gataReportFormDialogLoader: LoaderFunction = async ({ request: { signal }, params }) => {
    const token = await getRequiredAccessToken();

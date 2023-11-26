@@ -1,7 +1,7 @@
 import { ListItem } from "@chakra-ui/react";
 import { Link, LinkProps } from "react-router-dom";
 
-type ListItemLinkProps = {} & Pick<LinkProps, "to" | "children">;
+type ListItemLinkProps = Pick<LinkProps, "to" | "children">;
 
 export const ListItemLink = ({ to, children }: ListItemLinkProps) => {
    return (

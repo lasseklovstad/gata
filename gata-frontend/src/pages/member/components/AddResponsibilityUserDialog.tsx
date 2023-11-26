@@ -1,5 +1,3 @@
-import { Save } from "@mui/icons-material";
-import { useState } from "react";
 import {
    Button,
    FormControl,
@@ -11,13 +9,16 @@ import {
    ModalHeader,
    ModalOverlay,
 } from "@chakra-ui/react";
+import { Save } from "@mui/icons-material";
 import { Select } from "chakra-react-select";
-import { IResponsibility } from "../../../types/Responsibility.type";
+import { useState } from "react";
 import { json, Link, LoaderFunction, useFetcher, useLoaderData, useNavigate } from "react-router-dom";
+
 import { client } from "../../../api/client/client";
 import { getRequiredAccessToken } from "../../../auth0Client";
+import { IResponsibility } from "../../../types/Responsibility.type";
 
-export const addResponsibilityUserDialogLoader: LoaderFunction = async ({ request: { signal }, params }) => {
+export const addResponsibilityUserDialogLoader: LoaderFunction = async ({ request: { signal } }) => {
    const token = await getRequiredAccessToken();
    const responsibilities = await client<IResponsibility[]>("responsibility", {
       token,

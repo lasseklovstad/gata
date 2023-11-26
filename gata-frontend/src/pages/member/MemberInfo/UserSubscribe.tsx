@@ -1,8 +1,9 @@
-import { IGataUser } from "../../../types/GataUser.type";
 import { Box, Button, Text } from "@chakra-ui/react";
 import { ActionFunction, useFetcher } from "react-router-dom";
+
 import { client } from "../../../api/client/client";
 import { getRequiredAccessToken } from "../../../auth0Client";
+import { IGataUser } from "../../../types/GataUser.type";
 
 export const userSubscribeAction: ActionFunction = async ({ params }) => {
    const token = await getRequiredAccessToken();
@@ -13,7 +14,7 @@ export const userSubscribeAction: ActionFunction = async ({ params }) => {
    return {};
 };
 
-export interface UserSubscribeProps {
+interface UserSubscribeProps {
    user: IGataUser;
 }
 

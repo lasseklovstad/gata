@@ -1,3 +1,4 @@
+import { Box, Button, ButtonGroup, Divider } from "@chakra-ui/react";
 import {
    FormatBold,
    FormatItalic,
@@ -6,21 +7,21 @@ import {
    FormatUnderlined,
    Save,
 } from "@mui/icons-material";
-import { Box, Button, ButtonGroup, Divider } from "@chakra-ui/react";
 import { useCallback, useMemo, useRef } from "react";
 import { createEditor, Descendant } from "slate";
 import { withHistory } from "slate-history";
 import { Editable, RenderElementProps, RenderLeafProps, Slate, withReact } from "slate-react";
-import { UseClientState } from "../../api/client/client.types";
-import { Loading, LoadingButton } from "../Loading";
+
+import { AddImage } from "./AddImage";
 import { BlockButton } from "./BlockButton";
-import { insertImage, withImages } from "./withImages";
 import { MarkButton } from "./MarkButton";
 import { insertTab, toggleMark } from "./RichTextEditor.util";
 import { RichTextElement } from "./RichTextElement";
 import { RichTextLeaf } from "./RichTextLeaf";
+import { insertImage, withImages } from "./withImages";
+import { UseClientState } from "../../api/client/client.types";
 import { usePostGataReportFile } from "../../api/file.api";
-import { AddImage } from "./AddImage";
+import { Loading, LoadingButton } from "../Loading";
 
 type RichTextEditorProps = {
    onCancel: () => void;

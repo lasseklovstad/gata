@@ -1,9 +1,10 @@
-import { IGataReport } from "../types/GataReport.type";
-import { RichTextPreview } from "./RichTextEditor/RichTextPreview";
-import { Link } from "react-router-dom";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
-import { IGataUser } from "../types/GataUser.type";
+import { Link } from "react-router-dom";
+
+import { RichTextPreview } from "./RichTextEditor/RichTextPreview";
 import { isAdmin } from "./useRoles";
+import { IGataReport } from "../types/GataReport.type";
+import { IGataUser } from "../types/GataUser.type";
 
 type NewsItemProps = {
    report: IGataReport;

@@ -1,4 +1,5 @@
 import { ActionFunction, redirect } from "react-router-dom";
+
 import { client } from "../../../api/client/client";
 import { getRequiredAccessToken } from "../../../auth0Client";
 
@@ -7,7 +8,7 @@ export const putResponsibilityYearAction: ActionFunction = async ({ request, par
 
    if (request.method === "PUT") {
       const body = Object.fromEntries(await request.formData());
-      client(`user/${params.memberId}/responsibilityyear/${params.responsibilityYearId}/note`, {
+      await client(`user/${params.memberId}/responsibilityyear/${params.responsibilityYearId}/note`, {
          method: "PUT",
          body,
          token,

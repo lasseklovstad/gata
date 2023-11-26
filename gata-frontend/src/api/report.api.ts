@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import { Descendant } from "slate";
-import { IGataReport } from "../types/GataReport.type";
+
 import { useClient } from "./client/useClient";
+import { IGataReport } from "../types/GataReport.type";
 
 export const useGetReportEmails = () => {
    const [emailsResponse, clientFetch] = useClient<string[], never>();
 
    useEffect(() => {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       clientFetch(`report/publishemails`);
    }, [clientFetch]);
 
