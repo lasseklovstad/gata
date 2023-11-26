@@ -1,4 +1,3 @@
-import { Image } from "@mui/icons-material";
 import {
    Button,
    FormControl,
@@ -13,6 +12,7 @@ import {
    ModalOverlay,
    Textarea,
 } from "@chakra-ui/react";
+import { Image } from "@mui/icons-material";
 import { useState } from "react";
 
 type AddImageProps = {

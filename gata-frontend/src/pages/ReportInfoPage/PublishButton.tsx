@@ -1,6 +1,7 @@
-import { useConfirmDialog } from "../../components/ConfirmDialog";
-import { useGetReportEmails, usePublishReport } from "../../api/report.api";
 import { Email } from "@mui/icons-material";
+
+import { useGetReportEmails, usePublishReport } from "../../api/report.api";
+import { useConfirmDialog } from "../../components/ConfirmDialog";
 import { LoadingButton } from "../../components/Loading";
 
 type PublishButtonProps = {
@@ -15,7 +16,7 @@ export const PublishButton = ({ reportId }: PublishButtonProps) => {
       useConfirmDialog({
          text: `Er du sikker du vil sende e-post til disse brukerne: ${emails.join(", ")}?`,
          onConfirm: async () => {
-            publish();
+            await publish();
          },
       });
    const { openConfirmDialog: openConfirmPublish, ConfirmDialogComponent: ConfirmPublishDialog } = useConfirmDialog({

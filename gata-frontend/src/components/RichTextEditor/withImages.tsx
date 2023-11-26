@@ -17,9 +17,9 @@ export const withImages = (editor: Editor, saveImage: (data: string) => Promise<
             const [mime] = file!.type.split("/");
 
             if (mime === "image") {
-               reader.addEventListener("load", () => {
+               reader.addEventListener("load", async () => {
                   const url = reader.result;
-                  saveImage(url as string).then((body) => {
+                  await saveImage(url as string).then((body) => {
                      if (body) {
                         insertImage(editor, body.id);
                      }

@@ -1,5 +1,6 @@
 import { Heading, ListItem, OrderedList, Text, UnorderedList } from "@chakra-ui/react";
 import { RenderElementProps } from "slate-react";
+
 import { SlateImage, Image } from "./Image";
 
 type RichTextElementProps = {
@@ -68,7 +69,7 @@ export const RichTextElement = ({ attributes, children, element, outsideContext 
                {children}
             </SlateImage>
          ) : (
-            <Image id={element?.imageId!} size={element?.size} />
+            <Image id={element?.imageId || ""} size={element?.size} />
          );
       default:
          return (

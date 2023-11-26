@@ -1,13 +1,14 @@
-import { PageLayout } from "../components/PageLayout";
-import { News } from "../components/News";
-import { isMember } from "../components/useRoles";
 import { Heading, Text } from "@chakra-ui/react";
-import { IGataUser } from "../types/GataUser.type";
 import { json, LoaderFunction, useLoaderData } from "react-router-dom";
-import { IGataReport } from "../types/GataReport.type";
-import { Page } from "../types/Page.type";
+
 import { client } from "../api/client/client";
 import { getAccessToken, getIsAuthenticated } from "../auth0Client";
+import { News } from "../components/News";
+import { PageLayout } from "../components/PageLayout";
+import { isMember } from "../components/useRoles";
+import { IGataReport } from "../types/GataReport.type";
+import { IGataUser } from "../types/GataUser.type";
+import { Page } from "../types/Page.type";
 
 export const homeLoader: LoaderFunction = async ({ request: { signal, url } }) => {
    const isAuthenticated = await getIsAuthenticated();

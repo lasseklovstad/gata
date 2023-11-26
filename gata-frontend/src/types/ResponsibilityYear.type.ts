@@ -1,6 +1,6 @@
+import { ISimpleGataUser } from "./GataUser.type";
 import { IResponsibility } from "./Responsibility.type";
 import { IResponsibilityNote } from "./ResponsibilityNote.type";
-import { ISimpleGataUser } from "./GataUser.type";
 
 export interface IResponsibilityYear {
    id: string;

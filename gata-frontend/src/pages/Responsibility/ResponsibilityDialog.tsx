@@ -1,4 +1,3 @@
-import { Save } from "@mui/icons-material";
 import {
    Button,
    FormControl,
@@ -13,8 +12,8 @@ import {
    ModalOverlay,
    Textarea,
 } from "@chakra-ui/react";
+import { Save } from "@mui/icons-material";
 import { useState } from "react";
-import { IResponsibility } from "../../types/Responsibility.type";
 import {
    ActionFunction,
    json,
@@ -24,8 +23,10 @@ import {
    useLoaderData,
    useNavigate,
 } from "react-router-dom";
+
 import { client } from "../../api/client/client";
 import { getRequiredAccessToken } from "../../auth0Client";
+import { IResponsibility } from "../../types/Responsibility.type";
 
 export const responsibilityDialogLoader: LoaderFunction = async ({ request: { signal }, params }) => {
    const token = await getRequiredAccessToken();

@@ -1,5 +1,5 @@
-import { IExternalUser } from "../types/GataUser.type";
 import { ExternalUserIcon } from "./ExternalUserIcon";
+import { IExternalUser } from "../types/GataUser.type";
 
 type ExternalUserMenuItemProps = {
    user: IExternalUser;

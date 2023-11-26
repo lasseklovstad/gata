@@ -1,5 +1,5 @@
-import { RenderLeafProps } from "slate-react";
 import { Text } from "@chakra-ui/react";
+import { RenderLeafProps } from "slate-react";
 
 export const RichTextLeaf = ({ leaf, attributes, children }: Partial<RenderLeafProps>) => {
    return (

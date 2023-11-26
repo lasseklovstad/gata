@@ -1,8 +1,9 @@
+import { Modal, ModalBody, ModalFooter, ModalHeader, ModalOverlay, Button, ModalContent } from "@chakra-ui/react";
 import { useState } from "react";
-import { UseClientState } from "../api/client/client.types";
+
 import { ErrorAlert } from "./ErrorAlert";
 import { LoadingButton } from "./Loading";
-import { Modal, ModalBody, ModalFooter, ModalHeader, ModalOverlay, Button, ModalContent } from "@chakra-ui/react";
+import { UseClientState } from "../api/client/client.types";
 
 type ConfirmDialogProps = {
    onClose: () => void;

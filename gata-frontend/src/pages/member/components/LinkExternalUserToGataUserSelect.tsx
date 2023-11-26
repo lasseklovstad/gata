@@ -1,7 +1,17 @@
 import { Flex, FormControl, FormHelperText, FormLabel, Text } from "@chakra-ui/react";
-import { ChakraStylesConfig, OptionBase, Props, Select, chakraComponents } from "chakra-react-select";
+import {
+   ChakraStylesConfig,
+   MultiValueProps,
+   MultiValueRemoveProps,
+   OptionBase,
+   OptionProps,
+   Props,
+   Select,
+   chakraComponents,
+} from "chakra-react-select";
 import { ReactNode } from "react";
 import { ActionFunction, useFetcher } from "react-router-dom";
+
 import { client } from "../../../api/client/client";
 import { getRequiredAccessToken } from "../../../auth0Client";
 import { ExternalUserIcon } from "../../../components/ExternalUserIcon";
@@ -28,7 +38,7 @@ export const LinkExternalUserToGataUserSelect = ({
    notMemberUsers,
 }: LinkExternalUserToGataUserSelectProps) => {
    const fetcher = useFetcher();
-   const handleChange: Props<ColorOption, true>["onChange"] = async (options) => {
+   const handleChange: Props<ColorOption, true>["onChange"] = (options) => {
       const userIds = options.map((o) => o.value);
       const formData = new FormData();
       formData.set("userId", id);
@@ -76,20 +86,20 @@ interface ColorOption extends OptionBase {
    isClearable: boolean;
 }
 
-const customComponents: Props<ColorOption, true, never>["components"] = {
-   Option: ({ children, ...props }) => (
+const customComponents = {
+   Option: ({ children, ...props }: OptionProps<ColorOption, true, never>) => (
       <chakraComponents.Option {...props}>
          {props.data.icon} {children}
       </chakraComponents.Option>
    ),
-   MultiValue: ({ children, ...props }) => (
+   MultiValue: ({ children, ...props }: MultiValueProps<ColorOption, true, never>) => (
       <chakraComponents.MultiValue {...props}>
          <Flex alignItems="center">
             {props.data.icon} <Text>{children}</Text>
          </Flex>
       </chakraComponents.MultiValue>
    ),
-   MultiValueRemove: (props) => (
+   MultiValueRemove: (props: MultiValueRemoveProps<ColorOption, true, never>) => (
       <chakraComponents.MultiValueRemove
          {...props}
          innerProps={{ ...props.innerProps, "aria-label": `Fjern ${props.data.label}` }}

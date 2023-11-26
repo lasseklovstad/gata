@@ -1,17 +1,18 @@
 import { Box, Button, Heading, List, ListItem, Tooltip } from "@chakra-ui/react";
-import { useClearUserCache } from "../../api/user.api";
-import { Loading, LoadingButton } from "../../components/Loading";
-import { isAdmin } from "../../components/useRoles";
-import { PageLayout } from "../../components/PageLayout";
-import { useConfirmDialog } from "../../components/ConfirmDialog";
 import { Email } from "@mui/icons-material";
-import { usePublishKontigentReport } from "../../api/contingent.api";
-import { UserListItem } from "./components/UserListItem";
+import { ActionFunction, LoaderFunction, useLoaderData, useRevalidator } from "react-router-dom";
+
 import { ExternalUsersWithNoGataUser } from "./components/ExternalUsersWithNoGataUser";
-import { ActionFunction, LoaderFunction, useLoaderData, useRevalidator, useSubmit } from "react-router-dom";
+import { UserListItem } from "./components/UserListItem";
 import { client } from "../../api/client/client";
-import { IExternalUser, IGataUser } from "../../types/GataUser.type";
+import { usePublishKontigentReport } from "../../api/contingent.api";
+import { useClearUserCache } from "../../api/user.api";
 import { getRequiredAccessToken } from "../../auth0Client";
+import { useConfirmDialog } from "../../components/ConfirmDialog";
+import { Loading, LoadingButton } from "../../components/Loading";
+import { PageLayout } from "../../components/PageLayout";
+import { isAdmin } from "../../components/useRoles";
+import { IExternalUser, IGataUser } from "../../types/GataUser.type";
 
 export const memberPageLoader: LoaderFunction = async ({ request: { signal } }) => {
    const token = await getRequiredAccessToken();

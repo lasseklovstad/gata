@@ -1,12 +1,13 @@
 import { Accordion, Alert, AlertDescription, AlertTitle, Box, Button, Heading, Text } from "@chakra-ui/react";
 import { Add } from "@mui/icons-material";
-import { ResponsibilityForm } from "../components/ResponsibilityForm";
-import { isAdmin, isMember } from "../../../components/useRoles";
-import { IResponsibilityYear } from "../../../types/ResponsibilityYear.type";
 import { ActionFunction, json, Link, LoaderFunction, Outlet, redirect, useLoaderData } from "react-router-dom";
+
 import { client } from "../../../api/client/client";
-import { IGataUser } from "../../../types/GataUser.type";
 import { getRequiredAccessToken } from "../../../auth0Client";
+import { isAdmin, isMember } from "../../../components/useRoles";
+import { IGataUser } from "../../../types/GataUser.type";
+import { IResponsibilityYear } from "../../../types/ResponsibilityYear.type";
+import { ResponsibilityForm } from "../components/ResponsibilityForm";
 
 export const memberResponsibilityLoader: LoaderFunction = async ({ request: { signal }, params }) => {
    const token = await getRequiredAccessToken();

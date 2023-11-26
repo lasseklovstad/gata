@@ -1,6 +1,7 @@
-import { Facebook, Google, Security } from "@mui/icons-material";
-import { IExternalUser } from "../types/GataUser.type";
 import { Icon, IconProps } from "@chakra-ui/react";
+import { Facebook, Google, Security } from "@mui/icons-material";
+
+import { IExternalUser } from "../types/GataUser.type";
 
 type ExternalUserIconProps = {
    user: IExternalUser;

@@ -1,16 +1,17 @@
 import { Avatar, Box, Button, Divider, Flex, Heading, IconButton, List, ListItem } from "@chakra-ui/react";
+import { Delete } from "@mui/icons-material";
 import { ActionFunction, json, LoaderFunction, redirect, useFetcher, useLoaderData } from "react-router-dom";
-import { UserInfo } from "../components/UserInfo";
+
+import { UserSubscribe } from "./UserSubscribe";
+import { client } from "../../../api/client/client";
+import { getRequiredAccessToken } from "../../../auth0Client";
+import { useConfirmDialog } from "../../../components/ConfirmDialog";
 import { isAdmin } from "../../../components/useRoles";
+import { IContingentInfo } from "../../../types/ContingentInfo.type";
 import { IGataRole } from "../../../types/GataRole.type";
 import { IExternalUser, IGataUser } from "../../../types/GataUser.type";
-import { Delete } from "@mui/icons-material";
-import { useConfirmDialog } from "../../../components/ConfirmDialog";
 import { LinkExternalUserToGataUserSelect } from "../components/LinkExternalUserToGataUserSelect";
-import { IContingentInfo } from "../../../types/ContingentInfo.type";
-import { client } from "../../../api/client/client";
-import { UserSubscribe } from "./UserSubscribe";
-import { getRequiredAccessToken } from "../../../auth0Client";
+import { UserInfo } from "../components/UserInfo";
 
 export const memberInfoPageLoader: LoaderFunction = async ({ request: { signal }, params }) => {
    const token = await getRequiredAccessToken();

@@ -1,6 +1,6 @@
 import { ClientConfigType } from "./client.types";
 
-export const client = <ResponseBody extends unknown = unknown, RequestBody extends unknown = unknown>(
+export const client = <ResponseBody = unknown, RequestBody = unknown>(
    url: string,
    { body, token, ...customConfig } = {} as ClientConfigType<RequestBody>
 ): Promise<ResponseBody> => {

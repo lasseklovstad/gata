@@ -1,10 +1,11 @@
 import { Flex, FormControl, FormHelperText, FormLabel } from "@chakra-ui/react";
-import { OptionBase, Props, Select, chakraComponents } from "chakra-react-select";
+import { OptionBase, OptionProps, Select, SingleValueProps, chakraComponents } from "chakra-react-select";
 import { ActionFunction, useFetcher } from "react-router-dom";
+
+import { ExternalUserIcon } from "./ExternalUserIcon";
 import { client } from "../api/client/client";
 import { getRequiredAccessToken } from "../auth0Client";
 import { IExternalUser, IGataUser } from "../types/GataUser.type";
-import { ExternalUserIcon } from "./ExternalUserIcon";
 
 export const primaryUserEmailAction: ActionFunction = async ({ request, params }) => {
    const token = await getRequiredAccessToken();
@@ -61,14 +62,14 @@ interface ColorOption extends OptionBase {
    user: IExternalUser;
 }
 
-const customComponents: Props<ColorOption, false, never>["components"] = {
-   Option: ({ children, ...props }) => (
+const customComponents = {
+   Option: ({ children, ...props }: OptionProps<ColorOption, false, never>) => (
       <chakraComponents.Option {...props}>
          <ExternalUserIcon user={props.data.user} sx={{ mr: 1 }} color={props.isSelected ? "white" : "blue.500"} />{" "}
          {children}
       </chakraComponents.Option>
    ),
-   SingleValue: ({ children, ...props }) => (
+   SingleValue: ({ children, ...props }: SingleValueProps<ColorOption, false, never>) => (
       <chakraComponents.SingleValue {...props}>
          <Flex>
             <ExternalUserIcon user={props.data.user} sx={{ mr: 1 }} /> {children}

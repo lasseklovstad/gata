@@ -2,6 +2,15 @@
    "name": "gata-frontend",
    "version": "0.2.3",
    "private": true,
+   "type": "module",
+   
+   "scripts": {
+      "start": "vite",
+      "build": "tsc && vite build",
+      "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx,.mjs,.cjs",
+      "lint:fix": "npm run lint -- --fix",
+      "lint:ci": "npm run lint -- --max-warnings 0"
+   },
    "dependencies": {
       "@auth0/auth0-spa-js": "2.1.2",
       "@chakra-ui/react": "2.8.2",
@@ -10,14 +19,21 @@
       "@mui/icons-material": "5.14.18",
       "@types/react": "18.2.38",
       "@types/react-dom": "18.2.17",
+      "@typescript-eslint/eslint-plugin": "6.12.0",
+      "@typescript-eslint/parser": "6.12.0",
       "@vitejs/plugin-react": "4.2.0",
       "chakra-react-select": "4.7.6",
       "eslint": "8.54.0",
-      "eslint-config-prettier": "8.10.0",
-      "eslint-config-react-app": "7.0.1",
-      "eslint-plugin-prettier": "4.2.1",
+      "eslint-config-prettier": "9.0.0",
+      "eslint-import-resolver-typescript": "3.6.1",
+      "eslint-plugin-deprecation": "^2.0.0",
+      "eslint-plugin-import": "2.29.0",
+      "eslint-plugin-jsx-a11y": "6.8.0",
+      "eslint-plugin-prettier": "5.0.1",
+      "eslint-plugin-react": "7.33.2",
+      "eslint-plugin-react-hooks": "4.6.0",
       "framer-motion": "10.16.5",
-      "prettier": "2.8.8",
+      "prettier": "3.1.0",
       "react": "18.2.0",
       "react-dom": "18.2.0",
       "react-router-dom": "6.20.0",
@@ -28,11 +44,5 @@
       "vite": "5.0.2",
       "vite-plugin-checker": "0.6.2",
       "vite-plugin-eslint": "1.8.1"
-   },
-   "scripts": {
-      "start": "vite",
-      "build": "tsc && vite build",
-      "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx,.mjs,.cjs",
-      "lint:fix": "npm run lint -- --fix"
    }
 }
