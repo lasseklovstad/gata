@@ -1,4 +1,4 @@
-export type RequestBodyBase = unknown;
+type RequestBodyBase = unknown;
 
 export type ClientConfigType<RequestBody extends RequestBodyBase> = {
    body?: RequestBody;
@@ -8,8 +8,8 @@ export type ClientConfigType<RequestBody extends RequestBodyBase> = {
    token?: string;
 };
 
-export type UseClientStatus = "idle" | "loading" | "error" | "success";
-export type UseClientError = {
+type UseClientStatus = "idle" | "loading" | "error" | "success";
+type UseClientError = {
    message: string;
 };
 export type UseClientState<ResponseBody> = {

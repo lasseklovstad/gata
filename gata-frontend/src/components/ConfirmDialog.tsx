@@ -15,7 +15,7 @@ type ConfirmDialogProps = {
    showOnlyOk?: boolean;
 };
 
-export const ConfirmDialog = ({ text, onClose, onConfirm, open, response, title, showOnlyOk }: ConfirmDialogProps) => {
+const ConfirmDialog = ({ text, onClose, onConfirm, open, response, title, showOnlyOk }: ConfirmDialogProps) => {
    return (
       <Modal isOpen={open} onClose={onClose}>
          <ModalOverlay />

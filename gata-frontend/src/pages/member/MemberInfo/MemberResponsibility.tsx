@@ -20,8 +20,6 @@ export const memberResponsibilityLoader: LoaderFunction = async ({ request: { si
    return json<MemberResponsibilityLoaderData>({ loggedInUser, responsibilityYears, member });
 };
 
-export const memberResponsibilityLoaderId = "memberResponsibilityLoaderId";
-
 export const memberResponsibilityAction: ActionFunction = async ({ request, params }) => {
    const token = await getRequiredAccessToken();
    if (request.method === "POST") {
@@ -32,7 +30,7 @@ export const memberResponsibilityAction: ActionFunction = async ({ request, para
    return redirect(`/member/${params.memberId}/responsibility`);
 };
 
-export interface MemberResponsibilityLoaderData {
+interface MemberResponsibilityLoaderData {
    loggedInUser: IGataUser;
    responsibilityYears: IResponsibilityYear[];
    member: IGataUser;

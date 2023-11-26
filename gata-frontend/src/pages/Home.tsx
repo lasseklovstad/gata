@@ -27,7 +27,7 @@ export const homeLoader: LoaderFunction = async ({ request: { signal, url } }) =
    }
 };
 
-export interface HomeLoaderData {
+interface HomeLoaderData {
    loggedInUser: IGataUser | undefined;
    reportPage: Page<IGataReport> | undefined;
    isAuthenticated: boolean;

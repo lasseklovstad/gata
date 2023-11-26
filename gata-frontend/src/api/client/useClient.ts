@@ -4,8 +4,6 @@ import { client } from "./client";
 import { ClientConfigType, UseClientState } from "./client.types";
 import { getRequiredAccessToken } from "../../auth0Client";
 
-export type DefaultResponseTypes = Record<string, unknown | undefined> | number | string | boolean;
-
 export const useClient = <ResponseBody = unknown, RequestBody = unknown>() => {
    const [clientState, setClientState] = useState<UseClientState<ResponseBody>>({
       status: "idle",

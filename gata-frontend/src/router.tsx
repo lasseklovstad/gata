@@ -59,7 +59,8 @@ import {
 import { ResponsibilityPage, responsibilityPageLoader } from "./pages/Responsibility/ResponsibilityPage";
 import { RouteConfirmFormDialog } from "./RouteConfirmFormDialog";
 import { IGataUser } from "./types/GataUser.type";
-export const rootLoader: LoaderFunction = async ({ request: { signal } }) => {
+
+const rootLoader: LoaderFunction = async ({ request: { signal } }) => {
    const isAuthenticated = await getIsAuthenticated();
    if (isAuthenticated) {
       const user = await getUser();
@@ -74,7 +75,7 @@ export const rootLoader: LoaderFunction = async ({ request: { signal } }) => {
    return json<RootLoaderData>({ isAuthenticated });
 };
 
-export interface RootLoaderData {
+interface RootLoaderData {
    loggedInUser?: IGataUser;
    isAuthenticated: boolean;
    user?: User;
@@ -97,7 +98,7 @@ const Root = () => {
    );
 };
 
-export const ErrorBoundary = () => {
+const ErrorBoundary = () => {
    const error = useRouteError();
    console.error(error);
    if (isRouteErrorResponse(error)) {

@@ -14,7 +14,7 @@ export const userSubscribeAction: ActionFunction = async ({ params }) => {
    return {};
 };
 
-export interface UserSubscribeProps {
+interface UserSubscribeProps {
    user: IGataUser;
 }
 

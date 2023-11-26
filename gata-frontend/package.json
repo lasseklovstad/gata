@@ -3,13 +3,13 @@
    "version": "0.2.3",
    "private": true,
    "type": "module",
-   
    "scripts": {
       "start": "vite",
       "build": "tsc && vite build",
       "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx,.mjs,.cjs",
       "lint:fix": "npm run lint -- --fix",
-      "lint:ci": "npm run lint -- --max-warnings 0"
+      "lint:ci": "npm run lint -- --max-warnings 0",
+      "knip": "knip"
    },
    "dependencies": {
       "@auth0/auth0-spa-js": "2.1.2",
@@ -33,6 +33,7 @@
       "eslint-plugin-react": "7.33.2",
       "eslint-plugin-react-hooks": "4.6.0",
       "framer-motion": "10.16.5",
+      "knip": "2.43.0",
       "prettier": "3.1.0",
       "react": "18.2.0",
       "react-dom": "18.2.0",

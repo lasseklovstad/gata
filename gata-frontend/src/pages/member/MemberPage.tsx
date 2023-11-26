@@ -28,7 +28,7 @@ export const memberPageAction: ActionFunction = async ({ request }) => {
    return client("user", { method: "POST", body: form, token });
 };
 
-export interface MemberPageLoaderData {
+interface MemberPageLoaderData {
    loggedInUser: IGataUser;
    users: IGataUser[];
    externalUsers: IExternalUser[];

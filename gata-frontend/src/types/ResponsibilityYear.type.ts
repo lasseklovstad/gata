@@ -9,12 +9,3 @@ export interface IResponsibilityYear {
    responsibility: IResponsibility;
    note: IResponsibilityNote;
 }
-
-export interface IResponsibilityYearPayload {
-   responsibilityId: string;
-   year: number;
-}
-
-export interface IResponsibilityNotePayload {
-   text: string;
-}
