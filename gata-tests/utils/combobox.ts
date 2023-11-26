@@ -9,7 +9,7 @@ export const selectComboBoxOption = async (
   await comboBox.fill(optionName);
   const listBoxId = await comboBox.getAttribute("aria-controls");
   const listBox = page.locator(`#${listBoxId}`);
-  await listBox.getByRole("button").filter({ hasText: optionName }).click();
+  await listBox.getByRole("option", { name: optionName, exact: true }).click();
   await expect(listBox).toBeHidden();
 };
 
@@ -22,6 +22,6 @@ export const selectSingleComboBoxOption = async (
   await comboBox.click();
   const listBoxId = await comboBox.getAttribute("aria-controls");
   const listBox = page.locator(`#${listBoxId}`);
-  await listBox.getByRole("button", { name: optionName, exact: true }).click();
+  await listBox.getByRole("option", { name: optionName, exact: true }).click();
   await expect(listBox).toBeHidden();
 };
