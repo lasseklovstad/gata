@@ -146,6 +146,11 @@ export const ErrorBoundary = () => {
    );
 };
 
+/**
+ * Remember to update ReactSpaController.kt when adding a new route to this file.
+ * Or it will not forward the request to index.html
+ */
+
 export const router = createBrowserRouter(
    createRoutesFromElements(
       <Route path="/" element={<Root />} loader={rootLoader} errorElement={<ErrorBoundary />}>
