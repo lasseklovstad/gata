@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootApplication
@@ -19,7 +18,7 @@ class WebApplication : CommandLineRunner {
     private var runUpdateUserOnStartup: Boolean = false
 
     override fun run(vararg args: String?) {
-        if(this.runUpdateUserOnStartup){
+        if (this.runUpdateUserOnStartup) {
             auth0RestService.updateInternalUsersWithExternalData()
         }
     }

@@ -66,3 +66,7 @@ jobs:
         with:
           name: playwright-report
           path: gata-tests/playwright-report
+
+      - name: Write docker compose logs to file
+        if: always()
+        run: docker-compose logs > E2E-LOGS.txt

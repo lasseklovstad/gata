@@ -13,4 +13,9 @@ class RedirectOnResourceNotFoundException : ErrorController {
     fun redirectOnError(): String {
         return "forward:/"
     }
+
+    @RequestMapping(value = ["/{[path:[^\\.]*}"])
+    fun redirect(): String? {
+        return "forward:/"
+    }
 }
