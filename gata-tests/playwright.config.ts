@@ -31,7 +31,6 @@ const config: PlaywrightTestConfig = {
   workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [["html"], ["line"]],
-  globalSetup: require.resolve("./globalSetup"),
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
@@ -47,24 +46,19 @@ const config: PlaywrightTestConfig = {
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "chromium",
+      name: "setup",
       use: {
         ...devices["Desktop Chrome"],
       },
+      testMatch: ["globalSetup.spec.ts"],
     },
-
     {
-      name: "firefox",
+      name: "chromium",
+      dependencies: ["setup"],
       use: {
-        ...devices["Desktop Firefox"],
+        ...devices["Desktop Chrome"],
       },
-    },
-
-    {
-      name: "webkit",
-      use: {
-        ...devices["Desktop Safari"],
-      },
+      testIgnore: ["globalSetup.spec.ts"],
     },
 
     /* Test against mobile viewports. */
