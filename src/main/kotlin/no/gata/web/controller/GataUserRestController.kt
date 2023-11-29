@@ -12,7 +12,6 @@ import no.gata.web.exception.GataUserNoSufficientRole
 import no.gata.web.exception.GataUserNotFound
 import no.gata.web.models.*
 import no.gata.web.repository.*
-import no.gata.web.service.GataReportService
 import no.gata.web.service.GataUserService
 import no.gata.web.service.RoleService
 import org.springframework.beans.factory.annotation.Autowired
@@ -131,7 +130,7 @@ class GataUserRestController {
 
     @DeleteMapping("{id}/responsibilityyear/{responsibilityYearId}")
     @PreAuthorize("hasAuthority('admin')")
-    fun removeResponseibilityForUser(@PathVariable responsibilityYearId: String, @PathVariable id: String): List<DtoOutResponsibilityYear> {
+    fun removeResponsibilityForUser(@PathVariable responsibilityYearId: String, @PathVariable id: String): List<DtoOutResponsibilityYear> {
         val user = gataUserService.getUser(id)
         validateUserIsMember(user)
         val responsibilityYear = responsibilityYearRepository.findById(UUID.fromString(responsibilityYearId)).get()
@@ -156,7 +155,6 @@ class GataUserRestController {
         if (responsibilityYearCheck.isNotEmpty()) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Bruker har allerede denne ansvarsposten for dette året.")
         }
-
 
         val responsibilityYear = ResponsibilityYear(id = null, year = year, user = user, responsibility = responsibility, note = null)
         val note = ResponsibilityNote(id = null, lastModifiedDate = Date(), lastModifiedBy = user.getPrimaryUser()!!.name, text = "", responsibilityYear = responsibilityYear)

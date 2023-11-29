@@ -14,6 +14,7 @@
 	<name>web</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
+		<java.version>21</java.version>
 		<kotlin.version>1.9.21</kotlin.version>
 		<liquibase.version>4.25.0</liquibase.version>
 		<liquibase-hibernate5.version>4.25.0</liquibase-hibernate5.version>
@@ -38,10 +39,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 		<dependency>
@@ -58,7 +55,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.jetbrains.kotlin</groupId>
-			<artifactId>kotlin-stdlib-jdk8</artifactId>
+			<artifactId>kotlin-stdlib</artifactId>
 		</dependency>
 
 		<dependency>

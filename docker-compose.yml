@@ -24,9 +24,8 @@ services:
       - AUTH0_DOMAIN=${AUTH0_DOMAIN}
       - AUTH0_CLIENT_ID=${API_AUTH0_CLIENT_ID}
       - AUTH0_CLIENT_SECRET=${API_AUTH0_CLIENT_SECRET}
-      - GMAIL_USER_NAME=test@gmail.com
-      - GMAIL_PASSWORD=halla
       - CLOUDINARY_URL=noe
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
     build:
       context: .
       dockerfile: ./Dockerfile

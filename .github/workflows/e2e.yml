@@ -117,3 +117,10 @@ jobs:
       - name: Write docker compose logs to file
         if: always()
         run: docker-compose logs > E2E-LOGS.txt
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: E2E-LOGS.txt
+          path: E2E-LOGS.txt

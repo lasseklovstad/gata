@@ -1,6 +1,7 @@
 package no.gata.web.controller.dtoOut
 
 import no.gata.web.models.*
+import java.time.Year
 
 class DtoOutGataUser(
         var id: String?,

@@ -100,7 +100,7 @@ export const MemberPage = () => {
          </Heading>
          <List aria-labelledby="admin-title">
             {admins.map((user) => {
-               return <UserListItem key={user.id} user={user} />;
+               return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
             })}
             {admins.length === 0 && <ListItem>Ingen administratorer funnet</ListItem>}
          </List>
@@ -109,7 +109,7 @@ export const MemberPage = () => {
          </Heading>
          <List aria-labelledby="member-title">
             {members?.map((user) => {
-               return <UserListItem key={user.id} user={user} />;
+               return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
             })}
             {members.length === 0 && <ListItem>Ingen medlemmer funnet</ListItem>}
          </List>
@@ -120,7 +120,7 @@ export const MemberPage = () => {
                </Heading>
                <List aria-labelledby="non-member-title">
                   {nonMembers?.map((user) => {
-                     return <UserListItem key={user.id} user={user} />;
+                     return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
                   })}
                   {nonMembers?.length === 0 && <ListItem>Ingen andre brukere</ListItem>}
                </List>

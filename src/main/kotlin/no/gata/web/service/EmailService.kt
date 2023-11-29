@@ -28,9 +28,12 @@ class EmailService(private val sendGrid: SendGrid) {
             request.endpoint = "mail/send"
             request.body = mail.build()
             val response = sendGrid.api(request)
-            logger.info(
-                "Email sent with statusCode:${response.statusCode}\n${response.body}\n${response.headers}"
-            )
+
+            if(response.statusCode != 202){
+                logger.error(
+                    "Email could not be sent with statusCode:${response.statusCode} ${response.body}"
+                )
+            }
         } catch (ex: IOException) {
             logger.error("Something went wrong when sending email", ex)
         }

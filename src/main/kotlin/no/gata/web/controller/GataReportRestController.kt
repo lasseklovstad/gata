@@ -1,7 +1,6 @@
 package no.gata.web.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.mail.internet.InternetAddress
 import no.gata.web.controller.dtoInn.DtoInnGataReport
 import no.gata.web.controller.dtoOut.DtoOutGataReport
 import no.gata.web.controller.dtoOut.DtoOutGataReportSimple
@@ -19,8 +18,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
-import org.springframework.mail.javamail.JavaMailSender
-import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.transaction.annotation.Transactional

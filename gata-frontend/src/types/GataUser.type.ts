@@ -10,6 +10,7 @@ export interface IGataUser {
    roles: IGataRole[];
    contingents: IGataContingent[];
    subscribe: boolean;
+   isCurrentContingentPaid: boolean;
 }
 
 export interface ISimpleGataUser {
