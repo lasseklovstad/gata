@@ -28,7 +28,15 @@ export const UserListItem = ({ user, isLoggedInUserAdmin }: UserListItemProps) =
                      alignItems="center"
                      display="flex"
                   >
-                     Betalt kontigent: {isCurrentContingentPaid ? <Check /> : <Clear />}
+                     {isCurrentContingentPaid ? (
+                        <>
+                           <Check /> Betalt kontigent
+                        </>
+                     ) : (
+                        <>
+                           <Clear /> Ikke betalt kontigent
+                        </>
+                     )}
                   </Text>
                )}
             </Box>
