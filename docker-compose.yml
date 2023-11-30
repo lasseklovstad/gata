@@ -26,6 +26,7 @@ services:
       - AUTH0_CLIENT_SECRET=${API_AUTH0_CLIENT_SECRET}
       - CLOUDINARY_URL=noe
       - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - GATA_SYNC_AUTH0_ON_STARTUP=${GATA_SYNC_AUTH0_ON_STARTUP}
     build:
       context: .
       dockerfile: ./Dockerfile
