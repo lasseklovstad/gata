@@ -103,6 +103,7 @@ jobs:
          PLAYWRIGHT_NONMEMBER_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_NONMEMBER_PASSWORD}}
          PLAYWRIGHT_BASE_URL: http://localhost:8080
          SENDGRID_API_KEY: no
+         GATA_SYNC_AUTH0_ON_STARTUP: true
          # DEBUG: pw:webserver
          # DEBUG: pw:api
         run: |
