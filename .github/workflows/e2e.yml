@@ -102,6 +102,7 @@ jobs:
          PLAYWRIGHT_NONMEMBER_USERNAME: ${{secrets.E2E_PLAYWRIGHT_NONMEMBER_USERNAME}}
          PLAYWRIGHT_NONMEMBER_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_NONMEMBER_PASSWORD}}
          PLAYWRIGHT_BASE_URL: http://localhost:8080
+         SENDGRID_API_KEY: no
          # DEBUG: pw:webserver
          # DEBUG: pw:api
         run: |
