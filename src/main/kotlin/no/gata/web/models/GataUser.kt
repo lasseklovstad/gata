@@ -18,7 +18,7 @@ class GataUser (
         @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
         @JsonIgnore
         var responsibilities: List<ResponsibilityYear>,
-        @ManyToMany()
+        @ManyToMany(fetch = FetchType.EAGER)
         var roles: List<GataRole>,
         @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
         var contingents: List<GataContingent>,
