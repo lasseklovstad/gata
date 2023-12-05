@@ -1,7 +1,6 @@
 package no.gata.web.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.mail.internet.InternetAddress
 import no.gata.web.controller.dtoInn.DtoInnGataReport
 import no.gata.web.controller.dtoOut.DtoOutGataReport
 import no.gata.web.controller.dtoOut.DtoOutGataReportSimple
@@ -12,14 +11,13 @@ import no.gata.web.repository.GataReportRepository
 import no.gata.web.repository.GataRoleRepository
 import no.gata.web.repository.GataUserRepository
 import no.gata.web.service.CloudinaryService
+import no.gata.web.service.EmailService
 import no.gata.web.service.GataReportService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
-import org.springframework.mail.javamail.JavaMailSender
-import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.transaction.annotation.Transactional
@@ -42,9 +40,6 @@ class GataReportRestController {
     private lateinit var gataReportFileRepository: GataReportFileRepository
 
     @Autowired
-    private lateinit var javaMailSender: JavaMailSender
-
-    @Autowired
     private lateinit var gataRoleRepository: GataRoleRepository
 
     @Autowired
@@ -52,6 +47,9 @@ class GataReportRestController {
 
     @Autowired
     private lateinit var gataReportService: GataReportService
+
+    @Autowired
+    private lateinit var emailService: EmailService
 
     @GetMapping()
     @PreAuthorize("hasAuthority('member')")
@@ -108,17 +106,13 @@ class GataReportRestController {
         val report = gataReportService.getReport(id)
         val emails = getEmailsToPublishReport()
         if (emails.isNotEmpty()) {
-            val msg = javaMailSender.createMimeMessage()
-            val helper = MimeMessageHelper(msg, true)
-            helper.setTo(emails.map { InternetAddress(it) }.toTypedArray())
-
-            helper.setSubject("Nytt fra Gata! ${report.title}")
-            helper.setText("<h1>Nytt fra Gata</h1><p>Det har kommet en oppdatering på ${siteBaseUrl}!</p><h2>${report.title}</h2>" +
+            val content = "<h1>Nytt fra Gata</h1><p>Det har kommet en oppdatering på ${siteBaseUrl}!</p><h2>${report.title}</h2>" +
                     "<p>${report.description}</p><p>" +
                     "<a href='${siteBaseUrl}/reportInfo/${report.id}'>Trykk her for å lese hele saken!</a>" +
-                    "</p>", true)
-
-            javaMailSender.send(msg)
+                    "</p>"
+            emails.forEach{email->
+                emailService.sendTextEmail(email,"Nytt fra Gata! ${report.title}",content)
+            }
         }
         return emails
     }

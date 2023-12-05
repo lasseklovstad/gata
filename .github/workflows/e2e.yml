@@ -102,6 +102,8 @@ jobs:
          PLAYWRIGHT_NONMEMBER_USERNAME: ${{secrets.E2E_PLAYWRIGHT_NONMEMBER_USERNAME}}
          PLAYWRIGHT_NONMEMBER_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_NONMEMBER_PASSWORD}}
          PLAYWRIGHT_BASE_URL: http://localhost:8080
+         SENDGRID_API_KEY: no
+         GATA_SYNC_AUTH0_ON_STARTUP: true
          # DEBUG: pw:webserver
          # DEBUG: pw:api
         run: |
@@ -117,3 +119,10 @@ jobs:
       - name: Write docker compose logs to file
         if: always()
         run: docker-compose logs > E2E-LOGS.txt
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: E2E-LOGS.txt
+          path: E2E-LOGS.txt

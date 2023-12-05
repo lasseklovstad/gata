@@ -36,17 +36,6 @@ class ResponsibilityRestController {
         return responsibilityRepository.findById(UUID.fromString(responsibilityId)).orElseThrow { ResponsibilityNotFound(responsibilityId) }
     }
 
-    @GetMapping("available")
-    @PreAuthorize("hasAuthority('member')")
-    fun getAvailableResponsibilities(@RequestParam("year") yearParam: String?): List<DtoOutResponsibility> {
-        val allResponsibilities = responsibilityRepository.findAll();
-        val year = if (yearParam == null) Year.now() else Year.of(yearParam.toInt());
-        val responsibilityYears = responsibilityYearRepository.findResponsibilityYearsByYearEquals(year);
-        return allResponsibilities
-                .filter { responsibilityYears.find { responsibilityYear -> responsibilityYear.responsibility?.id == it.id } == null }
-                .map { DtoOutResponsibility(it) }
-    }
-
     @PostMapping
     @PreAuthorize("hasAuthority('admin')")
     fun postResponsibility(@RequestBody body: DtoInnResponsibility) {
