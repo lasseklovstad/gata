@@ -1,5 +1,6 @@
 package no.gata.web.security
 
+import no.gata.web.models.UserRoleName
 import no.gata.web.repository.GataUserRepository
 import org.springframework.core.convert.converter.Converter
 import org.springframework.security.authentication.AbstractAuthenticationToken
@@ -15,12 +16,13 @@ class CustomAuthenticationConverter(private var gataUserRepository: GataUserRepo
 
         val authorities = if (userOptional.isPresent) {
             userOptional.get().roles.flatMap { role ->
-                if (role.name == "Medlem")
-                    listOf(SimpleGrantedAuthority("member"))
-                else listOf(
-                    SimpleGrantedAuthority("admin"),
-                    SimpleGrantedAuthority("member")
-                )
+                when (role.roleName) {
+                    UserRoleName.Member -> listOf(SimpleGrantedAuthority("member"))
+                    UserRoleName.Admin -> listOf(
+                        SimpleGrantedAuthority("admin"),
+                        SimpleGrantedAuthority("member")
+                    )
+                }
             }
         } else {
             emptyList()

@@ -21,9 +21,6 @@ class RoleRestController {
     lateinit var roleRepository: GataRoleRepository
 
     @Autowired
-    lateinit var gataUserRepository: GataUserRepository
-
-    @Autowired
     lateinit var roleService: RoleService
 
     @Autowired
@@ -38,25 +35,17 @@ class RoleRestController {
 
     @PostMapping("{roleId}/user/{userId}")
     @PreAuthorize("hasAuthority('admin')")
-    fun postRole(@PathVariable roleId: String, @PathVariable userId: String): DtoOutGataUser {
+    fun postRole(@PathVariable roleId: String, @PathVariable userId: String) {
         val user = gataUserService.getUser(userId)
         val role = roleRepository.findById(UUID.fromString(roleId)).get()
-        val updatedUser = roleService.addRoles(user, setOf(role))
-        if (updatedUser != null) {
-            return DtoOutGataUser(updatedUser);
-        }
-        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Kunne ikke oppdatere alle roller for bruker");
+        roleService.addRoles(user, setOf(role))
     }
 
     @DeleteMapping("{roleId}/user/{userId}")
     @PreAuthorize("hasAuthority('admin')")
-    fun deleteRole(@PathVariable roleId: String, @PathVariable userId: String): DtoOutGataUser {
+    fun deleteRole(@PathVariable roleId: String, @PathVariable userId: String) {
         val user = gataUserService.getUser(userId)
         val role = roleRepository.findById(UUID.fromString(roleId)).get()
-        val updatedUser = roleService.deleteRoles(user, setOf(role))
-        if (updatedUser != null) {
-            return DtoOutGataUser(updatedUser);
-        }
-        throw ResponseStatusException(HttpStatus.NOT_FOUND, "Kunne ikke oppdatere alle roller for bruker");
+        roleService.deleteRoles(user, setOf(role))
     }
 }

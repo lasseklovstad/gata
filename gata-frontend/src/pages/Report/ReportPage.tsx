@@ -1,6 +1,6 @@
 import { Box, Button, Divider, Heading, List, ListItem, Text } from "@chakra-ui/react";
 import { Add } from "@mui/icons-material";
-import { json, Link, LoaderFunction, Outlet, useLoaderData } from "react-router-dom";
+import { Link, LoaderFunction, Outlet, json, useLoaderData } from "react-router-dom";
 
 import { client } from "../../api/client/client";
 import { getRequiredAccessToken } from "../../auth0Client";
@@ -15,18 +15,16 @@ export const reportPageLoader: LoaderFunction = async ({ request: { signal } }) 
    const token = await getRequiredAccessToken();
    const reports = await client<Page<IGataReportSimple>>(`report/simple?page=0&type=DOCUMENT`, { token, signal });
    const loggedInUser = await client<IGataUser>("user/loggedin", { token, signal });
-   const databaseSize = await client<string>("report/databasesize", { token, signal });
-   return json<ReportPageLoaderData>({ reports, loggedInUser, databaseSize });
+   return json<ReportPageLoaderData>({ reports, loggedInUser });
 };
 
 interface ReportPageLoaderData {
    reports: Page<IGataReportSimple>;
    loggedInUser: IGataUser;
-   databaseSize: string;
 }
 
 export const ReportPage = () => {
-   const { loggedInUser, reports, databaseSize } = useLoaderData() as ReportPageLoaderData;
+   const { loggedInUser, reports } = useLoaderData() as ReportPageLoaderData;
    return (
       <PageLayout>
          <Box
@@ -40,7 +38,6 @@ export const ReportPage = () => {
             <Heading variant="h1" id="report-page-title">
                Aktuelle dokumenter
             </Heading>
-            <Text>{parseInt(databaseSize) / 10}% brukt</Text>
             {isAdmin(loggedInUser) && (
                <Button leftIcon={<Add />} as={Link} to="new">
                   Opprett

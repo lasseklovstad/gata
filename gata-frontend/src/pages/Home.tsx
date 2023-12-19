@@ -2,6 +2,7 @@ import { Heading, Text } from "@chakra-ui/react";
 import { json, LoaderFunction, useLoaderData } from "react-router-dom";
 
 import { client } from "../api/client/client";
+import { getLoggedInUser } from "../api/user.api";
 import { getAccessToken, getIsAuthenticated } from "../auth0Client";
 import { News } from "../components/News";
 import { PageLayout } from "../components/PageLayout";
@@ -15,7 +16,7 @@ export const homeLoader: LoaderFunction = async ({ request: { signal, url } }) =
 
    try {
       const token = await getAccessToken();
-      const loggedInUser = await client<IGataUser>("user/loggedin", { signal, token });
+      const loggedInUser = await getLoggedInUser(signal);
       const params = new URL(url).searchParams;
       const reportPage = await client<Page<IGataReport>>(`report?page=${params.get("page") || 0}&type=NEWS`, {
          signal,

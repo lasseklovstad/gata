@@ -42,11 +42,11 @@ class GataUser (
             subscribe = false)
 
     fun getIsUserMember(): Boolean {
-        return roles.find { it.name == GataRoleName.Medlem.name } != null
+        return roles.find { it.roleName == UserRoleName.Member } != null
     }
 
     fun getIsUserAdmin(): Boolean {
-        return roles.find { it.name == GataRoleName.Administrator.name } != null
+        return roles.find { it.roleName == UserRoleName.Admin } != null
     }
 
     fun getPrimaryUser(): ExternalUser? {

@@ -15,6 +15,7 @@ import {
 } from "react-router-dom";
 
 import { client } from "./api/client/client";
+import { createLoggedInUser, getLoggedInUser } from "./api/user.api";
 import { getIsAuthenticated, getRequiredAccessToken, getUser, handleRedirectCallback } from "./auth0Client";
 import {
    GataReportFormDialog,
@@ -60,7 +61,7 @@ import { ResponsibilityPage, responsibilityPageLoader } from "./pages/Responsibi
 import { RouteConfirmFormDialog } from "./RouteConfirmFormDialog";
 import { IGataUser } from "./types/GataUser.type";
 
-const rootLoader: LoaderFunction = async ({ request: { signal } }) => {
+export const rootLoader: LoaderFunction = async ({ request: { signal } }) => {
    const isAuthenticated = await getIsAuthenticated();
    if (isAuthenticated) {
       const user = await getUser();
@@ -81,7 +82,7 @@ interface RootLoaderData {
    user?: User;
 }
 
-const Root = () => {
+export const Root = () => {
    const { loggedInUser, isAuthenticated, user } = useLoaderData() as RootLoaderData;
    const { state } = useNavigation();
    return (
@@ -98,7 +99,7 @@ const Root = () => {
    );
 };
 
-const ErrorBoundary = () => {
+export const ErrorBoundary = () => {
    const error = useRouteError();
    console.error(error);
    if (isRouteErrorResponse(error)) {
@@ -156,9 +157,14 @@ export const router = createBrowserRouter(
       <Route path="/" element={<Root />} loader={rootLoader} errorElement={<ErrorBoundary />}>
          <Route
             path="callback"
-            loader={async () => {
-               await handleRedirectCallback();
-               return redirect("/");
+            loader={async ({ request }) => {
+               try {
+                  await handleRedirectCallback();
+                  await createLoggedInUser(request.signal);
+                  return redirect("/");
+               } catch {
+                  return redirect("/");
+               }
             }}
          />
          <Route path="privacy" element={<Privacy />} />

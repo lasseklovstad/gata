@@ -25,7 +25,8 @@ export const memberPageLoader: LoaderFunction = async ({ request: { signal } }) 
 export const memberPageAction: ActionFunction = async ({ request }) => {
    const token = await getRequiredAccessToken();
    const form = Object.fromEntries(await request.formData());
-   return client("user", { method: "POST", body: form, token });
+   await client("user", { method: "POST", body: form, token });
+   return { ok: true };
 };
 
 interface MemberPageLoaderData {

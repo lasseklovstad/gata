@@ -2,7 +2,13 @@ import { expect, Page, test } from "@playwright/test";
 import { LoginPage } from "../pages/LoginPage";
 import { Environment } from "../pages/Environment";
 
-test.describe.parallel("Global Setup", () => {
+test.describe("Global Setup", () => {
+  test("Login admin", async ({ page }) => {
+    const env = new Environment();
+    const memberLogin = new LoginPage(page);
+    await memberLogin.login(env.adminUsername, env.adminPassword);
+    await page.context().storageState({ path: "adminStorageState.json" });
+  });
   test("Login non member", async ({ page }) => {
     const env = new Environment();
     const memberLogin = new LoginPage(page);
@@ -14,11 +20,5 @@ test.describe.parallel("Global Setup", () => {
     const memberLogin = new LoginPage(page);
     await memberLogin.login(env.memberUsername, env.memberPassword);
     await page.context().storageState({ path: "memberStorageState.json" });
-  });
-  test("Login admin", async ({ page }) => {
-    const env = new Environment();
-    const memberLogin = new LoginPage(page);
-    await memberLogin.login(env.adminUsername, env.adminPassword);
-    await page.context().storageState({ path: "adminStorageState.json" });
   });
 });
