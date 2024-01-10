@@ -84,7 +84,7 @@ jobs:
       - name: Install playwright
         working-directory: ./gata-tests
         run: |
-         npm install
+         npm ci
          npx playwright install --with-deps chromium
 
       - name: Run E2E tests
