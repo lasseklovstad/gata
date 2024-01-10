@@ -1,4 +1,4 @@
-import { Box, Button, Heading, List, ListItem, Tooltip } from "@chakra-ui/react";
+import { Box, Heading, List, ListItem, Tooltip } from "@chakra-ui/react";
 import { Email } from "@mui/icons-material";
 import { ActionFunction, LoaderFunction, useLoaderData, useRevalidator } from "react-router-dom";
 
@@ -6,10 +6,9 @@ import { ExternalUsersWithNoGataUser } from "./components/ExternalUsersWithNoGat
 import { UserListItem } from "./components/UserListItem";
 import { client } from "../../api/client/client";
 import { usePublishKontigentReport } from "../../api/contingent.api";
-import { useClearUserCache } from "../../api/user.api";
 import { getRequiredAccessToken } from "../../auth0Client";
 import { useConfirmDialog } from "../../components/ConfirmDialog";
-import { Loading, LoadingButton } from "../../components/Loading";
+import { LoadingButton } from "../../components/Loading";
 import { PageLayout } from "../../components/PageLayout";
 import { isAdmin } from "../../components/useRoles";
 import { IExternalUser, IGataUser } from "../../types/GataUser.type";
@@ -37,7 +36,6 @@ interface MemberPageLoaderData {
 
 export const MemberPage = () => {
    const { loggedInUser, users, externalUsers } = useLoaderData() as MemberPageLoaderData;
-   const { cacheResponse, clearCache } = useClearUserCache();
    const { publishContigent, publishContigentResponse } = usePublishKontigentReport();
    const revalidate = useRevalidator();
    const { openConfirmDialog: openConfirmPublishKontigent, ConfirmDialogComponent: ConfirmPublishKontigentDialog } =
@@ -50,13 +48,6 @@ export const MemberPage = () => {
          title: "Vellykket",
          showOnlyOk: true,
       });
-
-   const handleUpdate = async () => {
-      const { status } = await clearCache();
-      if (status === "success") {
-         revalidate.revalidate();
-      }
-   };
 
    const startPublishContigent = async () => {
       const { data } = await publishContigent();
@@ -74,13 +65,6 @@ export const MemberPage = () => {
                Brukere
             </Heading>
             {isAdmin(loggedInUser) && (
-               <Tooltip label="Hent nye brukere som har logget inn">
-                  <Button variant="ghost" onClick={handleUpdate}>
-                     Oppdater
-                  </Button>
-               </Tooltip>
-            )}
-            {isAdmin(loggedInUser) && (
                <Tooltip label="Send påminnelse om betaling til de som ikke har betalt kontigent">
                   <LoadingButton
                      response={publishContigentResponse}
@@ -95,7 +79,6 @@ export const MemberPage = () => {
             )}
          </Box>
          {ConfirmPublishKontigentDialog}
-         <Loading response={cacheResponse} alertTitle="Det oppstod en feil ved oppdatering av cache" />
          <Heading as="h2" id="admin-title" size="lg">
             Administratorer
          </Heading>
