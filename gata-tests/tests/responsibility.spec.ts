@@ -22,7 +22,11 @@ test("linked member should be able to edit responsibility", async ({
   const responsibilityName = "Aktivitetsansvarlig";
   await addResponsibilityToMember(adminPage, responsibilityName);
   await editResponsibility(memberPage, responsibilityName, "Jeg er medlem");
-  await addLinkedUserWithAdmin(adminPage);
+  await addLinkedUserWithAdmin(
+    adminPage,
+    env.memberUsername,
+    env.nonMemberUsername
+  );
   await editResponsibility(
     nonMemberPage,
     responsibilityName,
@@ -31,7 +35,11 @@ test("linked member should be able to edit responsibility", async ({
 
   await removeResponsibilityFromMember(adminPage, responsibilityName);
   await removeResponsibility(adminPage, responsibilityName);
-  await removeLinkedUserWithAdmin(adminPage);
+  await removeLinkedUserWithAdmin(
+    adminPage,
+    env.memberUsername,
+    env.nonMemberUsername
+  );
 });
 
 const editResponsibility = async (

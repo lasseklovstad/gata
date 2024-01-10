@@ -1,5 +1,7 @@
 package no.gata.web.security
 
+import no.gata.web.repository.GataUserRepository
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -26,19 +28,26 @@ class WebSecurityConfig() {
     @Value(value = "\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private lateinit var issuer: String
 
+    @Autowired
+    private lateinit var gataUserRepository: GataUserRepository
+
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http.authorizeHttpRequests { authorize ->
             authorize.requestMatchers(
-                    "/api/user/**",
-                    "/api/file/**",
-                    "/api/role/**",
-                    "/api/auth0user/**",
-                    "/api/report/**",
-                    "/api/responsibility/**",
-                    "/api/contingent/**"
+                "/api/user/**",
+                "/api/file/**",
+                "/api/role/**",
+                "/api/auth0user/**",
+                "/api/report/**",
+                "/api/responsibility/**",
+                "/api/contingent/**"
             ).authenticated().anyRequest().permitAll()
-        }.oauth2ResourceServer().jwt().decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter())
+        }.oauth2ResourceServer { oauth2 ->
+            oauth2.jwt { jwt ->
+                jwt.decoder(jwtDecoder()).jwtAuthenticationConverter(CustomAuthenticationConverter(gataUserRepository))
+            }
+        }
         return http.build()
     }
 
@@ -49,14 +58,5 @@ class WebSecurityConfig() {
         val withAudience = DelegatingOAuth2TokenValidator(withIssuer, audienceValidator)
         jwtDecoder.setJwtValidator(withAudience)
         return jwtDecoder
-    }
-
-    fun jwtAuthenticationConverter(): JwtAuthenticationConverter {
-        val converter = JwtGrantedAuthoritiesConverter()
-        converter.setAuthoritiesClaimName("permissions")
-        converter.setAuthorityPrefix("")
-        val jwtConverter = JwtAuthenticationConverter()
-        jwtConverter.setJwtGrantedAuthoritiesConverter(converter)
-        return jwtConverter
     }
 }

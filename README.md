@@ -5,7 +5,11 @@ Run local db:
 legg til env for java: AUTH0_CLIENT_ID=xxx;AUTH0_CLIENT_SECRET=xxx
 
 ```bash
-AUTH0_AUDIENCE=https://gataersamla.no;AUTH0_DOMAIN=https://gataersamla.eu.auth0.com;AUTH0_CLIENT_ID=xxx;AUTH0_CLIENT_SECRET=xxxx;GMAIL_PASSWORD=123;GMAIL_USER_NAME=lasse.klovstad@gmail.com;CLOUDINARY_URL=123
+AUTH0_AUDIENCE=https://gataersamla.no;
+AUTH0_DOMAIN=https://gataersamla.eu.auth0.com;
+CLOUDINARY_URL=123
+GATA_MAKE_FIRST_USER_ADMIN=true
+SENDGRID_API_KEY=xxx
 ```
 
 ## Local profile
@@ -41,27 +45,6 @@ Legg til filen i ``db.changelog-master.xml``
 ## Generate changelog
 ``mvn liquibase:generateChangeLog``
 
-# Domene
-### domene.shop.no
-20 epostpakker
-TOTALPRIS: 210kr per år
-https://domene.shop/pricelist
-### syse
-60kr (1år), 120kr (2år) en epost: 4kr/måned = 48kr/år 1 epost
-TOTALPRIS: 168kr/år
-SMTP: tornado.mail
-### one.com
-Har kjøpt opp syse, men er litt dyrere
-99kr (1år), 189kr (2år) en epost: 0 kr (1år) , 100kr(2år) 5 eposter
-TOTALPRIS: 289kr/år
-### domene.no 
-Prisen inkluderer epost, 5gb lagring,
-SSL, backup, antivirus og spamfilter
-79kr (1år), 369kr (2år)
-
-### proisp
-361,25kr/år
-
 # Autentisering med Auth0
 Google app er registrert her: https://console.cloud.google.com/
 Facebook app er registrert her: https://developers.facebook.com/apps/406253220837238/settings/basic/
@@ -96,8 +79,8 @@ dokku postgres:expose gatadatabase
 dokku postgres:unexpose gatadatabase
 
 # Create backup to local machine
-dokku postgres:export gatadatabase > /tmp/gatadatabase-7.export
-scp root@gataersamla.no:/tmp/gatadatabase-7.export C:\pg_dump
+dokku postgres:export gatadatabase > /tmp/gatadatabase-8.export
+scp root@gataersamla.no:/tmp/gatadatabase-8.export C:\pg_dump
 
 # Delete existing backups on server
 ls /tmp
@@ -108,7 +91,7 @@ scp C:\pg_dump\gatadatabase-1.export root@gataersamla.no:/tmp
 dokku postgres:import gatadatabase < /tmp/gatadatabase-1.export
 
 # restore backup to local database for development
-pg_restore -p 5433 -h localhost -d postgres -U postgres gatadatabase-7.export
+pg_restore -p 5433 -h localhost -d postgres -U postgres gatadatabase-8.export
 ````
 
 ## Max upload size nginx
@@ -122,12 +105,36 @@ dokku proxy:build-config gata
 # run with custom env file for prod
 docker compose --env-file ./.env.prod up --build -d
 
-
+# .env eller .env.prod fil:
+AUTH0_DOMAIN=https://gataersamla.eu.auth0.com
+AUTH0_AUDIENCE=https://gataersamla.no
+VITE_AUTH0_CLIENT_ID=xxx
+SENDGRID_API_KEY=xxx
+GATA_MAKE_FIRST_USER_ADMIN=true
 ````
 
 ## Kotlin info
 ### Lambda
 In Kotlin, lambda always goes in curly braces. https://medium.com/@s.badamestani/lambda-in-kotlin-a6fc055a2c88
 
+# Domene
+### domene.shop.no
+20 epostpakker
+TOTALPRIS: 210kr per år
+https://domene.shop/pricelist
+### syse
+60kr (1år), 120kr (2år) en epost: 4kr/måned = 48kr/år 1 epost
+TOTALPRIS: 168kr/år
+SMTP: tornado.mail
+### one.com
+Har kjøpt opp syse, men er litt dyrere
+99kr (1år), 189kr (2år) en epost: 0 kr (1år) , 100kr(2år) 5 eposter
+TOTALPRIS: 289kr/år
+### domene.no
+Prisen inkluderer epost, 5gb lagring,
+SSL, backup, antivirus og spamfilter
+79kr (1år), 369kr (2år)
 
+### proisp
+361,25kr/år
 

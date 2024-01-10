@@ -2,7 +2,7 @@ FROM node:20 AS build-frontend
 ENV HOME=/usr/src/app
 WORKDIR $HOME
 COPY ./gata-frontend/package*.json ./
-RUN npm i
+RUN npm ci
 # Bundle app source
 COPY ./gata-frontend .
 

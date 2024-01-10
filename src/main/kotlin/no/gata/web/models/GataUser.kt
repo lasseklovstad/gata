@@ -18,7 +18,7 @@ class GataUser (
         @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
         @JsonIgnore
         var responsibilities: List<ResponsibilityYear>,
-        @ManyToMany()
+        @ManyToMany(fetch = FetchType.EAGER)
         var roles: List<GataRole>,
         @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
         var contingents: List<GataContingent>,
@@ -42,11 +42,11 @@ class GataUser (
             subscribe = false)
 
     fun getIsUserMember(): Boolean {
-        return roles.find { it.name == GataRoleName.Medlem.name } != null
+        return roles.find { it.roleName == UserRoleName.Member } != null
     }
 
     fun getIsUserAdmin(): Boolean {
-        return roles.find { it.name == GataRoleName.Administrator.name } != null
+        return roles.find { it.roleName == UserRoleName.Admin } != null
     }
 
     fun getPrimaryUser(): ExternalUser? {

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
+import kotlin.math.log
 
 data class ErrorResponse(val message: String?)
 
@@ -39,6 +40,8 @@ class ControllerAdvisor : ResponseEntityExceptionHandler() {
             request: WebRequest
     ): ResponseEntity<ErrorResponse> {
         logger.error(exception)
+        logger.info(exception.stackTrace)
+        logger.error("Application error in: [" + exception.javaClass.name + "]", exception);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponse(exception.message))
     }
 }

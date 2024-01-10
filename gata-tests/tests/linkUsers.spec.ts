@@ -14,11 +14,19 @@ import {
 const env = new Environment();
 test("link non member to member and unlink", async ({ browser }) => {
   const adminPage = await getAdminPage(browser);
-  await addLinkedUserWithAdmin(adminPage);
+  await addLinkedUserWithAdmin(
+    adminPage,
+    env.memberUsername,
+    env.nonMemberUsername
+  );
   const nonMemberPage = await getNonMemberPage(browser);
   await assertThatNonMemberIsLinked(nonMemberPage, env.memberUsername);
 
-  await removeLinkedUserWithAdmin(adminPage);
+  await removeLinkedUserWithAdmin(
+    adminPage,
+    env.memberUsername,
+    env.nonMemberUsername
+  );
 
   await assertThatNonMemberIsNotMember(nonMemberPage);
 });
@@ -27,16 +35,24 @@ test("link non member to member and change primary user", async ({
   browser,
 }) => {
   const adminPage = await getAdminPage(browser);
-  await addLinkedUserWithAdmin(adminPage);
+  await addLinkedUserWithAdmin(
+    adminPage,
+    env.memberUsername,
+    env.nonMemberUsername
+  );
   const nonMemberPage = await getNonMemberPage(browser);
 
   await assertThatNonMemberIsLinked(nonMemberPage, env.memberUsername);
-  await changePrimaryUser(adminPage, env.nonMemberUsername);
+  await changePrimaryUser(adminPage, env.memberUsername, env.nonMemberUsername);
   await assertThatNonMemberIsLinked(nonMemberPage, env.nonMemberUsername);
   // Change back
-  await changePrimaryUser(adminPage, env.memberUsername);
+  await changePrimaryUser(adminPage, env.nonMemberUsername, env.memberUsername);
 
-  await removeLinkedUserWithAdmin(adminPage);
+  await removeLinkedUserWithAdmin(
+    adminPage,
+    env.memberUsername,
+    env.nonMemberUsername
+  );
 
   await assertThatNonMemberIsNotMember(nonMemberPage);
 });
@@ -46,7 +62,11 @@ test("linked member should be able to edit news", async ({ browser }) => {
   const nonMemberPage = await getNonMemberPage(browser);
   const memberPage = await getMemberPage(browser);
 
-  await addLinkedUserWithAdmin(adminPage);
+  await addLinkedUserWithAdmin(
+    adminPage,
+    env.memberUsername,
+    env.nonMemberUsername
+  );
 
   const title = "Members are awesome";
   const description = "This is made by a member";
@@ -57,7 +77,11 @@ test("linked member should be able to edit news", async ({ browser }) => {
   await editNewsAsNonMember(nonMemberPage, title, editContent);
   await assertEditNewsAsMember(memberPage, title, editContent);
   await deleteNews(nonMemberPage);
-  await removeLinkedUserWithAdmin(adminPage);
+  await removeLinkedUserWithAdmin(
+    adminPage,
+    env.memberUsername,
+    env.nonMemberUsername
+  );
 });
 
 const deleteNews = async (page: Page) => {

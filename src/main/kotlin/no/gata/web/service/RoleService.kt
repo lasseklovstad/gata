@@ -1,68 +1,69 @@
 package no.gata.web.service
 
+import no.gata.web.exception.GataRoleNotFound
 import no.gata.web.models.ExternalUser
 import no.gata.web.models.GataRole
 import no.gata.web.models.GataUser
+import no.gata.web.models.UserRoleName
+import no.gata.web.repository.GataRoleRepository
 import no.gata.web.repository.GataUserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
 class RoleService {
 
     @Autowired
-    private lateinit var auth0RestService: Auth0RestService
-
-    @Autowired
     private lateinit var gataUserRepository: GataUserRepository
 
+    @Autowired
+    private lateinit var gataRoleRepository: GataRoleRepository
 
 
-    fun addRoles(gataUser: GataUser, roles: Set<GataRole>): GataUser? {
-        val roleIds = roles.map { it.externalUserProviderId }
-        var updateOk = true
-        gataUser.externalUserProviders.forEach {
-            val response = auth0RestService.updateRole(it.id, roleIds, HttpMethod.POST);
-            if (response?.statusCode != HttpStatus.NO_CONTENT) {
-                updateOk = false
-            }
-        }
-        if (updateOk) {
-            gataUser.roles = gataUser.roles.plus(roles)
-            return gataUserRepository.save(gataUser)
-        }
-        return null
-    }
-
-    fun deleteRoles(gataUser: GataUser, roles: Set<GataRole>): GataUser? {
-        val roleIds = roles.map { it.externalUserProviderId }
-        var updateOk = true
-        gataUser.externalUserProviders.forEach {
-            val response = auth0RestService.updateRole(it.id, roleIds, HttpMethod.DELETE);
-            if (response?.statusCode != HttpStatus.NO_CONTENT) {
-                updateOk = false
-            }
-        }
-        if(updateOk){
-            gataUser.roles = gataUser.roles.minus(roles)
-            return gataUserRepository.save(gataUser)
-        }
-        return null
-    }
-
-    fun deleteRoles(externalUserProviders: List<ExternalUser>, roles: List<GataRole>) {
-        val roleIds = roles.map { it.externalUserProviderId }
-        externalUserProviders.forEach {
-            auth0RestService.updateRole(it.id, roleIds, HttpMethod.DELETE);
+    fun seedRoles() {
+        if (!gataRoleRepository.findAll().any()) {
+            gataRoleRepository.saveAll(
+                listOf(
+                    GataRole(
+                        id = null,
+                        roleName = UserRoleName.Admin,
+                        name = "Administrator"
+                    ), GataRole(
+                        id = null,
+                        roleName = UserRoleName.Member,
+                        name = "Medlem"
+                    )
+                )
+            )
         }
     }
 
-    fun addRoles(externalUserProviders: List<ExternalUser>, roles: List<GataRole>) {
-        val roleIds = roles.map { it.externalUserProviderId }
-        externalUserProviders.forEach {
-            auth0RestService.updateRole(it.id, roleIds, HttpMethod.POST);
-        }
+    fun addRoles(gataUser: GataUser, roles: Set<GataRole>) {
+        gataUser.roles = gataUser.roles.plus(roles)
+        gataUserRepository.save(gataUser)
+    }
+
+    fun deleteRoles(gataUser: GataUser, roles: Set<GataRole>) {
+        gataUser.roles = gataUser.roles.minus(roles)
+        gataUserRepository.save(gataUser)
+    }
+
+    fun deleteAllRoles(gataUser: GataUser){
+        gataUser.roles = emptyList<GataRole>().toMutableList()
+        gataUserRepository.save(gataUser)
+    }
+
+    fun getRole(roleName: UserRoleName): GataRole{
+        return gataRoleRepository.findByRoleName(roleName)
+            .orElseThrow { GataRoleNotFound(roleName) }
+    }
+
+    fun getAdminRole(): GataRole {
+        return getRole(UserRoleName.Admin)
+    }
+
+    fun getMemberRole(): GataRole {
+        return getRole(UserRoleName.Member)
     }
 }

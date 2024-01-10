@@ -1,20 +1,21 @@
 import { User } from "@auth0/auth0-spa-js";
 import { Alert, AlertDescription, AlertTitle, Box, Container, Progress, Text } from "@chakra-ui/react";
 import {
-   LoaderFunction,
-   Outlet,
-   Route,
    createBrowserRouter,
    createRoutesFromElements,
    isRouteErrorResponse,
    json,
+   LoaderFunction,
+   Outlet,
    redirect,
+   Route,
    useLoaderData,
    useNavigation,
    useRouteError,
 } from "react-router-dom";
 
 import { client } from "./api/client/client";
+import { createLoggedInUser } from "./api/user.api";
 import { getIsAuthenticated, getRequiredAccessToken, getUser, handleRedirectCallback } from "./auth0Client";
 import {
    GataReportFormDialog,
@@ -156,9 +157,14 @@ export const router = createBrowserRouter(
       <Route path="/" element={<Root />} loader={rootLoader} errorElement={<ErrorBoundary />}>
          <Route
             path="callback"
-            loader={async () => {
-               await handleRedirectCallback();
-               return redirect("/");
+            loader={async ({ request }) => {
+               try {
+                  await handleRedirectCallback();
+                  await createLoggedInUser(request.signal);
+                  return redirect("/");
+               } catch {
+                  return redirect("/");
+               }
             }}
          />
          <Route path="privacy" element={<Privacy />} />

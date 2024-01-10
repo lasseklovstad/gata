@@ -92,10 +92,11 @@ export const memberRoleAction: ActionFunction = async ({ request, params }) => {
    const token = await getRequiredAccessToken();
    const form = Object.fromEntries(await request.formData());
    if (request.method === "POST" || request.method === "DELETE") {
-      return client(`role/${form.roleId}/user/${params.memberId}`, {
+      await client(`role/${form.roleId}/user/${params.memberId}`, {
          method: request.method,
          token,
       });
+      return { ok: true };
    }
 };
 

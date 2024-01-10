@@ -3,15 +3,13 @@ import { Environment } from "./Environment";
 
 export class LoginPage {
   page: Page;
-  environment: Environment;
 
   constructor(page: Page) {
     this.page = page;
-    this.environment = new Environment();
   }
 
   async login(username: string, password: string) {
-    await this.page.goto(this.environment.baseUrl);
+    await this.page.goto("");
     await this.page.getByRole("button", { name: "Logg inn" }).click();
     await this.page
       .getByRole("textbox", { name: "Email address" })

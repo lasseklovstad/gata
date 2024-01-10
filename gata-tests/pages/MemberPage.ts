@@ -119,4 +119,30 @@ export class MemberPage {
     await this.responsibilityContentTextBox.fill(content);
     await this.saveResonsibilityButton.click();
   }
+
+  private getAddRoleButton(role: Role) {
+    return this.page
+      .getByRole("listitem")
+      .filter({ hasText: role })
+      .getByRole("button", { name: "Legg til rolle" });
+  }
+
+  private getRemoveRoleButton(role: Role) {
+    return this.page
+      .getByRole("listitem")
+      .filter({ hasText: role })
+      .getByRole("button", { name: "Fjern rolle" });
+  }
+
+  async addRole(role: Role) {
+    this.getAddRoleButton(role).click();
+    await expect(this.getRemoveRoleButton(role)).toBeVisible();
+  }
+
+  async removeRole(role: Role) {
+    this.getRemoveRoleButton(role).click();
+    await expect(this.getAddRoleButton(role)).toBeVisible();
+  }
 }
+
+type Role = "Administrator" | "Medlem";

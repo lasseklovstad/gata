@@ -1,8 +1,8 @@
 package no.gata.web.controller
 
 import no.gata.web.controller.dtoOut.DtoOutGataContingentInfo
-import no.gata.web.repository.*
 import no.gata.web.service.EmailService
+import no.gata.web.service.GataUserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.access.prepost.PreAuthorize
@@ -22,10 +22,7 @@ class ContingentRestController {
     private lateinit var contingentSize: String
 
     @Autowired
-    private lateinit var gataUserRepository: GataUserRepository
-
-    @Autowired
-    private lateinit var gataRoleRepository: GataRoleRepository
+    private lateinit var gataUserService: GataUserService
 
     @Autowired
     private lateinit var emailService: EmailService
@@ -33,8 +30,7 @@ class ContingentRestController {
     @GetMapping("email")
     @PreAuthorize("hasAuthority('admin')")
     fun publishContigent(): List<String> {
-        val role = gataRoleRepository.findByName("Medlem")
-        val members = gataUserRepository.findAllByRolesEquals(role.get())
+        val members = gataUserService.getAllMembers()
         val membersNotPaid = members.filter {
             it.contingents.find { cont -> cont.year.equals(Year.now().value) }?.isPaid != true
         }.mapNotNull { it.getPrimaryUser() }
@@ -53,7 +49,7 @@ class ContingentRestController {
 
     @GetMapping()
     @PreAuthorize("hasAuthority('member')")
-    fun getContigent(): DtoOutGataContingentInfo {
+    fun getContingent(): DtoOutGataContingentInfo {
         return DtoOutGataContingentInfo(size = contingentSize, bank = contingentBank)
     }
 }
