@@ -79,8 +79,8 @@ dokku postgres:expose gatadatabase
 dokku postgres:unexpose gatadatabase
 
 # Create backup to local machine
-dokku postgres:export gatadatabase > /tmp/gatadatabase-7.export
-scp root@gataersamla.no:/tmp/gatadatabase-7.export C:\pg_dump
+dokku postgres:export gatadatabase > /tmp/gatadatabase-8.export
+scp root@gataersamla.no:/tmp/gatadatabase-8.export C:\pg_dump
 
 # Delete existing backups on server
 ls /tmp
@@ -91,7 +91,7 @@ scp C:\pg_dump\gatadatabase-1.export root@gataersamla.no:/tmp
 dokku postgres:import gatadatabase < /tmp/gatadatabase-1.export
 
 # restore backup to local database for development
-pg_restore -p 5433 -h localhost -d postgres -U postgres gatadatabase-7.export
+pg_restore -p 5433 -h localhost -d postgres -U postgres gatadatabase-8.export
 ````
 
 ## Max upload size nginx
