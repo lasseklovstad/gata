@@ -1,6 +1,6 @@
 import { Box, Heading, List, ListItem, Tooltip } from "@chakra-ui/react";
 import { Email } from "@mui/icons-material";
-import { ActionFunction, LoaderFunction, useLoaderData, useRevalidator } from "react-router-dom";
+import { ActionFunction, LoaderFunction, useLoaderData } from "react-router-dom";
 
 import { ExternalUsersWithNoGataUser } from "./components/ExternalUsersWithNoGataUser";
 import { UserListItem } from "./components/UserListItem";
@@ -37,7 +37,6 @@ interface MemberPageLoaderData {
 export const MemberPage = () => {
    const { loggedInUser, users, externalUsers } = useLoaderData() as MemberPageLoaderData;
    const { publishContigent, publishContigentResponse } = usePublishKontigentReport();
-   const revalidate = useRevalidator();
    const { openConfirmDialog: openConfirmPublishKontigent, ConfirmDialogComponent: ConfirmPublishKontigentDialog } =
       useConfirmDialog({
          text: `Det ble sent en email til: ${
