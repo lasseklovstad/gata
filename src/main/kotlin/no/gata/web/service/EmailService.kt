@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.IOException
 
-
 @Service
 class EmailService(private val sendGrid: SendGrid) {
 

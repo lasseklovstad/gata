@@ -1,16 +1,12 @@
 package no.gata.web.controller
 
 import no.gata.web.controller.dtoOut.DtoOutGataRole
-import no.gata.web.controller.dtoOut.DtoOutGataUser
 import no.gata.web.repository.GataRoleRepository
-import no.gata.web.repository.GataUserRepository
 import no.gata.web.service.GataUserService
 import no.gata.web.service.RoleService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @RestController

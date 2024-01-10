@@ -99,6 +99,17 @@ pg_restore -p 5433 -h localhost -d postgres -U postgres gatadatabase-8.export
 dokku nginx:set gata client-max-body-size 50m
 dokku proxy:build-config gata
 ```
+## Add ssh on dokku
+For extra deploy generate new public key with the ssh-keygen command and add the public key to dokku with this command:
+```bash
+echo "Key Here" | dokku ssh-keys:add jobbpc
+
+```
+If you want another root access user follow these steps:
+1. Create ssh key
+2. Add the public key to dokku with this command: ``sudo nano /root/.ssh/authorized_keys``. Navigate with arrows and past key with write click of mouse. Save the file `Ctrl+o` and press Enter to accept the same file name. Exit with `Ctrl+x`.
+
+You can check the read write permissions with this command: ``ls -l /root/.ssh/authorized_keys`` and print out the file with this command: `cat /root/.ssh/authorized_keys`
 
 # Docker compose
 ````bash

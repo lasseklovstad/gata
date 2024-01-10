@@ -1,14 +1,12 @@
 package no.gata.web.service
 
 import no.gata.web.exception.GataRoleNotFound
-import no.gata.web.models.ExternalUser
 import no.gata.web.models.GataRole
 import no.gata.web.models.GataUser
 import no.gata.web.models.UserRoleName
 import no.gata.web.repository.GataRoleRepository
 import no.gata.web.repository.GataUserRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 
 @Service

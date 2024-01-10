@@ -96,7 +96,12 @@ class GataUserRestController {
     @DeleteMapping("{id}")
     @PreAuthorize("hasAuthority('admin')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteUser(@PathVariable id: String) {
+    fun deleteUser(authentication: JwtAuthenticationToken, @PathVariable id: String) {
+        val loggedInUser = gataUserService.getLoggedInUser(authentication)
+        if(id == loggedInUser.id?.toString()){
+            throw throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Du kan ikke slette deg selv!")
+        }
+
         val gataUser = gataUserService.getUser(id)
         roleService.deleteAllRoles(gataUser)
         // Remove link to external user

@@ -13,8 +13,6 @@ class GataRole(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id: UUID? = null,
-    @JsonIgnore
-    var externalUserProviderId: String = "",
     var name: String,
     var roleName: UserRoleName,
     @ManyToMany(mappedBy = "roles")

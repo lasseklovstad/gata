@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.jvm.optionals.getOrDefault
 import kotlin.jvm.optionals.getOrElse
 
 @Service
@@ -40,12 +41,26 @@ class GataUserService {
     }
 
     fun findOrCreateNewExternalUser(authentication: JwtAuthenticationToken): ExternalUser {
-        return externalUserRepository
+        val externalUserOptional = externalUserRepository
             .findById(authentication.name)
-            .getOrElse {
-                // save external user if it doesn't exist in database
-                createNewExternalUser(authentication)
-            }
+
+        return if(externalUserOptional.isEmpty){
+            // save external user if it doesn't exist in database
+            createNewExternalUser(authentication)
+        }else{
+            updateExternalUserInfo(authentication, externalUserOptional.get())
+        }
+    }
+
+    fun updateExternalUserInfo(authentication: JwtAuthenticationToken, externalUser: ExternalUser): ExternalUser{
+        val auth0User = auth0RestService.getUserInfo(authentication.token.tokenValue)
+            .orElseThrow { ExternalUserNotFound(authentication.name) }
+        externalUser.apply {
+            name = auth0User.name
+            picture = auth0User.picture
+            lastLogin = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
+        }
+        return externalUserRepository.save(externalUser)
     }
 
     fun createNewExternalUser(authentication: JwtAuthenticationToken): ExternalUser {
@@ -59,11 +74,7 @@ class GataUserService {
             lastLogin = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
             user = null, primary = false
         )
-        return externalUserRepository
-            .findById(authentication.name)
-            .getOrElse {
-                externalUserRepository.save(newExternalUser)
-            }
+        return externalUserRepository.save(newExternalUser)
     }
 
     fun createNewGataUser(externalUser: ExternalUser, userRoleName: UserRoleName?) {
