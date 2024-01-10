@@ -59,13 +59,4 @@ class WebSecurityConfig() {
         jwtDecoder.setJwtValidator(withAudience)
         return jwtDecoder
     }
-
-    fun jwtAuthenticationConverter(): JwtAuthenticationConverter {
-        val converter = JwtGrantedAuthoritiesConverter()
-        converter.setAuthoritiesClaimName("permissions")
-        converter.setAuthorityPrefix("")
-        val jwtConverter = JwtAuthenticationConverter()
-        jwtConverter.setJwtGrantedAuthoritiesConverter(converter)
-        return jwtConverter
-    }
 }

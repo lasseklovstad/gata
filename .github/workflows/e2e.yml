@@ -93,8 +93,6 @@ jobs:
          AUTH0_DOMAIN: ${{secrets.E2E_AUTH0_DOMAIN}}
          AUTH0_AUDIENCE: ${{secrets.E2E_AUTH0_AUDIENCE}}
          VITE_AUTH0_CLIENT_ID: ${{secrets.E2E_VITE_AUTH0_CLIENT_ID}}
-         API_AUTH0_CLIENT_ID: ${{secrets.E2E_API_AUTH0_CLIENT_ID}}
-         API_AUTH0_CLIENT_SECRET: ${{secrets.E2E_API_AUTH0_CLIENT_SECRET}}
          PLAYWRIGHT_ADMIN_USERNAME: ${{secrets.E2E_PLAYWRIGHT_ADMIN_USERNAME}}
          PLAYWRIGHT_ADMIN_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_ADMIN_PASSWORD}}
          PLAYWRIGHT_MEMBER_USERNAME: ${{secrets.E2E_PLAYWRIGHT_MEMBER_USERNAME}}
@@ -104,6 +102,7 @@ jobs:
          PLAYWRIGHT_BASE_URL: http://localhost:8080
          SENDGRID_API_KEY: no
          GATA_SYNC_AUTH0_ON_STARTUP: true
+
          # DEBUG: pw:webserver
          # DEBUG: pw:api
         run: |

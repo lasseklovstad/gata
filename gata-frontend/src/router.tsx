@@ -1,21 +1,21 @@
 import { User } from "@auth0/auth0-spa-js";
 import { Alert, AlertDescription, AlertTitle, Box, Container, Progress, Text } from "@chakra-ui/react";
 import {
-   LoaderFunction,
-   Outlet,
-   Route,
    createBrowserRouter,
    createRoutesFromElements,
    isRouteErrorResponse,
    json,
+   LoaderFunction,
+   Outlet,
    redirect,
+   Route,
    useLoaderData,
    useNavigation,
    useRouteError,
 } from "react-router-dom";
 
 import { client } from "./api/client/client";
-import { createLoggedInUser, getLoggedInUser } from "./api/user.api";
+import { createLoggedInUser } from "./api/user.api";
 import { getIsAuthenticated, getRequiredAccessToken, getUser, handleRedirectCallback } from "./auth0Client";
 import {
    GataReportFormDialog,
@@ -61,7 +61,7 @@ import { ResponsibilityPage, responsibilityPageLoader } from "./pages/Responsibi
 import { RouteConfirmFormDialog } from "./RouteConfirmFormDialog";
 import { IGataUser } from "./types/GataUser.type";
 
-export const rootLoader: LoaderFunction = async ({ request: { signal } }) => {
+const rootLoader: LoaderFunction = async ({ request: { signal } }) => {
    const isAuthenticated = await getIsAuthenticated();
    if (isAuthenticated) {
       const user = await getUser();
@@ -82,7 +82,7 @@ interface RootLoaderData {
    user?: User;
 }
 
-export const Root = () => {
+const Root = () => {
    const { loggedInUser, isAuthenticated, user } = useLoaderData() as RootLoaderData;
    const { state } = useNavigation();
    return (
@@ -99,7 +99,7 @@ export const Root = () => {
    );
 };
 
-export const ErrorBoundary = () => {
+const ErrorBoundary = () => {
    const error = useRouteError();
    console.error(error);
    if (isRouteErrorResponse(error)) {
