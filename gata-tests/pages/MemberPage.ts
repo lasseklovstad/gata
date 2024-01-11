@@ -143,6 +143,11 @@ export class MemberPage {
     this.getRemoveRoleButton(role).click();
     await expect(this.getAddRoleButton(role)).toBeVisible();
   }
+
+  async deleteUser() {
+    await this.page.getByRole("button", { name: "Slett" }).click();
+    await new ConfirmModal(this.page).confirm();
+  }
 }
 
 type Role = "Administrator" | "Medlem";

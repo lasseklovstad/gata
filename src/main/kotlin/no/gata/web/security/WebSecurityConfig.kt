@@ -19,7 +19,6 @@ import org.springframework.security.web.SecurityFilterChain
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 class WebSecurityConfig() {
-
     @Value(value = "\${auth0.audience}")
     private lateinit var audience: String
 
@@ -39,7 +38,7 @@ class WebSecurityConfig() {
                 "/api/auth0user/**",
                 "/api/report/**",
                 "/api/responsibility/**",
-                "/api/contingent/**"
+                "/api/contingent/**",
             ).authenticated().anyRequest().permitAll()
         }.oauth2ResourceServer { oauth2 ->
             oauth2.jwt { jwt ->

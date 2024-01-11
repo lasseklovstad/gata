@@ -1,8 +1,8 @@
 import { expect, Locator, Page } from "@playwright/test";
 
 export class ConfirmModal {
-  modal: Locator;
-  confirmButton: Locator;
+  private readonly modal: Locator;
+  private readonly confirmButton: Locator;
 
   constructor(page: Page) {
     this.modal = page.getByRole("dialog", { name: "Er du sikker?" });

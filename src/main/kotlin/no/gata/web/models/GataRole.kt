@@ -1,11 +1,16 @@
 package no.gata.web.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import java.util.*
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.ManyToMany
+import java.util.UUID
 
 enum class UserRoleName {
-    Member, Admin,
+    Member,
+    Admin,
 }
 
 @Entity
@@ -17,7 +22,5 @@ class GataRole(
     var roleName: UserRoleName,
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
-    var users: List<GataUser> = emptyList()
+    var users: List<GataUser> = emptyList(),
 )
-
-

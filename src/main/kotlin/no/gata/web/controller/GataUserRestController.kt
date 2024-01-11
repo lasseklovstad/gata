@@ -8,8 +8,18 @@ import no.gata.web.controller.dtoOut.DtoOutGataContingent
 import no.gata.web.controller.dtoOut.DtoOutGataUser
 import no.gata.web.controller.dtoOut.DtoOutResponsibilityYear
 import no.gata.web.exception.GataUserNoSufficientRole
-import no.gata.web.models.*
-import no.gata.web.repository.*
+import no.gata.web.models.GataContingent
+import no.gata.web.models.GataUser
+import no.gata.web.models.ResponsibilityNote
+import no.gata.web.models.ResponsibilityYear
+import no.gata.web.models.UserRoleName
+import no.gata.web.repository.ExternalUserRepository
+import no.gata.web.repository.GataContingentRepository
+import no.gata.web.repository.GataRoleRepository
+import no.gata.web.repository.GataUserRepository
+import no.gata.web.repository.ResponsibilityNoteRepository
+import no.gata.web.repository.ResponsibilityRepository
+import no.gata.web.repository.ResponsibilityYearRepository
 import no.gata.web.service.GataUserService
 import no.gata.web.service.RoleService
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,9 +27,19 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.springframework.web.bind.annotation.*
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
-import java.util.*
+import java.util.Date
+import java.util.UUID
 
 @RestController
 @RequestMapping("api/user")
@@ -67,7 +87,9 @@ class GataUserRestController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('admin')")
-    fun postUser(@RequestBody body: DtoInnGataUser) {
+    fun postUser(
+        @RequestBody body: DtoInnGataUser,
+    ) {
         val externalUser = gataUserService.findExternalUser(body.externalUserId)
         gataUserService.createNewGataUser(externalUser, null)
     }
@@ -89,31 +111,38 @@ class GataUserRestController {
 
     @GetMapping("{id}")
     @PreAuthorize("hasAuthority('member')")
-    fun getUser(@PathVariable id: String): DtoOutGataUser? {
+    fun getUser(
+        @PathVariable id: String,
+    ): DtoOutGataUser? {
         return DtoOutGataUser(gataUserService.getUser(id))
     }
 
     @DeleteMapping("{id}")
     @PreAuthorize("hasAuthority('admin')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteUser(authentication: JwtAuthenticationToken, @PathVariable id: String) {
+    @Transactional
+    fun deleteUser(
+        authentication: JwtAuthenticationToken,
+        @PathVariable id: String,
+    ) {
         val loggedInUser = gataUserService.getLoggedInUser(authentication)
-        if(id == loggedInUser.id?.toString()){
+        if (id == loggedInUser.id?.toString()) {
             throw throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Du kan ikke slette deg selv!")
         }
 
         val gataUser = gataUserService.getUser(id)
         roleService.deleteAllRoles(gataUser)
         // Remove link to external user
-        gataUser.externalUserProviders = gataUser.externalUserProviders.map {
-            it.user = null
-            it.primary = false
-            it
+        gataUser.externalUserProviders =
+            gataUser.externalUserProviders.map {
+                it.user = null
+                it.primary = false
+                it
+            }
+        for (report in gataUser.reports) {
+            report.createdBy = null
         }
-        gataUser.reports = gataUser.reports.map {
-            it.createdBy = null
-            it
-        }
+
         gataUserRepository.save(gataUser)
         // Delete user
         gataUserRepository.delete(gataUser)
@@ -121,7 +150,9 @@ class GataUserRestController {
 
     @GetMapping("{id}/responsibilityyear")
     @PreAuthorize("hasAuthority('member')")
-    fun getResponsibilitiesByUserId(@PathVariable id: String): List<DtoOutResponsibilityYear> {
+    fun getResponsibilitiesByUserId(
+        @PathVariable id: String,
+    ): List<DtoOutResponsibilityYear> {
         val user = gataUserService.getUser(id)
         return responsibilityYearRepository.findResponsibilityYearsByUser(user).map { DtoOutResponsibilityYear(it) }
     }
@@ -138,7 +169,7 @@ class GataUserRestController {
     @PreAuthorize("hasAuthority('admin')")
     fun removeResponsibilityForUser(
         @PathVariable responsibilityYearId: String,
-        @PathVariable id: String
+        @PathVariable id: String,
     ): List<DtoOutResponsibilityYear> {
         val user = gataUserService.getUser(id)
         validateUserIsMember(user)
@@ -150,17 +181,16 @@ class GataUserRestController {
         responsibilityYearRepository.delete(responsibilityYear)
 
         return responsibilityYearRepository.findResponsibilityYearsByUser(user).map { DtoOutResponsibilityYear(it) }
-
     }
 
     @PostMapping("{id}/responsibilityyear")
     @PreAuthorize("hasAuthority('admin')")
     fun createResponsibilityForUser(
         @PathVariable id: String,
-        @RequestBody responsibilityYearPayload: DtoInnResponsibilityYear
+        @RequestBody responsibilityYearPayload: DtoInnResponsibilityYear,
     ): List<DtoOutResponsibilityYear> {
         val user = gataUserService.getUser(id)
-        val year = responsibilityYearPayload.year;
+        val year = responsibilityYearPayload.year
         validateUserIsMember(user)
         val responsibility =
             responsibilityRepository.findById(UUID.fromString(responsibilityYearPayload.responsibilityId)).get()
@@ -168,55 +198,58 @@ class GataUserRestController {
             responsibilityYearRepository.findResponsibilityYearsByUserAndYearAndResponsibility(
                 user,
                 year,
-                responsibility
+                responsibility,
             )
         if (responsibilityYearCheck.isNotEmpty()) {
             throw ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
-                "Bruker har allerede denne ansvarsposten for dette året."
+                "Bruker har allerede denne ansvarsposten for dette året.",
             )
         }
 
         val responsibilityYear =
             ResponsibilityYear(id = null, year = year, user = user, responsibility = responsibility, note = null)
-        val note = ResponsibilityNote(
-            id = null,
-            lastModifiedDate = Date(),
-            lastModifiedBy = user.getPrimaryUser()!!.name,
-            text = "",
-            responsibilityYear = responsibilityYear
-        )
+        val note =
+            ResponsibilityNote(
+                id = null,
+                lastModifiedDate = Date(),
+                lastModifiedBy = user.getPrimaryUser()!!.name,
+                text = "",
+                responsibilityYear = responsibilityYear,
+            )
         responsibilityYear.note = note
-        responsibilityYearRepository.save(responsibilityYear);
+        responsibilityYearRepository.save(responsibilityYear)
 
         return responsibilityYearRepository.findResponsibilityYearsByUser(user).map { DtoOutResponsibilityYear(it) }
-
     }
 
     @PutMapping("{id}/responsibilityyear/{responsibilityYearId}/note")
     @PreAuthorize("hasAuthority('member')")
     fun updateResponsibilityNote(
         @PathVariable responsibilityYearId: String,
-        @PathVariable id: String, authentication: JwtAuthenticationToken,
-        @RequestBody noteBody: DtoInnResponsibilityNote
+        @PathVariable id: String,
+        authentication: JwtAuthenticationToken,
+        @RequestBody noteBody: DtoInnResponsibilityNote,
     ): DtoOutResponsibilityYear {
         val user = gataUserService.getUser(id)
         val loggedInUser = gataUserService.getLoggedInUser(authentication)
         val isAdmin = authentication.authorities.find { it.authority == "admin" } != null
         if (loggedInUser.id != user.id && !isAdmin) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Du kan ikke endre på noen andre sine ansvarsposter!");
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Du kan ikke endre på noen andre sine ansvarsposter!")
         }
 
         validateUserIsMember(user)
         val responsibilityYear = responsibilityYearRepository.findById(UUID.fromString(responsibilityYearId)).get()
         responsibilityYear.note?.update(user, noteBody.text)
         return DtoOutResponsibilityYear(responsibilityYearRepository.save(responsibilityYear))
-
     }
 
     @PostMapping("{id}/contingent")
     @PreAuthorize("hasAuthority('admin')")
-    fun postContingent(@PathVariable id: String, @RequestBody body: DtoInnContingent): List<DtoOutGataContingent> {
+    fun postContingent(
+        @PathVariable id: String,
+        @RequestBody body: DtoInnContingent,
+    ): List<DtoOutGataContingent> {
         val user = gataUserService.getUser(id)
         validateUserIsMember(user)
         val existingContingentOptional = gataContingentRepository.findByUserAndYear(user, body.year)
@@ -230,12 +263,13 @@ class GataUserRestController {
             gataContingentRepository.save(contingent)
         }
         return gataContingentRepository.findAllByUser(user).map { DtoOutGataContingent(it) }
-
     }
 
     @PutMapping("{id}/subscribe")
     @PreAuthorize("hasAuthority('member')")
-    fun updateSubscribe(@PathVariable id: String) {
+    fun updateSubscribe(
+        @PathVariable id: String,
+    ) {
         val user = gataUserService.getUser(id)
         user.subscribe = !user.subscribe
         gataUserRepository.save(user)
@@ -243,7 +277,10 @@ class GataUserRestController {
 
     @PutMapping("{id}/externaluserproviders")
     @PreAuthorize("hasAuthority('admin')")
-    fun updateExternalUserProviders(@PathVariable id: String, @RequestBody externalUserProviderIds: List<String>) {
+    fun updateExternalUserProviders(
+        @PathVariable id: String,
+        @RequestBody externalUserProviderIds: List<String>,
+    ) {
         val user = gataUserService.getUser(id)
         val removeExternalUserProviders =
             user.externalUserProviders.filter { !externalUserProviderIds.contains(it.id) }.onEach { it.user = null }
@@ -257,7 +294,10 @@ class GataUserRestController {
 
     @PutMapping("{id}/primaryuser")
     @PreAuthorize("hasAuthority('admin')")
-    fun updatePrimaryExternalUser(@PathVariable id: String, @RequestBody externalUserId: String) {
+    fun updatePrimaryExternalUser(
+        @PathVariable id: String,
+        @RequestBody externalUserId: String,
+    ) {
         val user = gataUserService.getUser(id)
         user.externalUserProviders.onEach {
             it.primary = it.id == externalUserId

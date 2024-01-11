@@ -14,19 +14,21 @@ class CustomAuthenticationConverter(private var gataUserRepository: GataUserRepo
         val externalId = jwt.subject
         val userOptional = gataUserRepository.findByExternalUserProvidersId(externalId)
 
-        val authorities = if (userOptional.isPresent) {
-            userOptional.get().roles.flatMap { role ->
-                when (role.roleName) {
-                    UserRoleName.Member -> listOf(SimpleGrantedAuthority("member"))
-                    UserRoleName.Admin -> listOf(
-                        SimpleGrantedAuthority("admin"),
-                        SimpleGrantedAuthority("member")
-                    )
+        val authorities =
+            if (userOptional.isPresent) {
+                userOptional.get().roles.flatMap { role ->
+                    when (role.roleName) {
+                        UserRoleName.Member -> listOf(SimpleGrantedAuthority("member"))
+                        UserRoleName.Admin ->
+                            listOf(
+                                SimpleGrantedAuthority("admin"),
+                                SimpleGrantedAuthority("member"),
+                            )
+                    }
                 }
+            } else {
+                emptyList()
             }
-        } else {
-            emptyList()
-        }
 
         return JwtAuthenticationToken(jwt, authorities)
     }

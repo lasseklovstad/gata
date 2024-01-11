@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+
 @SpringBootApplication
 class WebApplication : CommandLineRunner {
     @Autowired
@@ -18,5 +19,3 @@ class WebApplication : CommandLineRunner {
 fun main(args: Array<String>) {
     runApplication<WebApplication>(*args)
 }
-
-

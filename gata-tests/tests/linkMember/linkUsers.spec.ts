@@ -1,25 +1,27 @@
-import { expect, Page, test } from "@playwright/test";
-import { Environment } from "../pages/Environment";
-import { MemberPage } from "../pages/MemberPage";
-import { GataHeader } from "../pages/GataHeader";
-import { HomePage } from "../pages/HomePage";
-import { DocumentPage } from "../pages/DocumentPage";
-import { getAdminPage, getMemberPage, getNonMemberPage } from "../utils/page";
+import { expect, Page } from "@playwright/test";
+import { DocumentPage } from "../../pages/DocumentPage";
+import { Environment } from "../../pages/Environment";
+import { GataHeader } from "../../pages/GataHeader";
+import { HomePage } from "../../pages/HomePage";
+import { MemberPage } from "../../pages/MemberPage";
+import { testWithRoles as test } from "../../utils/fixtures";
 import {
   addLinkedUserWithAdmin,
   changePrimaryUser,
   removeLinkedUserWithAdmin,
-} from "../utils/linkUser";
+} from "../../utils/linkUser";
 
 const env = new Environment();
-test("link non member to member and unlink", async ({ browser }) => {
-  const adminPage = await getAdminPage(browser);
+test("link non member to member and unlink", async ({
+  adminPage,
+  nonMemberPage,
+}) => {
   await addLinkedUserWithAdmin(
     adminPage,
     env.memberUsername,
     env.nonMemberUsername
   );
-  const nonMemberPage = await getNonMemberPage(browser);
+
   await assertThatNonMemberIsLinked(nonMemberPage, env.memberUsername);
 
   await removeLinkedUserWithAdmin(
@@ -32,15 +34,14 @@ test("link non member to member and unlink", async ({ browser }) => {
 });
 
 test("link non member to member and change primary user", async ({
-  browser,
+  adminPage,
+  nonMemberPage,
 }) => {
-  const adminPage = await getAdminPage(browser);
   await addLinkedUserWithAdmin(
     adminPage,
     env.memberUsername,
     env.nonMemberUsername
   );
-  const nonMemberPage = await getNonMemberPage(browser);
 
   await assertThatNonMemberIsLinked(nonMemberPage, env.memberUsername);
   await changePrimaryUser(adminPage, env.memberUsername, env.nonMemberUsername);
@@ -57,11 +58,11 @@ test("link non member to member and change primary user", async ({
   await assertThatNonMemberIsNotMember(nonMemberPage);
 });
 
-test("linked member should be able to edit news", async ({ browser }) => {
-  const adminPage = await getAdminPage(browser);
-  const nonMemberPage = await getNonMemberPage(browser);
-  const memberPage = await getMemberPage(browser);
-
+test("linked member should be able to edit news", async ({
+  adminPage,
+  memberPage,
+  nonMemberPage,
+}) => {
   await addLinkedUserWithAdmin(
     adminPage,
     env.memberUsername,

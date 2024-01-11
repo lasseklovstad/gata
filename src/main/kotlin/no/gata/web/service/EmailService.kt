@@ -12,10 +12,13 @@ import java.io.IOException
 
 @Service
 class EmailService(private val sendGrid: SendGrid) {
-
     private var logger = LoggerFactory.getLogger(EmailService::class.java)
 
-    fun sendTextEmail(toEmail: String, subject: String, emailContent: String) {
+    fun sendTextEmail(
+        toEmail: String,
+        subject: String,
+        emailContent: String,
+    ) {
         val from = Email("hesten.bla@gataersamla.no", "Hesten Blå")
         val to = Email(toEmail)
         val content = Content("text/html", emailContent)
@@ -28,9 +31,9 @@ class EmailService(private val sendGrid: SendGrid) {
             request.body = mail.build()
             val response = sendGrid.api(request)
 
-            if(response.statusCode != 202){
+            if (response.statusCode != 202) {
                 logger.error(
-                    "Email could not be sent with statusCode:${response.statusCode} ${response.body}"
+                    "Email could not be sent with statusCode:${response.statusCode} ${response.body}",
                 )
             }
         } catch (ex: IOException) {

@@ -11,13 +11,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class RoleService {
-
     @Autowired
     private lateinit var gataUserRepository: GataUserRepository
 
     @Autowired
     private lateinit var gataRoleRepository: GataRoleRepository
-
 
     fun seedRoles() {
         if (!gataRoleRepository.findAll().any()) {
@@ -26,33 +24,40 @@ class RoleService {
                     GataRole(
                         id = null,
                         roleName = UserRoleName.Admin,
-                        name = "Administrator"
-                    ), GataRole(
+                        name = "Administrator",
+                    ),
+                    GataRole(
                         id = null,
                         roleName = UserRoleName.Member,
-                        name = "Medlem"
-                    )
-                )
+                        name = "Medlem",
+                    ),
+                ),
             )
         }
     }
 
-    fun addRoles(gataUser: GataUser, roles: Set<GataRole>) {
+    fun addRoles(
+        gataUser: GataUser,
+        roles: Set<GataRole>,
+    ) {
         gataUser.roles = gataUser.roles.plus(roles)
         gataUserRepository.save(gataUser)
     }
 
-    fun deleteRoles(gataUser: GataUser, roles: Set<GataRole>) {
+    fun deleteRoles(
+        gataUser: GataUser,
+        roles: Set<GataRole>,
+    ) {
         gataUser.roles = gataUser.roles.minus(roles)
         gataUserRepository.save(gataUser)
     }
 
-    fun deleteAllRoles(gataUser: GataUser){
+    fun deleteAllRoles(gataUser: GataUser) {
         gataUser.roles = emptyList<GataRole>().toMutableList()
         gataUserRepository.save(gataUser)
     }
 
-    fun getRole(roleName: UserRoleName): GataRole{
+    fun getRole(roleName: UserRoleName): GataRole {
         return gataRoleRepository.findByRoleName(roleName)
             .orElseThrow { GataRoleNotFound(roleName) }
     }
