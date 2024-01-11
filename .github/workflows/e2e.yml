@@ -106,7 +106,7 @@ jobs:
          # DEBUG: pw:webserver
          # DEBUG: pw:api
         run: |
-          npx playwright test --project=chromium
+          npx playwright test
 
       - name: Upload test results
         if: always()
