@@ -71,6 +71,18 @@ class GataReportService {
         return gataReportRepository.save(report)
     }
 
+    fun updateReportMarkdown(
+        reportId: String,
+        markdown: String,
+        lastModifiedBy: ExternalUser?,
+    ): GataReport {
+        val report = getReport(reportId)
+        report.markdown = markdown
+        report.lastModifiedBy = lastModifiedBy?.name
+        report.lastModifiedDate = Date()
+        return gataReportRepository.save(report)
+    }
+
     fun createReport(
         user: GataUser,
         body: DtoInnGataReport,

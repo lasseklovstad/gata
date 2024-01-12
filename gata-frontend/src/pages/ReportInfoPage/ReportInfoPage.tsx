@@ -7,7 +7,7 @@ import { Descendant } from "slate";
 import { MarkdownEditor } from "./MarkdownEditor";
 import { PublishButton } from "./PublishButton";
 import { client } from "../../api/client/client";
-import { usePutGataReportContent } from "../../api/report.api";
+import { putReportMarkdownContent, usePutGataReportContent } from "../../api/report.api";
 import { getRequiredAccessToken } from "../../auth0Client";
 import { PageLayout } from "../../components/PageLayout";
 import { RichTextEditor } from "../../components/RichTextEditor/RichTextEditor";
@@ -23,7 +23,14 @@ export const reportInfoPageLoader: LoaderFunction = async ({ request: { signal }
    return json<ReportInfoPageLoaderData>({ report, loggedInUser });
 };
 
-export const reportInfoPageAction: ActionFunction = () => {
+export const reportInfoPageAction: ActionFunction = async ({ request, params: { reportId } }) => {
+   const token = await getRequiredAccessToken();
+   const formData = await request.formData();
+   const intent = formData.get("intent");
+   if (intent === "saveMarkdown") {
+      const markdown = formData.get("markdown");
+      await putReportMarkdownContent(String(reportId), String(markdown), token);
+   }
    return json({});
 };
 
@@ -51,6 +58,7 @@ export const ReportInfoPage = () => {
          close && setEditing(false);
       }
    };
+
    const lastModifiedDate = new Date(report.lastModifiedDate);
 
    return (
@@ -147,11 +155,13 @@ export const ReportInfoPage = () => {
                />
             </>
          )}
+
+         <MarkdownEditor value={report.markdown} onCancel={() => setEditing(false)} />
+
          <Text fontSize="sm" color="gray" sx={{ mt: 1, mb: 10 }}>
             Sist redigert av: {report.lastModifiedBy}, {lastModifiedDate.toLocaleDateString()}{" "}
             {lastModifiedDate.toLocaleTimeString()}
          </Text>
-         <MarkdownEditor />
 
          <Outlet />
       </PageLayout>

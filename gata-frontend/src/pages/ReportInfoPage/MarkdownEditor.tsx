@@ -8,41 +8,26 @@ import {
    Link,
    StrikethroughS,
    Image,
+   Save,
 } from "@mui/icons-material";
 import { useRef, useState } from "react";
+import { useFetcher } from "react-router-dom";
 
+import { LoadingButton } from "../../components/Loading";
 import { MarkdownPreview } from "../../components/MarkdownPreview";
 
-// To try using the depreacted Document.execCommand() to change the value in the textfield when clicking toolbar options
-// The execute command makes it possible på manipulate input value without loosing input history
-// Defaults to true
-const useExecCommand = true;
+type Props = {
+   value: string;
+   onCancel: () => void;
+};
 
-export const MarkdownEditor = () => {
-   const [value, onChange] = useState("");
-
+export const MarkdownEditor = ({ value, onCancel }: Props) => {
+   const fetcher = useFetcher();
    const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
-   const getSelection = (selectionStart: number, selectionEnd: number) => {
-      const selectionBefore = value.substring(0, selectionStart);
-      const selection = selectionStart === selectionEnd ? "" : value.substring(selectionStart, selectionEnd);
-      const selectionAfter = value.substring(selectionEnd);
-      return { selectionBefore, selection, selectionAfter };
-   };
-
-   const changeInputValue = (textToAdd: string, allText: string) => {
-      if (useExecCommand && inputRef.current) {
-         const isSuccess = setTextValue(inputRef.current, textToAdd);
-         if (isSuccess) {
-            return;
-         }
-      }
-      // Fallback to using onChange
-      // Bas side of this is that the history of the input element is cleared each time.
-      onChange(allText);
+   const changeInputValue = (textToAdd: string) => {
       if (inputRef.current) {
-         // Set the value to be able to correctly place the cursor
-         inputRef.current.value = allText;
+         setTextValue(inputRef.current, textToAdd);
       }
    };
 
@@ -50,18 +35,15 @@ export const MarkdownEditor = () => {
       if (inputRef.current) {
          const { selectionStart, selectionEnd } = inputRef.current;
          if (selectionStart !== null && selectionEnd !== null && selectionEnd !== selectionStart) {
-            const { selectionBefore, selection, selectionAfter } = getSelection(selectionStart, selectionEnd);
+            const { selection } = getSelection(inputRef.current);
             const text = valueBefore + selection + (valueAfter ?? valueBefore);
-            const newValue = selectionBefore + text + selectionAfter;
-            changeInputValue(text, newValue);
+            changeInputValue(text);
             setSelectionRange(inputRef.current, selectionStart, selectionStart + text.length);
             return;
          }
          if (selectionStart !== null && defaultSelection) {
-            const { selectionBefore, selectionAfter } = getSelection(selectionStart, selectionStart);
             const text = valueBefore + defaultSelection + (valueAfter ?? valueAfter);
-            const newValue = selectionBefore + text + selectionAfter;
-            changeInputValue(text, newValue);
+            changeInputValue(text);
             setSelectionRange(inputRef.current, selectionStart, selectionStart + text.length);
             return;
          }
@@ -70,13 +52,10 @@ export const MarkdownEditor = () => {
 
    const addAfterSelectionStart = (value: string) => {
       if (inputRef.current) {
-         const { selectionStart, selectionEnd } = inputRef.current;
+         const { selectionStart } = inputRef.current;
          if (selectionStart !== null) {
-            // If selectionEnd is set the selection will be replaces by the vale
-            const { selectionBefore, selectionAfter } = getSelection(selectionStart, selectionEnd ?? selectionStart);
             const text = `\n\n${value}\n\n`;
-            const newValue = selectionBefore + text + selectionAfter;
-            changeInputValue(text, newValue);
+            changeInputValue(text);
             setSelectionRange(inputRef.current, selectionStart + text.length);
          }
       }
@@ -84,15 +63,11 @@ export const MarkdownEditor = () => {
 
    const addListToSelection = (value: string) => {
       if (inputRef.current) {
-         const { selectionStart, selectionEnd } = inputRef.current;
+         const { selectionStart } = inputRef.current;
          if (selectionStart !== null) {
-            const { selectionBefore, selection, selectionAfter } = getSelection(
-               selectionStart,
-               selectionEnd ?? selectionStart
-            );
+            const { selection } = getSelection(inputRef.current);
             const text = `\n\n${value} ${selection}\n\n`;
-            const newValue = selectionBefore + text + selectionAfter;
-            changeInputValue(text, newValue);
+            changeInputValue(text);
             setSelectionRange(inputRef.current, selectionStart + text.length - 2);
          }
       }
@@ -103,11 +78,9 @@ export const MarkdownEditor = () => {
          const { selectionStart } = inputRef.current;
          if (selectionStart !== null) {
             const startOfLine = getStartOfLine(selectionStart, inputRef.current.value);
-            const { selectionBefore, selectionAfter } = getSelection(startOfLine, startOfLine);
             const text = `${value} `;
-            const newValue = selectionBefore + text + selectionAfter;
             setSelectionRange(inputRef.current, startOfLine);
-            changeInputValue(text, newValue);
+            changeInputValue(text);
             setSelectionRange(inputRef.current, selectionStart + text.length);
          }
       }
@@ -122,7 +95,7 @@ export const MarkdownEditor = () => {
             </TabList>
 
             <TabPanels>
-               <TabPanel>
+               <TabPanel px={0}>
                   <Box
                      sx={{
                         display: "flex",
@@ -208,6 +181,7 @@ export const MarkdownEditor = () => {
                            key={id}
                            variant="ghost"
                            colorScheme="gray"
+                           title={ariaLabel}
                            aria-label={ariaLabel}
                            onMouseDown={(e) => e.preventDefault()}
                            onClick={(ev) => {
@@ -219,14 +193,30 @@ export const MarkdownEditor = () => {
                         </IconButton>
                      ))}
                   </Box>
-                  <Textarea
-                     bg="white"
-                     minHeight="300px"
-                     value={value}
-                     ref={inputRef}
-                     onChange={(e) => onChange(e.target.value)}
-                     placeholder="Begynn å skriv markdown..."
-                  />
+                  <fetcher.Form method="PUT">
+                     <Textarea
+                        bg="white"
+                        minHeight="300px"
+                        defaultValue={value}
+                        ref={inputRef}
+                        name="markdown"
+                        placeholder="Begynn å skriv markdown..."
+                     />
+                     <Box sx={{ p: 1 }}>
+                        <Button type="button" variant="ghost" onClick={onCancel} sx={{ mr: 1 }}>
+                           Avbryt
+                        </Button>
+                        <Button
+                           type="submit"
+                           name="intent"
+                           value="saveMarkdown"
+                           leftIcon={<Save />}
+                           isLoading={fetcher.state !== "idle"}
+                        >
+                           Lagre
+                        </Button>
+                     </Box>
+                  </fetcher.Form>
                </TabPanel>
                <TabPanel>
                   <MarkdownPreview text={value} />
@@ -235,6 +225,14 @@ export const MarkdownEditor = () => {
          </Tabs>
       </>
    );
+};
+
+const getSelection = (input: HTMLTextAreaElement) => {
+   const { selectionStart, selectionEnd, value } = input;
+   const selectionBefore = value.substring(0, selectionStart);
+   const selection = selectionStart === selectionEnd ? "" : value.substring(selectionStart, selectionEnd);
+   const selectionAfter = value.substring(selectionEnd);
+   return { selectionBefore, selection, selectionAfter };
 };
 
 const setTextValue = (input: HTMLTextAreaElement, value: string) => {

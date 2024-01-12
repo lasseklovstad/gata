@@ -2,7 +2,7 @@ package no.gata.web.controller.dtoOut
 
 import no.gata.web.models.GataReport
 import no.gata.web.models.ReportType
-import java.util.*
+import java.util.Date
 
 class DtoOutGataReport(
     var id: String?,
@@ -13,6 +13,7 @@ class DtoOutGataReport(
     var lastModifiedBy: String?,
     var createdBy: DtoOutSimpleGataUser?,
     var content: String?,
+    var markdown: String,
     var type: ReportType,
 ) {
     constructor(gataReport: GataReport) : this(
@@ -24,6 +25,7 @@ class DtoOutGataReport(
         lastModifiedBy = gataReport.lastModifiedBy,
         createdBy = gataReport.createdBy?.let { DtoOutSimpleGataUser(it) },
         content = gataReport.content,
+        markdown = gataReport.markdown,
         type = gataReport.type,
     )
 }

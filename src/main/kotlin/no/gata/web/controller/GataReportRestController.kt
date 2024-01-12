@@ -1,6 +1,7 @@
 package no.gata.web.controller
 
 import no.gata.web.controller.dtoInn.DtoInnGataReport
+import no.gata.web.controller.dtoInn.DtoInnMarkdown
 import no.gata.web.controller.dtoOut.DtoOutGataReport
 import no.gata.web.controller.dtoOut.DtoOutGataReportSimple
 import no.gata.web.models.ReportType
@@ -155,5 +156,16 @@ class GataReportRestController {
         val user = gataUserService.getLoggedInUser(authentication)
         val report = gataReportService.updateReportContent(id, body, user.getPrimaryUser())
         return DtoOutGataReport(report)
+    }
+
+    @PutMapping("{id}/markdown")
+    @PreAuthorize("hasAuthority('member')")
+    fun updateReportMarkdown(
+        @RequestBody body: DtoInnMarkdown,
+        authentication: JwtAuthenticationToken,
+        @PathVariable id: String,
+    ) {
+        val user = gataUserService.getLoggedInUser(authentication)
+        gataReportService.updateReportMarkdown(id, body.markdown, user.getPrimaryUser())
     }
 }
