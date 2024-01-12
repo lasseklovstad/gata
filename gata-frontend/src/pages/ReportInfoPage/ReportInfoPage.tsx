@@ -1,9 +1,10 @@
 import { Box, Button, Heading, IconButton, Text } from "@chakra-ui/react";
 import { Delete, Edit } from "@mui/icons-material";
 import { useState } from "react";
-import { ActionFunction, json, Link, LoaderFunction, Outlet, useLoaderData, useSubmit } from "react-router-dom";
+import { ActionFunction, Link, LoaderFunction, Outlet, json, useLoaderData, useSubmit } from "react-router-dom";
 import { Descendant } from "slate";
 
+import { MarkdownEditor } from "./MarkdownEditor";
 import { PublishButton } from "./PublishButton";
 import { client } from "../../api/client/client";
 import { usePutGataReportContent } from "../../api/report.api";
@@ -150,6 +151,8 @@ export const ReportInfoPage = () => {
             Sist redigert av: {report.lastModifiedBy}, {lastModifiedDate.toLocaleDateString()}{" "}
             {lastModifiedDate.toLocaleTimeString()}
          </Text>
+         <MarkdownEditor />
+
          <Outlet />
       </PageLayout>
    );
