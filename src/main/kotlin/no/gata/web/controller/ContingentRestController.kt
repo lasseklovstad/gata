@@ -14,7 +14,6 @@ import java.time.Year
 @RestController
 @RequestMapping("api/contingent")
 class ContingentRestController {
-
     @Value(value = "\${gata.contingent.bank}")
     private lateinit var contingentBank: String
 
@@ -31,18 +30,18 @@ class ContingentRestController {
     @PreAuthorize("hasAuthority('admin')")
     fun publishContigent(): List<String> {
         val members = gataUserService.getAllMembers()
-        val membersNotPaid = members.filter {
-            it.contingents.find { cont -> cont.year.equals(Year.now().value) }?.isPaid != true
-        }.mapNotNull { it.getPrimaryUser() }
+        val membersNotPaid =
+            members.filter {
+                it.contingents.find { cont -> cont.year.equals(Year.now().value) }?.isPaid != true
+            }.mapNotNull { it.getPrimaryUser() }
         if (membersNotPaid.isNotEmpty()) {
             membersNotPaid.forEach {
                 emailService.sendTextEmail(
                     it.email,
                     "Du har ikke betalt Gata kontigenten!",
-                    "<h1>Betal kontigent</h1><p>Du har ikke betalt kontigenten på ${contingentSize}kr til ${contingentBank}!</p>"
+                    "<h1>Betal kontigent</h1><p>Du har ikke betalt kontigenten på ${contingentSize}kr til $contingentBank!</p>",
                 )
             }
-
         }
         return membersNotPaid.map { it.email }
     }

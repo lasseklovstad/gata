@@ -7,13 +7,18 @@ import no.gata.web.service.CloudinaryService
 import no.gata.web.service.GataReportService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.*
-import java.util.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import java.util.Optional
+import java.util.UUID
 
 @RestController
 @RequestMapping("api/file")
 class GataReportFileRestController {
-
     @Autowired
     private lateinit var gataReportFileRepository: GataReportFileRepository
 
@@ -26,33 +31,38 @@ class GataReportFileRestController {
     // Old upload
     @PostMapping()
     @PreAuthorize("hasAuthority('member')")
-    fun createReportFile(@RequestBody body: DtoInnGataReportFile): GataReportFile {
+    fun createReportFile(
+        @RequestBody body: DtoInnGataReportFile,
+    ): GataReportFile {
         val report = gataReportService.getReport(body.reportId)
         val newFile = GataReportFile(id = null, data = body.data, report = report, cloudUrl = null, cloudId = null)
         return gataReportFileRepository.save(newFile)
-
     }
 
     @PostMapping("cloud")
     @PreAuthorize("hasAuthority('member')")
-    fun createCloudFile(@RequestBody body: DtoInnGataReportFile): GataReportFile {
+    fun createCloudFile(
+        @RequestBody body: DtoInnGataReportFile,
+    ): GataReportFile {
         val report = gataReportService.getReport(body.reportId)
         val cloudFile = cloudinaryService.uploadFile(body.data)
 
-        val newFile = GataReportFile(
-            id = null,
-            cloudUrl = cloudFile.cloudUrl,
-            report = report,
-            cloudId = cloudFile.cloudId,
-            data = null
-        )
+        val newFile =
+            GataReportFile(
+                id = null,
+                cloudUrl = cloudFile.cloudUrl,
+                report = report,
+                cloudId = cloudFile.cloudId,
+                data = null,
+            )
         return gataReportFileRepository.save(newFile)
-
     }
 
     @GetMapping("{fileId}")
     @PreAuthorize("hasAuthority('member')")
-    fun getReportFile(@PathVariable fileId: String): Optional<GataReportFile> {
+    fun getReportFile(
+        @PathVariable fileId: String,
+    ): Optional<GataReportFile> {
         return gataReportFileRepository.findById(UUID.fromString(fileId))
     }
 }

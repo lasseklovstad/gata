@@ -53,7 +53,7 @@ const config: PlaywrightTestConfig = {
       testMatch: ["globalSetup.spec.ts"],
     },
     {
-      name: "chromium",
+      name: "main",
       dependencies: ["setup"],
       use: {
         ...devices["Desktop Chrome"],

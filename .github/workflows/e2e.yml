@@ -1,4 +1,4 @@
-name: 'e2e'
+name: 'pr'
 
 on:
   push:
@@ -67,6 +67,12 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install npm dependencies and check typescript
+        working-directory: ./gata-tests
+        run: |
+          npm ci
+          npm run typescript
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -84,7 +90,6 @@ jobs:
       - name: Install playwright
         working-directory: ./gata-tests
         run: |
-         npm ci
          npx playwright install --with-deps chromium
 
       - name: Run E2E tests
@@ -106,7 +111,7 @@ jobs:
          # DEBUG: pw:webserver
          # DEBUG: pw:api
         run: |
-          npx playwright test --project=chromium
+          npx playwright test
 
       - name: Upload test results
         if: always()

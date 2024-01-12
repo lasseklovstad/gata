@@ -1,6 +1,6 @@
 package no.gata.web.controller.dtoInn
 
 data class DtoInnResponsibility(
-        var name: String,
-        var description: String,
+    var name: String,
+    var description: String,
 )

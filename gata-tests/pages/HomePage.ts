@@ -48,6 +48,10 @@ export class HomePage {
     this.documentPage = new DocumentPage(page);
   }
 
+  async goto() {
+    await this.page.goto("");
+  }
+
   async addNews(title: string, description: string) {
     await this.addNewsButton.click();
     await this.addNewsModal.fillForm(title, description);
@@ -76,16 +80,26 @@ export class HomePage {
   }
 
   async deleteAllNews() {
-    const items = this.page.getByRole("listitem");
+    const items = this.newsList.getByRole("listitem");
     const count = await items.count();
     // Iterate backwards
     for (let i = count - 1; i >= 0; i--) {
-      const item = items.nth(i);
-      await expect(item).toBeVisible();
-      const { editButton } = this.getListItemButtons(item);
-      await editButton.click();
-      await this.documentPage.deleteDocument();
-      await expect(this.memberWelcomeTitle).toBeVisible();
+      await this.deleteNewsItem(items.nth(i));
     }
+  }
+
+  private async deleteNewsItem(item: Locator) {
+    await expect(item).toBeVisible();
+    const { editButton } = this.getListItemButtons(item);
+    await editButton.click();
+    await this.documentPage.deleteDocument();
+    await expect(this.memberWelcomeTitle).toBeVisible();
+  }
+
+  async deleteNews(title: string) {
+    const item = this.newsList
+      .getByRole("listitem")
+      .filter({ has: this.page.getByRole("heading", { name: title }) });
+    await this.deleteNewsItem(item);
   }
 }

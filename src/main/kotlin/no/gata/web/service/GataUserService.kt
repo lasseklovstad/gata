@@ -12,8 +12,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
-import kotlin.jvm.optionals.getOrElse
+import java.util.UUID
 
 @Service
 class GataUserService {
@@ -40,39 +39,64 @@ class GataUserService {
     }
 
     fun findOrCreateNewExternalUser(authentication: JwtAuthenticationToken): ExternalUser {
-        return externalUserRepository
-            .findById(authentication.name)
-            .getOrElse {
-                // save external user if it doesn't exist in database
-                createNewExternalUser(authentication)
-            }
+        val externalUserOptional =
+            externalUserRepository
+                .findById(authentication.name)
+
+        return if (externalUserOptional.isEmpty) {
+            // save external user if it doesn't exist in database
+            createNewExternalUser(authentication)
+        } else {
+            updateExternalUserInfo(authentication, externalUserOptional.get())
+        }
+    }
+
+    fun updateExternalUserInfo(
+        authentication: JwtAuthenticationToken,
+        externalUser: ExternalUser,
+    ): ExternalUser {
+        val auth0User =
+            auth0RestService.getUserInfo(authentication.token.tokenValue)
+                .orElseThrow { ExternalUserNotFound(authentication.name) }
+        externalUser.apply {
+            name = auth0User.name
+            picture = auth0User.picture
+            lastLogin = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
+        }
+        return externalUserRepository.save(externalUser)
     }
 
     fun createNewExternalUser(authentication: JwtAuthenticationToken): ExternalUser {
-        val auth0User = auth0RestService.getUserInfo(authentication.token.tokenValue)
-            .orElseThrow { ExternalUserNotFound(authentication.name) }
-        val newExternalUser = ExternalUser(
-            id = auth0User.userId,
-            name = auth0User.name,
-            email = auth0User.email,
-            picture = auth0User.picture,
-            lastLogin = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
-            user = null, primary = false
-        )
-        return externalUserRepository
-            .findById(authentication.name)
-            .getOrElse {
-                externalUserRepository.save(newExternalUser)
-            }
+        val auth0User =
+            auth0RestService.getUserInfo(authentication.token.tokenValue)
+                .orElseThrow { ExternalUserNotFound(authentication.name) }
+        val newExternalUser =
+            ExternalUser(
+                id = auth0User.userId,
+                name = auth0User.name,
+                email = auth0User.email,
+                picture = auth0User.picture,
+                lastLogin = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
+                user = null,
+                primary = false,
+            )
+        return externalUserRepository.save(newExternalUser)
     }
 
-    fun createNewGataUser(externalUser: ExternalUser, userRoleName: UserRoleName?) {
-
-        val newGataUser = gataUserRepository.save(
-            if (userRoleName == null) GataUser() else GataUser(
-                gataRoleService.getRole(userRoleName)
+    fun createNewGataUser(
+        externalUser: ExternalUser,
+        userRoleName: UserRoleName?,
+    ) {
+        val newGataUser =
+            gataUserRepository.save(
+                if (userRoleName == null) {
+                    GataUser()
+                } else {
+                    GataUser(
+                        gataRoleService.getRole(userRoleName),
+                    )
+                },
             )
-        )
         externalUser.user = newGataUser
         externalUser.primary = true
         externalUserRepository.save(externalUser)

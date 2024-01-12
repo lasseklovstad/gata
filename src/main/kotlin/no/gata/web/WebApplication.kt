@@ -19,5 +19,3 @@ class WebApplication : CommandLineRunner {
 fun main(args: Array<String>) {
     runApplication<WebApplication>(*args)
 }
-
-

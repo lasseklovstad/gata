@@ -13,15 +13,12 @@ import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtDecoders
 import org.springframework.security.oauth2.jwt.JwtValidators
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.security.web.SecurityFilterChain
 
 @EnableWebSecurity
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 class WebSecurityConfig() {
-
     @Value(value = "\${auth0.audience}")
     private lateinit var audience: String
 
@@ -41,7 +38,7 @@ class WebSecurityConfig() {
                 "/api/auth0user/**",
                 "/api/report/**",
                 "/api/responsibility/**",
-                "/api/contingent/**"
+                "/api/contingent/**",
             ).authenticated().anyRequest().permitAll()
         }.oauth2ResourceServer { oauth2 ->
             oauth2.jwt { jwt ->

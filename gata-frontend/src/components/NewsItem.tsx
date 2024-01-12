@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
 import { RichTextPreview } from "./RichTextEditor/RichTextPreview";
@@ -16,7 +16,9 @@ export const NewsItem = ({ report, loggedInUser }: NewsItemProps) => {
    return (
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%", alignItems: "flex-end" }}>
          <Flex alignItems="center" width="100%">
-            <Text flex={1}>{report.title}</Text>
+            <Heading flex={1} as="h2" size="md">
+               {report.title}
+            </Heading>
             {canEdit && (
                <Button as={Link} to={`/reportInfo/${report.id}`} variant="ghost">
                   Rediger

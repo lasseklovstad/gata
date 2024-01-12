@@ -29,3 +29,5 @@ export class Environment {
     return value;
   }
 }
+
+export const env = new Environment();

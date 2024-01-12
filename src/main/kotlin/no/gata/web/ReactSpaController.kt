@@ -5,17 +5,19 @@ import org.springframework.web.bind.annotation.RequestMapping
 
 @Controller
 class ReactSpaController {
-
     /**
      * This must match all the routes in the React application
      */
-    @RequestMapping(value = [
-        "/member/**",
-        "/callback/**",
-        "/privacy/**",
-        "/report/**",
-        "/reportInfo/**",
-        "/responsibility/**"])
+    @RequestMapping(
+        value = [
+            "/member/**",
+            "/callback/**",
+            "/privacy/**",
+            "/report/**",
+            "/reportInfo/**",
+            "/responsibility/**",
+        ],
+    )
     fun redirect(): String? {
         return "forward:/"
     }

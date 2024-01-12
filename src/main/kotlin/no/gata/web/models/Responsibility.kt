@@ -1,17 +1,19 @@
 package no.gata.web.models
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import java.util.*
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
+import java.util.UUID
 
 @Entity
-class Responsibility (
-        @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
-        var id: UUID? = null,
-        var name: String = "",
-        var description: String = "",
-        @OneToMany(mappedBy = "responsibility")
-        @JsonIgnore
-        var responsibilityYears: List<ResponsibilityYear>? = null
+class Responsibility(
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    var id: UUID? = null,
+    var name: String = "",
+    var description: String = "",
+    @OneToMany(mappedBy = "responsibility")
+    var responsibilityYears: List<ResponsibilityYear>? = null,
 )

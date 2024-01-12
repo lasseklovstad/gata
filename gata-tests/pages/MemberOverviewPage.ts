@@ -3,12 +3,12 @@ import { GataHeader } from "./GataHeader";
 
 export class MemberOverviewPage {
   private readonly page: Page;
-  header: GataHeader;
-  pageTitle: Locator;
-  listMembers: Locator;
-  listLoggedInUsers: Locator;
-  listNotMembers: Locator;
-  listAdmins: Locator;
+  private readonly header: GataHeader;
+  private readonly pageTitle: Locator;
+  private readonly listMembers: Locator;
+  private readonly listLoggedInUsers: Locator;
+  private readonly listNotMembers: Locator;
+  private readonly listAdmins: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -28,31 +28,37 @@ export class MemberOverviewPage {
     await expect(this.pageTitle).toBeVisible();
   }
 
-  private getUserListItem(
-    username: string,
-    type: "admin" | "member" | "notMember" | "loggedIn"
-  ) {
+  private getList(type: ListType) {
     const lists: Record<typeof type, Locator> = {
       admin: this.listAdmins,
       member: this.listMembers,
       notMember: this.listNotMembers,
       loggedIn: this.listLoggedInUsers,
     };
-    return lists[type]
+    return lists[type];
+  }
+
+  private getUserListItem(username: string, type: ListType) {
+    return this.getList(type)
       .getByRole("listitem")
       .filter({ hasText: new RegExp(`^${username}`) });
   }
 
-  async goToMember(name: string) {
-    await this.getUserListItem(name, "member").click();
+  async gotoUser(name: string, type: ListType) {
+    await this.getUserListItem(name, type).click();
   }
 
-  async goToNonMember(name: string) {
-    await this.getUserListItem(name, "notMember").click();
-  }
-
-  async verifyMember(name: string) {
-    await expect(this.getUserListItem(name, "member")).toBeVisible();
+  async verifyUsersInList(names: string | string[], type: ListType) {
+    if (typeof names === "string") {
+      await expect(this.getUserListItem(names, type)).toBeVisible();
+    } else {
+      await expect(this.getList(type).getByRole("listitem")).toHaveCount(
+        names.length
+      );
+      for (const name of names) {
+        await expect(this.getUserListItem(name, type)).toBeVisible();
+      }
+    }
   }
 
   async addUser(username: string) {
@@ -62,3 +68,5 @@ export class MemberOverviewPage {
     await expect(this.getUserListItem(username, "notMember")).toBeVisible();
   }
 }
+
+type ListType = "admin" | "member" | "notMember" | "loggedIn";
