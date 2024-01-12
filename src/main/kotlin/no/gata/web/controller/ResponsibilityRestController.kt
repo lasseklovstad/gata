@@ -1,6 +1,7 @@
 package no.gata.web.controller
 
 import no.gata.web.controller.dtoInn.DtoInnResponsibility
+import no.gata.web.controller.dtoOut.DtoOutResponsibility
 import no.gata.web.exception.ResponsibilityNotFound
 import no.gata.web.models.Responsibility
 import no.gata.web.repository.ResponsibilityRepository
@@ -31,17 +32,17 @@ class ResponsibilityRestController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('member')")
-    fun getResponsibilities(): List<Responsibility> {
-        return responsibilityRepository.findAll()
+    fun getResponsibilities(): List<DtoOutResponsibility> {
+        return responsibilityRepository.findAll().map { DtoOutResponsibility(it) }
     }
 
     @GetMapping("{responsibilityId}")
     @PreAuthorize("hasAuthority('member')")
     fun getResponsibility(
         @PathVariable responsibilityId: String,
-    ): Responsibility {
+    ): DtoOutResponsibility {
         return responsibilityRepository.findById(UUID.fromString(responsibilityId))
-            .orElseThrow { ResponsibilityNotFound(responsibilityId) }
+            .orElseThrow { ResponsibilityNotFound(responsibilityId) }.let { DtoOutResponsibility(it) }
     }
 
     @PostMapping
