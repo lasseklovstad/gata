@@ -3,6 +3,7 @@ import { Descendant } from "slate";
 
 import { useClient } from "./client/useClient";
 import { IGataReport } from "../types/GataReport.type";
+import { client } from "./client/client";
 
 export const useGetReportEmails = () => {
    const [emailsResponse, clientFetch] = useClient<string[], never>();
@@ -33,4 +34,8 @@ export const usePutGataReportContent = (id: string) => {
    };
 
    return { putReportResponse, putReportContent };
+};
+
+export const putReportMarkdownContent = (reportId: string, markdown: string, token: string) => {
+   return client(`report/${reportId}/markdown`, { method: "PUT", body: { markdown }, token });
 };

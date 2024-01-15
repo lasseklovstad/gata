@@ -8,6 +8,7 @@ export interface IGataReport {
    lastModifiedDate: string;
    lastModifiedBy: string | null;
    content: string | null;
+   markdown: string;
    type: GataReportType;
    createdBy?: ISimpleGataUser;
 }

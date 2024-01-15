@@ -8,14 +8,14 @@ import {
    Save,
 } from "@mui/icons-material";
 import { useCallback, useMemo, useRef } from "react";
-import { createEditor, Descendant } from "slate";
+import { createEditor, Descendant, Editor } from "slate";
 import { withHistory } from "slate-history";
 import { Editable, RenderElementProps, RenderLeafProps, Slate, withReact } from "slate-react";
 
 import { AddImage } from "./AddImage";
 import { BlockButton } from "./BlockButton";
 import { MarkButton } from "./MarkButton";
-import { insertTab, toggleMark } from "./RichTextEditor.util";
+import { endListIfEmptyListItem, insertTab, toggleMark } from "./RichTextEditor.util";
 import { RichTextElement } from "./RichTextElement";
 import { RichTextLeaf } from "./RichTextLeaf";
 import { insertImage, withImages } from "./withImages";
@@ -49,6 +49,9 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
               },
            ];
    }, [initialContent]);
+
+   console.log(initialValue);
+
    const content = useRef<Descendant[]>();
 
    const handleSave = (close: boolean) => {
@@ -70,8 +73,6 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
          >
             <Box boxShadow="xl" sx={{ mt: 1 }}>
                <Box
-                  bg="white"
-                  zIndex={1}
                   sx={{
                      display: "flex",
                      justifyContent: "space-between",
@@ -79,6 +80,8 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                      alignItems: "center",
                      position: "sticky",
                      top: "0",
+                     bgColor: "white",
+                     zIndex: 1,
                   }}
                >
                   <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center" }}>
@@ -115,16 +118,11 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                      <Loading response={fileResponse} />
                      <Loading response={saveResponse} />
                   </Box>
-                  <Box sx={{ p: 1 }}>
-                     <Button variant="ghost" onClick={() => onCancel()} sx={{ mr: 1 }}>
+                  <Box sx={{ display: "flex", gap: 1, justifyContent: "end" }}>
+                     <Button variant="outline" onClick={() => onCancel()}>
                         Avbryt
                      </Button>
-                     <LoadingButton
-                        leftIcon={<Save />}
-                        response={saveResponse}
-                        onClick={() => handleSave(true)}
-                        sx={{ mr: 1 }}
-                     >
+                     <LoadingButton leftIcon={<Save />} response={saveResponse} onClick={() => handleSave(true)}>
                         Lagre
                      </LoadingButton>
                   </Box>
@@ -133,7 +131,7 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                <Box sx={{ p: 2, minHeight: "600px" }}>
                   <Editable
                      aria-label="Rediger innhold"
-                     style={{ minHeight: "600px" }}
+                     style={{ minHeight: "600px", outline: 0 }}
                      renderElement={renderElement}
                      renderLeaf={renderLeaf}
                      onKeyDown={(event) => {
@@ -146,6 +144,10 @@ export const RichTextEditor = ({ onCancel, onSave, saveResponse, initialContent,
                            case "Tab": {
                               event.preventDefault();
                               insertTab(editor);
+                              break;
+                           }
+                           case "Enter": {
+                              endListIfEmptyListItem(editor) && event.preventDefault();
                               break;
                            }
                         }

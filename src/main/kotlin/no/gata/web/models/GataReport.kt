@@ -1,6 +1,7 @@
 package no.gata.web.models
 
 import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -22,6 +23,8 @@ class GataReport(
     var createdDate: Date = Date(),
     var lastModifiedDate: Date = Date(),
     var lastModifiedBy: String? = null,
+    @Column(columnDefinition = "TEXT")
+    var markdown: String = "",
     @ManyToOne
     @JoinColumn(name = "created_by")
     var createdBy: GataUser? = null,
