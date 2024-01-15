@@ -1,10 +1,9 @@
-import { Box, Button, Heading, IconButton, Text } from "@chakra-ui/react";
-import { Delete, Edit } from "@mui/icons-material";
+import { Box, Heading, IconButton, Menu, MenuButton, MenuItem, MenuList, Text } from "@chakra-ui/react";
+import { Delete, Edit, Menu as MenuIcon } from "@mui/icons-material";
 import { useState } from "react";
 import { ActionFunction, Link, LoaderFunction, Outlet, json, useLoaderData, useSubmit } from "react-router-dom";
 import { Descendant } from "slate";
 
-import { MarkdownEditor } from "./MarkdownEditor";
 import { PublishButton } from "./PublishButton";
 import { client } from "../../api/client/client";
 import { putReportMarkdownContent, usePutGataReportContent } from "../../api/report.api";
@@ -67,67 +66,33 @@ export const ReportInfoPage = () => {
             <Heading as="h1" id="report-page-title">
                {report.title}
             </Heading>
-            {canEdit && (
+            {canEdit && !editing && (
                <Box>
-                  <Button
-                     variant="ghost"
-                     leftIcon={<Delete />}
-                     as={Link}
-                     to={`${report.type}/delete`}
-                     sx={{ mr: 1, display: { base: "none", md: "inline-flex" } }}
-                  >
-                     Slett
-                  </Button>
                   <PublishButton reportId={report.id} />
-                  <Button
-                     variant="ghost"
-                     leftIcon={<Edit />}
-                     as={Link}
-                     to="edit"
-                     sx={{ display: { base: "none", md: "inline-flex" } }}
-                  >
-                     Rediger info
-                  </Button>
-                  <IconButton
-                     variant="ghost"
-                     as={Link}
-                     to="delete"
-                     sx={{ mr: 1, display: { md: "none" } }}
-                     icon={<Delete />}
-                     aria-label="Slett"
-                  />
-                  <IconButton
-                     variant="ghost"
-                     as={Link}
-                     to="edit"
-                     sx={{ display: { md: "none" } }}
-                     icon={<Edit />}
-                     aria-label="Rediger"
-                  />
+                  <Menu>
+                     <MenuButton aria-label="Handlinger" as={IconButton} icon={<MenuIcon />} variant="ghost" />
+                     <MenuList zIndex={2}>
+                        <MenuItem gap={2} as={Link} to={`${report.type}/delete`}>
+                           <Delete />
+                           Slett
+                        </MenuItem>
+                        <MenuItem gap={2} as={Link} to={"edit"}>
+                           <Edit />
+                           Rediger tittel og beskrivelse
+                        </MenuItem>
+                        <MenuItem gap={2} onClick={() => setEditing(true)}>
+                           <Edit />
+                           Rediger innhold
+                        </MenuItem>
+                     </MenuList>
+                  </Menu>
                </Box>
             )}
          </Box>
          <Text mb={2}>{report.description}</Text>
+
          {!editing && (
             <>
-               {canEdit && (
-                  <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                     <Button
-                        leftIcon={<Edit />}
-                        onClick={() => setEditing(true)}
-                        sx={{ display: { base: "none", md: "flex" } }}
-                     >
-                        Rediger innhold
-                     </Button>
-                     <IconButton
-                        variant="ghost"
-                        onClick={() => setEditing(true)}
-                        sx={{ display: { md: "none" } }}
-                        aria-label="Rediger"
-                        icon={<Edit />}
-                     />
-                  </Box>
-               )}
                <Box
                   boxShadow="xs"
                   rounded={4}
@@ -155,8 +120,6 @@ export const ReportInfoPage = () => {
                />
             </>
          )}
-
-         <MarkdownEditor value={report.markdown} onCancel={() => setEditing(false)} />
 
          <Text fontSize="sm" color="gray" sx={{ mt: 1, mb: 10 }}>
             Sist redigert av: {report.lastModifiedBy}, {lastModifiedDate.toLocaleDateString()}{" "}
