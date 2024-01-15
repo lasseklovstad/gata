@@ -201,9 +201,10 @@ export const MarkdownEditor = ({ value, onCancel }: Props) => {
                         ref={inputRef}
                         name="markdown"
                         placeholder="Begynn å skriv markdown..."
+                        onBlur={(e) => fetcher.submit(e.target.form, { method: "PUT" })}
                      />
-                     <Box sx={{ p: 1 }}>
-                        <Button type="button" variant="ghost" onClick={onCancel} sx={{ mr: 1 }}>
+                     <Box sx={{ p: 1, display: "flex", justifyContent: "end", gap: 2 }}>
+                        <Button type="button" variant="outline" onClick={onCancel} colorScheme="red">
                            Avbryt
                         </Button>
                         <Button

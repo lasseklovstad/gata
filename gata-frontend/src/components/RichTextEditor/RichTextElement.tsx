@@ -45,15 +45,15 @@ export const RichTextElement = ({ attributes, children, element, outsideContext 
          );
       case "list-item":
          return <ListItem {...attributes}>{children}</ListItem>;
-      case "native-list-item":
-         return (
-            <Text as="li" {...attributes}>
-               {children}
-            </Text>
-         );
       case "bulleted-list":
          return (
             <UnorderedList p={2} {...attributes}>
+               {children}
+            </UnorderedList>
+         );
+      case "nested-list":
+         return (
+            <UnorderedList px={2} listStyleType="circle" {...attributes}>
                {children}
             </UnorderedList>
          );

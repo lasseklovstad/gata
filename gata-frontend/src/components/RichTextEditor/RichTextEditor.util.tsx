@@ -1,4 +1,4 @@
-import { Editor, Transforms, Element, Text } from "slate";
+import { Editor, Transforms, Element, Text, Node } from "slate";
 
 import type { BlockTypes } from "./BlockButton";
 import { ListTypes, LIST_TYPES, MarkType } from "./RichTextEditor.types";
@@ -7,27 +7,22 @@ const getIsListType = (type: BlockTypes): type is ListTypes => {
    return LIST_TYPES.includes(type as ListTypes);
 };
 
-const getIsMuiListType = (type: BlockTypes): type is ListTypes => {
-   return type === "mui-list";
-};
-
 export const toggleBlock = (editor: Editor, type: BlockTypes) => {
    const isActive = isBlockActive(editor, type);
    const isList = getIsListType(type);
-   const isMuiList = getIsMuiListType(type);
 
    Transforms.unwrapNodes(editor, {
       match: (n) => !Editor.isEditor(n) && Element.isElement(n) && LIST_TYPES.includes(n.type as ListTypes),
       split: true,
    });
    if (isList) {
-      Transforms.setNodes<Element>(editor, { type: isActive ? "body1" : isMuiList ? "list-item" : "native-list-item" });
+      Transforms.setNodes<Element>(editor, { type: isActive ? "body1" : "list-item" });
    } else {
       Transforms.setNodes<Element>(editor, { type: isActive ? "body1" : type });
    }
 
    if (!isActive && isList) {
-      const block = { type: type, children: [] };
+      const block = { type, children: [] };
       Transforms.wrapNodes(editor, block);
    }
 };
@@ -52,15 +47,32 @@ export const isMarkActive = (editor: Editor, type: MarkType) => {
 };
 
 export const toggleMark = (editor: Editor, type: MarkType) => {
-   Transforms.setNodes(
-      editor,
-      { [type]: isMarkActive(editor, type) ? false : true },
-      // Apply it to text nodes, and split the text node up if the
-      // selection is overlapping only part of it.
-      { match: (n) => Text.isText(n), split: true }
-   );
+   const isActive = isMarkActive(editor, type);
+
+   if (isActive) {
+      Editor.removeMark(editor, type);
+   } else {
+      Editor.addMark(editor, type, true);
+   }
 };
 
 export const insertTab = (editor: Editor) => {
-   Editor.insertText(editor, "    ");
+   const [match] = Editor.nodes(editor, {
+      match: (n) => !Editor.isEditor(n) && Element.isElement(n) && n.type === "list-item",
+   });
+   if (match) {
+      Transforms.wrapNodes(editor, { type: "nested-list", children: [] }, { at: match[1] });
+   } else {
+      Editor.insertText(editor, "    ");
+   }
+};
+
+export const endListIfEmptyListItem = (editor: Editor) => {
+   const [match1] = Editor.nodes<Element>(editor, {
+      match: (n) => !Editor.isEditor(n) && Element.isElement(n) && n.type === "list-item",
+   });
+
+   Node.
+
+   return false;
 };
