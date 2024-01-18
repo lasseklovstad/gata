@@ -1,4 +1,5 @@
 import { Link, Text, Heading } from "@chakra-ui/react";
+
 import { PageLayout } from "./PageLayout";
 
 export const Privacy = () => {
@@ -126,9 +127,9 @@ export const Privacy = () => {
          <Heading as="h2">Usage Data</Heading>
          <Text>Usage Data is collected automatically when using the Service.</Text>
          <Text mb={4}>
-            Usage Data may include information such as Your Device's Internet Protocol address (e.g. IP address),
-            browser type, browser version, the pages of our Service that You visit, the time and date of Your visit, the
-            time spent on those pages, unique device identifiers and other diagnostic data.
+            Usage Data may include information such as Your Devices Internet Protocol address (e.g. IP address), browser
+            type, browser version, the pages of our Service that You visit, the time and date of Your visit, the time
+            spent on those pages, unique device identifiers and other diagnostic data.
          </Text>
          <Text mb={4}>
             When You access the Service by or through a mobile device, We may collect certain information automatically,
@@ -250,7 +251,7 @@ export const Privacy = () => {
             <li>
                <Text>
                   <strong>To contact You:</strong> To contact You by email, telephone calls, SMS, or other equivalent
-                  forms of electronic communication, such as a mobile application's push notifications regarding updates
+                  forms of electronic communication, such as a mobile applications push notifications regarding updates
                   or informative communications related to the functionalities, products or contracted services,
                   including the security updates, when necessary or reasonable for their implementation.
                </Text>
@@ -328,7 +329,7 @@ export const Privacy = () => {
          </Text>
          <Heading as="h3">Transfer of Your Personal Data</Heading>
          <Text mb={4}>
-            Your information, including Personal Data, is processed at the Company's operating offices and in any other
+            Your information, including Personal Data, is processed at the Companys operating offices and in any other
             places where the parties involved in the processing are located. It means that this information may be
             transferred to — and maintained on — computers located outside of Your state, province, country or other
             governmental jurisdiction where the data protection laws may differ than those from Your jurisdiction.
@@ -374,7 +375,7 @@ export const Privacy = () => {
          </Text>
          <Heading as="h2">Request deletion of Your Personal Data</Heading>
          <Text mb={4}>You can request deletion of your data by sending a email to lasse.klovstad@gmail.com</Text>
-         <Heading as="h2">Children's Privacy</Heading>
+         <Heading as="h2">Childrens Privacy</Heading>
          <Text mb={4}>
             Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable
             information from anyone under the age of 13. If You are a parent or guardian and You are aware that Your
@@ -384,13 +385,13 @@ export const Privacy = () => {
          </Text>
          <Text mb={4}>
             If We need to rely on consent as a legal basis for processing Your information and Your country requires
-            consent from a parent, We may require Your parent's consent before We collect and use that information.
+            consent from a parent, We may require Your parents consent before We collect and use that information.
          </Text>
          <Heading as="h2">Links to Other Websites</Heading>
          <Text mb={4}>
             Our Service may contain links to other websites that are not operated by Us. If You click on a third party
-            link, You will be directed to that third party's site. We strongly advise You to review the Privacy Policy
-            of every site You visit.
+            link, You will be directed to that third partys site. We strongly advise You to review the Privacy Policy of
+            every site You visit.
          </Text>
          <Text mb={4}>
             We have no control over and assume no responsibility for the content, privacy policies or practices of any

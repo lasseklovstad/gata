@@ -1,11 +1,12 @@
-import { Link, Outlet } from "react-router-dom";
-import { PageLayout } from "./PageLayout";
-import { Add } from "@mui/icons-material";
-import { NewsItem } from "./NewsItem";
 import { Box, Button, Heading, List, ListItem, Text } from "@chakra-ui/react";
-import { Page } from "../types/Page.type";
+import { Add } from "@mui/icons-material";
+import { Link, Outlet } from "react-router-dom";
+
+import { NewsItem } from "./NewsItem";
+import { PageLayout } from "./PageLayout";
 import { IGataReport } from "../types/GataReport.type";
 import { IGataUser } from "../types/GataUser.type";
+import { Page } from "../types/Page.type";
 
 type NewsProps = {
    reportPage: Page<IGataReport>;

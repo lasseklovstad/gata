@@ -1,6 +1,7 @@
+import { useCallback, useEffect } from "react";
+
 import { useClient } from "./client/useClient";
 import { IGataReportFile, IGataReportFilePayload } from "../types/GataReportFile.type";
-import { useCallback, useEffect } from "react";
 
 export const useGetGataReportFile = (fileId: string) => {
    const [fileResponse, clientFetch] = useClient<IGataReportFile, never>();
@@ -10,6 +11,7 @@ export const useGetGataReportFile = (fileId: string) => {
    }, [clientFetch, fileId]);
 
    useEffect(() => {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       getReportFile();
    }, [getReportFile]);
 

@@ -11,24 +11,24 @@ export class DocumentPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.deleteButton = page.locator("role=link[name=/slett/i]");
-    this.editContentButton = page.locator(
-      "role=button[name=/rediger innhold/i]"
-    );
-    this.saveContentButton = page.locator("role=button[name=/lagre/i]");
-    this.contentTextBox = page.locator("role=textbox[name=/rediger innhold/i]");
+    this.deleteButton = page.getByRole("link", { name: "Slett" });
+    this.editContentButton = page.getByRole("button", {
+      name: "Rediger innhold",
+    });
+    this.saveContentButton = page.getByRole("button", { name: "Lagre" });
+    this.contentTextBox = page.getByRole("textbox", {
+      name: "Rediger innhold",
+    });
     this.confirmDeleteModal = new ConfirmModal(page);
   }
 
   async validateTitle(title: string) {
-    await expect(
-      this.page.locator(`role=heading[name='${title}']`)
-    ).toBeVisible();
+    await expect(this.page.getByRole("heading", { name: title })).toBeVisible();
   }
 
   async validateTitleAndDescription(title: string, description: string) {
     await this.validateTitle(title);
-    await expect(this.page.locator(`text='${description}'`)).toBeVisible();
+    await expect(this.page.getByText(description)).toBeVisible();
   }
 
   async deleteDocument() {

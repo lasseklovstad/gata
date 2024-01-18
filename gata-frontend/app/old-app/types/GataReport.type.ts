@@ -22,10 +22,4 @@ export interface IGataReportSimple {
    type: GataReportType;
 }
 
-export interface IGataReportPayload {
-   title: string;
-   description: string;
-   type: GataReportType;
-}
-
 export type GataReportType = "DOCUMENT" | "NEWS";

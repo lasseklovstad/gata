@@ -1,27 +1,36 @@
-import { Page, test } from "@playwright/test";
-import { getAdminPage, getMemberPage, getNonMemberPage } from "../utils/page";
-import { ResponsibilityPage } from "../pages/ResponsibilityPage";
-import { MemberOverviewPage } from "../pages/MemberOverviewPage";
-import { MemberPage } from "../pages/MemberPage";
-import { Environment } from "../pages/Environment";
-import { GataHeader } from "../pages/GataHeader";
+import { Page } from "@playwright/test";
+import {
+  getAdminPage,
+  getMemberPage,
+  getNonMemberPage,
+} from "../../utils/page";
+import { ResponsibilityPage } from "../../pages/ResponsibilityPage";
+import { MemberOverviewPage } from "../../pages/MemberOverviewPage";
+import { MemberPage } from "../../pages/MemberPage";
+import { Environment } from "../../pages/Environment";
+import { GataHeader } from "../../pages/GataHeader";
 import {
   addLinkedUserWithAdmin,
   removeLinkedUserWithAdmin,
-} from "../utils/linkUser";
+} from "../../utils/linkUser";
+import { testWithRoles as test } from "../../utils/fixtures";
 
 const env = new Environment();
 
 test("linked member should be able to edit responsibility", async ({
-  browser,
+  adminPage,
+  memberPage,
+  nonMemberPage,
 }) => {
-  const adminPage = await getAdminPage(browser);
-  const memberPage = await getMemberPage(browser);
-  const nonMemberPage = await getNonMemberPage(browser);
+  test.slow();
   const responsibilityName = "Aktivitetsansvarlig";
   await addResponsibilityToMember(adminPage, responsibilityName);
   await editResponsibility(memberPage, responsibilityName, "Jeg er medlem");
-  await addLinkedUserWithAdmin(adminPage);
+  await addLinkedUserWithAdmin(
+    adminPage,
+    env.memberUsername,
+    env.nonMemberUsername
+  );
   await editResponsibility(
     nonMemberPage,
     responsibilityName,
@@ -30,7 +39,11 @@ test("linked member should be able to edit responsibility", async ({
 
   await removeResponsibilityFromMember(adminPage, responsibilityName);
   await removeResponsibility(adminPage, responsibilityName);
-  await removeLinkedUserWithAdmin(adminPage);
+  await removeLinkedUserWithAdmin(
+    adminPage,
+    env.memberUsername,
+    env.nonMemberUsername
+  );
 });
 
 const editResponsibility = async (
@@ -63,7 +76,7 @@ const removeResponsibilityFromMember = async (
 
   await page.goto("/");
   await memberOverviewPage.goto();
-  await memberOverviewPage.goToMember(env.memberUsername);
+  await memberOverviewPage.gotoUser(env.memberUsername, "member");
   await memberPage.goToResponsibilityTab();
   await memberPage.deleteResponsibility(responsibilityName);
 };
@@ -93,7 +106,7 @@ const assignResponsibilityToMember = async (
 
   await page.goto("/");
   await memberOverviewPage.goto();
-  await memberOverviewPage.goToMember(username);
+  await memberOverviewPage.gotoUser(username, "member");
   await memberPage.goToResponsibilityTab();
   await memberPage.addResponsibility(responsibilityName);
 };

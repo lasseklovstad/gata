@@ -1,32 +1,21 @@
 package no.gata.web
 
-import no.gata.web.service.Auth0RestService
+import no.gata.web.service.RoleService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories
-import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootApplication
-@EnableScheduling
 class WebApplication : CommandLineRunner {
     @Autowired
-    private lateinit var auth0RestService: Auth0RestService
-
-    @Value(value = "\${gata.update.users.on.startup}")
-    private var runUpdateUserOnStartup: Boolean = false
+    private lateinit var roleService: RoleService
 
     override fun run(vararg args: String?) {
-        if(this.runUpdateUserOnStartup){
-            auth0RestService.updateInternalUsersWithExternalData()
-        }
+        roleService.seedRoles()
     }
 }
 
 fun main(args: Array<String>) {
     runApplication<WebApplication>(*args)
 }
-
-

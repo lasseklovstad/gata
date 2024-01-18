@@ -1,4 +1,4 @@
-export type GataRoleType = "Administrator" | "Medlem";
+type GataRoleType = "Administrator" | "Medlem";
 
 export interface IGataRole {
    id: string;

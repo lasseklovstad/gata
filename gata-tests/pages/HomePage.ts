@@ -8,10 +8,12 @@ class DocumentModal {
   saveButton: Locator;
 
   constructor(page: Page) {
-    this.modal = page.locator("role=dialog[name=/nytt dokument/i]");
-    this.titleTextBox = page.locator("role=textbox[name=/tittel/i]");
-    this.descriptionTextBox = page.locator("role=textbox[name=/beskrivelse/i]");
-    this.saveButton = page.locator("role=button[name=/lagre/i]");
+    this.modal = page.getByRole("dialog", { name: "Nytt dokument" });
+    this.titleTextBox = page.getByRole("textbox", { name: "Tittel" });
+    this.descriptionTextBox = page.getByRole("textbox", {
+      name: "Beskrivelse",
+    });
+    this.saveButton = page.getByRole("button", { name: "Lagre" });
   }
 
   async fillForm(title: string, description: string) {
@@ -35,15 +37,19 @@ export class HomePage {
 
   constructor(page: Page) {
     this.page = page;
-    this.welcomeTitle = page.locator("role=heading[name=Velkommen]");
-    this.memberWelcomeTitle = page.locator("role=heading[name=Nyheter]");
-    this.newsList = page.locator("role=list[name=Nyheter]");
-    this.addNewsButton = page.locator("role=link[name=Opprett]");
-    this.nonMemberInformationText = page.locator(
-      "text=Du må være medlem for å se nyheter"
+    this.welcomeTitle = page.getByRole("heading", { name: "Velkommen" });
+    this.memberWelcomeTitle = page.getByRole("heading", { name: "Nyheter" });
+    this.newsList = page.getByRole("list", { name: "Nyheter" });
+    this.addNewsButton = page.getByRole("link", { name: "Opprett" });
+    this.nonMemberInformationText = page.getByText(
+      "Du må være medlem for å se nyheter"
     );
     this.addNewsModal = new DocumentModal(page);
     this.documentPage = new DocumentPage(page);
+  }
+
+  async goto() {
+    await this.page.goto("");
   }
 
   async addNews(title: string, description: string) {
@@ -53,12 +59,12 @@ export class HomePage {
   }
 
   getListItemButtons(listItem: Locator) {
-    const editButton = listItem.locator("role=link[name=/rediger/i]");
+    const editButton = listItem.getByRole("link", { name: "Rediger" });
     return { editButton };
   }
 
   getNewsListItem(title: string) {
-    return this.page.locator("role=listitem", { hasText: title });
+    return this.page.getByRole("listitem").filter({ hasText: title });
   }
 
   async assertNewsHasContent(title: string, content: string) {
@@ -74,16 +80,26 @@ export class HomePage {
   }
 
   async deleteAllNews() {
-    const items = this.page.locator("role=listitem");
+    const items = this.newsList.getByRole("listitem");
     const count = await items.count();
     // Iterate backwards
     for (let i = count - 1; i >= 0; i--) {
-      const item = items.nth(i);
-      await expect(item).toBeVisible();
-      const { editButton } = this.getListItemButtons(item);
-      await editButton.click();
-      await this.documentPage.deleteDocument();
-      await expect(this.memberWelcomeTitle).toBeVisible();
+      await this.deleteNewsItem(items.nth(i));
     }
+  }
+
+  private async deleteNewsItem(item: Locator) {
+    await expect(item).toBeVisible();
+    const { editButton } = this.getListItemButtons(item);
+    await editButton.click();
+    await this.documentPage.deleteDocument();
+    await expect(this.memberWelcomeTitle).toBeVisible();
+  }
+
+  async deleteNews(title: string) {
+    const item = this.newsList
+      .getByRole("listitem")
+      .filter({ has: this.page.getByRole("heading", { name: title }) });
+    await this.deleteNewsItem(item);
   }
 }

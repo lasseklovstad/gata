@@ -1,7 +1,8 @@
 import { Avatar, Box, Divider, Flex, IconButton, ListItem, Text } from "@chakra-ui/react";
 import { Add } from "@mui/icons-material";
-import { IExternalUser } from "../../../types/GataUser.type";
 import { useFetcher } from "react-router-dom";
+
+import { IExternalUser } from "../../../types/GataUser.type";
 
 type ExternalUsersWithNoGataUserListItemProps = {
    user: IExternalUser;

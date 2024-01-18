@@ -1,16 +1,17 @@
 import { Avatar, Box, Button, Divider, Flex, Heading, IconButton, List, ListItem } from "@chakra-ui/react";
+import { Delete } from "@mui/icons-material";
 import { ActionFunction, json, LoaderFunction, redirect, useFetcher, useLoaderData } from "react-router-dom";
-import { UserInfo } from "../components/UserInfo";
+
+import { UserSubscribe } from "./UserSubscribe";
+import { client } from "../../../api/client/client";
+import { getRequiredAccessToken } from "../../../auth0Client";
+import { useConfirmDialog } from "../../../components/ConfirmDialog";
 import { isAdmin } from "../../../components/useRoles";
+import { IContingentInfo } from "../../../types/ContingentInfo.type";
 import { IGataRole } from "../../../types/GataRole.type";
 import { IExternalUser, IGataUser } from "../../../types/GataUser.type";
-import { Delete } from "@mui/icons-material";
-import { useConfirmDialog } from "../../../components/ConfirmDialog";
 import { LinkExternalUserToGataUserSelect } from "../components/LinkExternalUserToGataUserSelect";
-import { IContingentInfo } from "../../../types/ContingentInfo.type";
-import { client } from "../../../api/client/client";
-import { UserSubscribe } from "./UserSubscribe";
-import { getRequiredAccessToken } from "../../../auth0Client";
+import { UserInfo } from "../components/UserInfo";
 
 export const memberInfoPageLoader: LoaderFunction = async ({ request: { signal }, params }) => {
    const token = await getRequiredAccessToken();
@@ -45,7 +46,7 @@ export const MemberInfoPage = () => {
    const { member, contingentInfo, loggedInUser, roles, notMemberUsers } = useLoaderData() as MemberInfoPageLoaderData;
    const fetcher = useFetcher();
    const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog({
-      text: "Ved å slette mister vi all informasjon knyttet til brukeren",
+      text: "Ved å slette fjernes all historikk for ansvarsposter og kontigent. Knytningen mellom en artikkel laget og brukeren blir også fjernet.",
       onConfirm: () => {
          fetcher.submit(null, { method: "delete" });
       },
@@ -91,10 +92,11 @@ export const memberRoleAction: ActionFunction = async ({ request, params }) => {
    const token = await getRequiredAccessToken();
    const form = Object.fromEntries(await request.formData());
    if (request.method === "POST" || request.method === "DELETE") {
-      return client(`role/${form.roleId}/user/${params.memberId}`, {
+      await client(`role/${form.roleId}/user/${params.memberId}`, {
          method: request.method,
          token,
       });
+      return { ok: true };
    }
 };
 

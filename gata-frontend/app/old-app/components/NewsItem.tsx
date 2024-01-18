@@ -1,7 +1,9 @@
-import { IGataReport } from "../types/GataReport.type";
-import { RichTextPreview } from "./RichTextEditor/RichTextPreview";
+import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+
+import { RichTextPreview } from "./RichTextEditor/RichTextPreview";
+import { isAdmin } from "./useRoles";
+import { IGataReport } from "../types/GataReport.type";
 import { IGataUser } from "../types/GataUser.type";
 import { ClientOnly } from "./ClientOnly";
 
@@ -11,11 +13,13 @@ type NewsItemProps = {
 };
 
 export const NewsItem = ({ report, loggedInUser }: NewsItemProps) => {
-   const canEdit = loggedInUser.id === report.createdBy?.id;
+   const canEdit = loggedInUser.id === report.createdBy?.id || isAdmin(loggedInUser);
    return (
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%", alignItems: "flex-end" }}>
          <Flex alignItems="center" width="100%">
-            <Text flex={1}>{report.title}</Text>
+            <Heading flex={1} as="h2" size="md">
+               {report.title}
+            </Heading>
             {canEdit && (
                <Button as={Link} to={`/reportInfo/${report.id}`} variant="ghost">
                   Rediger

@@ -7,7 +7,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
 
 @Entity
-class ExternalUser (
+class ExternalUser(
     @Id
     var id: String = "",
     var name: String? = null,
@@ -15,9 +15,9 @@ class ExternalUser (
     @Column(length = 500)
     var picture: String? = null,
     var lastLogin: String? = null,
-    @Column(name="primary_user")
+    @Column(name = "primary_user")
     var primary: Boolean = false,
     @ManyToOne
     @JsonIgnore
-    var user: GataUser? = null
+    var user: GataUser? = null,
 )

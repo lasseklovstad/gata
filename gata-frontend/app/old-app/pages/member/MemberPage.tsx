@@ -1,17 +1,17 @@
-import { Box, Button, Heading, List, ListItem, Tooltip } from "@chakra-ui/react";
-import { useClearUserCache } from "../../api/user.api";
-import { Loading, LoadingButton } from "../../components/Loading";
-import { isAdmin } from "../../components/useRoles";
-import { PageLayout } from "../../components/PageLayout";
-import { useConfirmDialog } from "../../components/ConfirmDialog";
+import { Box, Heading, List, ListItem, Tooltip } from "@chakra-ui/react";
 import { Email } from "@mui/icons-material";
-import { usePublishKontigentReport } from "../../api/contingent.api";
-import { UserListItem } from "./components/UserListItem";
+import { ActionFunction, LoaderFunction, useLoaderData } from "react-router-dom";
+
 import { ExternalUsersWithNoGataUser } from "./components/ExternalUsersWithNoGataUser";
-import { ActionFunction, LoaderFunction, useLoaderData, useSubmit } from "react-router-dom";
+import { UserListItem } from "./components/UserListItem";
 import { client } from "../../api/client/client";
-import { IExternalUser, IGataUser } from "../../types/GataUser.type";
+import { usePublishKontigentReport } from "../../api/contingent.api";
 import { getRequiredAccessToken } from "../../auth0Client";
+import { useConfirmDialog } from "../../components/ConfirmDialog";
+import { LoadingButton } from "../../components/Loading";
+import { PageLayout } from "../../components/PageLayout";
+import { isAdmin } from "../../components/useRoles";
+import { IExternalUser, IGataUser } from "../../types/GataUser.type";
 
 export const memberPageLoader: LoaderFunction = async ({ request: { signal } }) => {
    const token = await getRequiredAccessToken();
@@ -24,10 +24,11 @@ export const memberPageLoader: LoaderFunction = async ({ request: { signal } }) 
 export const memberPageAction: ActionFunction = async ({ request }) => {
    const token = await getRequiredAccessToken();
    const form = Object.fromEntries(await request.formData());
-   return client("user", { method: "POST", body: form, token });
+   await client("user", { method: "POST", body: form, token });
+   return { ok: true };
 };
 
-export interface MemberPageLoaderData {
+interface MemberPageLoaderData {
    loggedInUser: IGataUser;
    users: IGataUser[];
    externalUsers: IExternalUser[];
@@ -35,9 +36,7 @@ export interface MemberPageLoaderData {
 
 export const MemberPage = () => {
    const { loggedInUser, users, externalUsers } = useLoaderData() as MemberPageLoaderData;
-   const { cacheResponse, clearCache } = useClearUserCache();
    const { publishContigent, publishContigentResponse } = usePublishKontigentReport();
-   const submit = useSubmit();
    const { openConfirmDialog: openConfirmPublishKontigent, ConfirmDialogComponent: ConfirmPublishKontigentDialog } =
       useConfirmDialog({
          text: `Det ble sent en email til: ${
@@ -48,13 +47,6 @@ export const MemberPage = () => {
          title: "Vellykket",
          showOnlyOk: true,
       });
-
-   const handleUpdate = async () => {
-      const { status } = await clearCache();
-      if (status === "success") {
-         submit({}, { method: "get", action: "member" });
-      }
-   };
 
    const startPublishContigent = async () => {
       const { data } = await publishContigent();
@@ -72,13 +64,6 @@ export const MemberPage = () => {
                Brukere
             </Heading>
             {isAdmin(loggedInUser) && (
-               <Tooltip label="Hent nye brukere som har logget inn">
-                  <Button variant="ghost" onClick={handleUpdate}>
-                     Oppdater
-                  </Button>
-               </Tooltip>
-            )}
-            {isAdmin(loggedInUser) && (
                <Tooltip label="Send påminnelse om betaling til de som ikke har betalt kontigent">
                   <LoadingButton
                      response={publishContigentResponse}
@@ -93,13 +78,12 @@ export const MemberPage = () => {
             )}
          </Box>
          {ConfirmPublishKontigentDialog}
-         <Loading response={cacheResponse} alertTitle="Det oppstod en feil ved oppdatering av cache" />
          <Heading as="h2" id="admin-title" size="lg">
             Administratorer
          </Heading>
          <List aria-labelledby="admin-title">
             {admins.map((user) => {
-               return <UserListItem key={user.id} user={user} />;
+               return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
             })}
             {admins.length === 0 && <ListItem>Ingen administratorer funnet</ListItem>}
          </List>
@@ -108,7 +92,7 @@ export const MemberPage = () => {
          </Heading>
          <List aria-labelledby="member-title">
             {members?.map((user) => {
-               return <UserListItem key={user.id} user={user} />;
+               return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
             })}
             {members.length === 0 && <ListItem>Ingen medlemmer funnet</ListItem>}
          </List>
@@ -119,7 +103,7 @@ export const MemberPage = () => {
                </Heading>
                <List aria-labelledby="non-member-title">
                   {nonMembers?.map((user) => {
-                     return <UserListItem key={user.id} user={user} />;
+                     return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
                   })}
                   {nonMembers?.length === 0 && <ListItem>Ingen andre brukere</ListItem>}
                </List>

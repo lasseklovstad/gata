@@ -2,7 +2,7 @@ import { useFetcher } from "@remix-run/react";
 import type { IGataUser } from "../../../types/GataUser.type";
 import { Box, Button, Text } from "@chakra-ui/react";
 
-export interface UserSubscribeProps {
+interface UserSubscribeProps {
    user: IGataUser;
 }
 

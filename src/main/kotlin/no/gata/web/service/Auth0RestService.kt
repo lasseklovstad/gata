@@ -1,66 +1,33 @@
 package no.gata.web.service
 
-import no.gata.web.models.*
-import no.gata.web.repository.ExternalUserRepository
-import no.gata.web.repository.GataRoleRepository
-import no.gata.web.repository.GataUserRepository
+import no.gata.web.models.Auth0User
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.BodyInserters
-import org.springframework.web.reactive.function.client.ClientRequest
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import java.time.Duration
-import java.util.ArrayList
-
+import java.util.Optional
 
 @Service
 class Auth0RestService(private val builder: WebClient.Builder) {
-
     private var logger = LoggerFactory.getLogger(Auth0RestService::class.java)
-
-    @Value(value = "\${auth0.client-id}")
-    private lateinit var clientId: String
-
-    @Value(value = "\${auth0.client-secret}")
-    private lateinit var clientSecret: String
 
     @Value(value = "\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private lateinit var issuer: String
 
-    @Autowired
-    private lateinit var gataUserRepository: GataUserRepository
-
-    @Autowired
-    private lateinit var externalUserRepository: ExternalUserRepository
-
-    @Autowired
-    private lateinit var gataRoleRepository: GataRoleRepository
-
     private var client: WebClient? = null
-
-    private fun getToken(): String {
-        val client = builder.baseUrl(issuer).filter(logRequest()).build()
-        val audience = issuer + "api/v2/";
-
-        val body = Auth0TokenPayload(clientId, clientSecret, audience, "client_credentials")
-        val token = client.post().uri("/oauth/token").accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(body))
-                .retrieve().toEntity(Auth0Token::class.java).delayElement(Duration.ofMillis(500)).block();
-        return token!!.body!!.access_token
-    }
 
     // This method returns filter function which will log request data
     private fun logRequest(): ExchangeFilterFunction {
-        return ExchangeFilterFunction.ofRequestProcessor { clientRequest: ClientRequest ->
-            logger.info("Request: {} {}", clientRequest.method(), clientRequest.url())
-            Mono.just(clientRequest)
+        return ExchangeFilterFunction.ofResponseProcessor { response ->
+            logger.info(
+                "Request: {} {}",
+                response.request().method,
+                response.statusCode(),
+            )
+            Mono.just(response)
         }
     }
 
@@ -71,109 +38,13 @@ class Auth0RestService(private val builder: WebClient.Builder) {
         return client as WebClient
     }
 
-    private fun getUsers(token: String): Array<Auth0User>? {
-        val client = getClient();
-        val response = client.get().uri("/api/v2/users").accept(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token)
-                .retrieve().bodyToMono(Array<Auth0User>::class.java).delayElement(Duration.ofSeconds(1))
-        return response.block()
+    fun getUserInfo(token: String): Optional<Auth0User> {
+        val client = getClient()
+        val response =
+            client.get().uri("/userinfo").accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + token)
+                .retrieve()
+                .bodyToMono(Auth0User::class.java)
+        return response.blockOptional()
     }
-
-    private fun getRoles(): Array<Auth0Role>? {
-        val client = getClient();
-        val token = getToken();
-        val response = client.get().uri("/api/v2/roles").accept(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token)
-                .retrieve().bodyToMono(Array<Auth0Role>::class.java).delayElement(Duration.ofSeconds(1))
-        return response.block()
-    }
-
-    fun updateRole(userId: String, roles: List<String>, method: HttpMethod): ResponseEntity<Void>? {
-
-        val client = getClient();
-        val token = getToken();
-        return client.method(method).uri("/api/v2/users/${userId}/roles")
-                .body(BodyInserters.fromValue(Auth0RolePayload(roles)))
-                .accept(MediaType.APPLICATION_JSON).header("Authorization", "Bearer ${token}")
-                .retrieve().toBodilessEntity().block();
-
-    }
-
-    private fun getUserRole(userId: String, token: String): Array<Auth0Role>? {
-        val client = getClient();
-        val response = client.get().uri("/api/v2/users/${userId}/roles").accept(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token)
-                .retrieve().bodyToMono(Array<Auth0Role>::class.java).delayElement(Duration.ofSeconds(1))
-        return response.block()
-    }
-
-    private fun getUsersWithRole(): List<Auth0User>? {
-        logger.info("Fetching users from auth0")
-        val token = getToken();
-        val usersWithoutRole = getUsers(token);
-        return usersWithoutRole!!.map {
-            val roles = getUserRole(it.userId, token)
-            Auth0User(it.name, it.email, it.picture, it.userId, roles?.toList(), it.lastLogin)
-        }
-    }
-    @Scheduled(cron = "0 0 1 * * ?")
-    fun updateInternalUsersWithExternalData() {
-        val externalRoles = getRoles();
-
-        externalRoles?.forEach { externalRole ->
-            run {
-                val role = gataRoleRepository.findByExternalUserProviderId(externalRole.id)
-                if (role.isPresent) {
-                    // Update
-                    val newRole = role.get()
-                    newRole.name = externalRole.name
-                    gataRoleRepository.save(newRole)
-                } else {
-                    // Create
-                    gataRoleRepository.save(GataRole(
-                            id = null,
-                            externalUserProviderId = externalRole.id,
-                            name = externalRole.name, users = null))
-                }
-            }
-        }
-
-        val externalUsers = getUsersWithRole();
-        externalUsers?.forEach { externalUser ->
-            run {
-                val user = externalUserRepository.findById(externalUser.userId)
-                if (user.isPresent) {
-                    val newUserRoles = externalUser.roles?.map { gataRoleRepository.findByExternalUserProviderId(it.id).get() }
-                            .orEmpty()
-                    val updatedUser = user.get();
-                    updatedUser.email = externalUser.email
-                    updatedUser.picture = externalUser.picture
-                    if (updatedUser.user != null) {
-                        updatedUser.user!!.roles = newUserRoles as ArrayList<GataRole>
-                    }
-                    updatedUser.lastLogin = externalUser.lastLogin
-                    externalUserRepository.save(updatedUser)
-                } else {
-                    val newExternalUser = ExternalUser(
-                            id = externalUser.userId,
-                            name = externalUser.name,
-                            email = externalUser.email,
-                            picture = externalUser.picture,
-                            lastLogin = externalUser.lastLogin,
-                            user = null, primary = false)
-                    if (externalUser.roles != null) {
-                        val newGataUser = GataUser()
-                        newGataUser.roles = externalUser.roles?.map { gataRoleRepository.findByExternalUserProviderId(it.id).get() }
-                            .orEmpty()
-                        gataUserRepository.save(newGataUser)
-                        newExternalUser.primary = true
-                        newExternalUser.user = newGataUser
-                        externalUserRepository.save(newExternalUser)
-                    }  else {
-                        externalUserRepository.save(newExternalUser)
-                    }
-
-                }
-            }
-        }
-    }
-
-
 }

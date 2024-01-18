@@ -32,7 +32,7 @@ interface ReportInfoPageLoaderData {
 
 export const ReportInfoPage = () => {
    const { report, loggedInUser } = useLoaderData() as ReportInfoPageLoaderData;
-   const canEdit = report.createdBy?.id === loggedInUser.id;
+   const canEdit = report.createdBy?.id === loggedInUser.id || isAdmin(loggedInUser);
    const [editing, setEditing] = useState(false);
    const submit = useSubmit();
 

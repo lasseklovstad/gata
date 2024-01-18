@@ -1,5 +1,6 @@
 import { Editor, Transforms, Element, Text } from "slate";
-import { BlockTypes } from "./BlockButton";
+
+import type { BlockTypes } from "./BlockButton";
 import { ListTypes, LIST_TYPES, MarkType } from "./RichTextEditor.types";
 
 const getIsListType = (type: BlockTypes): type is ListTypes => {

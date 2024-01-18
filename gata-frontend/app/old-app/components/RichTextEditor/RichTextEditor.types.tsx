@@ -26,7 +26,7 @@ export type CustomElement = {
 
 export type MarkType = "bold" | "italic" | "underline";
 
-export type CustomText = { text: string; bold?: boolean; italic?: boolean; underline?: boolean };
+type CustomText = { text: string; bold?: boolean; italic?: boolean; underline?: boolean };
 
 declare module "slate" {
    interface CustomTypes {

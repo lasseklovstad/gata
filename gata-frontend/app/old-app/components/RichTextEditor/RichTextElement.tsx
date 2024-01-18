@@ -70,7 +70,7 @@ export const RichTextElement = ({ attributes, children, element, outsideContext 
                {children}
             </SlateImage>
          ) : (
-            <Image id={element?.imageId!} size={element?.size} />
+            <Image id={element?.imageId || ""} size={element?.size} />
          );
       default:
          return (

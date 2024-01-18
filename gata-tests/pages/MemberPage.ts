@@ -1,5 +1,8 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { selectComboboxOption } from "../utils/combobox";
+import {
+  selectComboBoxOption,
+  selectSingleComboBoxOption,
+} from "../utils/combobox";
 import { ConfirmModal } from "./ConfirmModal";
 
 class MemberResponsibilityModal {
@@ -10,19 +13,19 @@ class MemberResponsibilityModal {
   page: Page;
 
   constructor(page: Page) {
-    this.responsibilityCombobox = page.locator(
-      "role=combobox[name=/Velg ansvarspost/i]"
-    );
-    this.yearCombobox = page.locator("role=combobox[name=/velg år/i]");
-    this.saveButton = page.locator("role=button[name=/lagre/i]");
-    this.modal = page.locator("role=dialog[name=/Legg til ansvarspost/i]");
+    this.responsibilityCombobox = page.getByRole("combobox", {
+      name: "Velg ansvarspost",
+    });
+    this.yearCombobox = page.getByRole("combobox", { name: "Velg år" });
+    this.saveButton = page.getByRole("button", { name: "Lagre" });
+    this.modal = page.getByRole("dialog", { name: "Legg til ansvarspost" });
     this.page = page;
   }
 
   async fillForm(name: string, year: string) {
     await expect(this.modal).toBeVisible();
-    await selectComboboxOption(this.page, this.responsibilityCombobox, name);
-    await selectComboboxOption(this.page, this.yearCombobox, year);
+    await selectComboBoxOption(this.page, this.responsibilityCombobox, name);
+    await selectComboBoxOption(this.page, this.yearCombobox, year);
     await this.saveButton.click();
     await expect(this.modal).toBeHidden();
   }
@@ -31,6 +34,7 @@ class MemberResponsibilityModal {
 export class MemberPage {
   pageTitle: Locator;
   linkUserSelect: Locator;
+  primaryUserSelect: Locator;
   page: Page;
   responsibilityModal: MemberResponsibilityModal;
   addResponsibilityButton: Locator;
@@ -41,33 +45,41 @@ export class MemberPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.pageTitle = page.locator("role=heading[name=/informasjon/i]");
-    this.linkUserSelect = page.locator(
-      "role=combobox[name=/Epost tilknytninger/i]"
-    );
+    this.pageTitle = page.getByRole("heading", { name: "Informasjon" });
+    this.linkUserSelect = page.getByRole("combobox", {
+      name: "Epost tilknytninger",
+    });
+    this.primaryUserSelect = page.getByRole("combobox", {
+      name: "Primær epost",
+    });
     this.responsibilityModal = new MemberResponsibilityModal(page);
-    this.addResponsibilityButton = page.locator(
-      "role=link[name=/legg til ansvarspost/i]"
-    );
+    this.addResponsibilityButton = page.getByRole("link", {
+      name: "Legg til ansvarspost",
+    });
     this.confirmDeleteResponsibilityModal = new ConfirmModal(page);
-    this.deleteResponsibilityButton = page.locator(
-      "role=link[name=/fjern ansvarspost/i]"
-    );
-    this.responsibilityContentTextBox = this.page.locator(
-      "role=textbox[name=/notat/i]"
-    );
-    this.saveResonsibilityButton = this.page.locator(
-      "role=button[name=/lagre/i]"
-    );
+    this.deleteResponsibilityButton = page.getByRole("link", {
+      name: "Fjern ansvarspost",
+    });
+    this.responsibilityContentTextBox = page.getByRole("textbox", {
+      name: "Notat",
+    });
+    this.saveResonsibilityButton = page.getByRole("button", {
+      name: "Lagre",
+    });
   }
 
   getRemoveLinkedUserButton(name: string) {
-    return this.page.locator(`role=button[name=/fjern ${name}/i]`);
+    return this.page.getByRole("button", { name: `Fjern ${name}` });
   }
 
   async linkUser(name: string) {
-    await selectComboboxOption(this.page, this.linkUserSelect, name);
+    await selectComboBoxOption(this.page, this.linkUserSelect, name);
     await expect(this.getRemoveLinkedUserButton(name)).toBeVisible();
+  }
+
+  async changePrimaryUser(name: string) {
+    await selectSingleComboBoxOption(this.page, this.primaryUserSelect, name);
+    await expect(this.page.getByText(`Navn: ${name}`)).toBeVisible();
   }
 
   async removeLinkedUser(name: string) {
@@ -77,15 +89,15 @@ export class MemberPage {
   }
 
   async assertPrimaryEmail(email: string) {
-    await expect(this.page.locator(`text=Email: ${email}`)).toBeVisible();
+    await expect(this.page.getByText(`Email: ${email}`)).toBeVisible();
   }
 
   getResponsibilityButton(name: string) {
-    return this.page.locator(`role=button[name=/${name}/i]`);
+    return this.page.getByRole("button", { name });
   }
 
   goToResponsibilityTab() {
-    return this.page.locator(`role=tab[name=/ansvarsposter/i]`).click();
+    return this.page.getByRole("tab", { name: "Ansvarsposter" }).click();
   }
 
   async addResponsibility(name: string) {
@@ -107,4 +119,35 @@ export class MemberPage {
     await this.responsibilityContentTextBox.fill(content);
     await this.saveResonsibilityButton.click();
   }
+
+  private getAddRoleButton(role: Role) {
+    return this.page
+      .getByRole("listitem")
+      .filter({ hasText: role })
+      .getByRole("button", { name: "Legg til rolle" });
+  }
+
+  private getRemoveRoleButton(role: Role) {
+    return this.page
+      .getByRole("listitem")
+      .filter({ hasText: role })
+      .getByRole("button", { name: "Fjern rolle" });
+  }
+
+  async addRole(role: Role) {
+    this.getAddRoleButton(role).click();
+    await expect(this.getRemoveRoleButton(role)).toBeVisible();
+  }
+
+  async removeRole(role: Role) {
+    this.getRemoveRoleButton(role).click();
+    await expect(this.getAddRoleButton(role)).toBeVisible();
+  }
+
+  async deleteUser() {
+    await this.page.getByRole("button", { name: "Slett" }).click();
+    await new ConfirmModal(this.page).confirm();
+  }
 }
+
+type Role = "Administrator" | "Medlem";

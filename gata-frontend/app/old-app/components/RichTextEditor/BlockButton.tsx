@@ -1,8 +1,9 @@
+import { Button } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { useSlate } from "slate-react";
+
 import { CustomElement } from "./RichTextEditor.types";
 import { isBlockActive, toggleBlock } from "./RichTextEditor.util";
-import { Button } from "@chakra-ui/react";
 
 export type BlockTypes = CustomElement["type"];
 

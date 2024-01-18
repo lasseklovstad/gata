@@ -2,34 +2,28 @@ package no.gata.web.controller
 
 import no.gata.web.controller.dtoOut.DtoOutExternalUser
 import no.gata.web.repository.ExternalUserRepository
-import no.gata.web.service.Auth0RestService
+import no.gata.web.service.GataUserService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.Authentication
-import org.springframework.web.bind.annotation.*
-
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("api/auth0user")
 class Auth0UserRestController {
     @Autowired
-    lateinit var auth0RestService: Auth0RestService
-    @Autowired
     private lateinit var externalUserRepository: ExternalUserRepository
 
-    @GetMapping("update")
-    @PreAuthorize("hasAuthority('admin')")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun updateInternalUsersWithExternalData() {
-        auth0RestService.updateInternalUsersWithExternalData()
-    }
+    @Autowired
+    private lateinit var gataUserService: GataUserService
 
     @GetMapping("nogatauser")
     @PreAuthorize("hasAuthority('member')")
-    fun getExternalUsersWithNoGataUser(authentication: Authentication): List<DtoOutExternalUser> {
-        val isAdmin = authentication.authorities.find { it.authority == "admin" } != null
-        if(isAdmin){
+    fun getExternalUsersWithNoGataUser(authentication: JwtAuthenticationToken): List<DtoOutExternalUser> {
+        val isAdmin = gataUserService.getLoggedInUser(authentication).getIsUserAdmin()
+        if (isAdmin) {
             return externalUserRepository.findAllByUserIsNull().map { DtoOutExternalUser(it) }
         }
         return emptyList()

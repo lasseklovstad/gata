@@ -10,7 +10,7 @@ test("Should have welcome title", async ({ page }) => {
   const homePage = new HomePage(page);
   await expect(page).toHaveTitle(/Gata/);
 
-  await expect(homePage.welcomeTitle).toBeVisible();
+  await expect(homePage.memberWelcomeTitle).toBeVisible();
   await expect(gataHeader.homeLink).toBeVisible();
   await expect(gataHeader.responsibilityLink).toBeVisible();
   await expect(gataHeader.documentsLink).toBeVisible();

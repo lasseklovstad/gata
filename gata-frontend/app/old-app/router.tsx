@@ -1,39 +1,38 @@
 import { User } from "@auth0/auth0-spa-js";
 import { Alert, AlertDescription, AlertTitle, Box, Container, Progress, Text } from "@chakra-ui/react";
 import {
-   LoaderFunction,
-   Outlet,
-   Route,
    createBrowserRouter,
    createRoutesFromElements,
    isRouteErrorResponse,
    json,
+   LoaderFunction,
+   Outlet,
    redirect,
+   Route,
    useLoaderData,
    useNavigation,
    useRouteError,
 } from "react-router-dom";
-import { RouteConfirmFormDialog } from "./RouteConfirmFormDialog";
+
 import { client } from "./api/client/client";
+import { createLoggedInUser } from "./api/user.api";
 import { getIsAuthenticated, getRequiredAccessToken, getUser, handleRedirectCallback } from "./auth0Client";
 import {
    GataReportFormDialog,
    gataReportFormDialogAction,
    gataReportFormDialogLoader,
 } from "./components/GataReportFormDialog";
+import { Privacy } from "./components/Privacy";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar";
 import { primaryUserEmailAction } from "./components/SelectPrimaryEmail";
 import { Home, homeLoader } from "./pages/Home";
-import { ReportPage, reportPageLoader } from "./pages/Report/ReportPage";
-import { ReportInfoPage, reportInfoPageAction, reportInfoPageLoader } from "./pages/ReportInfoPage/ReportInfoPage";
-import { deleteReportAction } from "./pages/ReportInfoPage/deleteReportAction";
 import {
-   ResponsibilityDialog,
-   responsibilityDialogAction,
-   responsibilityDialogLoader,
-} from "./pages/Responsibility/ResponsibilityDialog";
-import { ResponsibilityPage, responsibilityPageLoader } from "./pages/Responsibility/ResponsibilityPage";
-import { deleteResponsibilityAction } from "./pages/Responsibility/deleteResponsibilityAction";
+   AddResponsibilityUserDialog,
+   addResponsibilityUserDialogLoader,
+} from "./pages/member/components/AddResponsibilityUserDialog";
+import { externalUserProvidersAction } from "./pages/member/components/LinkExternalUserToGataUserSelect";
+import { contingentAction } from "./pages/member/components/UserInfo";
+import { deleteResponsibilityYearAction } from "./pages/member/MemberInfo/deleteResponsibilityYearAction";
 import {
    MemberInfoPage,
    memberInfoPageAction,
@@ -45,20 +44,24 @@ import {
    memberResponsibilityAction,
    memberResponsibilityLoader,
 } from "./pages/member/MemberInfo/MemberResponsibility";
-import { userSubscribeAction } from "./pages/member/MemberInfo/UserSubscribe";
-import { deleteResponsibilityYearAction } from "./pages/member/MemberInfo/deleteResponsibilityYearAction";
 import { putResponsibilityYearAction } from "./pages/member/MemberInfo/putResponsibilityYearAction";
+import { userSubscribeAction } from "./pages/member/MemberInfo/UserSubscribe";
 import { MemberLayout } from "./pages/member/MemberLayout";
 import { MemberPage, memberPageAction, memberPageLoader } from "./pages/member/MemberPage";
+import { ReportPage, reportPageLoader } from "./pages/Report/ReportPage";
+import { deleteReportAction } from "./pages/ReportInfoPage/deleteReportAction";
+import { ReportInfoPage, reportInfoPageAction, reportInfoPageLoader } from "./pages/ReportInfoPage/ReportInfoPage";
+import { deleteResponsibilityAction } from "./pages/Responsibility/deleteResponsibilityAction";
 import {
-   AddResponsibilityUserDialog,
-   addResponsibilityUserDialogLoader,
-} from "./pages/member/components/AddResponsibilityUserDialog";
-import { externalUserProvidersAction } from "./pages/member/components/LinkExternalUserToGataUserSelect";
-import { contingentAction } from "./pages/member/components/UserInfo";
+   ResponsibilityDialog,
+   responsibilityDialogAction,
+   responsibilityDialogLoader,
+} from "./pages/Responsibility/ResponsibilityDialog";
+import { ResponsibilityPage, responsibilityPageLoader } from "./pages/Responsibility/ResponsibilityPage";
+import { RouteConfirmFormDialog } from "./RouteConfirmFormDialog";
 import { IGataUser } from "./types/GataUser.type";
 
-export const rootLoader: LoaderFunction = async ({ request: { signal } }) => {
+const rootLoader: LoaderFunction = async ({ request: { signal } }) => {
    const isAuthenticated = await getIsAuthenticated();
    if (isAuthenticated) {
       const user = await getUser();
@@ -73,7 +76,7 @@ export const rootLoader: LoaderFunction = async ({ request: { signal } }) => {
    return json<RootLoaderData>({ isAuthenticated });
 };
 
-export interface RootLoaderData {
+interface RootLoaderData {
    loggedInUser?: IGataUser;
    isAuthenticated: boolean;
    user?: User;
@@ -96,9 +99,9 @@ const Root = () => {
    );
 };
 
-export const ErrorBoundary = () => {
-   let error = useRouteError();
-
+const ErrorBoundary = () => {
+   const error = useRouteError();
+   console.error(error);
    if (isRouteErrorResponse(error)) {
       // the response json is automatically parsed to
       // `error.data`, you also have access to the status
@@ -144,16 +147,27 @@ export const ErrorBoundary = () => {
    );
 };
 
+/**
+ * Remember to update ReactSpaController.kt when adding a new route to this file.
+ * Or it will not forward the request to index.html
+ */
+
 export const router = createBrowserRouter(
    createRoutesFromElements(
       <Route path="/" element={<Root />} loader={rootLoader} errorElement={<ErrorBoundary />}>
          <Route
             path="callback"
-            loader={async () => {
-               await handleRedirectCallback();
-               return redirect("/");
+            loader={async ({ request }) => {
+               try {
+                  await handleRedirectCallback();
+                  await createLoggedInUser(request.signal);
+                  return redirect("/");
+               } catch {
+                  return redirect("/");
+               }
             }}
          />
+         <Route path="privacy" element={<Privacy />} />
          <Route path="" loader={homeLoader} element={<Home />}>
             <Route
                path="new"
@@ -237,7 +251,7 @@ export const router = createBrowserRouter(
                   }
                />
             </Route>
-            <Route path="" loader={memberInfoPageLoader} action={memberInfoPageAction} element={<MemberInfoPage />} />
+            <Route index loader={memberInfoPageLoader} action={memberInfoPageAction} element={<MemberInfoPage />} />
          </Route>
       </Route>
    )

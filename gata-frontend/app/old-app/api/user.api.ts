@@ -1,10 +1,13 @@
-import { useClient } from "./client/useClient";
+import { client } from "./client/client";
+import { getAccessToken } from "../auth0Client";
+import { IGataUser } from "../types/GataUser.type";
 
-export const useClearUserCache = () => {
-   const [cacheResponse, clientFetch] = useClient<never, never>();
-   const clearCache = () => {
-      return clientFetch("auth0user/update");
-   };
+export const getLoggedInUser = async (signal: AbortSignal) => {
+   const token = await getAccessToken();
+   return client<IGataUser>("user/loggedin", { signal, token });
+};
 
-   return { cacheResponse, clearCache };
+export const createLoggedInUser = async (signal: AbortSignal) => {
+   const token = await getAccessToken();
+   return client("user/loggedin/create", { signal, token, method: "POST" });
 };

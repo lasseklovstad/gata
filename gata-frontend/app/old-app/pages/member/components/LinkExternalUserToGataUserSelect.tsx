@@ -16,13 +16,12 @@ export const LinkExternalUserToGataUserSelect = ({
    notMemberUsers,
 }: LinkExternalUserToGataUserSelectProps) => {
    const fetcher = useFetcher();
-   const action = useFormAction();
-   const handleChange: Props<ColorOption, true>["onChange"] = async (options) => {
+   const handleChange: Props<ColorOption, true>["onChange"] = (options) => {
       const userIds = options.map((o) => o.value);
       const formData = new FormData();
       formData.set("userId", id);
       userIds.forEach((userId) => formData.append("externalUserId", userId));
-      fetcher.submit(formData, { action: `${action}/externaluserproviders`, method: "put" });
+      fetcher.submit(formData, { action: "externaluserproviders", method: "PUT" });
    };
 
    const menuItems = [...externalUserProviders, ...notMemberUsers];
@@ -65,20 +64,20 @@ interface ColorOption extends OptionBase {
    isClearable: boolean;
 }
 
-const customComponents: Props<ColorOption, true, never>["components"] = {
-   Option: ({ children, ...props }) => (
+const customComponents = {
+   Option: ({ children, ...props }: OptionProps<ColorOption, true, never>) => (
       <chakraComponents.Option {...props}>
          {props.data.icon} {children}
       </chakraComponents.Option>
    ),
-   MultiValue: ({ children, ...props }) => (
+   MultiValue: ({ children, ...props }: MultiValueProps<ColorOption, true, never>) => (
       <chakraComponents.MultiValue {...props}>
          <Flex alignItems="center">
             {props.data.icon} <Text>{children}</Text>
          </Flex>
       </chakraComponents.MultiValue>
    ),
-   MultiValueRemove: (props) => (
+   MultiValueRemove: (props: MultiValueRemoveProps<ColorOption, true, never>) => (
       <chakraComponents.MultiValueRemove
          {...props}
          innerProps={{ ...props.innerProps, "aria-label": `Fjern ${props.data.label}` }}

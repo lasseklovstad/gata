@@ -1,20 +1,22 @@
-import { PageLayout } from "../components/PageLayout";
-import { News } from "../components/News";
-import { isMember } from "../components/useRoles";
 import { Heading, Text } from "@chakra-ui/react";
-import { IGataUser } from "../types/GataUser.type";
 import { json, LoaderFunction, useLoaderData } from "react-router-dom";
-import { IGataReport } from "../types/GataReport.type";
-import { Page } from "../types/Page.type";
+
 import { client } from "../api/client/client";
+import { getLoggedInUser } from "../api/user.api";
 import { getAccessToken, getIsAuthenticated } from "../auth0Client";
+import { News } from "../components/News";
+import { PageLayout } from "../components/PageLayout";
+import { isMember } from "../components/useRoles";
+import { IGataReport } from "../types/GataReport.type";
+import { IGataUser } from "../types/GataUser.type";
+import { Page } from "../types/Page.type";
 
 export const homeLoader: LoaderFunction = async ({ request: { signal, url } }) => {
    const isAuthenticated = await getIsAuthenticated();
 
    try {
       const token = await getAccessToken();
-      const loggedInUser = await client<IGataUser>("user/loggedin", { signal, token });
+      const loggedInUser = await getLoggedInUser(signal);
       const params = new URL(url).searchParams;
       const reportPage = await client<Page<IGataReport>>(`report?page=${params.get("page") || 0}&type=NEWS`, {
          signal,
@@ -26,7 +28,7 @@ export const homeLoader: LoaderFunction = async ({ request: { signal, url } }) =
    }
 };
 
-export interface HomeLoaderData {
+interface HomeLoaderData {
    loggedInUser: IGataUser | undefined;
    reportPage: Page<IGataReport> | undefined;
    isAuthenticated: boolean;

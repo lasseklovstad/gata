@@ -1,4 +1,3 @@
-import { Delete, Save } from "@mui/icons-material";
 import {
    AccordionButton,
    AccordionIcon,
@@ -12,11 +11,13 @@ import {
    Text,
    Textarea,
 } from "@chakra-ui/react";
+import { Delete, Save } from "@mui/icons-material";
 import { useState } from "react";
+import { Link, useFetcher } from "react-router-dom";
+
+import { isAdmin } from "../../../components/useRoles";
 import { IGataUser } from "../../../types/GataUser.type";
 import { IResponsibilityYear } from "../../../types/ResponsibilityYear.type";
-import { isAdmin } from "../../../components/useRoles";
-import { Link, useFetcher } from "react-router-dom";
 
 type ResponsibilityFormProps = {
    responsibilityYear: IResponsibilityYear;

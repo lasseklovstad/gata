@@ -1,14 +1,15 @@
-import { Add, Delete, Edit } from "@mui/icons-material";
 import { Box, Button, Divider, Heading, IconButton, List, ListItem, Text } from "@chakra-ui/react";
-import { isAdmin } from "../../components/useRoles";
-import { IResponsibility } from "../../types/Responsibility.type";
-import { PageLayout } from "../../components/PageLayout";
+import { Add, Delete, Edit } from "@mui/icons-material";
 import { json, Link, LoaderFunction, Outlet, useLoaderData } from "react-router-dom";
-import { client } from "../../api/client/client";
-import { IGataUser } from "../../types/GataUser.type";
-import { getRequiredAccessToken } from "../../auth0Client";
 
-export const responsibilityPageLoader: LoaderFunction = async ({ request: { signal }, params }) => {
+import { client } from "../../api/client/client";
+import { getRequiredAccessToken } from "../../auth0Client";
+import { PageLayout } from "../../components/PageLayout";
+import { isAdmin } from "../../components/useRoles";
+import { IGataUser } from "../../types/GataUser.type";
+import { IResponsibility } from "../../types/Responsibility.type";
+
+export const responsibilityPageLoader: LoaderFunction = async ({ request: { signal } }) => {
    const token = await getRequiredAccessToken();
    const responsibilities = await client<IResponsibility[]>("responsibility", { token, signal });
    const loggedInUser = await client<IGataUser>("user/loggedin", { token, signal });
