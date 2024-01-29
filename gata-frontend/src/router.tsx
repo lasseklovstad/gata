@@ -1,15 +1,5 @@
 import { User } from "@auth0/auth0-spa-js";
-import {
-   Alert,
-   AlertDescription,
-   AlertTitle,
-   Box,
-   Container,
-   Progress,
-   Text,
-   Link as ChakraLink,
-   Button,
-} from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertTitle, Box, Button, Container, Progress, Text } from "@chakra-ui/react";
 import {
    createBrowserRouter,
    createRoutesFromElements,

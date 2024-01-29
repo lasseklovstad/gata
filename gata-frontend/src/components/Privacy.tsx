@@ -1,4 +1,4 @@
-import { Link, Text, Heading } from "@chakra-ui/react";
+import { Heading, Text } from "@chakra-ui/react";
 
 import { PageLayout } from "./PageLayout";
 
