@@ -1,7 +1,3 @@
-import * as React from "react";
-import { UserMenu } from "./UserMenu";
-import { isAdmin, isMember } from "./useRoles";
-import MenuIcon from "@mui/icons-material/Menu";
 import {
    Box,
    Button,
@@ -15,9 +11,14 @@ import {
    MenuList,
    Text,
 } from "@chakra-ui/react";
-import type { IGataUser } from "../types/GataUser.type";
-import type { Auth0Profile } from "remix-auth-auth0";
+import { Menu as MenuIcon } from "@mui/icons-material";
 import { Link } from "@remix-run/react";
+import * as React from "react";
+import type { Auth0Profile } from "remix-auth-auth0";
+
+import { UserMenu } from "./UserMenu";
+import { isAdmin, isMember } from "./useRoles";
+import type { IGataUser } from "../types/GataUser.type";
 
 type ResponsiveAppBarProps = {
    loggedInUser: IGataUser | undefined;
@@ -31,7 +32,7 @@ export const ResponsiveAppBar = ({ loggedInUser, user, isAuthenticated }: Respon
    const filteredPages = [
       { name: "Hjem", url: "" },
       { name: "Min side", url: `member/${loggedInUser?.id}`, isMember: true },
-      { name: "Medlemmer", url: "member", isMember: true },
+      { name: "Medlemmer", url: "members", isMember: true },
       { name: "Ansvarsposter", url: "responsibility", isMember: true },
       { name: "Aktuelle dokumenter", url: "report", isMember: true },
       { name: "Arkiv", url: "https://1drv.ms/f/s!Aimiul1gt9LbrA10geM-AnPDKFoY", isMember: true },

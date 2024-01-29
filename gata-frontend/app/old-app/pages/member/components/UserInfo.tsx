@@ -12,11 +12,9 @@ import {
    Select,
    Text,
 } from "@chakra-ui/react";
+import { useFetcher } from "@remix-run/react";
 import { useState } from "react";
-import { ActionFunction, useFetcher } from "react-router-dom";
 
-import { client } from "../../../api/client/client";
-import { getRequiredAccessToken } from "../../../auth0Client";
 import { SelectPrimaryEmail } from "../../../components/SelectPrimaryEmail";
 import { isAdmin, isMember } from "../../../components/useRoles";
 import { IContingentInfo } from "../../../types/ContingentInfo.type";
@@ -26,20 +24,6 @@ type UserInfoProps = {
    user: IGataUser;
    loggedInUser: IGataUser;
    contingentInfo: IContingentInfo;
-};
-
-export const contingentAction: ActionFunction = async ({ request, params }) => {
-   const token = await getRequiredAccessToken();
-   const form = Object.fromEntries(await request.formData());
-   const year = form.year as string;
-   const isPaid = !(form.hasPaid === "true");
-   const body = { year, isPaid };
-
-   return client(`user/${params.memberId}/contingent`, {
-      method: "POST",
-      body: JSON.stringify(body),
-      token,
-   });
 };
 
 const numberOfYears = 10;

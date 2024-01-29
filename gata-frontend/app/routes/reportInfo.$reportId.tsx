@@ -1,17 +1,16 @@
-import { Heading, Button, IconButton, Box, Text } from "@chakra-ui/react";
-import { Delete, Edit } from "@mui/icons-material";
+import { Box, Button, Heading, IconButton, Text } from "@chakra-ui/react";
+import { Delete, Edit, Email } from "@mui/icons-material";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useSubmit, Link, Outlet, useFetcher } from "@remix-run/react";
+import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { Descendant } from "slate";
-import { client } from "~/old-app/api/client/client";
-import { usePutGataReportContent } from "~/old-app/api/report.api";
+
+import { client } from "~/utils/client";
 import { ClientOnly } from "~/old-app/components/ClientOnly";
 import { PageLayout } from "~/old-app/components/PageLayout";
 import { RichTextEditor } from "~/old-app/components/RichTextEditor/RichTextEditor";
 import { RichTextPreview } from "~/old-app/components/RichTextEditor/RichTextPreview";
-import { PublishButton } from "~/old-app/pages/ReportInfoPage/PublishButton";
 import type { IGataReport } from "~/old-app/types/GataReport.type";
 import type { IGataUser } from "~/old-app/types/GataUser.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
@@ -77,7 +76,9 @@ export default function ReportInfoPage() {
                   >
                      Slett
                   </Button>
-                  <PublishButton reportId={report.id} />
+                  <Button variant="ghost" leftIcon={<Email />} as={Link} to={"publish"} sx={{ mr: 1 }}>
+                     Publiser
+                  </Button>
                   <Button
                      variant="ghost"
                      leftIcon={<Edit />}

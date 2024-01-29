@@ -20,7 +20,6 @@ export type CustomElement = {
       | ListTypes;
    children: CustomText[];
    imageId?: string | null;
-   savingImageData?: string;
    size?: number;
 };
 

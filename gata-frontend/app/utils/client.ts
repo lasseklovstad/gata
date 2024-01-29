@@ -32,6 +32,7 @@ export const client = <ResponseBody = unknown, RequestBody = unknown>(
          }
          return undefined as ResponseBody;
       } else {
+         throw response;
          if (response.status === 401) {
             throw new Error("Du er ikke logget in");
          }

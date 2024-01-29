@@ -1,9 +1,9 @@
-import { redirect, type ActionArgs } from "@remix-run/node";
+import { redirect, type ActionFunction } from "@remix-run/node";
 
 import { authenticator } from "~/utils/auth.server";
 
 export const loader = () => redirect("/");
 
-export const action = ({ request }: ActionArgs) => {
+export const action: ActionFunction = ({ request }) => {
    return authenticator.authenticate("auth0", request);
 };

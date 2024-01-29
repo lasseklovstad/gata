@@ -1,6 +1,6 @@
 import { Alert, AlertDescription, AlertIcon, AlertTitle, Box } from "@chakra-ui/react";
 
-import { UseClientState } from "../api/client/client.types";
+import { UseClientState } from "../../utils/client.types";
 
 type ErrorAlertProps = {
    response: UseClientState<unknown>;

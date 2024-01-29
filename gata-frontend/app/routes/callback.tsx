@@ -1,10 +1,10 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
 
 import { authenticator } from "~/utils/auth.server";
 
-export let loader = ({ request }: LoaderArgs) => {
+export const loader: LoaderFunction = ({ request }) => {
    return authenticator.authenticate("auth0", request, {
-      successRedirect: "/home",
+      successRedirect: "/registerLogin",
       failureRedirect: "/login",
    });
 };

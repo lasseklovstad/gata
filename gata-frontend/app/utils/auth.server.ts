@@ -17,7 +17,7 @@ export const authenticator = new Authenticator<{ profile: Auth0Profile; accessTo
 
 const auth0Strategy = new Auth0Strategy(
    {
-      callbackURL: process.env.AUTH0_CALLBACK_URL!,
+      callbackURL: "/callback",
       clientID: process.env.AUTH0_CLIENT_ID!,
       audience: process.env.AUTH0_AUDIENCE!,
       clientSecret: process.env.AUTH0_CLIENT_SECRET!,

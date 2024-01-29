@@ -2,7 +2,7 @@ import { Add, Delete, Edit } from "@mui/icons-material";
 import { Box, Button, Divider, Heading, IconButton, List, ListItem, Text } from "@chakra-ui/react";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import type { IResponsibility } from "~/old-app/types/Responsibility.type";
-import { client } from "~/old-app/api/client/client";
+import { client } from "~/utils/client";
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";

@@ -3,12 +3,13 @@ import { Delete } from "@mui/icons-material";
 import type { LoaderFunction, ActionFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useLoaderData, useFetcher } from "@remix-run/react";
-import { client } from "~/old-app/api/client/client";
+
+import { client } from "~/utils/client";
 import { useConfirmDialog } from "~/old-app/components/ConfirmDialog";
 import { isAdmin } from "~/old-app/components/useRoles";
-import { UserSubscribe } from "~/old-app/pages/member/MemberInfo/UserSubscribe";
 import { LinkExternalUserToGataUserSelect } from "~/old-app/pages/member/components/LinkExternalUserToGataUserSelect";
 import { UserInfo } from "~/old-app/pages/member/components/UserInfo";
+import { UserSubscribe } from "~/old-app/pages/member/MemberInfo/UserSubscribe";
 import type { IContingentInfo } from "~/old-app/types/ContingentInfo.type";
 import type { IGataRole } from "~/old-app/types/GataRole.type";
 import type { IGataUser, IExternalUser } from "~/old-app/types/GataUser.type";
@@ -31,7 +32,7 @@ export const action: ActionFunction = async ({ request, params }) => {
          method: "DELETE",
          token,
       });
-      return redirect("/member");
+      return redirect("/members");
    }
 };
 

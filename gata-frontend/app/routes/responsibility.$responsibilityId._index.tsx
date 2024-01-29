@@ -18,7 +18,7 @@ import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { useNavigate, useLoaderData, useFetcher } from "@remix-run/react";
-import { client } from "~/old-app/api/client/client";
+import { client } from "~/utils/client";
 import type { IResponsibility } from "~/old-app/types/Responsibility.type";
 
 export const loader: LoaderFunction = async ({ request, params }) => {

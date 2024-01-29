@@ -15,7 +15,7 @@ import {
    ModalOverlay,
    Textarea,
 } from "@chakra-ui/react";
-import { client } from "../api/client/client";
+import { client } from "../../utils/client";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import type { LoaderFunction, ActionFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";

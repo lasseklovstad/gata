@@ -15,7 +15,7 @@ import { Select } from "chakra-react-select";
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useNavigate, useFetcher, Link } from "@remix-run/react";
-import { client } from "~/old-app/api/client/client";
+import { client } from "~/utils/client";
 import type { IResponsibility } from "~/old-app/types/Responsibility.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 

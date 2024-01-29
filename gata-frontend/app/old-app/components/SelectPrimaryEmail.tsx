@@ -1,22 +1,9 @@
 import { Flex, FormControl, FormHelperText, FormLabel } from "@chakra-ui/react";
+import { useFetcher } from "@remix-run/react";
 import { OptionBase, OptionProps, Select, SingleValueProps, chakraComponents } from "chakra-react-select";
-import { ActionFunction, useFetcher } from "react-router-dom";
 
 import { ExternalUserIcon } from "./ExternalUserIcon";
-import { client } from "../api/client/client";
-import { getRequiredAccessToken } from "../auth0Client";
 import { IExternalUser, IGataUser } from "../types/GataUser.type";
-
-export const primaryUserEmailAction: ActionFunction = async ({ request, params }) => {
-   const token = await getRequiredAccessToken();
-   const form = Object.fromEntries(await request.formData());
-   await client(`user/${params.memberId}/primaryuser`, {
-      method: "PUT",
-      body: form.primaryUserEmail,
-      token,
-   });
-   return {};
-};
 
 type SelectPrimaryEmailProps = {
    user: IGataUser;

@@ -1,11 +1,9 @@
-import { Box, Button, CircularProgress, Heading, List, ListItem, Tooltip } from "@chakra-ui/react";
+import { Box, Button, Heading, List, ListItem, Tooltip } from "@chakra-ui/react";
 import { Email } from "@mui/icons-material";
-import type { ActionArgs, LoaderArgs } from "@remix-run/node";
-import { useFetcher, useLoaderData } from "@remix-run/react";
-import { client } from "~/old-app/api/client/client";
-import { usePublishKontigentReport } from "~/old-app/api/contingent.api";
-import { useConfirmDialog } from "~/old-app/components/ConfirmDialog";
-import { LoadingButton } from "~/old-app/components/Loading";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
+
+import { client } from "~/utils/client";
 import { PageLayout } from "~/old-app/components/PageLayout";
 import { isAdmin } from "~/old-app/components/useRoles";
 import { ExternalUsersWithNoGataUser } from "~/old-app/pages/member/components/ExternalUsersWithNoGataUser";
@@ -13,7 +11,7 @@ import { UserListItem } from "~/old-app/pages/member/components/UserListItem";
 import type { IExternalUser, IGataUser } from "~/old-app/types/GataUser.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader: LoaderFunction = async ({ request }) => {
    const { signal } = request;
    const token = await getRequiredAuthToken(request);
    const loggedInUser = await client("user/loggedin", { token, signal });
@@ -22,10 +20,11 @@ export const loader = async ({ request }: LoaderArgs) => {
    return { loggedInUser, users, externalUsers };
 };
 
-export const action = async ({ request }: ActionArgs) => {
+export const action: ActionFunction = async ({ request }) => {
    const token = await getRequiredAuthToken(request);
    const form = Object.fromEntries(await request.formData());
-   return client("user", { method: "POST", body: form, token });
+   await client("user", { method: "POST", body: form, token });
+   return { ok: true };
 };
 
 export interface MemberPageLoaderData {
@@ -36,23 +35,6 @@ export interface MemberPageLoaderData {
 
 export default function MemberPage() {
    const { loggedInUser, users, externalUsers } = useLoaderData() as MemberPageLoaderData;
-   const { publishContigent, publishContigentResponse } = usePublishKontigentReport();
-   const clearCacheFetcher = useFetcher();
-   const { openConfirmDialog: openConfirmPublishKontigent, ConfirmDialogComponent: ConfirmPublishKontigentDialog } =
-      useConfirmDialog({
-         text: `Det ble sent en email til: ${
-            publishContigentResponse.data && publishContigentResponse.data.length
-               ? publishContigentResponse.data?.join(", ")
-               : "Ingen"
-         }`,
-         title: "Vellykket",
-         showOnlyOk: true,
-      });
-
-   const startPublishContigent = async () => {
-      const { data } = await publishContigent();
-      data && openConfirmPublishKontigent();
-   };
 
    const admins = users.filter((user) => user.isUserAdmin);
    const members = users.filter((user) => user.isUserMember && !user.isUserAdmin);
@@ -65,36 +47,19 @@ export default function MemberPage() {
                Brukere
             </Heading>
             {isAdmin(loggedInUser) && (
-               <Tooltip label="Hent nye brukere som har logget inn">
-                  <clearCacheFetcher.Form method="POST" action="clearCache">
-                     <Button variant="ghost" type="submit">
-                        Oppdater
-                     </Button>
-                  </clearCacheFetcher.Form>
-               </Tooltip>
-            )}
-            {isAdmin(loggedInUser) && (
                <Tooltip label="Send påminnelse om betaling til de som ikke har betalt kontigent">
-                  <LoadingButton
-                     response={publishContigentResponse}
-                     variant="ghost"
-                     leftIcon={<Email />}
-                     onClick={startPublishContigent}
-                     sx={{ mr: 1 }}
-                  >
+                  <Button as={Link} to="contingent" variant="ghost" leftIcon={<Email />} sx={{ mr: 1 }}>
                      Kontigent
-                  </LoadingButton>
+                  </Button>
                </Tooltip>
             )}
          </Box>
-         {ConfirmPublishKontigentDialog}
-         {clearCacheFetcher.state !== "idle" && <CircularProgress isIndeterminate />}
          <Heading as="h2" id="admin-title" size="lg">
             Administratorer
          </Heading>
          <List aria-labelledby="admin-title">
             {admins.map((user) => {
-               return <UserListItem key={user.id} user={user} />;
+               return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
             })}
             {admins.length === 0 && <ListItem>Ingen administratorer funnet</ListItem>}
          </List>
@@ -103,7 +68,7 @@ export default function MemberPage() {
          </Heading>
          <List aria-labelledby="member-title">
             {members?.map((user) => {
-               return <UserListItem key={user.id} user={user} />;
+               return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
             })}
             {members.length === 0 && <ListItem>Ingen medlemmer funnet</ListItem>}
          </List>
@@ -114,13 +79,14 @@ export default function MemberPage() {
                </Heading>
                <List aria-labelledby="non-member-title">
                   {nonMembers?.map((user) => {
-                     return <UserListItem key={user.id} user={user} />;
+                     return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
                   })}
                   {nonMembers?.length === 0 && <ListItem>Ingen andre brukere</ListItem>}
                </List>
                <ExternalUsersWithNoGataUser externalUsers={externalUsers} />
             </>
          )}
+         <Outlet />
       </PageLayout>
    );
 }

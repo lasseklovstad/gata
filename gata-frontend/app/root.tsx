@@ -1,4 +1,6 @@
-import { json, type LoaderFunction, type V2_MetaFunction } from "@remix-run/node";
+import { Progress, Container, Box, Text, ChakraProvider, Heading } from "@chakra-ui/react";
+import { withEmotionCache } from "@emotion/react";
+import { json, LinksFunction, LoaderFunctionArgs, type MetaFunction } from "@remix-run/node";
 import {
    Links,
    LiveReload,
@@ -6,48 +8,100 @@ import {
    Outlet,
    Scripts,
    ScrollRestoration,
+   isRouteErrorResponse,
    useLoaderData,
    useNavigation,
+   useRouteError,
 } from "@remix-run/react";
-import { authenticator } from "./utils/auth.server";
-import { IGataUser } from "./old-app/types/GataUser.type";
-import { client } from "./old-app/api/client/client";
-import { Progress, Container, Box, Text, ChakraProvider } from "@chakra-ui/react";
-import { ResponsiveAppBar } from "./old-app/components/ResponsiveAppBar";
+import { useEffect, useContext } from "react";
 import { Auth0Profile } from "remix-auth-auth0";
-import { chakraTheme } from "./old-app/chakraTheme";
 
-export const meta: V2_MetaFunction = () => {
-   return [{ title: "Gata" }];
+import { ClientStyleContext, ServerStyleContext } from "./context";
+import { chakraTheme } from "./old-app/chakraTheme";
+import { ResponsiveAppBar } from "./old-app/components/ResponsiveAppBar";
+import { IGataUser } from "./old-app/types/GataUser.type";
+import { authenticator } from "./utils/auth.server";
+import { client } from "./utils/client";
+
+export const meta: MetaFunction = () => {
+   return [
+      {
+         title: "Gata",
+         charset: "utf-8",
+         viewport: "width=device-width,initial-scale=1",
+         "theme-color": "#000000",
+         description: "Nettside for gata",
+      },
+   ];
 };
 
-export default function App() {
+export const links: LinksFunction = () => {
+   return [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com" },
+      {
+         rel: "stylesheet",
+         href: "https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap",
+      },
+      { rel: "apple-touch-icon", href: "/logo192.png" },
+      { rel: "manifest", href: "/manifest.json" },
+      { rel: "icon", href: "/favicon.ico" },
+   ];
+};
+
+interface DocumentProps {
+   children: React.ReactNode;
+}
+
+const Document = withEmotionCache(({ children }: DocumentProps, emotionCache) => {
+   const serverStyleData = useContext(ServerStyleContext);
+   const clientStyleData = useContext(ClientStyleContext);
+
+   // Only executed on client
+   useEffect(() => {
+      // re-link sheet container
+      emotionCache.sheet.container = document.head;
+      // re-inject tags
+      const tags = emotionCache.sheet.tags;
+      emotionCache.sheet.flush();
+      tags.forEach((tag) => {
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         (emotionCache.sheet as any)._insertTag(tag);
+      });
+      // reset cache to reapply global styles
+      clientStyleData?.reset();
+   }, []);
+
    return (
       <html lang="no">
          <head>
-            <meta charSet="utf-8" />
-            <link rel="icon" href="/favicon.ico" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <meta name="theme-color" content="#000000" />
-            <meta name="description" content="Nettside for gata" />
-            <link rel="apple-touch-icon" href="/logo192.png" />
-            <link rel="manifest" href="/manifest.json" />
             <Meta />
             <Links />
+            {serverStyleData?.map(({ key, ids, css }) => (
+               <style key={key} data-emotion={`${key} ${ids.join(" ")}`} dangerouslySetInnerHTML={{ __html: css }} />
+            ))}
          </head>
          <body>
-            <ChakraProvider theme={chakraTheme}>
-               <Root />
-            </ChakraProvider>
+            {children}
             <ScrollRestoration />
             <Scripts />
             <LiveReload />
          </body>
       </html>
    );
+});
+
+export default function App() {
+   return (
+      <Document>
+         <ChakraProvider theme={chakraTheme}>
+            <Root />
+         </ChakraProvider>
+      </Document>
+   );
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    const auth = await authenticator.isAuthenticated(request);
    const version = process.env.npm_package_version || "0.0.0";
    if (auth) {
@@ -55,18 +109,23 @@ export const loader: LoaderFunction = async ({ request }) => {
       const loggedInUser = await client<IGataUser>("user/loggedin", {
          token: auth.accessToken,
          signal: request.signal,
+      }).catch((e) => {
+         if (e instanceof Response && e.status === 404) return undefined;
+         else {
+            throw e;
+         }
       });
-      return json<RootLoaderData>({ isAuthenticated: true, loggedInUser, user, version });
+      return json<LoaderData>({ isAuthenticated: true, loggedInUser, user, version });
    }
-   return json<RootLoaderData>({ isAuthenticated: false, version });
+   return json<LoaderData>({ isAuthenticated: false, version });
 };
 
-export interface RootLoaderData {
+type LoaderData = {
    loggedInUser?: IGataUser;
    isAuthenticated: boolean;
    user?: Auth0Profile;
    version: string;
-}
+};
 
 function Root() {
    const { loggedInUser, isAuthenticated, user, version } = useLoaderData<typeof loader>();
@@ -83,4 +142,31 @@ function Root() {
          </Box>
       </Box>
    );
+}
+
+export function ErrorBoundary() {
+   const error = useRouteError();
+   console.log(error);
+
+   if (isRouteErrorResponse(error)) {
+      return (
+         <div>
+            <Heading>
+               {error.status} {error.statusText}
+            </Heading>
+            <Text>{error.data.message}</Text>
+         </div>
+      );
+   } else if (error instanceof Error) {
+      return (
+         <div>
+            <Heading>Error</Heading>
+            <Text>{error.message}</Text>
+            <Text>The stack trace is:</Text>
+            <Text as="pre">{error.stack}</Text>
+         </div>
+      );
+   } else {
+      return <Heading>Unknown Error</Heading>;
+   }
 }

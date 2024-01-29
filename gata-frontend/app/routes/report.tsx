@@ -1,33 +1,32 @@
-import { Add } from "@mui/icons-material";
 import { Box, Button, Divider, Heading, List, ListItem, Text } from "@chakra-ui/react";
-import { getRequiredAuthToken } from "~/utils/auth.server";
+import { Add } from "@mui/icons-material";
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
-import { client } from "~/old-app/api/client/client";
+
+import { client } from "~/utils/client";
 import { ListItemLink } from "~/old-app/components/ListItemLink";
 import { PageLayout } from "~/old-app/components/PageLayout";
 import { isAdmin } from "~/old-app/components/useRoles";
 import type { IGataReportSimple } from "~/old-app/types/GataReport.type";
 import type { IGataUser } from "~/old-app/types/GataUser.type";
 import type { Page } from "~/old-app/types/Page.type";
+import { getRequiredAuthToken } from "~/utils/auth.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
    const token = await getRequiredAuthToken(request);
    const reports = await client<Page<IGataReportSimple>>(`report/simple?page=0&type=DOCUMENT`, { token });
    const loggedInUser = await client<IGataUser>("user/loggedin", { token });
-   const databaseSize = await client<string>("report/databasesize", { token });
-   return json<ReportPageLoaderData>({ reports, loggedInUser, databaseSize });
+   return json<ReportPageLoaderData>({ reports, loggedInUser });
 };
 
 interface ReportPageLoaderData {
    reports: Page<IGataReportSimple>;
    loggedInUser: IGataUser;
-   databaseSize: string;
 }
 
 export default function ReportPage() {
-   const { loggedInUser, reports, databaseSize } = useLoaderData() as ReportPageLoaderData;
+   const { loggedInUser, reports } = useLoaderData() as ReportPageLoaderData;
    return (
       <PageLayout>
          <Box
@@ -41,7 +40,6 @@ export default function ReportPage() {
             <Heading variant="h1" id="report-page-title">
                Aktuelle dokumenter
             </Heading>
-            <Text>{parseInt(databaseSize) / 10}% brukt</Text>
             {isAdmin(loggedInUser) && (
                <Button leftIcon={<Add />} as={Link} to="new">
                   Opprett

@@ -1,5 +1,6 @@
 import { LoaderFunction, json } from "@remix-run/node";
-import { client } from "~/old-app/api/client/client";
+
+import { client } from "~/utils/client";
 import type { IGataReportFile } from "~/old-app/types/GataReportFile.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 

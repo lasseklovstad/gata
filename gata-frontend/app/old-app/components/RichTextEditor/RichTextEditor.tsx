@@ -7,20 +7,22 @@ import {
    FormatUnderlined,
    Save,
 } from "@mui/icons-material";
+import { useFetcher, useSubmit } from "@remix-run/react";
 import { useCallback, useMemo, useRef } from "react";
 import type { Descendant } from "slate";
 import { createEditor } from "slate";
 import { withHistory } from "slate-history";
 import type { RenderElementProps, RenderLeafProps } from "slate-react";
 import { Editable, Slate, withReact } from "slate-react";
-import { LoadingButton } from "../Loading";
+
 import { AddImage } from "./AddImage";
 import { BlockButton } from "./BlockButton";
 import { MarkButton } from "./MarkButton";
 import { insertTab, toggleMark } from "./RichTextEditor.util";
 import { RichTextElement } from "./RichTextElement";
 import { RichTextLeaf } from "./RichTextLeaf";
-import { insertImage, withImages } from "./withImages";
+import { insertImage, useSaveImage, withImages } from "./withImages";
+import { LoadingButton } from "../Loading";
 
 type RichTextEditorProps = {
    onCancel: () => void;
@@ -31,7 +33,8 @@ type RichTextEditorProps = {
 };
 
 export const RichTextEditor = ({ onCancel, onSave, isLoading, initialContent, reportId }: RichTextEditorProps) => {
-   const editor = useMemo(() => withImages(withHistory(withReact(createEditor()))), []);
+   const submitImage = useSubmit();
+   const editor = useMemo(() => withImages(withHistory(withReact(createEditor())), submitImage), [submitImage]);
    const renderElement = useCallback((props: RenderElementProps) => <RichTextElement {...props} />, []);
    const renderLeaf = useCallback((props: RenderLeafProps) => {
       return <RichTextLeaf {...props} />;

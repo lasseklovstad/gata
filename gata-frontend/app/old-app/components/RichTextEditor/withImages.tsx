@@ -1,9 +1,10 @@
-import { Editor, Element, Text, Transforms } from "slate";
+import { SubmitFunction } from "@remix-run/react";
+import { Editor, Element, Transforms } from "slate";
 
 let counter = 0;
-const generateId = () => (counter++).toString();
+const generateSavingImageId = () => `saving-image-${counter++}`;
 
-export const withImages = (editor: Editor) => {
+export const withImages = (editor: Editor, submit: SubmitFunction) => {
    const { isVoid, insertData } = editor;
 
    editor.isVoid = (element: Element) => {
@@ -16,14 +17,17 @@ export const withImages = (editor: Editor) => {
       if (!text && files && files.length > 0) {
          for (let i = 0; i < files.length; i++) {
             const file = files.item(i);
-            const reader = new FileReader();
             const [mime] = file!.type.split("/");
 
             if (mime === "image") {
+               const reader = new FileReader();
                reader.addEventListener("load", () => {
-                  const url = reader.result;
-                  console.log(url);
-                  typeof url === "string" && insertSavingImage(editor, generateId(), url);
+                  const data = reader.result;
+                  const tempId = generateSavingImageId();
+                  if (typeof data === "string") {
+                     insertSavingImage(editor, tempId);
+                     submit({ data }, { action: "file", method: "POST", fetcherKey: tempId, navigate: false });
+                  }
                });
 
                reader.readAsDataURL(file!);
@@ -45,10 +49,10 @@ export const insertImage = (editor: Editor, imageId: string | null) => {
    Transforms.insertNodes(editor, image);
 };
 
-export const insertSavingImage = (editor: Editor, imageId: string, data: string) => {
+export const insertSavingImage = (editor: Editor, imageId: string) => {
    const text = { text: "" };
    const image = [
-      { type: "saving-image" as const, imageId, savingImageData: data, size: 50, children: [text] },
+      { type: "saving-image" as const, imageId, size: 50, children: [text] },
       { type: "body2" as const, children: [text] },
    ];
    Transforms.insertNodes(editor, image);
@@ -59,7 +63,6 @@ export const replaceSavingImage = (editor: Editor, imageId: string, oldId: strin
    Transforms.setNodes(editor, image, {
       at: [],
       match: (n) => {
-         console.log("Node", n);
          return !Editor.isEditor(n) && Element.isElement(n) && n.type === "saving-image" && n.imageId === oldId;
       },
       mode: "all",

@@ -1,12 +1,14 @@
 import { Box, ButtonGroup, Image as ChakraImage, IconButton, Skeleton } from "@chakra-ui/react";
 import { Add, Delete, Remove } from "@mui/icons-material";
-import { useFetcher, useFormAction } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { useEffect } from "react";
 import type { Element } from "slate";
 import { Transforms } from "slate";
 import type { RenderElementProps } from "slate-react";
 import { ReactEditor, useFocused, useSelected, useSlate, useSlateStatic } from "slate-react";
+
 import type { IGataReportFile } from "~/old-app/types/GataReportFile.type";
+
 import { replaceSavingImage } from "./withImages";
 
 export const SlateImage = ({ attributes, children, element }: Partial<RenderElementProps>) => {
@@ -20,7 +22,7 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
          {children}
 
          <Box contentEditable={false} position="relative">
-            <Image id={element?.imageId!} selected={selected} focused={focused} size={element?.size} />
+            <Image id={element.imageId!} selected={selected} focused={focused} size={element?.size} />
 
             <IconButton
                onMouseDown={(ev) => ev.preventDefault()}
@@ -49,7 +51,7 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
                {element?.size && element.size > 10 && (
                   <IconButton
                      onMouseDown={(ev) => ev.preventDefault()}
-                     onClick={(ev) => {
+                     onClick={() => {
                         Transforms.setNodes<Element>(editor, { type: "image", size: (element?.size || 0) - 10 });
                      }}
                      icon={<Remove />}
@@ -59,7 +61,7 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
                {element?.size && element.size < 100 && (
                   <IconButton
                      onMouseDown={(ev) => ev.preventDefault()}
-                     onClick={(ev) => {
+                     onClick={() => {
                         Transforms.setNodes<Element>(editor, { type: "image", size: (element?.size || 0) + 10 });
                      }}
                      icon={<Add />}
@@ -129,20 +131,14 @@ const ExternalImage = ({ id, selected = false, focused = false, size = 50 }: Ima
    );
 };
 
-export const SavingImage = ({ data, oldId }: { data: string; oldId: string }) => {
-   const fetcher = useFetcher<{ id: string }>();
-   const action = useFormAction("file");
+export const SavingImage = ({ oldId }: { oldId: string }) => {
+   const fetcher = useFetcher<{ id: string }>({ key: oldId });
    const editor = useSlate();
 
    useEffect(() => {
-      if (fetcher.type === "init" && fetcher.state === "idle") {
-         console.log("Submit");
-         fetcher.submit({ data }, { action, method: "POST" });
-      }
-      if (fetcher.state === "idle" && fetcher.type === "done" && fetcher.data) {
-         console.log("Done", fetcher.data);
+      if (fetcher.state === "idle" && fetcher.data) {
          replaceSavingImage(editor, fetcher.data.id, oldId);
       }
-   }, [action, data, editor, fetcher, oldId]);
+   }, [editor, fetcher, oldId]);
    return <Skeleton variant="rectangular" width={400} height={300} />;
 };

@@ -1,41 +1,41 @@
 import { Heading, Text } from "@chakra-ui/react";
-import type { LoaderFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { client } from "~/old-app/api/client/client";
+import { LoaderFunctionArgs, SerializeFrom, json } from "@remix-run/node";
+import { useLoaderData, useRouteLoaderData } from "@remix-run/react";
+
 import { News } from "~/old-app/components/News";
 import { PageLayout } from "~/old-app/components/PageLayout";
 import { isMember } from "~/old-app/components/useRoles";
 import type { IGataReport } from "~/old-app/types/GataReport.type";
-import type { IGataUser } from "~/old-app/types/GataUser.type";
 import type { Page } from "~/old-app/types/Page.type";
+import { loader as rootLoader } from "~/root";
 import { authenticator } from "~/utils/auth.server";
+import { client } from "~/utils/client";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    const auth = await authenticator.isAuthenticated(request);
    if (auth) {
-      const loggedInUser = await client<IGataUser>("user/loggedin", {
-         signal: request.signal,
-         token: auth.accessToken,
-      });
       const params = new URL(request.url).searchParams;
       const reportPage = await client<Page<IGataReport>>(`report?page=${params.get("page") || 0}&type=NEWS`, {
          signal: request.signal,
          token: auth.accessToken,
+      }).catch((e) => {
+         if (e instanceof Response && e.status === 403) return undefined;
+         else {
+            throw e;
+         }
       });
-      return json<LoaderData>({ isAuthenticated: true, loggedInUser, reportPage });
+      return json<LoaderData>({ reportPage });
    }
-   return json({ isAuthenticated: false });
+   return json<LoaderData>({ reportPage: undefined });
 };
 
-export interface LoaderData {
-   loggedInUser: IGataUser | undefined;
+export type LoaderData = {
    reportPage: Page<IGataReport> | undefined;
-   isAuthenticated: boolean;
-}
+};
 
 export default function Home() {
-   const { loggedInUser, reportPage, isAuthenticated } = useLoaderData<typeof loader>();
+   const { loggedInUser, isAuthenticated } = useRouteLoaderData("root") as SerializeFrom<typeof rootLoader>;
+   const { reportPage } = useLoaderData<typeof loader>();
    if (isAuthenticated) {
       if (loggedInUser && isMember(loggedInUser) && reportPage) {
          return <News reportPage={reportPage} loggedInUser={loggedInUser} />;

@@ -1,21 +1,11 @@
-/**
- * By default, Remix will handle generating the HTTP Response for you.
- * You are free to delete this file if you'd like to, but if you ever want it revealed again, you can run `npx remix reveal` ✨
- * For more information, see https://remix.run/file-conventions/entry.server
- */
-
-import { PassThrough } from "node:stream";
-
-import type { EntryContext } from "@remix-run/node";
-import { Response } from "@remix-run/node";
-import { RemixServer } from "@remix-run/react";
-import isbot from "isbot";
-import { renderToPipeableStream } from "react-dom/server";
-import createEmotionCache from "./createEmotionCache";
+import { CacheProvider } from "@emotion/react";
 import createEmotionServer from "@emotion/server/create-instance";
-import { CacheProvider as EmotionCacheProvider } from "@emotion/react";
+import type { EntryContext } from "@remix-run/node"; // Depends on the runtime you choose
+import { RemixServer } from "@remix-run/react";
+import { renderToString } from "react-dom/server";
 
-const ABORT_DELAY = 5_000;
+import { ServerStyleContext } from "./context";
+import createEmotionCache from "./createEmotionCache";
 
 export default function handleRequest(
    request: Request,
@@ -23,98 +13,31 @@ export default function handleRequest(
    responseHeaders: Headers,
    remixContext: EntryContext
 ) {
-   return isbot(request.headers.get("user-agent"))
-      ? handleBotRequest(request, responseStatusCode, responseHeaders, remixContext)
-      : handleBrowserRequest(request, responseStatusCode, responseHeaders, remixContext);
-}
+   const cache = createEmotionCache();
+   const { extractCriticalToChunks } = createEmotionServer(cache);
 
-function handleBotRequest(
-   request: Request,
-   responseStatusCode: number,
-   responseHeaders: Headers,
-   remixContext: EntryContext
-) {
-   const emotionCache = createEmotionCache();
-   return new Promise((resolve, reject) => {
-      const { pipe, abort } = renderToPipeableStream(
-         <EmotionCacheProvider value={emotionCache}>
-            <RemixServer context={remixContext} url={request.url} abortDelay={ABORT_DELAY} />
-         </EmotionCacheProvider>,
-         {
-            onAllReady() {
-               const reactBody = new PassThrough();
-               const emotionServer = createEmotionServer(emotionCache);
+   const html = renderToString(
+      <ServerStyleContext.Provider value={null}>
+         <CacheProvider value={cache}>
+            <RemixServer context={remixContext} url={request.url} />
+         </CacheProvider>
+      </ServerStyleContext.Provider>
+   );
 
-               const bodyWithStyles = emotionServer.renderStylesToNodeStream();
-               reactBody.pipe(bodyWithStyles);
+   const chunks = extractCriticalToChunks(html);
 
-               responseHeaders.set("Content-Type", "text/html");
+   const markup = renderToString(
+      <ServerStyleContext.Provider value={chunks.styles}>
+         <CacheProvider value={cache}>
+            <RemixServer context={remixContext} url={request.url} />
+         </CacheProvider>
+      </ServerStyleContext.Provider>
+   );
 
-               resolve(
-                  new Response(bodyWithStyles, {
-                     headers: responseHeaders,
-                     status: responseStatusCode,
-                  })
-               );
+   responseHeaders.set("Content-Type", "text/html");
 
-               pipe(reactBody);
-            },
-            onShellError(error: unknown) {
-               reject(error);
-            },
-            onError(error: unknown) {
-               responseStatusCode = 500;
-               console.error(error);
-            },
-         }
-      );
-
-      setTimeout(abort, ABORT_DELAY);
-   });
-}
-
-function handleBrowserRequest(
-   request: Request,
-   responseStatusCode: number,
-   responseHeaders: Headers,
-   remixContext: EntryContext
-) {
-   const emotionCache = createEmotionCache();
-
-   return new Promise((resolve, reject) => {
-      const { pipe, abort } = renderToPipeableStream(
-         <EmotionCacheProvider value={emotionCache}>
-            <RemixServer context={remixContext} url={request.url} abortDelay={ABORT_DELAY} />
-         </EmotionCacheProvider>,
-         {
-            onShellReady() {
-               const reactBody = new PassThrough();
-               const emotionServer = createEmotionServer(emotionCache);
-
-               const bodyWithStyles = emotionServer.renderStylesToNodeStream();
-               reactBody.pipe(bodyWithStyles);
-
-               responseHeaders.set("Content-Type", "text/html");
-
-               resolve(
-                  new Response(bodyWithStyles, {
-                     headers: responseHeaders,
-                     status: responseStatusCode,
-                  })
-               );
-
-               pipe(reactBody);
-            },
-            onShellError(error: unknown) {
-               reject(error);
-            },
-            onError(error: unknown) {
-               console.error(error);
-               responseStatusCode = 500;
-            },
-         }
-      );
-
-      setTimeout(abort, ABORT_DELAY);
+   return new Response(`<!DOCTYPE html>${markup}`, {
+      status: responseStatusCode,
+      headers: responseHeaders,
    });
 }

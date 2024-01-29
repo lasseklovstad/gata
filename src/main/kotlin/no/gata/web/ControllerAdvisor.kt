@@ -5,6 +5,7 @@ import no.gata.web.exception.GataUserNoSufficientRole
 import no.gata.web.exception.GataUserNotFound
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
@@ -29,6 +30,14 @@ class ControllerAdvisor : ResponseEntityExceptionHandler() {
         request: WebRequest,
     ): ResponseEntity<ErrorResponse> {
         return ResponseEntity(ErrorResponse(ex.message), HttpStatus.BAD_REQUEST)
+    }
+
+    @ExceptionHandler(value = [AccessDeniedException::class])
+    protected fun handleAccessDeniedException(
+        ex: RuntimeException,
+        request: WebRequest,
+    ): ResponseEntity<ErrorResponse> {
+        return ResponseEntity(ErrorResponse(ex.message), HttpStatus.FORBIDDEN)
     }
 
     @ExceptionHandler(value = [ResponseStatusException::class])

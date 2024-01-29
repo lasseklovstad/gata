@@ -3,7 +3,8 @@ import { Add } from "@mui/icons-material";
 import type { LoaderFunction, ActionFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useLoaderData, Link, Outlet } from "@remix-run/react";
-import { client } from "~/old-app/api/client/client";
+
+import { client } from "~/utils/client";
 import { isMember, isAdmin } from "~/old-app/components/useRoles";
 import { ResponsibilityForm } from "~/old-app/pages/member/components/ResponsibilityForm";
 import type { IGataUser } from "~/old-app/types/GataUser.type";
@@ -26,7 +27,6 @@ export const action: ActionFunction = async ({ request, params }) => {
       const form = Object.fromEntries(await request.formData());
       await client(`user/${params.memberId}/responsibilityyear`, { method: "POST", body: form, token });
    }
-
    return redirect(`/member/${params.memberId}/responsibility`);
 };
 

@@ -13,7 +13,7 @@ type UserListItemProps = {
 export const UserListItem = ({ user, isLoggedInUserAdmin }: UserListItemProps) => {
    const isCurrentContingentPaid = user.contingents.find((c) => c.year === new Date().getFullYear())?.isPaid;
    return (
-      <ListItemLink to={user.id}>
+      <ListItemLink to={`/member/${user.id}`}>
          <Flex gap={2} p={2}>
             <Avatar src={user.primaryUser.picture || undefined} />
             <Box>
