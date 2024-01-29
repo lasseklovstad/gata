@@ -1,10 +1,21 @@
 import { User } from "@auth0/auth0-spa-js";
-import { Alert, AlertDescription, AlertTitle, Box, Container, Progress, Text } from "@chakra-ui/react";
+import {
+   Alert,
+   AlertDescription,
+   AlertTitle,
+   Box,
+   Container,
+   Progress,
+   Text,
+   Link as ChakraLink,
+   Button,
+} from "@chakra-ui/react";
 import {
    createBrowserRouter,
    createRoutesFromElements,
    isRouteErrorResponse,
    json,
+   Link,
    LoaderFunction,
    Outlet,
    redirect,
@@ -17,6 +28,7 @@ import {
 import { client } from "./api/client/client";
 import { createLoggedInUser } from "./api/user.api";
 import { getIsAuthenticated, getRequiredAccessToken, getUser, handleRedirectCallback } from "./auth0Client";
+import { About } from "./components/About";
 import {
    GataReportFormDialog,
    gataReportFormDialogAction,
@@ -92,9 +104,15 @@ const Root = () => {
          <Container as="main" maxW="6xl" sx={{ mb: 16 }}>
             <Outlet />
          </Container>
-         <Box as="footer" sx={{ marginTop: "auto", p: 1 }}>
-            <Text>Versjon: {APP_VERSION}</Text>
-         </Box>
+         <Container as="footer" sx={{ marginTop: "auto", p: 2, maxW: "6xl", display: "flex", gap: 4 }}>
+            <Text>V. {APP_VERSION}</Text>
+            <Button as={Link} to="/privacy" variant="link">
+               Privacy
+            </Button>
+            <Button as={Link} to="/about" variant="link">
+               About
+            </Button>
+         </Container>
       </Box>
    );
 };
@@ -168,6 +186,7 @@ export const router = createBrowserRouter(
             }}
          />
          <Route path="privacy" element={<Privacy />} />
+         <Route path="about" element={<About />} />
          <Route path="" loader={homeLoader} element={<Home />}>
             <Route
                path="new"
