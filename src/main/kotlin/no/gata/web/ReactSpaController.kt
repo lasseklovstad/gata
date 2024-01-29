@@ -14,6 +14,7 @@ class ReactSpaController {
             "/callback/**",
             "/privacy/**",
             "/report/**",
+            "/about/**",
             "/reportInfo/**",
             "/responsibility/**",
         ],

@@ -7,7 +7,7 @@ type PageLayoutProps = {
 
 export const PageLayout = ({ children }: PageLayoutProps) => {
    return (
-      <Box as="main" py={4} px={{ base: 0, md: 4 }}>
+      <Box py={4} px={{ base: 0, md: 4 }}>
          {children}
       </Box>
    );
