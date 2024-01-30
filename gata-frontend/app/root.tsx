@@ -1,7 +1,8 @@
-import { Progress, Container, Box, Text, ChakraProvider, Heading } from "@chakra-ui/react";
+import { Progress, Container, Box, Text, ChakraProvider, Heading, Button } from "@chakra-ui/react";
 import { withEmotionCache } from "@emotion/react";
 import { json, LinksFunction, LoaderFunctionArgs, type MetaFunction } from "@remix-run/node";
 import {
+   Link,
    Links,
    LiveReload,
    Meta,
@@ -137,9 +138,15 @@ function Root() {
          <Container as="main" maxW="6xl" sx={{ mb: 16 }}>
             <Outlet />
          </Container>
-         <Box as="footer" sx={{ marginTop: "auto", p: 1 }}>
-            <Text>Versjon: {version}</Text>
-         </Box>
+         <Container as="footer" sx={{ marginTop: "auto", p: 2, maxW: "6xl", display: "flex", gap: 4 }}>
+            <Text>{version}</Text>
+            <Button as={Link} to="/privacy" variant="link">
+               Privacy
+            </Button>
+            <Button as={Link} to="/about" variant="link">
+               About
+            </Button>
+         </Container>
       </Box>
    );
 }

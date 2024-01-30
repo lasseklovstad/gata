@@ -10,6 +10,7 @@ const sessionStorage = createCookieSessionStorage({
       path: "/",
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      secrets: [process.env.AUTH0_COOKIE_SECRET!],
    },
 });
 

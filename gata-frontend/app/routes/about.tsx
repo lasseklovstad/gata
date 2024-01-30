@@ -1,9 +1,9 @@
 import { Heading, Text } from "@chakra-ui/react";
 import { Fragment } from "react";
 
-import { PageLayout } from "./PageLayout";
+import { PageLayout } from "../old-app/components/PageLayout";
 
-export const About = () => {
+export default function About() {
    return (
       <PageLayout>
          <Heading as="h1">Welcome to Gata - A Digital Hub for Lifelong Connections</Heading>
@@ -73,4 +73,4 @@ export const About = () => {
          })}
       </PageLayout>
    );
-};
+}
