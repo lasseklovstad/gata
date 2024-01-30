@@ -10,6 +10,7 @@ import { ClientOnly } from "~/old-app/components/ClientOnly";
 import { PageLayout } from "~/old-app/components/PageLayout";
 import { RichTextEditor } from "~/old-app/components/RichTextEditor/RichTextEditor";
 import { RichTextPreview } from "~/old-app/components/RichTextEditor/RichTextPreview";
+import { isAdmin } from "~/old-app/components/useRoles";
 import type { IGataReport } from "~/old-app/types/GataReport.type";
 import type { IGataUser } from "~/old-app/types/GataUser.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
@@ -32,7 +33,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 
 export default function ReportInfoPage() {
    const { report, loggedInUser } = useLoaderData<typeof loader>();
-   const canEdit = report.createdBy?.id === loggedInUser.id;
+   const canEdit = report.createdBy?.id === loggedInUser.id || isAdmin(loggedInUser);
    const [editing, setEditing] = useState(false);
    const fetcher = useFetcher<typeof action>();
 
