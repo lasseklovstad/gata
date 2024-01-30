@@ -1,5 +1,5 @@
-import { BaseEditor } from "slate";
-import { ReactEditor } from "slate-react";
+import type { BaseEditor } from "slate";
+import type { ReactEditor } from "slate-react";
 
 export type ListTypes = "numbered-list" | "bulleted-list" | "list-item" | "mui-list" | "native-list-item";
 export const LIST_TYPES: ListTypes[] = ["numbered-list", "bulleted-list", "mui-list"];

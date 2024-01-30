@@ -1,4 +1,5 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 
 import { authenticator } from "~/utils/auth.server";
 

@@ -1,4 +1,4 @@
-import { SubmitFunction } from "@remix-run/react";
+import type { SubmitFunction } from "@remix-run/react";
 import { Editor, Element, Transforms } from "slate";
 
 let counter = 0;

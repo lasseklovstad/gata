@@ -1,6 +1,6 @@
 import { Box, Button, Heading, IconButton, Text } from "@chakra-ui/react";
 import { Delete, Edit, Email } from "@mui/icons-material";
-import type { ActionFunction, ActionFunctionArgs, LoaderFunction, LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";

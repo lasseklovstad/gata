@@ -3,7 +3,7 @@ import { Check, Clear } from "@mui/icons-material";
 
 import { ListItemLink } from "../../../components/ListItemLink";
 import { isMember } from "../../../components/useRoles";
-import { IGataUser } from "../../../types/GataUser.type";
+import type { IGataUser } from "../../../types/GataUser.type";
 
 type UserListItemProps = {
    user: IGataUser;

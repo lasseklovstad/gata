@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { ErrorAlert } from "./ErrorAlert";
 import { LoadingButton } from "./Loading";
-import { UseClientState } from "../../utils/client.types";
+import type { UseClientState } from "../../utils/client.types";
 
 type ConfirmDialogProps = {
    onClose: () => void;

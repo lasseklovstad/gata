@@ -16,8 +16,8 @@ import { Link, useFetcher } from "@remix-run/react";
 import { useState } from "react";
 
 import { isAdmin } from "../../../components/useRoles";
-import { IGataUser } from "../../../types/GataUser.type";
-import { IResponsibilityYear } from "../../../types/ResponsibilityYear.type";
+import type { IGataUser } from "../../../types/GataUser.type";
+import type { IResponsibilityYear } from "../../../types/ResponsibilityYear.type";
 
 type ResponsibilityFormProps = {
    responsibilityYear: IResponsibilityYear;

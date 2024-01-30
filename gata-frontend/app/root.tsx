@@ -1,6 +1,7 @@
 import { Progress, Container, Box, Text, ChakraProvider, Heading, Button } from "@chakra-ui/react";
 import { withEmotionCache } from "@emotion/react";
-import { json, LinksFunction, LoaderFunctionArgs, type MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import type { LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import {
    Link,
    Links,
@@ -15,12 +16,12 @@ import {
    useRouteError,
 } from "@remix-run/react";
 import { useEffect, useContext } from "react";
-import { Auth0Profile } from "remix-auth-auth0";
+import type { Auth0Profile } from "remix-auth-auth0";
 
 import { ClientStyleContext, ServerStyleContext } from "./context";
 import { chakraTheme } from "./old-app/chakraTheme";
 import { ResponsiveAppBar } from "./old-app/components/ResponsiveAppBar";
-import { IGataUser } from "./old-app/types/GataUser.type";
+import type { IGataUser } from "./old-app/types/GataUser.type";
 import { authenticator } from "./utils/auth.server";
 import { client } from "./utils/client";
 

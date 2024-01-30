@@ -1,9 +1,10 @@
 import { Flex, FormControl, FormHelperText, FormLabel } from "@chakra-ui/react";
 import { useFetcher } from "@remix-run/react";
-import { OptionBase, OptionProps, Select, SingleValueProps, chakraComponents } from "chakra-react-select";
+import type { OptionBase, OptionProps, SingleValueProps } from "chakra-react-select";
+import { Select, chakraComponents } from "chakra-react-select";
 
 import { ExternalUserIcon } from "./ExternalUserIcon";
-import { IExternalUser, IGataUser } from "../types/GataUser.type";
+import type { IExternalUser, IGataUser } from "../types/GataUser.type";
 
 type SelectPrimaryEmailProps = {
    user: IGataUser;

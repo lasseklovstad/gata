@@ -1,5 +1,6 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
-import { FormProps, useFetcher, useNavigate } from "@remix-run/react";
+import type { FormProps } from "@remix-run/react";
+import { useFetcher, useNavigate } from "@remix-run/react";
 
 type RouteConfirmFormDialogProps = {
    title?: string;

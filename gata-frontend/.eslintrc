@@ -65,6 +65,7 @@
        "warn"
      ],
      "@typescript-eslint/ban-ts-comment": "off",
+     "@typescript-eslint/consistent-type-imports": "error",
      "react/display-name": "off",
      "import/no-cycle": "warn",
      "import/order": ["warn", {

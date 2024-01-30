@@ -1,4 +1,4 @@
-import { ISimpleGataUser } from "./GataUser.type";
+import type { ISimpleGataUser } from "./GataUser.type";
 
 export interface IGataReport {
    id: string;

@@ -1,5 +1,6 @@
 import { ListItem } from "@chakra-ui/react";
-import { Link, LinkProps } from "@remix-run/react";
+import type { LinkProps } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 
 type ListItemLinkProps = Pick<LinkProps, "to" | "children">;
 

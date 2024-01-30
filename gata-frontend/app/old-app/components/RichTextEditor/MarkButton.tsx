@@ -1,8 +1,8 @@
 import { Button } from "@chakra-ui/react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useSlate } from "slate-react";
 
-import { MarkType } from "./RichTextEditor.types";
+import type { MarkType } from "./RichTextEditor.types";
 import { isMarkActive, toggleMark } from "./RichTextEditor.util";
 
 type MarkButtonProps = {

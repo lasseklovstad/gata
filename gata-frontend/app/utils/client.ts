@@ -1,4 +1,4 @@
-import { ClientConfigType } from "./client.types";
+import type { ClientConfigType } from "./client.types";
 
 export const client = <ResponseBody = unknown, RequestBody = unknown>(
    url: string,

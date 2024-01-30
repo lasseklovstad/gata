@@ -21,7 +21,7 @@ import { useState } from "react";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 
 import { client } from "../../utils/client";
-import { GataReportType, IGataReportSimple } from "../types/GataReport.type";
+import type { GataReportType, IGataReportSimple } from "../types/GataReport.type";
 
 export const gataReportFormDialogLoader = async ({ request, params }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);

@@ -1,5 +1,5 @@
-import { IGataContingent } from "./GataContingent.type";
-import { IGataRole } from "./GataRole.type";
+import type { IGataContingent } from "./GataContingent.type";
+import type { IGataRole } from "./GataRole.type";
 
 export interface IGataUser {
    id: string;

@@ -15,12 +15,12 @@ import {
 import { useFetcher } from "@remix-run/react";
 import { useState } from "react";
 
-import { action as contingentAction } from "~/routes/member.$memberId.contingent";
+import type { action as contingentAction } from "~/routes/member.$memberId.contingent";
 
 import { SelectPrimaryEmail } from "../../../components/SelectPrimaryEmail";
 import { isAdmin, isMember } from "../../../components/useRoles";
-import { IContingentInfo } from "../../../types/ContingentInfo.type";
-import { IGataUser } from "../../../types/GataUser.type";
+import type { IContingentInfo } from "../../../types/ContingentInfo.type";
+import type { IGataUser } from "../../../types/GataUser.type";
 
 type UserInfoProps = {
    user: IGataUser;

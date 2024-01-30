@@ -1,5 +1,5 @@
 import { Heading, ListItem, OrderedList, Text, UnorderedList } from "@chakra-ui/react";
-import { RenderElementProps } from "slate-react";
+import type { RenderElementProps } from "slate-react";
 
 import { SlateImage, Image, SavingImage } from "./Image";
 

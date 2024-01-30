@@ -15,7 +15,7 @@ import type { IExternalUser, IGataUser } from "~/old-app/types/GataUser.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-import { action as roleAction } from "./member.$memberId.role";
+import type { action as roleAction } from "./member.$memberId.role";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
