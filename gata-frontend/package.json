@@ -8,7 +8,7 @@
       "build": "remix build",
       "dev": "remix dev",
       "start": "remix-serve ./build/index.js",
-      "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx,.mjs,.cjs",
+      "lint": "eslint ./app --ext .js,.jsx,.ts,.tsx,.mjs,.cjs",
       "lint:fix": "npm run lint -- --fix",
       "lint:ci": "npm run lint -- --max-warnings 0",
       "knip": "knip"
@@ -17,6 +17,7 @@
       "@chakra-ui/react": "2.8.2",
       "@emotion/react": "11.11.3",
       "@emotion/styled": "11.11.0",
+      "@emotion/cache": "11.11.0",
       "@emotion/server": "11.11.0",
       "@mui/icons-material": "5.15.4",
       "@remix-run/node": "2.5.0",
@@ -27,7 +28,6 @@
       "remix-auth": "3.6.0",
       "remix-auth-auth0": "1.9.0",
       "framer-motion": "10.18.0",
-      "isbot": "^3.6.10",
       "react": "18.2.0",
       "react-dom": "18.2.0",
       "slate": "0.101.5",
@@ -49,7 +49,7 @@
       "eslint-plugin-react": "7.33.2",
       "eslint-plugin-react-hooks": "4.6.0",
       "prettier": "3.1.1",
-      "knip": "3.13.2",
+      "knip": "4.2.3",
       "typescript": "5.3.3"
    }
 }

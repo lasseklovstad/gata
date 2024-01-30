@@ -4,12 +4,12 @@ import type { LoaderFunction, ActionFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useLoaderData, Link, Outlet } from "@remix-run/react";
 
-import { client } from "~/utils/client";
 import { isMember, isAdmin } from "~/old-app/components/useRoles";
 import { ResponsibilityForm } from "~/old-app/pages/member/components/ResponsibilityForm";
 import type { IGataUser } from "~/old-app/types/GataUser.type";
 import type { IResponsibilityYear } from "~/old-app/types/ResponsibilityYear.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
+import { client } from "~/utils/client";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
    const token = await getRequiredAuthToken(request);

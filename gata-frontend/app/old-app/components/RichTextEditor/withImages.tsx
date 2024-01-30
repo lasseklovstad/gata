@@ -49,7 +49,7 @@ export const insertImage = (editor: Editor, imageId: string | null) => {
    Transforms.insertNodes(editor, image);
 };
 
-export const insertSavingImage = (editor: Editor, imageId: string) => {
+const insertSavingImage = (editor: Editor, imageId: string) => {
    const text = { text: "" };
    const image = [
       { type: "saving-image" as const, imageId, size: 50, children: [text] },

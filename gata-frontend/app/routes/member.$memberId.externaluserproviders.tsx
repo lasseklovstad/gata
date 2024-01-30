@@ -1,6 +1,7 @@
 import type { ActionFunction } from "@remix-run/node";
-import { client } from "~/utils/client";
+
 import { getRequiredAuthToken } from "~/utils/auth.server";
+import { client } from "~/utils/client";
 
 export const action: ActionFunction = async ({ request }) => {
    const token = await getRequiredAuthToken(request);

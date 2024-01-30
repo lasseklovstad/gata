@@ -22,11 +22,11 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
          {children}
 
          <Box contentEditable={false} position="relative">
-            <Image id={element.imageId!} selected={selected} focused={focused} size={element?.size} />
+            <Image id={element?.imageId ?? ""} selected={selected} focused={focused} size={element?.size} />
 
             <IconButton
                onMouseDown={(ev) => ev.preventDefault()}
-               onClick={(ev) => {
+               onClick={() => {
                   Transforms.removeNodes(editor, { at: path });
                }}
                sx={{
@@ -92,9 +92,10 @@ export const Image = (props: ImageProps) => {
 const InternalImage = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
    const fetcher = useFetcher<IGataReportFile>();
 
+   const { load } = fetcher;
    useEffect(() => {
-      fetcher.load(`/file/${id}`);
-   }, [id]);
+      load(`/file/${id}`);
+   }, [id, load]);
 
    const imageSrc = fetcher.data?.data || fetcher.data?.cloudUrl;
    return (

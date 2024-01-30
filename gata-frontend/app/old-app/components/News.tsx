@@ -1,6 +1,6 @@
 import { Box, Button, Heading, List, ListItem, Text } from "@chakra-ui/react";
 import { Add } from "@mui/icons-material";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet } from "@remix-run/react";
 
 import { NewsItem } from "./NewsItem";
 import { PageLayout } from "./PageLayout";

@@ -13,7 +13,6 @@ import {
 } from "@chakra-ui/react";
 import { Menu as MenuIcon } from "@mui/icons-material";
 import { Link } from "@remix-run/react";
-import * as React from "react";
 import type { Auth0Profile } from "remix-auth-auth0";
 
 import { UserMenu } from "./UserMenu";

@@ -1,5 +1,3 @@
-import { Save } from "@mui/icons-material";
-import { useState } from "react";
 import {
    Button,
    FormControl,
@@ -11,13 +9,16 @@ import {
    ModalHeader,
    ModalOverlay,
 } from "@chakra-ui/react";
-import { Select } from "chakra-react-select";
+import { Save } from "@mui/icons-material";
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useNavigate, useFetcher, Link } from "@remix-run/react";
-import { client } from "~/utils/client";
+import { Select } from "chakra-react-select";
+import { useState } from "react";
+
 import type { IResponsibility } from "~/old-app/types/Responsibility.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
+import { client } from "~/utils/client";
 
 export const loader: LoaderFunction = async ({ request }) => {
    const token = await getRequiredAuthToken(request);

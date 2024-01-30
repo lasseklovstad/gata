@@ -1,10 +1,18 @@
 import { Flex, FormControl, FormHelperText, FormLabel, Text } from "@chakra-ui/react";
-import type { IExternalUser, IGataUser } from "../../../types/GataUser.type";
-import { ExternalUserIcon } from "../../../components/ExternalUserIcon";
-import type { ChakraStylesConfig, OptionBase, Props } from "chakra-react-select";
-import { chakraComponents, Select } from "chakra-react-select";
+import { useFetcher } from "@remix-run/react";
+import type {
+   ChakraStylesConfig,
+   MultiValueProps,
+   MultiValueRemoveProps,
+   OptionBase,
+   OptionProps,
+   Props,
+} from "chakra-react-select";
+import { Select, chakraComponents } from "chakra-react-select";
 import type { ReactNode } from "react";
-import { useFetcher, useFormAction } from "@remix-run/react";
+
+import { ExternalUserIcon } from "../../../components/ExternalUserIcon";
+import type { IExternalUser, IGataUser } from "../../../types/GataUser.type";
 
 type LinkExternalUserToGataUserSelectProps = {
    user: IGataUser;

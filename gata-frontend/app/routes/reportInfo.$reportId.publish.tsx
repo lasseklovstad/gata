@@ -3,9 +3,8 @@ import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 
-import { client } from "~/utils/client";
-import type { IGataReportFile, IGataReportFilePayload } from "~/old-app/types/GataReportFile.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
+import { client } from "~/utils/client";
 
 export const loader: LoaderFunction = async ({ request }) => {
    const token = await getRequiredAuthToken(request);
@@ -15,17 +14,35 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export const action: ActionFunction = async ({ request, params }) => {
    const token = await getRequiredAuthToken(request);
-   const response = await client<IGataReportFile, IGataReportFilePayload>(`report/${params.reportId}/publish`, {
+   const emails = await client<string[]>(`report/${params.reportId}/publish`, {
       token,
    });
-   return json(response);
+   return json({ ok: true, emails });
 };
 
 export default function ConfirmDelete() {
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof action>();
    const navigate = useNavigate();
    const { reportEmails } = useLoaderData<typeof loader>();
    const onClose = () => navigate("..");
+
+   if (fetcher.data && fetcher.data.ok) {
+      return (
+         <Modal isOpen onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+               <ModalHeader>Vellykket</ModalHeader>
+               <ModalBody>
+                  Det ble sent en email til: {fetcher.data.emails.length ? fetcher.data.emails.join(", ") : "Ingen"}
+               </ModalBody>
+               <ModalFooter>
+                  <Button onClick={onClose}>Ok</Button>
+               </ModalFooter>
+            </ModalContent>
+         </Modal>
+      );
+   }
+
    return (
       <Modal isOpen onClose={onClose}>
          <ModalOverlay />

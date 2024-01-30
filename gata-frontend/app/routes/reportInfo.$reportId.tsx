@@ -6,7 +6,6 @@ import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { Descendant } from "slate";
 
-import { client } from "~/utils/client";
 import { ClientOnly } from "~/old-app/components/ClientOnly";
 import { PageLayout } from "~/old-app/components/PageLayout";
 import { RichTextEditor } from "~/old-app/components/RichTextEditor/RichTextEditor";
@@ -14,6 +13,7 @@ import { RichTextPreview } from "~/old-app/components/RichTextEditor/RichTextPre
 import type { IGataReport } from "~/old-app/types/GataReport.type";
 import type { IGataUser } from "~/old-app/types/GataUser.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
+import { client } from "~/utils/client";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
    const token = await getRequiredAuthToken(request);
@@ -41,7 +41,7 @@ export default function ReportInfoPage() {
    const fetcher = useFetcher();
    const [closeEdit, setCloseEdit] = useState(false);
 
-   const handleSaveContent = async (content: Descendant[] | undefined, close: boolean) => {
+   const handleSaveContent = (content: Descendant[] | undefined, close: boolean) => {
       if (content) {
          fetcher.submit({ content: JSON.stringify(content) }, { method: "put", action: `/reportInfo/${report.id}` });
          close && setCloseEdit(true);
@@ -155,7 +155,6 @@ export default function ReportInfoPage() {
                   onCancel={() => setEditing(false)}
                   onSave={handleSaveContent}
                   isLoading={fetcher.state !== "idle"}
-                  reportId={report.id}
                />
             </ClientOnly>
          )}

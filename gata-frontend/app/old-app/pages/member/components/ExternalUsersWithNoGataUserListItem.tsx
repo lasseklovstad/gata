@@ -1,6 +1,6 @@
 import { Avatar, Box, Divider, Flex, IconButton, ListItem, Text } from "@chakra-ui/react";
 import { Add } from "@mui/icons-material";
-import { useFetcher } from "react-router-dom";
+import { useFetcher } from "@remix-run/react";
 
 import { IExternalUser } from "../../../types/GataUser.type";
 

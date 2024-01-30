@@ -4,7 +4,6 @@ import type { LoaderFunction, ActionFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useLoaderData, useFetcher } from "@remix-run/react";
 
-import { client } from "~/utils/client";
 import { useConfirmDialog } from "~/old-app/components/ConfirmDialog";
 import { isAdmin } from "~/old-app/components/useRoles";
 import { LinkExternalUserToGataUserSelect } from "~/old-app/pages/member/components/LinkExternalUserToGataUserSelect";
@@ -14,6 +13,7 @@ import type { IContingentInfo } from "~/old-app/types/ContingentInfo.type";
 import type { IGataRole } from "~/old-app/types/GataRole.type";
 import type { IGataUser, IExternalUser } from "~/old-app/types/GataUser.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
+import { client } from "~/utils/client";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
    const token = await getRequiredAuthToken(request);

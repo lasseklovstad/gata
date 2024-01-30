@@ -2,10 +2,11 @@ import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Modal
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useFetcher, useNavigate } from "@remix-run/react";
 
-import { client } from "~/utils/client";
 import { getRequiredAuthToken } from "~/utils/auth.server";
+import { client } from "~/utils/client";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = () => {
+   // Todo: Hent ut brukere som ikke har betalt kontingent
    return {};
 };
 
@@ -16,18 +17,6 @@ export const action: ActionFunction = async ({ request }) => {
    });
    return { ok: true, emails };
 };
-
-/**
- * useConfirmDialog({
-         text: `Det ble sent en email til: ${
-            publishContigentResponse.data && publishContigentResponse.data.length
-               ? publishContigentResponse.data?.join(", ")
-               : "Ingen"
-         }`,
-         title: "Vellykket",
-         showOnlyOk: true,
-      });
- */
 
 export default function ConfirmDelete() {
    const fetcher = useFetcher<typeof action>();

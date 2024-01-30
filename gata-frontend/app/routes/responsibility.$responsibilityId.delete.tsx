@@ -1,8 +1,9 @@
 import type { ActionFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
+
 import { RouteConfirmFormDialog } from "~/old-app/RouteConfirmFormDialog";
-import { client } from "~/utils/client";
 import { getRequiredAuthToken } from "~/utils/auth.server";
+import { client } from "~/utils/client";
 
 export const action: ActionFunction = async ({ request, params }) => {
    const token = await getRequiredAuthToken(request);

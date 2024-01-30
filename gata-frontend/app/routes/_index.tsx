@@ -1,4 +1,4 @@
-import { redirect } from "react-router-dom";
+import { redirect } from "@remix-run/react";
 
 export const loader = () => {
    return redirect("/home");

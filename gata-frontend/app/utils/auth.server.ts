@@ -24,6 +24,7 @@ const auth0Strategy = new Auth0Strategy(
       clientSecret: process.env.AUTH0_CLIENT_SECRET!,
       domain: process.env.AUTH0_DOMAIN!,
    },
+   // eslint-disable-next-line require-await
    async ({ profile, accessToken }) => {
       // Get the user data from your DB or API using the tokens and profile
       return { profile, accessToken };
@@ -32,7 +33,7 @@ const auth0Strategy = new Auth0Strategy(
 
 authenticator.use(auth0Strategy);
 
-export const { getSession, commitSession, destroySession } = sessionStorage;
+export const { getSession, destroySession } = sessionStorage;
 
 export const getRequiredAuthToken = async (request: Request) => {
    const auth = await authenticator.isAuthenticated(request);

@@ -7,7 +7,7 @@ import {
    FormatUnderlined,
    Save,
 } from "@mui/icons-material";
-import { useFetcher, useSubmit } from "@remix-run/react";
+import { useSubmit } from "@remix-run/react";
 import { useCallback, useMemo, useRef } from "react";
 import type { Descendant } from "slate";
 import { createEditor } from "slate";
@@ -21,7 +21,7 @@ import { MarkButton } from "./MarkButton";
 import { insertTab, toggleMark } from "./RichTextEditor.util";
 import { RichTextElement } from "./RichTextElement";
 import { RichTextLeaf } from "./RichTextLeaf";
-import { insertImage, useSaveImage, withImages } from "./withImages";
+import { insertImage, withImages } from "./withImages";
 import { LoadingButton } from "../Loading";
 
 type RichTextEditorProps = {
@@ -29,10 +29,9 @@ type RichTextEditorProps = {
    onSave: (content: Descendant[] | undefined, close: boolean) => void;
    initialContent?: string | null;
    isLoading: boolean;
-   reportId: string;
 };
 
-export const RichTextEditor = ({ onCancel, onSave, isLoading, initialContent, reportId }: RichTextEditorProps) => {
+export const RichTextEditor = ({ onCancel, onSave, isLoading, initialContent }: RichTextEditorProps) => {
    const submitImage = useSubmit();
    const editor = useMemo(() => withImages(withHistory(withReact(createEditor())), submitImage), [submitImage]);
    const renderElement = useCallback((props: RenderElementProps) => <RichTextElement {...props} />, []);

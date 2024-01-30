@@ -1,6 +1,3 @@
-import { Save } from "@mui/icons-material";
-import { useState } from "react";
-import { GataReportType, IGataReportSimple } from "../types/GataReport.type";
 import {
    Button,
    FormControl,
@@ -15,11 +12,16 @@ import {
    ModalOverlay,
    Textarea,
 } from "@chakra-ui/react";
-import { client } from "../../utils/client";
-import { getRequiredAuthToken } from "~/utils/auth.server";
+import { Save } from "@mui/icons-material";
 import type { LoaderFunction, ActionFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useLoaderData, useFetcher, useNavigate } from "@remix-run/react";
+import { useState } from "react";
+
+import { getRequiredAuthToken } from "~/utils/auth.server";
+
+import { client } from "../../utils/client";
+import { GataReportType, IGataReportSimple } from "../types/GataReport.type";
 
 export const gataReportFormDialogLoader: LoaderFunction = async ({ request, params }) => {
    const token = await getRequiredAuthToken(request);

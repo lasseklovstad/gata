@@ -12,8 +12,8 @@ import {
    Textarea,
 } from "@chakra-ui/react";
 import { Delete, Save } from "@mui/icons-material";
+import { Link, useFetcher } from "@remix-run/react";
 import { useState } from "react";
-import { Link, useFetcher } from "react-router-dom";
 
 import { isAdmin } from "../../../components/useRoles";
 import { IGataUser } from "../../../types/GataUser.type";

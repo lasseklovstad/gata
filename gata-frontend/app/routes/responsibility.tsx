@@ -1,14 +1,15 @@
-import { Add, Delete, Edit } from "@mui/icons-material";
 import { Box, Button, Divider, Heading, IconButton, List, ListItem, Text } from "@chakra-ui/react";
-import { getRequiredAuthToken } from "~/utils/auth.server";
-import type { IResponsibility } from "~/old-app/types/Responsibility.type";
-import { client } from "~/utils/client";
+import { Add, Delete, Edit } from "@mui/icons-material";
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
+
 import { PageLayout } from "~/old-app/components/PageLayout";
 import { isAdmin } from "~/old-app/components/useRoles";
 import type { IGataUser } from "~/old-app/types/GataUser.type";
+import type { IResponsibility } from "~/old-app/types/Responsibility.type";
+import { getRequiredAuthToken } from "~/utils/auth.server";
+import { client } from "~/utils/client";
 
 export const loader: LoaderFunction = async ({ request }) => {
    const token = await getRequiredAuthToken(request);
