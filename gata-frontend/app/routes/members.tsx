@@ -1,6 +1,6 @@
 import { Box, Button, Heading, List, ListItem, Tooltip } from "@chakra-ui/react";
 import { Email } from "@mui/icons-material";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
 import { PageLayout } from "~/old-app/components/PageLayout";
@@ -11,30 +11,24 @@ import type { IExternalUser, IGataUser } from "~/old-app/types/GataUser.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    const { signal } = request;
    const token = await getRequiredAuthToken(request);
-   const loggedInUser = await client("user/loggedin", { token, signal });
-   const users = await client("user", { token, signal });
-   const externalUsers = await client("auth0user/nogatauser", { token, signal });
+   const loggedInUser = await client<IGataUser>("user/loggedin", { token, signal });
+   const users = await client<IGataUser[]>("user", { token, signal });
+   const externalUsers = await client<IExternalUser>("auth0user/nogatauser", { token, signal });
    return { loggedInUser, users, externalUsers };
 };
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const form = Object.fromEntries(await request.formData());
    await client("user", { method: "POST", body: form, token });
    return { ok: true };
 };
 
-export interface MemberPageLoaderData {
-   loggedInUser: IGataUser;
-   users: IGataUser[];
-   externalUsers: IExternalUser[];
-}
-
 export default function MemberPage() {
-   const { loggedInUser, users, externalUsers } = useLoaderData() as MemberPageLoaderData;
+   const { loggedInUser, users, externalUsers } = useLoaderData<typeof loader>();
 
    const admins = users.filter((user) => user.isUserAdmin);
    const members = users.filter((user) => user.isUserMember && !user.isUserAdmin);

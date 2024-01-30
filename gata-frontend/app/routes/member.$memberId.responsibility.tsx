@@ -1,27 +1,27 @@
 import { Accordion, Alert, AlertDescription, AlertTitle, Box, Button, Heading, Text } from "@chakra-ui/react";
 import { Add } from "@mui/icons-material";
-import type { LoaderFunction, ActionFunction } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useLoaderData, Link, Outlet } from "@remix-run/react";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
-import { isMember, isAdmin } from "~/old-app/components/useRoles";
+import { isAdmin, isMember } from "~/old-app/components/useRoles";
 import { ResponsibilityForm } from "~/old-app/pages/member/components/ResponsibilityForm";
 import type { IGataUser } from "~/old-app/types/GataUser.type";
 import type { IResponsibilityYear } from "~/old-app/types/ResponsibilityYear.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const loggedInUser = await client<IGataUser>("user/loggedin", { token });
    const member = await client<IGataUser>(`user/${params.memberId}`, { token });
    const responsibilityYears = await client<IResponsibilityYear[]>(`user/${params.memberId}/responsibilityyear`, {
       token,
    });
-   return json<MemberResponsibilityLoaderData>({ loggedInUser, responsibilityYears, member });
+   return json({ loggedInUser, responsibilityYears, member });
 };
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    if (request.method === "POST") {
       const form = Object.fromEntries(await request.formData());
@@ -30,14 +30,8 @@ export const action: ActionFunction = async ({ request, params }) => {
    return redirect(`/member/${params.memberId}/responsibility`);
 };
 
-export interface MemberResponsibilityLoaderData {
-   loggedInUser: IGataUser;
-   responsibilityYears: IResponsibilityYear[];
-   member: IGataUser;
-}
-
 export default function MemberResponsibility() {
-   const { loggedInUser, responsibilityYears, member } = useLoaderData() as MemberResponsibilityLoaderData;
+   const { loggedInUser, responsibilityYears, member } = useLoaderData<typeof loader>();
 
    if (!isMember(member)) {
       return (

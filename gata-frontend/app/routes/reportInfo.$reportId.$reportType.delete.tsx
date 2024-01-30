@@ -1,11 +1,11 @@
-import type { ActionFunction } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 
 import { RouteConfirmFormDialog } from "~/old-app/RouteConfirmFormDialog";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
 
    if (request.method === "DELETE") {

@@ -1,6 +1,6 @@
 import { Box, Button, Divider, Heading, List, ListItem, Text } from "@chakra-ui/react";
 import { Add } from "@mui/icons-material";
-import type { LoaderFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
@@ -13,20 +13,15 @@ import type { Page } from "~/old-app/types/Page.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const reports = await client<Page<IGataReportSimple>>(`report/simple?page=0&type=DOCUMENT`, { token });
    const loggedInUser = await client<IGataUser>("user/loggedin", { token });
-   return json<ReportPageLoaderData>({ reports, loggedInUser });
+   return json({ reports, loggedInUser });
 };
 
-interface ReportPageLoaderData {
-   reports: Page<IGataReportSimple>;
-   loggedInUser: IGataUser;
-}
-
 export default function ReportPage() {
-   const { loggedInUser, reports } = useLoaderData() as ReportPageLoaderData;
+   const { loggedInUser, reports } = useLoaderData<typeof loader>();
    return (
       <PageLayout>
          <Box

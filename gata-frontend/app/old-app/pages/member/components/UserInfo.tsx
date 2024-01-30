@@ -15,6 +15,8 @@ import {
 import { useFetcher } from "@remix-run/react";
 import { useState } from "react";
 
+import { action as contingentAction } from "~/routes/member.$memberId.contingent";
+
 import { SelectPrimaryEmail } from "../../../components/SelectPrimaryEmail";
 import { isAdmin, isMember } from "../../../components/useRoles";
 import { IContingentInfo } from "../../../types/ContingentInfo.type";
@@ -32,7 +34,7 @@ const years = Array.from({ length: numberOfYears }, (v, i) => todaysYear - numbe
 
 export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) => {
    const [selectedYear, setSelectedYear] = useState(todaysYear.toString());
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof contingentAction>();
 
    const notPaidYears = years
       .filter((y) => y <= todaysYear)

@@ -1,6 +1,6 @@
 import { Box, Button, Divider, Heading, IconButton, List, ListItem, Text } from "@chakra-ui/react";
 import { Add, Delete, Edit } from "@mui/icons-material";
-import type { LoaderFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
@@ -11,20 +11,15 @@ import type { IResponsibility } from "~/old-app/types/Responsibility.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const responsibilities = await client<IResponsibility[]>("responsibility", { token });
    const loggedInUser = await client<IGataUser>("user/loggedin", { token });
-   return json<ResponsibilityPageLoaderData>({ responsibilities, loggedInUser });
+   return json({ responsibilities, loggedInUser });
 };
 
-interface ResponsibilityPageLoaderData {
-   responsibilities: IResponsibility[];
-   loggedInUser: IGataUser;
-}
-
 export default function ResponsibilityPage() {
-   const { responsibilities, loggedInUser } = useLoaderData() as ResponsibilityPageLoaderData;
+   const { responsibilities, loggedInUser } = useLoaderData<typeof loader>();
 
    return (
       <PageLayout>

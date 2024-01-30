@@ -1,16 +1,16 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher, useNavigate } from "@remix-run/react";
 
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-export const loader: LoaderFunction = () => {
+export const loader = () => {
    // Todo: Hent ut brukere som ikke har betalt kontingent
    return {};
 };
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const emails = await client<string[]>("contingent/email", {
       token,

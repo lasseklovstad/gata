@@ -13,27 +13,27 @@ import {
    Textarea,
 } from "@chakra-ui/react";
 import { Save } from "@mui/icons-material";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useNavigate, useLoaderData, useFetcher } from "@remix-run/react";
+import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { useState } from "react";
 
 import type { IResponsibility } from "~/old-app/types/Responsibility.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    if (params.responsibilityId !== "new") {
       const responsibility = await client<IResponsibility>(`responsibility/${params.responsibilityId}`, {
          token,
       });
-      return json<ResponsibilityDialogLoaderData>({ responsibility });
+      return json<LoaderData>({ responsibility });
    }
-   return json<ResponsibilityDialogLoaderData>({ responsibility: undefined });
+   return json<LoaderData>({ responsibility: undefined });
 };
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const body = Object.fromEntries(await request.formData());
    if (!body.name) {
@@ -50,15 +50,15 @@ export const action: ActionFunction = async ({ request, params }) => {
    }
 };
 
-interface ResponsibilityDialogLoaderData {
+type LoaderData = {
    responsibility: IResponsibility | undefined;
-}
+};
 
-export default function ResponsibilityDialog() {
+export default function EditResponsibility() {
    const navigate = useNavigate();
-   const { responsibility } = useLoaderData() as ResponsibilityDialogLoaderData;
+   const { responsibility } = useLoaderData<typeof loader>();
    const method = responsibility ? "put" : "post";
-   const fetcher = useFetcher<{ error: { name: string } }>();
+   const fetcher = useFetcher<typeof action>();
    const [name, setName] = useState(responsibility?.name || "");
    const [description, setDescription] = useState(responsibility?.description || "");
    const error = fetcher.data?.error;

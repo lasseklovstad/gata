@@ -1,9 +1,9 @@
-import { redirect, type LoaderFunction } from "@remix-run/node";
+import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
 
 import { authenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    const user = await authenticator.isAuthenticated(request);
    if (user) {
       await client("user/loggedin/create", { token: user.accessToken, method: "POST" });

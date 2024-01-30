@@ -1,8 +1,8 @@
-import { ActionFunction, redirect } from "@remix-run/node";
+import { ActionFunctionArgs, redirect } from "@remix-run/node";
 
 import { destroySession, getSession } from "~/utils/auth.server";
 
-export const loader: ActionFunction = async ({ request }) => {
+export const loader = async ({ request }: ActionFunctionArgs) => {
    const session = await getSession(request.headers.get("Cookie"));
    const logoutURL = new URL(`https://${process.env.AUTH0_DOMAIN}/v2/logout`); // i.e https://YOUR_TENANT.us.auth0.com/v2/logout
 

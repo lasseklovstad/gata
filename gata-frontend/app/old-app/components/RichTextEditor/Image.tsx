@@ -7,7 +7,8 @@ import { Transforms } from "slate";
 import type { RenderElementProps } from "slate-react";
 import { ReactEditor, useFocused, useSelected, useSlate, useSlateStatic } from "slate-react";
 
-import type { IGataReportFile } from "~/old-app/types/GataReportFile.type";
+import { loader as fileLoader } from "~/routes/file.$fileId";
+import { action as fileAction } from "~/routes/reportInfo.$reportId.file";
 
 import { replaceSavingImage } from "./withImages";
 
@@ -90,7 +91,7 @@ export const Image = (props: ImageProps) => {
 };
 
 const InternalImage = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
-   const fetcher = useFetcher<IGataReportFile>();
+   const fetcher = useFetcher<typeof fileLoader>();
 
    const { load } = fetcher;
    useEffect(() => {
@@ -133,7 +134,7 @@ const ExternalImage = ({ id, selected = false, focused = false, size = 50 }: Ima
 };
 
 export const SavingImage = ({ oldId }: { oldId: string }) => {
-   const fetcher = useFetcher<{ id: string }>({ key: oldId });
+   const fetcher = useFetcher<typeof fileAction>({ key: oldId });
    const editor = useSlate();
 
    useEffect(() => {

@@ -1,6 +1,6 @@
 import { Box, Button, Heading, IconButton, Text } from "@chakra-ui/react";
 import { Delete, Edit, Email } from "@mui/icons-material";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import type { ActionFunction, ActionFunctionArgs, LoaderFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
@@ -15,47 +15,43 @@ import type { IGataUser } from "~/old-app/types/GataUser.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const report = await client<IGataReport>(`report/${params.reportId}`, { token });
    const loggedInUser = await client<IGataUser>("user/loggedin", { token });
-   return json<ReportInfoPageLoaderData>({ report, loggedInUser });
+   return json({ report, loggedInUser });
 };
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
-   const body = JSON.parse(String((await request.formData()).get("content")));
+   const formData = await request.formData();
+   const body = JSON.parse(String(formData.get("content")));
    await client(`report/${params.reportId}/content`, { method: "PUT", body, token });
-   return json({});
+   return json({ ok: true, close: formData.get("close") });
 };
-
-interface ReportInfoPageLoaderData {
-   report: IGataReport;
-   loggedInUser: IGataUser;
-}
 
 export default function ReportInfoPage() {
-   const { report, loggedInUser } = useLoaderData() as ReportInfoPageLoaderData;
+   const { report, loggedInUser } = useLoaderData<typeof loader>();
    const canEdit = report.createdBy?.id === loggedInUser.id;
    const [editing, setEditing] = useState(false);
-   const fetcher = useFetcher();
-   const [closeEdit, setCloseEdit] = useState(false);
+   const fetcher = useFetcher<typeof action>();
 
    const handleSaveContent = (content: Descendant[] | undefined, close: boolean) => {
       if (content) {
-         fetcher.submit({ content: JSON.stringify(content) }, { method: "put", action: `/reportInfo/${report.id}` });
-         close && setCloseEdit(true);
+         fetcher.submit(
+            { content: JSON.stringify(content), close: close ? "true" : "false" },
+            { method: "PUT", action: `/reportInfo/${report.id}` }
+         );
       } else {
          close && setEditing(false);
       }
    };
 
    useEffect(() => {
-      if (fetcher.state === "idle" && fetcher.type === "done") {
-         closeEdit && setEditing(false);
-         setCloseEdit(false);
+      if (fetcher.state === "idle" && fetcher.data && fetcher.data.ok && fetcher.data.close === "true") {
+         setEditing(false);
       }
-   }, [closeEdit, fetcher.state, fetcher.type]);
+   }, [fetcher.data, fetcher.state]);
 
    const lastModifiedDate = new Date(report.lastModifiedDate);
 

@@ -10,9 +10,9 @@ import {
    ModalOverlay,
 } from "@chakra-ui/react";
 import { Save } from "@mui/icons-material";
-import type { LoaderFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useNavigate, useFetcher, Link } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { Select } from "chakra-react-select";
 import { useState } from "react";
 
@@ -20,17 +20,13 @@ import type { IResponsibility } from "~/old-app/types/Responsibility.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const responsibilities = await client<IResponsibility[]>("responsibility", {
       token,
    });
-   return json<AddResponsibilityUserDialogLoaderData>({ responsibilities });
+   return json({ responsibilities });
 };
-
-interface AddResponsibilityUserDialogLoaderData {
-   responsibilities: IResponsibility[];
-}
 
 type IOption = { value: string; label: string };
 
@@ -39,7 +35,7 @@ const todaysYear = new Date().getFullYear();
 const years = Array.from({ length: numberOfYears }, (v, i) => todaysYear - numberOfYears + 2 + i).reverse();
 
 export default function AddResponsibilityUserDialog() {
-   const { responsibilities } = useLoaderData() as AddResponsibilityUserDialogLoaderData;
+   const { responsibilities } = useLoaderData<typeof loader>();
    const navigate = useNavigate();
    const [selectedResp, setSelectedResp] = useState<IOption | null>();
    const [selectedYear, setSelectedYear] = useState<IOption | null>();

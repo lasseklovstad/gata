@@ -1,18 +1,18 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const reportEmails = await client<string[]>(`report/publishemails`, { token });
    return { reportEmails };
 };
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const emails = await client<string[]>(`report/${params.reportId}/publish`, {
       token,
@@ -20,7 +20,7 @@ export const action: ActionFunction = async ({ request, params }) => {
    return json({ ok: true, emails });
 };
 
-export default function ConfirmDelete() {
+export default function PublishReport() {
    const fetcher = useFetcher<typeof action>();
    const navigate = useNavigate();
    const { reportEmails } = useLoaderData<typeof loader>();
@@ -47,7 +47,7 @@ export default function ConfirmDelete() {
       <Modal isOpen onClose={onClose}>
          <ModalOverlay />
          <ModalContent>
-            <fetcher.Form method="DELETE">
+            <fetcher.Form method="POST">
                <ModalHeader>Er du sikker?</ModalHeader>
                <ModalBody>Er du sikker du vil sende e-post til disse brukerne: {reportEmails.join(", ")}?</ModalBody>
                <ModalFooter gap={2}>

@@ -13,9 +13,9 @@ import {
    Textarea,
 } from "@chakra-ui/react";
 import { Save } from "@mui/icons-material";
-import type { LoaderFunction, ActionFunction } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useLoaderData, useFetcher, useNavigate } from "@remix-run/react";
+import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { useState } from "react";
 
 import { getRequiredAuthToken } from "~/utils/auth.server";
@@ -23,7 +23,7 @@ import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "../../utils/client";
 import { GataReportType, IGataReportSimple } from "../types/GataReport.type";
 
-export const gataReportFormDialogLoader: LoaderFunction = async ({ request, params }) => {
+export const gataReportFormDialogLoader = async ({ request, params }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    if (params.reportId) {
       const report = await client<IGataReportSimple>(`report/${params.reportId}/simple`, {
@@ -34,7 +34,7 @@ export const gataReportFormDialogLoader: LoaderFunction = async ({ request, para
    return json<GataReportFormDialogLoaderData>({ report: undefined });
 };
 
-export const gataReportFormDialogAction: ActionFunction = async ({ request, params }) => {
+export const gataReportFormDialogAction = async ({ request, params }: ActionFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const body = Object.fromEntries(await request.formData());
    if (!body.title) {
@@ -60,10 +60,10 @@ type GataReportFormDialogProps = {
 };
 
 export const GataReportFormDialog = ({ type }: GataReportFormDialogProps) => {
-   const { report } = useLoaderData() as GataReportFormDialogLoaderData;
-   const fetcher = useFetcher<{ error: { title: string } }>();
+   const { report } = useLoaderData<typeof gataReportFormDialogLoader>();
+   const fetcher = useFetcher<typeof gataReportFormDialogAction>();
    const navigate = useNavigate();
-   const method = report ? "put" : "post";
+   const method = report ? "PUT" : "POST";
    const [title, setTitle] = useState(report?.title || "");
    const [description, setDescription] = useState(report?.description || "");
    const error = fetcher.data?.error;
@@ -75,7 +75,7 @@ export const GataReportFormDialog = ({ type }: GataReportFormDialogProps) => {
          <ModalOverlay />
          <ModalContent>
             <fetcher.Form method={method}>
-               <ModalHeader>{method === "put" ? "Rediger informasjon" : "Nytt dokument"}</ModalHeader>
+               <ModalHeader>{method === "PUT" ? "Rediger informasjon" : "Nytt dokument"}</ModalHeader>
                <ModalBody sx={{ display: "flex", flexDirection: "column" }}>
                   <FormControl isInvalid={!!error?.title} isRequired>
                      <FormLabel>Tittel</FormLabel>
