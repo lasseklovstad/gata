@@ -98,7 +98,7 @@ const config: PlaywrightTestConfig = {
     timeout: 10 * 60 * 1000,
     command: "docker-compose up",
     cwd: "../",
-    url: process.env.PLAYWRIGHT_BASE_URL,
+    url: process.env.PLAYWRIGHT_BASE_URL +"/health",
     reuseExistingServer: !process.env.CI,
   },
 };
