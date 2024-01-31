@@ -35,7 +35,7 @@ export const NewsItem = ({ report, loggedInUser }: NewsItemProps) => {
             {!report.content && <Text>Det er ikke lagt til innhold enda.</Text>}
          </Box>
          <Text fontSize="sm" color="gray">
-            Dato endret: {new Date(report.lastModifiedDate).toLocaleDateString()}
+            Dato endret: {new Date(report.lastModifiedDate).toLocaleDateString("no")}
          </Text>
       </Box>
    );

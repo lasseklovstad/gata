@@ -19,7 +19,7 @@ export const UserListItem = ({ user, isLoggedInUserAdmin }: UserListItemProps) =
             <Box>
                <Text>{user.primaryUser.name}</Text>
                <Text color="gray" fontSize="sm">
-                  Sist innlogget: {new Date(user.primaryUser.lastLogin).toLocaleDateString()}
+                  Sist innlogget: {new Date(user.primaryUser.lastLogin).toLocaleDateString("no")}
                </Text>
                {isLoggedInUserAdmin && isMember(user) && (
                   <Text

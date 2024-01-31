@@ -121,7 +121,7 @@ AUTH0_DOMAIN=https://gataersamla.eu.auth0.com
 AUTH0_AUDIENCE=https://gataersamla.no
 VITE_AUTH0_CLIENT_ID=xxx
 SENDGRID_API_KEY=xxx
-GATA_MAKE_FIRST_USER_ADMIN=true
+GATA_MAKE_FIRST_USER_ADMIN=truel
 ````
 
 ## Kotlin info

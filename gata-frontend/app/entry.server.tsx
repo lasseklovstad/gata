@@ -4,8 +4,8 @@ import type { EntryContext } from "@remix-run/node"; // Depends on the runtime y
 import { RemixServer } from "@remix-run/react";
 import { renderToString } from "react-dom/server";
 
-import { ServerStyleContext } from "./context";
-import createEmotionCache from "./createEmotionCache";
+import { ServerStyleContext } from "./styles/context";
+import { createEmotionCache } from "./styles/createEmotionCache";
 
 export default function handleRequest(
    request: Request,

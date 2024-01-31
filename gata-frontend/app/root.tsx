@@ -18,10 +18,10 @@ import {
 import { useEffect, useContext } from "react";
 import type { Auth0Profile } from "remix-auth-auth0";
 
-import { ClientStyleContext, ServerStyleContext } from "./context";
-import { chakraTheme } from "./old-app/chakraTheme";
 import { ResponsiveAppBar } from "./old-app/components/ResponsiveAppBar";
 import type { IGataUser } from "./old-app/types/GataUser.type";
+import { chakraTheme } from "./styles/chakraTheme";
+import { ServerStyleContext, ClientStyleContext } from "./styles/context";
 import { authenticator } from "./utils/auth.server";
 import { client } from "./utils/client";
 
@@ -155,27 +155,38 @@ function Root() {
 
 export function ErrorBoundary() {
    const error = useRouteError();
-   console.log(error);
 
-   if (isRouteErrorResponse(error)) {
-      return (
-         <div>
-            <Heading>
-               {error.status} {error.statusText}
-            </Heading>
-            <Text>{error.data.message}</Text>
-         </div>
-      );
-   } else if (error instanceof Error) {
-      return (
-         <div>
-            <Heading>Error</Heading>
-            <Text>{error.message}</Text>
-            <Text>The stack trace is:</Text>
-            <Text as="pre">{error.stack}</Text>
-         </div>
-      );
-   } else {
-      return <Heading>Unknown Error</Heading>;
-   }
+   useEffect(() => {
+      console.log(error);
+   }, [error]);
+
+   const getErrorMessage = () => {
+      if (isRouteErrorResponse(error)) {
+         return (
+            <div>
+               <Heading>
+                  {error.status} {error.statusText}
+               </Heading>
+               <Text>{error.data.message}</Text>
+            </div>
+         );
+      } else if (error instanceof Error) {
+         return (
+            <div>
+               <Heading>Error</Heading>
+               <Text>{error.message}</Text>
+               <Text>The stack trace is:</Text>
+               <Text as="pre">{error.stack}</Text>
+            </div>
+         );
+      } else {
+         return <Heading>Unknown Error</Heading>;
+      }
+   };
+
+   return (
+      <Document>
+         <ChakraProvider theme={chakraTheme}>{getErrorMessage()}</ChakraProvider>
+      </Document>
+   );
 }

@@ -1,4 +1,4 @@
-import { createCookieSessionStorage } from "@remix-run/node";
+import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import { Authenticator } from "remix-auth";
 import type { Auth0Profile } from "remix-auth-auth0";
 import { Auth0Strategy } from "remix-auth-auth0";
@@ -38,7 +38,7 @@ export const { getSession, destroySession } = sessionStorage;
 export const getRequiredAuthToken = async (request: Request) => {
    const auth = await authenticator.isAuthenticated(request);
    if (auth === null) {
-      throw new Error("Du er ikke logget inn");
+      throw redirect("/home");
    }
    return auth.accessToken;
 };

@@ -156,8 +156,8 @@ export default function ReportInfoPage() {
             </ClientOnly>
          )}
          <Text fontSize="sm" color="gray" sx={{ mt: 1, mb: 10 }}>
-            Sist redigert av: {report.lastModifiedBy}, {lastModifiedDate.toLocaleDateString()}{" "}
-            {lastModifiedDate.toLocaleTimeString()}
+            Sist redigert av: {report.lastModifiedBy}, {lastModifiedDate.toLocaleDateString("no")}{" "}
+            {lastModifiedDate.toLocaleTimeString("no")}
          </Text>
          <Outlet />
       </PageLayout>

@@ -1,4 +1,4 @@
-import { Flex, FormControl, FormHelperText, FormLabel } from "@chakra-ui/react";
+import { Flex, FormControl, FormHelperText, FormLabel, useId } from "@chakra-ui/react";
 import { useFetcher } from "@remix-run/react";
 import type { OptionBase, OptionProps, SingleValueProps } from "chakra-react-select";
 import { Select, chakraComponents } from "chakra-react-select";
@@ -12,6 +12,7 @@ type SelectPrimaryEmailProps = {
 
 export const SelectPrimaryEmail = ({ user }: SelectPrimaryEmailProps) => {
    const fetcher = useFetcher();
+   const selectId = useId();
 
    const options = user.externalUserProviders.map((user) => ({
       label: user.email,
@@ -20,27 +21,28 @@ export const SelectPrimaryEmail = ({ user }: SelectPrimaryEmailProps) => {
    }));
 
    const selectedOption = options.find((option) => option.value === user.primaryUser.id);
-
+   const inputId = selectId + "-input";
    return (
-      <fetcher.Form>
-         <FormControl maxWidth={400} sx={{ mt: 1, mb: 1 }}>
-            <FormLabel>Primær epost</FormLabel>
-            <Select<ColorOption, false, never>
-               name="primaryUserEmail"
-               value={selectedOption}
-               components={customComponents}
-               onChange={(option) => {
-                  fetcher.submit(
-                     { primaryUserEmail: option?.value || "" },
-                     { action: "primaryUserEmail", method: "post" }
-                  );
-               }}
-               options={options}
-               isLoading={fetcher.state !== "idle"}
-            />
-            <FormHelperText>Denne eposten blir brukt til å sende ut informasjon</FormHelperText>
-         </FormControl>
-      </fetcher.Form>
+      <FormControl maxWidth={400} sx={{ mt: 1, mb: 1 }} id={inputId}>
+         <FormLabel>Primær epost</FormLabel>
+         <Select<ColorOption, false, never>
+            name="primaryUserEmail"
+            value={selectedOption}
+            components={customComponents}
+            onChange={(option) => {
+               fetcher.submit(
+                  { primaryUserEmail: option?.value || "" },
+                  { action: "primaryUserEmail", method: "post" }
+               );
+            }}
+            options={options}
+            isLoading={fetcher.state !== "idle"}
+            required={false}
+            inputId={inputId}
+            instanceId={selectId}
+         />
+         <FormHelperText>Denne eposten blir brukt til å sende ut informasjon</FormHelperText>
+      </FormControl>
    );
 };
 

@@ -22,7 +22,7 @@ export const ExternalUsersWithNoGataUserListItem = ({ user }: ExternalUsersWithN
             <Box flex={1} overflow="hidden">
                <Text>{user.name}</Text>
                <Text color="gray" fontSize="sm">
-                  Sist innlogget: {new Date(user.lastLogin).toLocaleDateString()}
+                  Sist innlogget: {new Date(user.lastLogin).toLocaleDateString("no")}
                </Text>
             </Box>
             <IconButton

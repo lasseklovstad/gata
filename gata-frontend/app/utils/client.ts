@@ -20,27 +20,25 @@ export const client = <ResponseBody = unknown, RequestBody = unknown>(
       config.body = typeof body !== "string" ? JSON.stringify(body) : body;
    }
 
-   return fetch(`${process.env.BACKEND_BASE_URL}/api/${url}`, config).then(async (response) => {
+   const urlFinal = `${process.env.BACKEND_BASE_URL}/api/${url}`;
+
+   return fetch(urlFinal, config).then((response) => {
       if (response.ok) {
-         if (response.status === 204) {
-            // No content
-            return undefined as ResponseBody;
-         } else if (response.headers.get("Content-Type") === "application/json") {
-            return (await response.json()) as ResponseBody;
-         } else if (response.headers.get("Content-Type")?.includes("text/plain")) {
-            return (await response.text()) as ResponseBody;
-         }
-         return undefined as ResponseBody;
+         return getResponseBody<ResponseBody>(response);
       } else {
          throw response;
-         if (response.status === 401) {
-            throw new Error("Du er ikke logget in");
-         }
-         if (response.status === 403) {
-            throw new Error("Du har ikke tilgang");
-         }
-         const errorMessage = await response.json();
-         throw new Error(errorMessage.message || response.status);
       }
    });
 };
+
+async function getResponseBody<ResponseBody>(response: Response) {
+   if (response.status === 204) {
+      // No content
+      return undefined as ResponseBody;
+   } else if (response.headers.get("Content-Type") === "application/json") {
+      return (await response.json()) as ResponseBody;
+   } else if (response.headers.get("Content-Type")?.includes("text/plain")) {
+      return (await response.text()) as ResponseBody;
+   }
+   return undefined as ResponseBody;
+}

@@ -9,7 +9,7 @@ import type {
    Props,
 } from "chakra-react-select";
 import { Select, chakraComponents } from "chakra-react-select";
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 
 import { ExternalUserIcon } from "../../../components/ExternalUserIcon";
 import type { IExternalUser, IGataUser } from "../../../types/GataUser.type";
@@ -24,6 +24,7 @@ export const LinkExternalUserToGataUserSelect = ({
    notMemberUsers,
 }: LinkExternalUserToGataUserSelectProps) => {
    const fetcher = useFetcher();
+   const selectId = useId();
    const handleChange: Props<ColorOption, true>["onChange"] = (options) => {
       const userIds = options.map((o) => o.value);
       const formData = new FormData();
@@ -42,10 +43,10 @@ export const LinkExternalUserToGataUserSelect = ({
    }));
 
    const selectedOption = options.filter((option) => !!externalUserProviders.find((user) => user.id === option.value));
-
+   const inputId = selectId + "-input";
    return (
       <>
-         <FormControl sx={{ mt: 1, mb: 1 }}>
+         <FormControl sx={{ mt: 1, mb: 1 }} id={inputId}>
             <FormLabel>Epost tilknytninger</FormLabel>
             <Select<ColorOption, true, never>
                value={selectedOption}
@@ -56,6 +57,9 @@ export const LinkExternalUserToGataUserSelect = ({
                isClearable={false}
                chakraStyles={chakraStyles}
                isLoading={fetcher.state !== "idle"}
+               instanceId={selectId}
+               inputId={inputId}
+               required={false}
             />
             <FormHelperText>
                Hvis en bruker har logget inn med forskjellige tjenester, kan disse kontoene knyttes sammen her!

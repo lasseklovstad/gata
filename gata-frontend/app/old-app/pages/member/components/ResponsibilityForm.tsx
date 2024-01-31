@@ -63,8 +63,8 @@ export const ResponsibilityForm = ({
                      />
                   </FormControl>
                   <Text fontSize="sm" color="gray">
-                     Sist redigert av: {note.lastModifiedBy}, {lastModifiedDate.toLocaleDateString()}{" "}
-                     {lastModifiedDate.toLocaleTimeString()}
+                     Sist redigert av: {note.lastModifiedBy}, {lastModifiedDate.toLocaleDateString("no")}{" "}
+                     {lastModifiedDate.toLocaleTimeString("no")}
                   </Text>
                   <Box sx={{ mt: 2 }}>
                      {isAdmin(loggedInUser) && (
