@@ -1,0 +1,24 @@
+import { Alert, AlertDescription, AlertIcon, AlertTitle, Box } from "@chakra-ui/react";
+
+import type { UseClientState } from "../../utils/client.types";
+
+type ErrorAlertProps = {
+   response: UseClientState<unknown>;
+   alertTitle?: string;
+};
+
+export const ErrorAlert = ({ response, alertTitle = "Det oppstod en feil" }: ErrorAlertProps) => {
+   return (
+      <>
+         {response.status === "error" && (
+            <Alert status="error">
+               <AlertIcon />
+               <Box>
+                  <AlertTitle>{alertTitle}</AlertTitle>
+                  <AlertDescription>{response.error?.message}</AlertDescription>
+               </Box>
+            </Alert>
+         )}
+      </>
+   );
+};

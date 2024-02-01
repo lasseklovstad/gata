@@ -127,7 +127,7 @@ class GataUserRestController {
     ) {
         val loggedInUser = gataUserService.getLoggedInUser(authentication)
         if (id == loggedInUser.id?.toString()) {
-            throw throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Du kan ikke slette deg selv!")
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Du kan ikke slette deg selv!")
         }
 
         val gataUser = gataUserService.getUser(id)
