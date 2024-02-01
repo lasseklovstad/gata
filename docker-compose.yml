@@ -50,8 +50,6 @@ services:
         - dockernet
       ports:
         - "3000:3000"
-      depends_on:
-        - backend-app
 
 networks:
   dockernet:

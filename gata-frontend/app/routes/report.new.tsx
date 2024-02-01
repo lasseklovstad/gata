@@ -1,8 +1,8 @@
+import { GataReportFormDialog } from "~/old-app/components/GataReportFormDialog";
 import {
-   GataReportFormDialog,
-   gataReportFormDialogAction,
    gataReportFormDialogLoader,
-} from "~/old-app/components/GataReportFormDialog";
+   gataReportFormDialogAction,
+} from "~/old-app/components/gataReportFormDialog.server";
 
 export const loader = gataReportFormDialogLoader;
 

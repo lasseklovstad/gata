@@ -16,7 +16,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const loggedInUser = await client<IGataUser>("user/loggedin", { token, signal });
    const users = await client<IGataUser[]>("user", { token, signal });
-   const externalUsers = await client<IExternalUser>("auth0user/nogatauser", { token, signal });
+   const externalUsers = await client<IExternalUser[]>("auth0user/nogatauser", { token, signal });
    return { loggedInUser, users, externalUsers };
 };
 

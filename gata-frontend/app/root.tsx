@@ -29,10 +29,6 @@ export const meta: MetaFunction = () => {
    return [
       {
          title: "Gata",
-         charset: "utf-8",
-         viewport: "width=device-width,initial-scale=1",
-         "theme-color": "#000000",
-         description: "Nettside for gata",
       },
    ];
 };
@@ -78,6 +74,10 @@ const Document = withEmotionCache(({ children }: DocumentProps, emotionCache) =>
    return (
       <html lang="no">
          <head>
+            <meta charSet="utf-8" />
+            <meta name="theme-color" content="#000000" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta name="description" content="Nettside for gata" />
             <Meta />
             <Links />
             {serverStyleData?.map(({ key, ids, css }) => (

@@ -3,11 +3,11 @@ import { Heading, List, ListItem } from "@chakra-ui/react";
 import { ExternalUsersWithNoGataUserListItem } from "./ExternalUsersWithNoGataUserListItem";
 import type { IExternalUser } from "../../../types/GataUser.type";
 
-type ExternalUsersWithNoGataUserProps = {
+type Props = {
    externalUsers: IExternalUser[];
 };
 
-export const ExternalUsersWithNoGataUser = ({ externalUsers }: ExternalUsersWithNoGataUserProps) => {
+export const ExternalUsersWithNoGataUser = ({ externalUsers }: Props) => {
    return (
       <>
          <Heading as="h2" id="external-user-title" size="lg">
