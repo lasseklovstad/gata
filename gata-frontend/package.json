@@ -11,7 +11,8 @@
       "lint": "eslint ./app --ext .js,.jsx,.ts,.tsx,.mjs,.cjs",
       "lint:fix": "npm run lint -- --fix",
       "lint:ci": "npm run lint -- --max-warnings 0",
-      "knip": "knip"
+      "knip": "knip",
+      "typecheck": "tsc"
    },
    "dependencies": {
       "@chakra-ui/react": "2.8.2",

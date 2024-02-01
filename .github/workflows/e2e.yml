@@ -28,7 +28,12 @@ jobs:
         with:
           working-directory: gata-frontend
 
-      - name: Run frontend tests
+      - name: Run typescript checks
+        working-directory: gata-frontend
+        run: |
+          npm run typecheck
+
+      - name: Run linting checks
         working-directory: gata-frontend
         run: |
           npm run lint:ci

@@ -9,12 +9,13 @@ type UserMenuProps = {
 };
 
 export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => {
+   const photo = user && user.photos && user.photos[0] ? user.photos[0].value : "";
    return (
       <>
          {isAuthenticated && (
             <>
                <Menu>
-                  <MenuButton aria-label="Åpne meny" as={IconButton} icon={<Avatar src={user?.picture} size="sm" />} />
+                  <MenuButton aria-label="Åpne meny" as={IconButton} icon={<Avatar src={photo} size="sm" />} />
                   <MenuList>
                      <MenuItem as={Link} to="logout">
                         <Text textAlign="center">Logg ut</Text>

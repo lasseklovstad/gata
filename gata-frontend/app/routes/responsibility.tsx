@@ -24,9 +24,7 @@ export default function ResponsibilityPage() {
    return (
       <PageLayout>
          <Box display="flex" justifyContent="space-between" flexWrap="wrap" alignItems="center">
-            <Heading as="h1" akake="">
-               Ansvarsposter
-            </Heading>
+            <Heading as="h1">Ansvarsposter</Heading>
             {isAdmin(loggedInUser) && (
                <Button leftIcon={<Add />} as={Link} to="new">
                   Legg til

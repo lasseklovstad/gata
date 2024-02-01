@@ -1,9 +1,5 @@
-import { Modal, ModalBody, ModalFooter, ModalHeader, ModalOverlay, Button, ModalContent } from "@chakra-ui/react";
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
 import { useState } from "react";
-
-import { ErrorAlert } from "./ErrorAlert";
-import { LoadingButton } from "./Loading";
-import type { UseClientState } from "../../utils/client.types";
 
 type ConfirmDialogProps = {
    onClose: () => void;
@@ -11,11 +7,10 @@ type ConfirmDialogProps = {
    title?: string;
    text: string;
    open: boolean;
-   response?: UseClientState<unknown>;
    showOnlyOk?: boolean;
 };
 
-const ConfirmDialog = ({ text, onClose, onConfirm, open, response, title, showOnlyOk }: ConfirmDialogProps) => {
+const ConfirmDialog = ({ text, onClose, onConfirm, open, title, showOnlyOk }: ConfirmDialogProps) => {
    return (
       <Modal isOpen={open} onClose={onClose}>
          <ModalOverlay />
@@ -27,16 +22,13 @@ const ConfirmDialog = ({ text, onClose, onConfirm, open, response, title, showOn
                   <Button onClick={onClose}>Ok</Button>
                ) : (
                   <>
-                     <LoadingButton response={response} onClick={onConfirm}>
-                        Jeg er sikker
-                     </LoadingButton>
+                     <Button onClick={onConfirm}>Jeg er sikker</Button>
                      <Button onClick={onClose} variant="ghost">
                         Avbryt
                      </Button>
                   </>
                )}
             </ModalFooter>
-            {response && <ErrorAlert response={response} />}
          </ModalContent>
       </Modal>
    );
@@ -45,9 +37,9 @@ const ConfirmDialog = ({ text, onClose, onConfirm, open, response, title, showOn
 type UseConfirmDialogProps = {
    onClose?: () => void;
    onConfirm?: () => Promise<boolean | void> | void; // Return true if you want to close
-} & Pick<ConfirmDialogProps, "text" | "response" | "title" | "showOnlyOk">;
+} & Pick<ConfirmDialogProps, "text" | "title" | "showOnlyOk">;
 
-export const useConfirmDialog = ({ onConfirm, text, onClose, response, title, showOnlyOk }: UseConfirmDialogProps) => {
+export const useConfirmDialog = ({ onConfirm, text, onClose, title, showOnlyOk }: UseConfirmDialogProps) => {
    const [open, setOpen] = useState(false);
    const openConfirmDialog = () => setOpen(true);
    const closeConfirmDialog = () => {
@@ -71,7 +63,6 @@ export const useConfirmDialog = ({ onConfirm, text, onClose, response, title, sh
          onConfirm={handleConfirm}
          text={text}
          title={title}
-         response={response}
          showOnlyOk={showOnlyOk}
       />
    );
