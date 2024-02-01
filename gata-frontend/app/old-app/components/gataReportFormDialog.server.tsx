@@ -1,10 +1,10 @@
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-import type { IGataReportSimple, GataReportType } from "../types/GataReport.type";
+import type { IGataReportSimple } from "../types/GataReport.type";
 
 export const gataReportFormDialogLoader = async ({ request, params }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
@@ -37,5 +37,3 @@ export const gataReportFormDialogAction = async ({ request, params }: ActionFunc
 interface GataReportFormDialogLoaderData {
    report: IGataReportSimple | undefined;
 }
-
-
