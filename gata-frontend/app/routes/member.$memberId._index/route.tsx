@@ -4,13 +4,14 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 
+import { getNotMemberUsers } from "~/api/auth0.api";
+import { getContingentInfo } from "~/api/contingent.api";
+import { getRoles } from "~/api/role.api";
+import { getLoggedInUser, getUser } from "~/api/user.api";
 import { useConfirmDialog } from "~/components/ConfirmDialog";
 import { LinkExternalUserToGataUserSelect } from "~/routes/member.$memberId._index/components/LinkExternalUserToGataUserSelect";
 import { UserInfo } from "~/routes/member.$memberId._index/components/UserInfo";
 import { UserSubscribe } from "~/routes/member.$memberId._index/components/UserSubscribe";
-import type { IContingentInfo } from "~/types/ContingentInfo.type";
-import type { IGataRole } from "~/types/GataRole.type";
-import type { IExternalUser, IGataUser } from "~/types/GataUser.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 import { isAdmin } from "~/utils/roleUtils";
@@ -18,13 +19,16 @@ import { isAdmin } from "~/utils/roleUtils";
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
-   const member = await client<IGataUser>(`user/${params.memberId}`, { token });
-   const loggedInUser = await client<IGataUser>("user/loggedin", { token });
-   const roles = await client<IGataRole[]>("role", { token });
-   const contingentInfo = await client<IContingentInfo>("contingent", { token });
-   const notMemberUsers = await client<IExternalUser[]>("auth0user/nogatauser", { token });
+   const signal = request.signal;
+   const [member, loggedInUser, roles, contingentInfo, notMemberUsers] = await Promise.all([
+      getUser({ memberId, token, signal }),
+      getLoggedInUser({ token, signal }),
+      getRoles({ token, signal }),
+      getContingentInfo({ token, signal }),
+      getNotMemberUsers({ token, signal }),
+   ]);
    return json({ member, contingentInfo, loggedInUser, roles, notMemberUsers });
 };
 

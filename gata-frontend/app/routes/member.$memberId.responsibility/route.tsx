@@ -4,20 +4,20 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
+import { getLoggedInUser, getResponsibilityYears, getUser } from "~/api/user.api";
 import { ResponsibilityForm } from "~/routes/member.$memberId.responsibility/ResponsibilityForm";
-import type { IGataUser } from "~/types/GataUser.type";
-import type { IResponsibilityYear } from "~/types/ResponsibilityYear.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 import { isAdmin, isMember } from "~/utils/roleUtils";
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
-   const loggedInUser = await client<IGataUser>("user/loggedin", { token });
-   const member = await client<IGataUser>(`user/${params.memberId}`, { token });
-   const responsibilityYears = await client<IResponsibilityYear[]>(`user/${params.memberId}/responsibilityyear`, {
-      token,
-   });
+   const signal = request.signal;
+   const [loggedInUser, member, responsibilityYears] = await Promise.all([
+      getLoggedInUser({ token, signal }),
+      getUser({ memberId, token, signal }),
+      getResponsibilityYears({ memberId, token, signal }),
+   ]);
    return json({ loggedInUser, responsibilityYears, member });
 };
 

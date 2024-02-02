@@ -3,10 +3,11 @@ import { Email } from "@mui/icons-material";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
+import { getNotMemberUsers } from "~/api/auth0.api";
+import { getLoggedInUser, getUsers } from "~/api/user.api";
 import { PageLayout } from "~/components/PageLayout";
 import { ExternalUsersWithNoGataUser } from "~/routes/members/ExternalUsersWithNoGataUser";
 import { UserListItem } from "~/routes/members/UserListItem";
-import type { IExternalUser, IGataUser } from "~/types/GataUser.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 import { isAdmin } from "~/utils/roleUtils";
@@ -14,9 +15,11 @@ import { isAdmin } from "~/utils/roleUtils";
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    const { signal } = request;
    const token = await getRequiredAuthToken(request);
-   const loggedInUser = await client<IGataUser>("user/loggedin", { token, signal });
-   const users = await client<IGataUser[]>("user", { token, signal });
-   const externalUsers = await client<IExternalUser[]>("auth0user/nogatauser", { token, signal });
+   const [loggedInUser, users, externalUsers] = await Promise.all([
+      getLoggedInUser({ token, signal }),
+      getUsers({ token, signal }),
+      getNotMemberUsers({ token, signal }),
+   ]);
    return { loggedInUser, users, externalUsers };
 };
 

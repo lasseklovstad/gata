@@ -6,23 +6,26 @@ import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { Descendant } from "slate";
 
+import { getReport } from "~/api/report.api";
+import { getLoggedInUser } from "~/api/user.api";
 import { ClientOnly } from "~/components/ClientOnly";
 import { PageLayout } from "~/components/PageLayout";
 import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
 import { RichTextPreview } from "~/components/RichTextEditor/RichTextPreview";
-import type { IGataReport } from "~/types/GataReport.type";
 import type { IGataReportFile, IGataReportFilePayload } from "~/types/GataReportFile.type";
-import type { IGataUser } from "~/types/GataUser.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 import { isAdmin } from "~/utils/roleUtils";
 
 import { reportInfoIntent } from "./intent";
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+export const loader = async ({ request, params: { reportId } }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
-   const report = await client<IGataReport>(`report/${params.reportId}`, { token });
-   const loggedInUser = await client<IGataUser>("user/loggedin", { token });
+   const signal = request.signal;
+   const [loggedInUser, report] = await Promise.all([
+      getLoggedInUser({ token, signal }),
+      getReport({ token, signal, reportId }),
+   ]);
    return json({ report, loggedInUser });
 };
 

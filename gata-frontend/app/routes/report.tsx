@@ -4,19 +4,20 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
+import { getReportsSimple } from "~/api/report.api";
+import { getLoggedInUser } from "~/api/user.api";
 import { ListItemLink } from "~/components/ListItemLink";
 import { PageLayout } from "~/components/PageLayout";
-import type { IGataReportSimple } from "~/types/GataReport.type";
-import type { IGataUser } from "~/types/GataUser.type";
-import type { Page } from "~/types/Page.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
-import { client } from "~/utils/client";
 import { isAdmin } from "~/utils/roleUtils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
-   const reports = await client<Page<IGataReportSimple>>(`report/simple?page=0&type=DOCUMENT`, { token });
-   const loggedInUser = await client<IGataUser>("user/loggedin", { token });
+   const signal = request.signal;
+   const [loggedInUser, reports] = await Promise.all([
+      getLoggedInUser({ token, signal }),
+      getReportsSimple({ token, signal }),
+   ]);
    return json({ reports, loggedInUser });
 };
 
