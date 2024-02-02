@@ -16,7 +16,7 @@ import { Link, useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { Select } from "chakra-react-select";
 import { useState } from "react";
 
-import type { IResponsibility } from "~/old-app/types/Responsibility.type";
+import type { IResponsibility } from "~/types/Responsibility.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 

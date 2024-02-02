@@ -1,6 +1,6 @@
 import { Heading, Text } from "@chakra-ui/react";
 
-import { PageLayout } from "~/old-app/components/PageLayout";
+import { PageLayout } from "~/components/PageLayout";
 
 export default function Privacy() {
    return (

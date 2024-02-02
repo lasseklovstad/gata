@@ -1,7 +1,7 @@
 import { Heading, List, ListItem } from "@chakra-ui/react";
 
 import { ExternalUsersWithNoGataUserListItem } from "./ExternalUsersWithNoGataUserListItem";
-import type { IExternalUser } from "../../../types/GataUser.type";
+import type { IExternalUser } from "../../types/GataUser.type";
 
 type Props = {
    externalUsers: IExternalUser[];

@@ -4,10 +4,10 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
-import { isAdmin, isMember } from "~/old-app/components/useRoles";
-import { ResponsibilityForm } from "~/old-app/pages/member/components/ResponsibilityForm";
-import type { IGataUser } from "~/old-app/types/GataUser.type";
-import type { IResponsibilityYear } from "~/old-app/types/ResponsibilityYear.type";
+import { isAdmin, isMember } from "~/utils/roleUtils";
+import { ResponsibilityForm } from "~/routes/member.$memberId.responsibility/ResponsibilityForm";
+import type { IGataUser } from "~/types/GataUser.type";
+import type { IResponsibilityYear } from "~/types/ResponsibilityYear.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 

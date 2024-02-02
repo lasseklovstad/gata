@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 
-import { RouteConfirmFormDialog } from "~/old-app/RouteConfirmFormDialog";
+import { RouteConfirmFormDialog } from "~/components/RouteConfirmFormDialog";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 

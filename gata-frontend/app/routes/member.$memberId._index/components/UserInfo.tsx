@@ -15,12 +15,12 @@ import {
 import { useFetcher } from "@remix-run/react";
 import { useState } from "react";
 
-import type { action as contingentAction } from "~/routes/member.$memberId.contingent";
-
-import { SelectPrimaryEmail } from "../../../components/SelectPrimaryEmail";
-import { isAdmin, isMember } from "../../../components/useRoles";
+import { SelectPrimaryEmail } from "./SelectPrimaryEmail";
 import type { IContingentInfo } from "../../../types/ContingentInfo.type";
 import type { IGataUser } from "../../../types/GataUser.type";
+import { isAdmin, isMember } from "../../../utils/roleUtils";
+import { memberIntent } from "../intent";
+import type { action as contingentAction } from "~/routes/member.$memberId.contingent";
 
 type UserInfoProps = {
    user: IGataUser;
@@ -57,7 +57,13 @@ export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) 
             </Flex>
             <input readOnly hidden value={hasPaid ? "true" : "false"} name="hasPaid" />
             {isAdmin(loggedInUser) && (
-               <Button isLoading={fetcher.state !== "idle"} variant="outline" type="submit">
+               <Button
+                  isLoading={fetcher.state !== "idle"}
+                  variant="outline"
+                  type="submit"
+                  name="intent"
+                  value={memberIntent.updateContingent}
+               >
                   {hasPaid ? "Marker som ikke betalt" : "Marker som betalt"}
                </Button>
             )}
@@ -83,7 +89,7 @@ export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) 
                <Heading as="h2" size="lg" mb={2}>
                   Kontingent
                </Heading>
-               <fetcher.Form action="contingent" method="post">
+               <fetcher.Form method="POST">
                   <Box boxShadow="md" bg="white" rounded={4} sx={{ p: 2, mb: 4 }}>
                      <FormControl mb={1}>
                         <FormLabel>Velg år</FormLabel>

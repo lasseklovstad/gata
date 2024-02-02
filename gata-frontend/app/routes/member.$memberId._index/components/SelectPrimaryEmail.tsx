@@ -4,13 +4,14 @@ import type { OptionBase, OptionProps, SingleValueProps } from "chakra-react-sel
 import { Select, chakraComponents } from "chakra-react-select";
 
 import { ExternalUserIcon } from "./ExternalUserIcon";
-import type { IExternalUser, IGataUser } from "../types/GataUser.type";
+import type { IExternalUser, IGataUser } from "../../../types/GataUser.type";
+import { memberIntent } from "../intent";
 
-type SelectPrimaryEmailProps = {
+type Props = {
    user: IGataUser;
 };
 
-export const SelectPrimaryEmail = ({ user }: SelectPrimaryEmailProps) => {
+export const SelectPrimaryEmail = ({ user }: Props) => {
    const fetcher = useFetcher();
    const selectId = useId();
 
@@ -31,8 +32,8 @@ export const SelectPrimaryEmail = ({ user }: SelectPrimaryEmailProps) => {
             components={customComponents}
             onChange={(option) => {
                fetcher.submit(
-                  { primaryUserEmail: option?.value || "" },
-                  { action: "primaryUserEmail", method: "post" }
+                  { primaryUserEmail: option?.value || "", intent: memberIntent.updatePrimaryUserEmail },
+                  { method: "POST" }
                );
             }}
             options={options}

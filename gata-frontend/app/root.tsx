@@ -1,11 +1,10 @@
-import { Progress, Container, Box, Text, ChakraProvider, Heading, Button } from "@chakra-ui/react";
+import { Box, Button, ChakraProvider, Container, Heading, Progress, Text } from "@chakra-ui/react";
 import { withEmotionCache } from "@emotion/react";
-import { json } from "@remix-run/node";
 import type { LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import {
    Link,
    Links,
-   LiveReload,
    Meta,
    Outlet,
    Scripts,
@@ -15,13 +14,13 @@ import {
    useNavigation,
    useRouteError,
 } from "@remix-run/react";
-import { useEffect, useContext } from "react";
+import { useContext, useEffect } from "react";
 import type { Auth0Profile } from "remix-auth-auth0";
 
-import { ResponsiveAppBar } from "./old-app/components/ResponsiveAppBar";
-import type { IGataUser } from "./old-app/types/GataUser.type";
+import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
 import { chakraTheme } from "./styles/chakraTheme";
-import { ServerStyleContext, ClientStyleContext } from "./styles/context";
+import { ClientStyleContext, ServerStyleContext } from "./styles/context";
+import type { IGataUser } from "./types/GataUser.type";
 import { authenticator } from "./utils/auth.server";
 import { client } from "./utils/client";
 
@@ -88,7 +87,6 @@ const Document = withEmotionCache(({ children }: DocumentProps, emotionCache) =>
             {children}
             <ScrollRestoration />
             <Scripts />
-            <LiveReload />
          </body>
       </html>
    );

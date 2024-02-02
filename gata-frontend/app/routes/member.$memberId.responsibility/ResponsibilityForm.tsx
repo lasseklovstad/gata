@@ -15,9 +15,9 @@ import { Delete, Save } from "@mui/icons-material";
 import { Link, useFetcher } from "@remix-run/react";
 import { useState } from "react";
 
-import { isAdmin } from "../../../components/useRoles";
-import type { IGataUser } from "../../../types/GataUser.type";
-import type { IResponsibilityYear } from "../../../types/ResponsibilityYear.type";
+import type { IGataUser } from "../../types/GataUser.type";
+import type { IResponsibilityYear } from "../../types/ResponsibilityYear.type";
+import { isAdmin } from "../../utils/roleUtils";
 
 type ResponsibilityFormProps = {
    responsibilityYear: IResponsibilityYear;

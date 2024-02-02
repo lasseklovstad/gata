@@ -1,9 +1,9 @@
 import { Avatar, Box, Divider, Flex, Text } from "@chakra-ui/react";
 import { Check, Clear } from "@mui/icons-material";
 
-import { ListItemLink } from "../../../components/ListItemLink";
-import { isMember } from "../../../components/useRoles";
-import type { IGataUser } from "../../../types/GataUser.type";
+import { ListItemLink } from "../../components/ListItemLink";
+import type { IGataUser } from "../../types/GataUser.type";
+import { isMember } from "../../utils/roleUtils";
 
 type UserListItemProps = {
    user: IGataUser;

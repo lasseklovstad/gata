@@ -16,8 +16,8 @@ import { Link } from "@remix-run/react";
 import type { Auth0Profile } from "remix-auth-auth0";
 
 import { UserMenu } from "./UserMenu";
-import { isAdmin, isMember } from "./useRoles";
-import type { IGataUser } from "../types/GataUser.type";
+import type { IGataUser } from "../../types/GataUser.type";
+import { isAdmin, isMember } from "../../utils/roleUtils";
 
 type ResponsiveAppBarProps = {
    loggedInUser: IGataUser | undefined;

@@ -11,8 +11,10 @@ import type {
 import { Select, chakraComponents } from "chakra-react-select";
 import { useId, type ReactNode } from "react";
 
-import { ExternalUserIcon } from "../../../components/ExternalUserIcon";
-import type { IExternalUser, IGataUser } from "../../../types/GataUser.type";
+import { ExternalUserIcon } from "~/routes/member.$memberId._index/components/ExternalUserIcon";
+import type { IGataUser, IExternalUser } from "~/types/GataUser.type";
+
+import { memberIntent } from "../intent";
 
 type LinkExternalUserToGataUserSelectProps = {
    user: IGataUser;
@@ -29,8 +31,9 @@ export const LinkExternalUserToGataUserSelect = ({
       const userIds = options.map((o) => o.value);
       const formData = new FormData();
       formData.set("userId", id);
+      formData.set("intent", memberIntent.updateLinkedUsers);
       userIds.forEach((userId) => formData.append("externalUserId", userId));
-      fetcher.submit(formData, { action: "externaluserproviders", method: "PUT" });
+      fetcher.submit(formData, { method: "PUT" });
    };
 
    const menuItems = [...externalUserProviders, ...notMemberUsers];

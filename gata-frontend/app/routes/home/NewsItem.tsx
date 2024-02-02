@@ -1,11 +1,11 @@
 import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
 import { Link } from "@remix-run/react";
 
-import { ClientOnly } from "./ClientOnly";
-import { RichTextPreview } from "./RichTextEditor/RichTextPreview";
-import { isAdmin } from "./useRoles";
-import type { IGataReport } from "../types/GataReport.type";
-import type { IGataUser } from "../types/GataUser.type";
+import { ClientOnly } from "../../components/ClientOnly";
+import { RichTextPreview } from "../../components/RichTextEditor/RichTextPreview";
+import type { IGataReport } from "../../types/GataReport.type";
+import type { IGataUser } from "../../types/GataUser.type";
+import { isAdmin } from "../../utils/roleUtils";
 
 type NewsItemProps = {
    report: IGataReport;

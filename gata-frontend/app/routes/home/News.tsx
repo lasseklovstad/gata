@@ -3,10 +3,10 @@ import { Add } from "@mui/icons-material";
 import { Link, Outlet } from "@remix-run/react";
 
 import { NewsItem } from "./NewsItem";
-import { PageLayout } from "./PageLayout";
-import type { IGataReport } from "../types/GataReport.type";
-import type { IGataUser } from "../types/GataUser.type";
-import type { Page } from "../types/Page.type";
+import { PageLayout } from "../../components/PageLayout";
+import type { IGataReport } from "../../types/GataReport.type";
+import type { IGataUser } from "../../types/GataUser.type";
+import type { Page } from "../../types/Page.type";
 
 type NewsProps = {
    reportPage: Page<IGataReport>;

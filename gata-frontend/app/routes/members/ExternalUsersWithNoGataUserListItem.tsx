@@ -2,7 +2,7 @@ import { Avatar, Box, Divider, Flex, IconButton, ListItem, Text } from "@chakra-
 import { Add } from "@mui/icons-material";
 import { useFetcher } from "@remix-run/react";
 
-import type { IExternalUser } from "../../../types/GataUser.type";
+import type { IExternalUser } from "../../types/GataUser.type";
 
 type ExternalUsersWithNoGataUserListItemProps = {
    user: IExternalUser;

@@ -6,15 +6,16 @@ import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { Descendant } from "slate";
 
-import { ClientOnly } from "~/old-app/components/ClientOnly";
-import { PageLayout } from "~/old-app/components/PageLayout";
-import { RichTextEditor } from "~/old-app/components/RichTextEditor/RichTextEditor";
-import { RichTextPreview } from "~/old-app/components/RichTextEditor/RichTextPreview";
-import { isAdmin } from "~/old-app/components/useRoles";
-import type { IGataReport } from "~/old-app/types/GataReport.type";
-import type { IGataUser } from "~/old-app/types/GataUser.type";
+import { ClientOnly } from "~/components/ClientOnly";
+import { PageLayout } from "~/components/PageLayout";
+import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
+import { RichTextPreview } from "~/components/RichTextEditor/RichTextPreview";
+import type { IGataReport } from "~/types/GataReport.type";
+import type { IGataReportFile, IGataReportFilePayload } from "~/types/GataReportFile.type";
+import type { IGataUser } from "~/types/GataUser.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
+import { isAdmin } from "~/utils/roleUtils";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
@@ -23,12 +24,32 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    return json({ report, loggedInUser });
 };
 
+export const updateContentIntent = "update-report-content";
+export const postFileIntent = "post-file";
+
 export const action = async ({ request, params }: ActionFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const formData = await request.formData();
-   const body = JSON.parse(String(formData.get("content")));
-   await client(`report/${params.reportId}/content`, { method: "PUT", body, token });
-   return json({ ok: true, close: formData.get("close") });
+   const intent = String(formData.get("intent"));
+
+   switch (intent) {
+      case updateContentIntent: {
+         const body = JSON.parse(String(formData.get("content")));
+         await client(`report/${params.reportId}/content`, { method: "PUT", body, token });
+         return json({ ok: true, close: formData.get("close"), intent: updateContentIntent } as const);
+      }
+      case postFileIntent: {
+         const dataBody = String(formData.get("data"));
+         const response = await client<IGataReportFile, IGataReportFilePayload>("file/cloud", {
+            body: { data: dataBody, reportId: params.reportId! },
+            token,
+         });
+         return json({ ok: true, file: response, intent: postFileIntent } as const);
+      }
+      default: {
+         throw new Response(`Invalid intent "${intent}"`, { status: 400 });
+      }
+   }
 };
 
 export default function ReportInfoPage() {
@@ -40,7 +61,7 @@ export default function ReportInfoPage() {
    const handleSaveContent = (content: Descendant[] | undefined, close: boolean) => {
       if (content) {
          fetcher.submit(
-            { content: JSON.stringify(content), close: close ? "true" : "false" },
+            { content: JSON.stringify(content), close: close ? "true" : "false", intent: updateContentIntent },
             { method: "PUT", action: `/reportInfo/${report.id}` }
          );
       } else {
@@ -49,7 +70,13 @@ export default function ReportInfoPage() {
    };
 
    useEffect(() => {
-      if (fetcher.state === "idle" && fetcher.data && fetcher.data.ok && fetcher.data.close === "true") {
+      if (
+         fetcher.state === "idle" &&
+         fetcher.data &&
+         fetcher.data.ok &&
+         fetcher.data.intent === updateContentIntent &&
+         fetcher.data.close === "true"
+      ) {
          setEditing(false);
       }
    }, [fetcher.data, fetcher.state]);

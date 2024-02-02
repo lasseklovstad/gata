@@ -8,7 +8,7 @@ import type { RenderElementProps } from "slate-react";
 import { ReactEditor, useFocused, useSelected, useSlate, useSlateStatic } from "slate-react";
 
 import type { loader as fileLoader } from "~/routes/file.$fileId";
-import type { action as fileAction } from "~/routes/reportInfo.$reportId.file";
+import type { action as fileAction } from "~/routes/reportInfo.$reportId";
 
 import { replaceSavingImage } from "./withImages";
 
@@ -138,9 +138,10 @@ export const SavingImage = ({ oldId }: { oldId: string }) => {
    const editor = useSlate();
 
    useEffect(() => {
-      if (fetcher.state === "idle" && fetcher.data) {
-         replaceSavingImage(editor, fetcher.data.id, oldId);
+      if (fetcher.state === "idle" && fetcher.data && fetcher.data.intent === "post-file") {
+         replaceSavingImage(editor, fetcher.data.file.id, oldId);
       }
    }, [editor, fetcher, oldId]);
+
    return <Skeleton variant="rectangular" width={400} height={300} />;
 };

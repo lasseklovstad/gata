@@ -3,11 +3,11 @@ import type { LoaderFunctionArgs, SerializeFrom } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useRouteLoaderData } from "@remix-run/react";
 
-import { News } from "~/old-app/components/News";
-import { PageLayout } from "~/old-app/components/PageLayout";
-import { isMember } from "~/old-app/components/useRoles";
-import type { IGataReport } from "~/old-app/types/GataReport.type";
-import type { Page } from "~/old-app/types/Page.type";
+import { News } from "~/routes/home/News";
+import { PageLayout } from "~/components/PageLayout";
+import { isMember } from "~/utils/roleUtils";
+import type { IGataReport } from "~/types/GataReport.type";
+import type { Page } from "~/types/Page.type";
 import type { loader as rootLoader } from "~/root";
 import { authenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";

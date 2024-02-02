@@ -4,12 +4,12 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
-import { PageLayout } from "~/old-app/components/PageLayout";
-import { isAdmin } from "~/old-app/components/useRoles";
-import type { IGataUser } from "~/old-app/types/GataUser.type";
-import type { IResponsibility } from "~/old-app/types/Responsibility.type";
+import { PageLayout } from "~/components/PageLayout";
+import type { IGataUser } from "~/types/GataUser.type";
+import type { IResponsibility } from "~/types/Responsibility.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
+import { isAdmin } from "~/utils/roleUtils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
