@@ -1,11 +1,10 @@
-import { Avatar, Box, Button, Divider, Flex, Heading, IconButton, List, ListItem } from "@chakra-ui/react";
+import { Avatar, Box, Divider, Flex, Heading, IconButton, List, ListItem } from "@chakra-ui/react";
 import { Delete } from "@mui/icons-material";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 
 import { useConfirmDialog } from "~/components/ConfirmDialog";
-import { isAdmin } from "~/utils/roleUtils";
 import { LinkExternalUserToGataUserSelect } from "~/routes/member.$memberId._index/components/LinkExternalUserToGataUserSelect";
 import { UserInfo } from "~/routes/member.$memberId._index/components/UserInfo";
 import { UserSubscribe } from "~/routes/member.$memberId._index/components/UserSubscribe";
@@ -14,6 +13,7 @@ import type { IGataRole } from "~/types/GataRole.type";
 import type { IExternalUser, IGataUser } from "~/types/GataUser.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
+import { isAdmin } from "~/utils/roleUtils";
 
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";

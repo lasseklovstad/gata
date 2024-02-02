@@ -20,7 +20,6 @@ import type { IContingentInfo } from "../../../types/ContingentInfo.type";
 import type { IGataUser } from "../../../types/GataUser.type";
 import { isAdmin, isMember } from "../../../utils/roleUtils";
 import { memberIntent } from "../intent";
-import type { action as contingentAction } from "~/routes/member.$memberId.contingent";
 
 type UserInfoProps = {
    user: IGataUser;
@@ -34,7 +33,7 @@ const years = Array.from({ length: numberOfYears }, (v, i) => todaysYear - numbe
 
 export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) => {
    const [selectedYear, setSelectedYear] = useState(todaysYear.toString());
-   const fetcher = useFetcher<typeof contingentAction>();
+   const fetcher = useFetcher();
 
    const notPaidYears = years
       .filter((y) => y <= todaysYear)

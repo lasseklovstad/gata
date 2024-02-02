@@ -6,12 +6,12 @@ import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
 import { ListItemLink } from "~/components/ListItemLink";
 import { PageLayout } from "~/components/PageLayout";
-import { isAdmin } from "~/utils/roleUtils";
 import type { IGataReportSimple } from "~/types/GataReport.type";
 import type { IGataUser } from "~/types/GataUser.type";
 import type { Page } from "~/types/Page.type";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
+import { isAdmin } from "~/utils/roleUtils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);

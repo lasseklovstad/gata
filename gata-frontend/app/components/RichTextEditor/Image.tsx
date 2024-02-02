@@ -8,7 +8,7 @@ import type { RenderElementProps } from "slate-react";
 import { ReactEditor, useFocused, useSelected, useSlate, useSlateStatic } from "slate-react";
 
 import type { loader as fileLoader } from "~/routes/file.$fileId";
-import type { action as fileAction } from "~/routes/reportInfo.$reportId";
+import type { action as fileAction } from "~/routes/reportInfo.$reportId/route";
 
 import { replaceSavingImage } from "./withImages";
 

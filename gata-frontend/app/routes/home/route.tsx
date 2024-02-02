@@ -3,14 +3,14 @@ import type { LoaderFunctionArgs, SerializeFrom } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useRouteLoaderData } from "@remix-run/react";
 
-import { News } from "~/routes/home/News";
 import { PageLayout } from "~/components/PageLayout";
-import { isMember } from "~/utils/roleUtils";
+import type { loader as rootLoader } from "~/root";
+import { News } from "~/routes/home/News";
 import type { IGataReport } from "~/types/GataReport.type";
 import type { Page } from "~/types/Page.type";
-import type { loader as rootLoader } from "~/root";
 import { authenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
+import { isMember } from "~/utils/roleUtils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    const auth = await authenticator.isAuthenticated(request);

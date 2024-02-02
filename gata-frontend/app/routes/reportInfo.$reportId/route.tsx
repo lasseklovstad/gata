@@ -17,6 +17,8 @@ import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 import { isAdmin } from "~/utils/roleUtils";
 
+import { reportInfoIntent } from "./intent";
+
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const report = await client<IGataReport>(`report/${params.reportId}`, { token });
@@ -24,27 +26,24 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    return json({ report, loggedInUser });
 };
 
-export const updateContentIntent = "update-report-content";
-export const postFileIntent = "post-file";
-
 export const action = async ({ request, params }: ActionFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
    const formData = await request.formData();
    const intent = String(formData.get("intent"));
 
    switch (intent) {
-      case updateContentIntent: {
+      case reportInfoIntent.updateContentIntent: {
          const body = JSON.parse(String(formData.get("content")));
          await client(`report/${params.reportId}/content`, { method: "PUT", body, token });
-         return json({ ok: true, close: formData.get("close"), intent: updateContentIntent } as const);
+         return json({ ok: true, close: formData.get("close"), intent: reportInfoIntent.updateContentIntent } as const);
       }
-      case postFileIntent: {
+      case reportInfoIntent.postFileIntent: {
          const dataBody = String(formData.get("data"));
          const response = await client<IGataReportFile, IGataReportFilePayload>("file/cloud", {
             body: { data: dataBody, reportId: params.reportId! },
             token,
          });
-         return json({ ok: true, file: response, intent: postFileIntent } as const);
+         return json({ ok: true, file: response, intent: reportInfoIntent.postFileIntent } as const);
       }
       default: {
          throw new Response(`Invalid intent "${intent}"`, { status: 400 });
@@ -61,7 +60,11 @@ export default function ReportInfoPage() {
    const handleSaveContent = (content: Descendant[] | undefined, close: boolean) => {
       if (content) {
          fetcher.submit(
-            { content: JSON.stringify(content), close: close ? "true" : "false", intent: updateContentIntent },
+            {
+               content: JSON.stringify(content),
+               close: close ? "true" : "false",
+               intent: reportInfoIntent.updateContentIntent,
+            },
             { method: "PUT", action: `/reportInfo/${report.id}` }
          );
       } else {
@@ -74,7 +77,7 @@ export default function ReportInfoPage() {
          fetcher.state === "idle" &&
          fetcher.data &&
          fetcher.data.ok &&
-         fetcher.data.intent === updateContentIntent &&
+         fetcher.data.intent === reportInfoIntent.updateContentIntent &&
          fetcher.data.close === "true"
       ) {
          setEditing(false);
