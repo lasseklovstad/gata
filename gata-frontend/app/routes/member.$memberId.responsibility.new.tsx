@@ -16,15 +16,13 @@ import { Link, useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { Select } from "chakra-react-select";
 import { useState } from "react";
 
-import type { IResponsibility } from "~/old-app/types/Responsibility.type";
+import { getResponsibilities } from "~/api/responsibility.api";
 import { getRequiredAuthToken } from "~/utils/auth.server";
-import { client } from "~/utils/client";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
-   const responsibilities = await client<IResponsibility[]>("responsibility", {
-      token,
-   });
+   const signal = request.signal;
+   const responsibilities = await getResponsibilities({ token, signal });
    return json({ responsibilities });
 };
 

@@ -4,17 +4,20 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
-import { PageLayout } from "~/old-app/components/PageLayout";
-import { isAdmin } from "~/old-app/components/useRoles";
-import type { IGataUser } from "~/old-app/types/GataUser.type";
-import type { IResponsibility } from "~/old-app/types/Responsibility.type";
+import { getResponsibilities } from "~/api/responsibility.api";
+import { getLoggedInUser } from "~/api/user.api";
+import { PageLayout } from "~/components/PageLayout";
 import { getRequiredAuthToken } from "~/utils/auth.server";
-import { client } from "~/utils/client";
+import { isAdmin } from "~/utils/roleUtils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    const token = await getRequiredAuthToken(request);
-   const responsibilities = await client<IResponsibility[]>("responsibility", { token });
-   const loggedInUser = await client<IGataUser>("user/loggedin", { token });
+   const signal = request.signal;
+   const [loggedInUser, responsibilities] = await Promise.all([
+      getLoggedInUser({ token, signal }),
+      getResponsibilities({ token, signal }),
+   ]);
+
    return json({ responsibilities, loggedInUser });
 };
 

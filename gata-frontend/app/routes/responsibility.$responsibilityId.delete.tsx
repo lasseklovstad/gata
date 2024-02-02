@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 
-import { RouteConfirmFormDialog } from "~/old-app/RouteConfirmFormDialog";
+import { RouteConfirmFormDialog } from "~/components/RouteConfirmFormDialog";
 import { getRequiredAuthToken } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
@@ -15,5 +15,5 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 };
 
 export default function ConfirmDeleteResponsibility() {
-   return <RouteConfirmFormDialog text="Ved å slette dokumentet mister du all data" backTo=".." method="delete" />;
+   return <RouteConfirmFormDialog text="Ved å slette dokumentet mister du all data" backTo=".." method="DELETE" />;
 }

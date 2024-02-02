@@ -281,11 +281,19 @@ class GataUserRestController {
         @PathVariable id: String,
         @RequestBody externalUserProviderIds: List<String>,
     ) {
+        if (externalUserProviderIds.isEmpty()) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "En gatabruker må være tilknyttet en ekstern bruker")
+        }
         val user = gataUserService.getUser(id)
-        val removeExternalUserProviders =
-            user.externalUserProviders.filter { !externalUserProviderIds.contains(it.id) }.onEach { it.user = null }
         val externalUserProviders =
             externalUserRepository.findAllById(externalUserProviderIds).onEach { it.user = user }
+        if (externalUserProviders.isEmpty())
+            {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Finner ikke eksterne brukere")
+            }
+        val removeExternalUserProviders =
+            user.externalUserProviders.filter { !externalUserProviderIds.contains(it.id) }.onEach { it.user = null }
+
         externalUserRepository.saveAll(removeExternalUserProviders)
         // Todo: Check if we actually need to save the user aswell
         user.externalUserProviders = externalUserProviders
