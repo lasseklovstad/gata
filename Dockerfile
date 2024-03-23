@@ -20,7 +20,7 @@ COPY --from=stage application/snapshot-dependencies/ ./
 COPY --from=stage application/application/ ./
 
 EXPOSE 8080
-
-ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
+# https://stackoverflow.com/questions/44491257/how-to-reduce-spring-boot-memory-usage
+ENTRYPOINT ["java", "-XX:MaxRAM=300m", "-Xss512k", "-XX:+UseSerialGC", "org.springframework.boot.loader.launch.JarLauncher"]
 
 
