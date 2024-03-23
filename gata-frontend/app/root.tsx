@@ -14,6 +14,7 @@ import {
    useNavigation,
    useRouteError,
 } from "@remix-run/react";
+import type { ComponentProps } from "react";
 import { useContext, useEffect } from "react";
 import type { Auth0Profile } from "remix-auth-auth0";
 
@@ -92,13 +93,34 @@ const Document = withEmotionCache(({ children }: DocumentProps, emotionCache) =>
    );
 });
 
-export default function App() {
+export function Layout({ children }: ComponentProps<never>) {
    return (
       <Document>
-         <ChakraProvider theme={chakraTheme}>
-            <Root />
-         </ChakraProvider>
+         <ChakraProvider theme={chakraTheme}>{children}</ChakraProvider>
       </Document>
+   );
+}
+
+export default function App() {
+   const { loggedInUser, isAuthenticated, user, version } = useLoaderData<typeof loader>();
+   const { state } = useNavigation();
+   return (
+      <Box sx={{ display: "flex", flexDirection: "column", backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
+         <ResponsiveAppBar loggedInUser={loggedInUser} isAuthenticated={isAuthenticated} user={user} />
+         <Progress size="xs" colorScheme="blue" isIndeterminate={state === "loading"} hasStripe />
+         <Container as="main" maxW="6xl" sx={{ mb: 16 }}>
+            <Outlet />
+         </Container>
+         <Container as="footer" sx={{ marginTop: "auto", p: 2, maxW: "6xl", display: "flex", gap: 4 }}>
+            <Text>{version}</Text>
+            <Button as={Link} to="/privacy" variant="link">
+               Privacy
+            </Button>
+            <Button as={Link} to="/about" variant="link">
+               About
+            </Button>
+         </Container>
+      </Box>
    );
 }
 
@@ -127,29 +149,6 @@ type LoaderData = {
    version: string;
 };
 
-function Root() {
-   const { loggedInUser, isAuthenticated, user, version } = useLoaderData<typeof loader>();
-   const { state } = useNavigation();
-   return (
-      <Box sx={{ display: "flex", flexDirection: "column", backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
-         <ResponsiveAppBar loggedInUser={loggedInUser} isAuthenticated={isAuthenticated} user={user} />
-         <Progress size="xs" colorScheme="blue" isIndeterminate={state === "loading"} hasStripe />
-         <Container as="main" maxW="6xl" sx={{ mb: 16 }}>
-            <Outlet />
-         </Container>
-         <Container as="footer" sx={{ marginTop: "auto", p: 2, maxW: "6xl", display: "flex", gap: 4 }}>
-            <Text>{version}</Text>
-            <Button as={Link} to="/privacy" variant="link">
-               Privacy
-            </Button>
-            <Button as={Link} to="/about" variant="link">
-               About
-            </Button>
-         </Container>
-      </Box>
-   );
-}
-
 export function ErrorBoundary() {
    const error = useRouteError();
 
@@ -157,33 +156,25 @@ export function ErrorBoundary() {
       console.log(error);
    }, [error]);
 
-   const getErrorMessage = () => {
-      if (isRouteErrorResponse(error)) {
-         return (
-            <div>
-               <Heading>
-                  {error.status} {error.statusText}
-               </Heading>
-               <Text>{error.data.message}</Text>
-            </div>
-         );
-      } else if (error instanceof Error) {
-         return (
-            <div>
-               <Heading>Error</Heading>
-               <Text>{error.message}</Text>
-               <Text>The stack trace is:</Text>
-               <Text as="pre">{error.stack}</Text>
-            </div>
-         );
-      } else {
-         return <Heading>Unknown Error</Heading>;
-      }
-   };
-
-   return (
-      <Document>
-         <ChakraProvider theme={chakraTheme}>{getErrorMessage()}</ChakraProvider>
-      </Document>
-   );
+   if (isRouteErrorResponse(error)) {
+      return (
+         <div>
+            <Heading>
+               {error.status} {error.statusText}
+            </Heading>
+            <Text>{error.data.message}</Text>
+         </div>
+      );
+   } else if (error instanceof Error) {
+      return (
+         <div>
+            <Heading>Error</Heading>
+            <Text>{error.message}</Text>
+            <Text>The stack trace is:</Text>
+            <Text as="pre">{error.stack}</Text>
+         </div>
+      );
+   } else {
+      return <Heading>Unknown Error</Heading>;
+   }
 }

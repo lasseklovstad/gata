@@ -1,3 +1,4 @@
+import { Text } from "@chakra-ui/react";
 import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
 
 import { authenticator } from "~/utils/auth.server";
@@ -11,3 +12,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
    }
    return redirect("/login");
 };
+
+export default function RegisterLogin() {
+   return <Text>Registrerer bruker...</Text>;
+}

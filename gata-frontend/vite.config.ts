@@ -1,4 +1,4 @@
-import { unstable_vitePlugin as remix } from "@remix-run/dev";
+import { vitePlugin as remix } from "@remix-run/dev";
 import { installGlobals } from "@remix-run/node";
 import { remixDevTools } from "remix-development-tools/vite";
 import { defineConfig } from "vite";
@@ -13,10 +13,10 @@ export default defineConfig({
    plugins: [
       remixDevTools(),
       remix({
-         ignoredRouteFiles: ["**/.*"],
          future: {
             v3_fetcherPersist: true,
             v3_relativeSplatPath: true,
+            v3_throwAbortReason: true,
          },
       }),
       tsconfigPaths(),
