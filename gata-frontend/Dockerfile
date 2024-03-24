@@ -12,15 +12,6 @@ WORKDIR /myapp
 ADD package.json package-lock.json ./
 RUN npm install --include=dev
 
-# Setup production node_modules
-FROM base as production-deps
-
-WORKDIR /myapp
-
-COPY --from=deps /myapp/node_modules /myapp/node_modules
-ADD package.json ./
-RUN npm prune --omit=dev
-
 # Build the app
 FROM base as build
 
@@ -36,10 +27,9 @@ FROM base
 
 WORKDIR /myapp
 
-COPY --from=production-deps /myapp/node_modules /myapp/node_modules
+COPY --from=build /myapp/node_modules /myapp/node_modules
 
 COPY --from=build /myapp/build /myapp/build
-COPY --from=build /myapp/public /myapp/public
 COPY --from=build /myapp/package.json /myapp/package.json
 
 EXPOSE 3000

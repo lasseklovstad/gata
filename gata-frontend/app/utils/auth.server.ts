@@ -1,44 +1,48 @@
-import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import { type AppLoadContext, createCookieSessionStorage, redirect } from "@remix-run/cloudflare";
 import { Authenticator } from "remix-auth";
 import type { Auth0Profile } from "remix-auth-auth0";
 import { Auth0Strategy } from "remix-auth-auth0";
 
-const sessionStorage = createCookieSessionStorage({
-   cookie: {
-      name: "_remix_session",
-      sameSite: "lax",
-      path: "/",
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      secrets: [process.env.AUTH0_COOKIE_SECRET!],
-   },
-});
+export const createAuthenticator = ({ cloudflare: { env } }: AppLoadContext) => {
+   const sessionStorage = createCookieSessionStorage({
+      cookie: {
+         name: "_remix_session",
+         sameSite: "lax",
+         path: "/",
+         httpOnly: true,
+         secure: process.env.NODE_ENV === "production",
+         secrets: [env.AUTH0_COOKIE_SECRET!],
+      },
+   });
 
-export const authenticator = new Authenticator<{ profile: Auth0Profile; accessToken: string }>(sessionStorage);
+   const authenticator = new Authenticator<{ profile: Auth0Profile; accessToken: string }>(sessionStorage);
 
-const auth0Strategy = new Auth0Strategy(
-   {
-      callbackURL: "/callback",
-      clientID: process.env.AUTH0_CLIENT_ID!,
-      audience: process.env.AUTH0_AUDIENCE!,
-      clientSecret: process.env.AUTH0_CLIENT_SECRET!,
-      domain: process.env.AUTH0_DOMAIN!,
-   },
-   // eslint-disable-next-line require-await
-   async ({ profile, accessToken }) => {
-      // Get the user data from your DB or API using the tokens and profile
-      return { profile, accessToken };
-   }
-);
+   const auth0Strategy = new Auth0Strategy(
+      {
+         callbackURL: "/callback",
+         clientID: env.AUTH0_CLIENT_ID!,
+         audience: env.AUTH0_AUDIENCE!,
+         clientSecret: env.AUTH0_CLIENT_SECRET!,
+         domain: env.AUTH0_DOMAIN!,
+      },
+      // eslint-disable-next-line require-await
+      async ({ profile, accessToken }) => {
+         // Get the user data from your DB or API using the tokens and profile
+         return { profile, accessToken };
+      }
+   );
 
-authenticator.use(auth0Strategy);
+   authenticator.use(auth0Strategy);
 
-export const { getSession, destroySession } = sessionStorage;
+   const { getSession, destroySession } = sessionStorage;
 
-export const getRequiredAuthToken = async (request: Request) => {
-   const auth = await authenticator.isAuthenticated(request);
-   if (auth === null) {
-      throw redirect("/home");
-   }
-   return auth.accessToken;
+   const getRequiredAuthToken = async (request: Request) => {
+      const auth = await authenticator.isAuthenticated(request);
+      if (auth === null) {
+         throw redirect("/home");
+      }
+      return auth.accessToken;
+   };
+
+   return { getSession, destroySession, getRequiredAuthToken, authenticator };
 };

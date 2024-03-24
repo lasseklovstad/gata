@@ -6,4 +6,5 @@ export type ClientConfigType<RequestBody extends RequestBodyBase> = {
    signal?: Request["signal"];
    method?: Request["method"];
    token?: string;
+   baseUrl: string;
 };

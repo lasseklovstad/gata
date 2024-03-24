@@ -1,8 +1,8 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
-import type { ActionFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/cloudflare";
 import { useFetcher, useNavigate } from "@remix-run/react";
 
-import { getRequiredAuthToken } from "~/utils/auth.server";
+import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
 export const loader = () => {
@@ -10,10 +10,11 @@ export const loader = () => {
    return {};
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-   const token = await getRequiredAuthToken(request);
+export const action = async ({ request, context }: ActionFunctionArgs) => {
+   const token = await createAuthenticator(context).getRequiredAuthToken(request);
    const emails = await client<string[]>("contingent/email", {
       token,
+      baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
    });
    return { ok: true, emails };
 };

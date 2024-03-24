@@ -1,9 +1,9 @@
 import { CacheProvider } from "@emotion/react";
-import createEmotionServer from "@emotion/server/create-instance";
-import type { EntryContext } from "@remix-run/node"; // Depends on the runtime you choose
+import type { EntryContext } from "@remix-run/cloudflare"; // Depends on the runtime you choose
 import { RemixServer } from "@remix-run/react";
 import { renderToString } from "react-dom/server";
 
+import { createEmotionServer } from "./styles/@emotion/server";
 import { ServerStyleContext } from "./styles/context";
 import { createEmotionCache } from "./styles/createEmotionCache";
 

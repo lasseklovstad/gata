@@ -5,9 +5,10 @@
    "type": "module",
    "sideEffects": false,
    "scripts": {
-      "dev": "remix vite:dev",
       "build": "remix vite:build",
-      "start": "remix-serve ./build/server/index.js",
+      "deploy": "wrangler pages deploy ./build/client",
+      "dev": "remix vite:dev",
+      "start": "wrangler pages dev ./build/client --port 3000 --env docker --binding AUTH0_CLIENT_SECRET=$(process.env.AUTH0_CLIENT_SECRET) AUTH0_CLIENT_ID=$(process.env.AUTH0_CLIENT_ID)",
       "lint": "eslint ./app --ext .js,.jsx,.ts,.tsx,.mjs,.cjs",
       "lint:fix": "npm run lint -- --fix",
       "lint:ci": "npm run lint -- --max-warnings 0",
@@ -18,14 +19,14 @@
       "@chakra-ui/react": "2.8.2",
       "@emotion/cache": "11.11.0",
       "@emotion/react": "11.11.4",
-      "@emotion/server": "11.11.0",
       "@emotion/styled": "11.11.0",
       "@mui/icons-material": "5.15.14",
-      "@remix-run/node": "2.8.1",
+      "@remix-run/cloudflare": "^2.8.1",
+      "@remix-run/cloudflare-pages": "^2.8.1",
       "@remix-run/react": "2.8.1",
-      "@remix-run/serve": "2.8.1",
       "chakra-react-select": "4.7.6",
       "framer-motion": "11.0.20",
+      "miniflare": "^3.20240320.0",
       "react": "18.2.0",
       "react-dom": "18.2.0",
       "remix-auth": "3.6.0",
@@ -35,6 +36,7 @@
       "slate-react": "0.102.0"
    },
    "devDependencies": {
+      "@cloudflare/workers-types": "^4.20240320.1",
       "@remix-run/dev": "2.8.1",
       "@types/react": "18.2.69",
       "@types/react-dom": "18.2.22",
@@ -53,6 +55,8 @@
       "prettier": "3.2.5",
       "typescript": "5.4.3",
       "vite": "5.2.4",
-      "vite-tsconfig-paths": "4.3.2"
+      "vite-plugin-checker": "^0.6.4",
+      "vite-tsconfig-paths": "4.3.2",
+      "wrangler": "^3.37.0"
    }
 }

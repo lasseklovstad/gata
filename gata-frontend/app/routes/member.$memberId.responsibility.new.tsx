@@ -10,19 +10,19 @@ import {
    ModalOverlay,
 } from "@chakra-ui/react";
 import { Save } from "@mui/icons-material";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
+import { json } from "@remix-run/cloudflare";
 import { Link, useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { Select } from "chakra-react-select";
 import { useState } from "react";
 
 import { getResponsibilities } from "~/api/responsibility.api";
-import { getRequiredAuthToken } from "~/utils/auth.server";
+import { createAuthenticator } from "~/utils/auth.server";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-   const token = await getRequiredAuthToken(request);
+export const loader = async ({ request, context }: LoaderFunctionArgs) => {
+   const token = await createAuthenticator(context).getRequiredAuthToken(request);
    const signal = request.signal;
-   const responsibilities = await getResponsibilities({ token, signal });
+   const responsibilities = await getResponsibilities({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL });
    return json({ responsibilities });
 };
 
