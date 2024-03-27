@@ -3,7 +3,7 @@ import type { EntryContext } from "@remix-run/cloudflare"; // Depends on the run
 import { RemixServer } from "@remix-run/react";
 import { renderToString } from "react-dom/server";
 
-import { createEmotionServer } from "./styles/@emotion/server";
+import { createEmotionServer } from "./styles/@emotion/server"; // https://github.com/emotion-js/emotion/issues/2446
 import { ServerStyleContext } from "./styles/context";
 import { createEmotionCache } from "./styles/createEmotionCache";
 

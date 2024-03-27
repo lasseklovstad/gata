@@ -8,7 +8,7 @@
       "build": "remix vite:build",
       "deploy": "wrangler pages deploy ./build/client",
       "dev": "remix vite:dev",
-      "start": "wrangler pages dev ./build/client --port 3000 --env docker --binding AUTH0_CLIENT_SECRET=$(process.env.AUTH0_CLIENT_SECRET) AUTH0_CLIENT_ID=$(process.env.AUTH0_CLIENT_ID)",
+      "start": "wrangler pages dev ./build/client --port 3000",
       "lint": "eslint ./app --ext .js,.jsx,.ts,.tsx,.mjs,.cjs",
       "lint:fix": "npm run lint -- --fix",
       "lint:ci": "npm run lint -- --max-warnings 0",
