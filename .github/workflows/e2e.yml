@@ -80,7 +80,6 @@ jobs:
           AUTH0_CLIENT_SECRET: ${{secrets.AUTH0_CLIENT_SECRET}}
           AUTH0_AUDIENCE: "https://gataersamla.no"
           AUTH0_COOKIE_SECRET: "s3cret"
-          AUTH0_RETURN_TO_URL: "http://localhost:3000"
           BACKEND_BASE_URL: "http://localhost:8080"
         run: |
           touch .dev.vars
