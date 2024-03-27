@@ -12,7 +12,6 @@ interface Env {
    AUTH0_AUDIENCE: string;
    AUTH0_CLIENT_SECRET: string;
    AUTH0_COOKIE_SECRET: string;
-   AUTH0_RETURN_TO_URL: string;
    BACKEND_BASE_URL: string;
 }
 

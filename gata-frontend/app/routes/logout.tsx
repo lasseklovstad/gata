@@ -11,8 +11,10 @@ export const loader = async ({ request, context }: ActionFunctionArgs) => {
    const session = await getSession(request.headers.get("Cookie"));
    const logoutURL = new URL(`https://${env.AUTH0_DOMAIN}/v2/logout`); // i.e https://YOUR_TENANT.us.auth0.com/v2/logout
 
+   const url = new URL(request.url);
+   const returnTo = url.origin;
    logoutURL.searchParams.set("client_id", env.AUTH0_CLIENT_ID!);
-   logoutURL.searchParams.set("returnTo", env.AUTH0_RETURN_TO_URL!);
+   logoutURL.searchParams.set("returnTo", returnTo);
 
    return redirect(logoutURL.toString(), {
       headers: {
