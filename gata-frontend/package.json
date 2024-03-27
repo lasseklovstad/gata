@@ -27,7 +27,7 @@
       "@remix-run/react": "2.8.1",
       "chakra-react-select": "4.7.6",
       "framer-motion": "11.0.20",
-      "miniflare": "^3.20240320.0",
+      "miniflare": "3.20231025.0",
       "react": "18.2.0",
       "react-dom": "18.2.0",
       "remix-auth": "3.6.0",
@@ -58,6 +58,6 @@
       "vite": "5.2.4",
       "vite-plugin-checker": "^0.6.4",
       "vite-tsconfig-paths": "4.3.2",
-      "wrangler": "^3.37.0"
+      "wrangler": "3.39.0"
    }
 }
