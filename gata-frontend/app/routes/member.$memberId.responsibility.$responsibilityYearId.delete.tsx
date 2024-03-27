@@ -11,7 +11,8 @@ export const action = async ({ request, params, context }: ActionFunctionArgs) =
    if (request.method === "DELETE") {
       await client(`user/${params.memberId}/responsibilityyear/${params.responsibilityYearId}`, {
          method: "DELETE",
-         token, baseUrl: context.cloudflare.env.BACKEND_BASE_URL
+         token,
+         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
       });
    }
 

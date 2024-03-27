@@ -25,7 +25,12 @@ export const action = async ({ request, params, context }: ActionFunctionArgs) =
    const token = await createAuthenticator(context).getRequiredAuthToken(request);
    if (request.method === "POST") {
       const form = Object.fromEntries(await request.formData());
-      await client(`user/${params.memberId}/responsibilityyear`, { method: "POST", body: form, token, baseUrl: context.cloudflare.env.BACKEND_BASE_URL });
+      await client(`user/${params.memberId}/responsibilityyear`, {
+         method: "POST",
+         body: form,
+         token,
+         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
+      });
    }
    return redirect(`/member/${params.memberId}/responsibility`);
 };

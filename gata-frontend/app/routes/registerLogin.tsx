@@ -7,7 +7,11 @@ import { client } from "~/utils/client";
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
    const user = await createAuthenticator(context).authenticator.isAuthenticated(request);
    if (user) {
-      await client("user/loggedin/create", { token: user.accessToken, method: "POST", baseUrl: context.cloudflare.env.BACKEND_BASE_URL });
+      await client("user/loggedin/create", {
+         token: user.accessToken,
+         method: "POST",
+         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
+      });
       return redirect("/home");
    }
    return redirect("/login");

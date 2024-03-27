@@ -22,7 +22,11 @@ import { createAuthenticator } from "~/utils/auth.server";
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
    const token = await createAuthenticator(context).getRequiredAuthToken(request);
    const signal = request.signal;
-   const responsibilities = await getResponsibilities({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL });
+   const responsibilities = await getResponsibilities({
+      token,
+      signal,
+      baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
+   });
    return json({ responsibilities });
 };
 

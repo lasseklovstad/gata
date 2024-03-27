@@ -8,14 +8,18 @@ import { client } from "~/utils/client";
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
    const token = await createAuthenticator(context).getRequiredAuthToken(request);
-   const reportEmails = await client<string[]>(`report/publishemails`, { token, baseUrl: context.cloudflare.env.BACKEND_BASE_URL });
+   const reportEmails = await client<string[]>(`report/publishemails`, {
+      token,
+      baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
+   });
    return { reportEmails };
 };
 
 export const action = async ({ request, params, context }: ActionFunctionArgs) => {
    const token = await createAuthenticator(context).getRequiredAuthToken(request);
    const emails = await client<string[]>(`report/${params.reportId}/publish`, {
-      token, baseUrl: context.cloudflare.env.BACKEND_BASE_URL
+      token,
+      baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
    });
    return json({ ok: true, emails });
 };
