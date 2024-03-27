@@ -2,7 +2,7 @@ import type { ClientConfigType } from "./client.types";
 
 export const client = <ResponseBody = unknown, RequestBody = unknown>(
    url: string,
-   { body, token, baseUrl, ...customConfig } = {} as ClientConfigType<RequestBody>
+   { body, token, baseUrl, ...customConfig }: ClientConfigType<RequestBody>
 ): Promise<ResponseBody> => {
    const headers: HeadersInit = { "content-type": "application/json" };
    if (token) {
