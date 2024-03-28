@@ -1,6 +1,6 @@
 import { Box, Button, Heading, List, ListItem, Tooltip } from "@chakra-ui/react";
 import { Email } from "@mui/icons-material";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
 import { getNotMemberUsers } from "~/api/auth0.api";
@@ -8,25 +8,25 @@ import { getLoggedInUser, getUsers } from "~/api/user.api";
 import { PageLayout } from "~/components/PageLayout";
 import { ExternalUsersWithNoGataUser } from "~/routes/members/ExternalUsersWithNoGataUser";
 import { UserListItem } from "~/routes/members/UserListItem";
-import { getRequiredAuthToken } from "~/utils/auth.server";
+import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 import { isAdmin } from "~/utils/roleUtils";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request, context }: LoaderFunctionArgs) => {
    const { signal } = request;
-   const token = await getRequiredAuthToken(request);
+   const token = await createAuthenticator(context).getRequiredAuthToken(request);
    const [loggedInUser, users, externalUsers] = await Promise.all([
-      getLoggedInUser({ token, signal }),
-      getUsers({ token, signal }),
-      getNotMemberUsers({ token, signal }),
+      getLoggedInUser({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getUsers({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getNotMemberUsers({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
    ]);
    return { loggedInUser, users, externalUsers };
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-   const token = await getRequiredAuthToken(request);
+export const action = async ({ request, context }: ActionFunctionArgs) => {
+   const token = await createAuthenticator(context).getRequiredAuthToken(request);
    const form = Object.fromEntries(await request.formData());
-   await client("user", { method: "POST", body: form, token });
+   await client("user", { method: "POST", body: form, token, baseUrl: context.cloudflare.env.BACKEND_BASE_URL });
    return { ok: true };
 };
 

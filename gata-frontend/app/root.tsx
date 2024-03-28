@@ -1,7 +1,7 @@
 import { Box, Button, ChakraProvider, Container, Heading, Progress, Text } from "@chakra-ui/react";
 import { withEmotionCache } from "@emotion/react";
-import type { LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
+import { json } from "@remix-run/cloudflare";
 import {
    Link,
    Links,
@@ -23,7 +23,7 @@ import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar
 import { chakraTheme } from "./styles/chakraTheme";
 import { ClientStyleContext, ServerStyleContext } from "./styles/context";
 import type { IGataUser } from "./types/GataUser.type";
-import { authenticator } from "./utils/auth.server";
+import { createAuthenticator } from "./utils/auth.server";
 
 export const meta: MetaFunction = () => {
    return [
@@ -124,14 +124,18 @@ export default function App() {
    );
 }
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-   const auth = await authenticator.isAuthenticated(request);
+export const loader = async ({ request, context }: LoaderFunctionArgs) => {
+   const auth = await createAuthenticator(context).authenticator.isAuthenticated(request);
    const signal = request.signal;
-   const version = process.env.npm_package_version || "0.0.0";
+   const version = "0.0.0";
    if (auth) {
       const user = auth.profile;
       const token = auth.accessToken;
-      const loggedInUser = await getLoggedInUser({ token, signal }).catch((e) => {
+      const loggedInUser = await getLoggedInUser({
+         token,
+         signal,
+         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
+      }).catch((e) => {
          if (e instanceof Response && e.status === 404) return undefined;
          else {
             throw e;

@@ -1,7 +1,7 @@
 import { Box, Button, Heading, IconButton, Text } from "@chakra-ui/react";
 import { Delete, Edit, Email } from "@mui/icons-material";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
+import { json } from "@remix-run/cloudflare";
 import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { Descendant } from "slate";
@@ -13,31 +13,36 @@ import { PageLayout } from "~/components/PageLayout";
 import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
 import { RichTextPreview } from "~/components/RichTextEditor/RichTextPreview";
 import type { IGataReportFile, IGataReportFilePayload } from "~/types/GataReportFile.type";
-import { getRequiredAuthToken } from "~/utils/auth.server";
+import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 import { isAdmin } from "~/utils/roleUtils";
 
 import { reportInfoIntent } from "./intent";
 
-export const loader = async ({ request, params: { reportId } }: LoaderFunctionArgs) => {
-   const token = await getRequiredAuthToken(request);
+export const loader = async ({ request, params: { reportId }, context }: LoaderFunctionArgs) => {
+   const token = await createAuthenticator(context).getRequiredAuthToken(request);
    const signal = request.signal;
    const [loggedInUser, report] = await Promise.all([
-      getLoggedInUser({ token, signal }),
-      getReport({ token, signal, reportId }),
+      getLoggedInUser({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getReport({ token, signal, reportId, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
    ]);
    return json({ report, loggedInUser });
 };
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   const token = await getRequiredAuthToken(request);
+export const action = async ({ request, params, context }: ActionFunctionArgs) => {
+   const token = await createAuthenticator(context).getRequiredAuthToken(request);
    const formData = await request.formData();
    const intent = String(formData.get("intent"));
 
    switch (intent) {
       case reportInfoIntent.updateContentIntent: {
          const body = JSON.parse(String(formData.get("content")));
-         await client(`report/${params.reportId}/content`, { method: "PUT", body, token });
+         await client(`report/${params.reportId}/content`, {
+            method: "PUT",
+            body,
+            token,
+            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
+         });
          return json({ ok: true, close: formData.get("close"), intent: reportInfoIntent.updateContentIntent } as const);
       }
       case reportInfoIntent.postFileIntent: {
@@ -45,6 +50,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
          const response = await client<IGataReportFile, IGataReportFilePayload>("file/cloud", {
             body: { data: dataBody, reportId: params.reportId! },
             token,
+            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
          });
          return json({ ok: true, file: response, intent: reportInfoIntent.postFileIntent } as const);
       }

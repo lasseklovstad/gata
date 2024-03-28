@@ -1,7 +1,7 @@
 import { Avatar, Box, Divider, Flex, Heading, IconButton, List, ListItem } from "@chakra-ui/react";
 import { Delete } from "@mui/icons-material";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
+import { json, redirect } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 
 import { getNotMemberUsers } from "~/api/auth0.api";
@@ -12,28 +12,28 @@ import { useConfirmDialog } from "~/components/ConfirmDialog";
 import { LinkExternalUserToGataUserSelect } from "~/routes/member.$memberId._index/components/LinkExternalUserToGataUserSelect";
 import { UserInfo } from "~/routes/member.$memberId._index/components/UserInfo";
 import { UserSubscribe } from "~/routes/member.$memberId._index/components/UserSubscribe";
-import { getRequiredAuthToken } from "~/utils/auth.server";
+import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 import { isAdmin } from "~/utils/roleUtils";
 
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
 
-export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
-   const token = await getRequiredAuthToken(request);
+export const loader = async ({ request, params: { memberId }, context }: LoaderFunctionArgs) => {
+   const token = await createAuthenticator(context).getRequiredAuthToken(request);
    const signal = request.signal;
    const [member, loggedInUser, roles, contingentInfo, notMemberUsers] = await Promise.all([
-      getUser({ memberId, token, signal }),
-      getLoggedInUser({ token, signal }),
-      getRoles({ token, signal }),
-      getContingentInfo({ token, signal }),
-      getNotMemberUsers({ token, signal }),
+      getUser({ memberId, token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getLoggedInUser({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getRoles({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getContingentInfo({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getNotMemberUsers({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
    ]);
    return json({ member, contingentInfo, loggedInUser, roles, notMemberUsers });
 };
 
-export const action = async ({ request, params: { memberId } }: ActionFunctionArgs) => {
-   const token = await getRequiredAuthToken(request);
+export const action = async ({ request, params: { memberId }, context }: ActionFunctionArgs) => {
+   const token = await createAuthenticator(context).getRequiredAuthToken(request);
    const formData = await request.formData();
    const intent = String(formData.get("intent"));
 
@@ -42,6 +42,7 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
          await client(`user/${memberId}`, {
             method: "DELETE",
             token,
+            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
          });
          return redirect("/members");
       }
@@ -50,6 +51,7 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
          await client(`role/${roleId}/user/${memberId}`, {
             method: request.method, // PUT or DELETE
             token,
+            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
          });
          return { ok: true };
       }
@@ -62,6 +64,7 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
             method: "POST",
             body,
             token,
+            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
          });
 
          return { ok: true };
@@ -74,6 +77,7 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
             method: "PUT",
             body,
             token,
+            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
          });
          return { ok: true };
       }
@@ -83,6 +87,7 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
             method: "PUT",
             body: primaryUserEmail,
             token,
+            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
          });
          return { ok: true };
       }
@@ -90,6 +95,7 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
          await client(`user/${memberId}/subscribe`, {
             method: "PUT",
             token,
+            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
          });
          return { ok: true };
       }

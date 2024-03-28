@@ -13,39 +13,45 @@ import {
    Textarea,
 } from "@chakra-ui/react";
 import { Save } from "@mui/icons-material";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
+import { json, redirect } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { useState } from "react";
 
 import type { IResponsibility } from "~/types/Responsibility.type";
-import { getRequiredAuthToken } from "~/utils/auth.server";
+import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-   const token = await getRequiredAuthToken(request);
+export const loader = async ({ request, params, context }: LoaderFunctionArgs) => {
+   const token = await createAuthenticator(context).getRequiredAuthToken(request);
    if (params.responsibilityId !== "new") {
       const responsibility = await client<IResponsibility>(`responsibility/${params.responsibilityId}`, {
          token,
+         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
       });
       return json<LoaderData>({ responsibility });
    }
    return json<LoaderData>({ responsibility: undefined });
 };
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   const token = await getRequiredAuthToken(request);
+export const action = async ({ request, params, context }: ActionFunctionArgs) => {
+   const token = await createAuthenticator(context).getRequiredAuthToken(request);
    const body = Object.fromEntries(await request.formData());
    if (!body.name) {
       return json({ error: { name: "Navn må fylles ut" } }, { status: 400 });
    }
 
    if (request.method === "POST") {
-      await client("responsibility", { method: "POST", body, token });
+      await client("responsibility", { method: "POST", body, token, baseUrl: context.cloudflare.env.BACKEND_BASE_URL });
       return redirect("/responsibility");
    }
    if (request.method === "PUT") {
-      await client(`responsibility/${params.responsibilityId}`, { method: "PUT", body, token });
+      await client(`responsibility/${params.responsibilityId}`, {
+         method: "PUT",
+         body,
+         token,
+         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
+      });
       return redirect("/responsibility");
    }
 };

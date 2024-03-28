@@ -94,13 +94,21 @@ const config: PlaywrightTestConfig = {
   // outputDir: 'test-results/',
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    timeout: 10 * 60 * 1000,
-    command: "docker-compose up",
-    cwd: "../",
-    url: process.env.PLAYWRIGHT_BASE_URL +"/health",
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: [
+    {
+      timeout: 10 * 60 * 1000,
+      command: "docker-compose up",
+      cwd: "../",
+      reuseExistingServer: !process.env.CI,
+    },
+    {
+      timeout: 10 * 60 * 1000,
+      command: "npm run start",
+      cwd: "../gata-frontend",
+      url: process.env.PLAYWRIGHT_BASE_URL +"/health",
+      reuseExistingServer: !process.env.CI,
+    }
+  ],
 };
 
 export default config;

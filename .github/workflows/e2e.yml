@@ -72,6 +72,32 @@ jobs:
         with:
           node-version: 20
 
+      - name: Create .dev.vars file for frontend
+        working-directory: ./gata-frontend
+        env:
+          AUTH0_DOMAIN: "gataersamla.eu.auth0.com"
+          AUTH0_CLIENT_ID: ${{secrets.AUTH0_CLIENT_ID}}
+          AUTH0_CLIENT_SECRET: ${{secrets.AUTH0_CLIENT_SECRET}}
+          AUTH0_AUDIENCE: "https://gataersamla.no"
+          AUTH0_COOKIE_SECRET: "s3cret"
+          BACKEND_BASE_URL: "http://localhost:8080"
+        run: |
+          touch .dev.vars
+          echo "AUTH0_DOMAIN=$AUTH0_DOMAIN" >> .dev.vars
+          echo "AUTH0_CLIENT_ID=$AUTH0_CLIENT_ID" >> .dev.vars
+          echo "AUTH0_AUDIENCE=$AUTH0_AUDIENCE" >> .dev.vars
+          echo "AUTH0_CLIENT_SECRET=$AUTH0_CLIENT_SECRET" >> .dev.vars
+          echo "AUTH0_COOKIE_SECRET=$AUTH0_COOKIE_SECRET" >> .dev.vars
+          echo "BACKEND_BASE_URL=$BACKEND_BASE_URL" >> .dev.vars
+      - name: Install frontend dependencies
+        working-directory: ./gata-frontend
+        run: |
+          npm ci
+      - name: Build frontend
+        working-directory: ./gata-frontend
+        run: |
+          npm run build
+
       - name: Install npm dependencies and check typescript
         working-directory: ./gata-tests
         run: |
@@ -87,37 +113,31 @@ jobs:
           context: .
           load: true
 
-      - name: Build frontend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./gata-frontend
-          load: true
-
       - name: Install playwright
         working-directory: ./gata-tests
         run: |
-         npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium
 
       - name: Run E2E tests
         working-directory: ./gata-tests
         env:
-         AUTH0_DOMAIN: "gataersamla.eu.auth0.com"
-         AUTH0_AUDIENCE: "https://gataersamla.no"
-         AUTH0_CLIENT_ID: ${{secrets.AUTH0_CLIENT_ID}}
-         AUTH0_CLIENT_SECRET: ${{secrets.AUTH0_CLIENT_SECRET}}
-         AUTH0_COOKIE_SECRET: "s3cret1"
-         PLAYWRIGHT_ADMIN_USERNAME: ${{secrets.E2E_PLAYWRIGHT_ADMIN_USERNAME}}
-         PLAYWRIGHT_ADMIN_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_ADMIN_PASSWORD}}
-         PLAYWRIGHT_MEMBER_USERNAME: ${{secrets.E2E_PLAYWRIGHT_MEMBER_USERNAME}}
-         PLAYWRIGHT_MEMBER_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_MEMBER_PASSWORD}}
-         PLAYWRIGHT_NONMEMBER_USERNAME: ${{secrets.E2E_PLAYWRIGHT_NONMEMBER_USERNAME}}
-         PLAYWRIGHT_NONMEMBER_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_NONMEMBER_PASSWORD}}
-         PLAYWRIGHT_BASE_URL: http://localhost:3000
-         SENDGRID_API_KEY: NA
-         CLOUDINARY_URL: NA
+          # Backend environments
+          AUTH0_DOMAIN: "gataersamla.eu.auth0.com"
+          AUTH0_AUDIENCE: "https://gataersamla.no"
+          SENDGRID_API_KEY: NA
+          CLOUDINARY_URL: NA
+          # Playwright environments
+          PLAYWRIGHT_ADMIN_USERNAME: ${{secrets.E2E_PLAYWRIGHT_ADMIN_USERNAME}}
+          PLAYWRIGHT_ADMIN_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_ADMIN_PASSWORD}}
+          PLAYWRIGHT_MEMBER_USERNAME: ${{secrets.E2E_PLAYWRIGHT_MEMBER_USERNAME}}
+          PLAYWRIGHT_MEMBER_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_MEMBER_PASSWORD}}
+          PLAYWRIGHT_NONMEMBER_USERNAME: ${{secrets.E2E_PLAYWRIGHT_NONMEMBER_USERNAME}}
+          PLAYWRIGHT_NONMEMBER_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_NONMEMBER_PASSWORD}}
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
 
-         # DEBUG: pw:webserver
-         # DEBUG: pw:api
+
+          # DEBUG: pw:webserver
+          # DEBUG: pw:api
         run: |
           npx playwright test
 

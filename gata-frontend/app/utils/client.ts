@@ -2,7 +2,7 @@ import type { ClientConfigType } from "./client.types";
 
 export const client = <ResponseBody = unknown, RequestBody = unknown>(
    url: string,
-   { body, token, ...customConfig } = {} as ClientConfigType<RequestBody>
+   { body, token, baseUrl, ...customConfig }: ClientConfigType<RequestBody>
 ): Promise<ResponseBody> => {
    const headers: HeadersInit = { "content-type": "application/json" };
    if (token) {
@@ -20,13 +20,17 @@ export const client = <ResponseBody = unknown, RequestBody = unknown>(
       config.body = typeof body !== "string" ? JSON.stringify(body) : body;
    }
 
-   const urlFinal = `${process.env.BACKEND_BASE_URL}/api/${url}`;
+   const urlFinal = `${baseUrl}/api/${url}`;
 
    return fetch(urlFinal, config).then((response) => {
       if (response.ok) {
          return getResponseBody<ResponseBody>(response);
       } else {
-         throw response;
+         throw new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: response.headers,
+         });
       }
    });
 };

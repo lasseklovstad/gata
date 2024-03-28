@@ -1,11 +1,11 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/cloudflare";
+import { redirect } from "@remix-run/cloudflare";
 
-import { getRequiredAuthToken } from "~/utils/auth.server";
+import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   const token = await getRequiredAuthToken(request);
+export const action = async ({ request, params, context }: ActionFunctionArgs) => {
+   const token = await createAuthenticator(context).getRequiredAuthToken(request);
 
    if (request.method === "PUT") {
       const body = Object.fromEntries(await request.formData());
@@ -13,6 +13,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
          method: "PUT",
          body,
          token,
+         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
       });
    }
 

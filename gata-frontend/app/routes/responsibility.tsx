@@ -1,21 +1,21 @@
 import { Box, Button, Divider, Heading, IconButton, List, ListItem, Text } from "@chakra-ui/react";
 import { Add, Delete, Edit } from "@mui/icons-material";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
+import { json } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
 import { getResponsibilities } from "~/api/responsibility.api";
 import { getLoggedInUser } from "~/api/user.api";
 import { PageLayout } from "~/components/PageLayout";
-import { getRequiredAuthToken } from "~/utils/auth.server";
+import { createAuthenticator } from "~/utils/auth.server";
 import { isAdmin } from "~/utils/roleUtils";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-   const token = await getRequiredAuthToken(request);
+export const loader = async ({ request, context }: LoaderFunctionArgs) => {
+   const token = await createAuthenticator(context).getRequiredAuthToken(request);
    const signal = request.signal;
    const [loggedInUser, responsibilities] = await Promise.all([
-      getLoggedInUser({ token, signal }),
-      getResponsibilities({ token, signal }),
+      getLoggedInUser({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getResponsibilities({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
    ]);
 
    return json({ responsibilities, loggedInUser });
