@@ -8,7 +8,6 @@ export default defineConfig({
       port: 3000,
    },
    plugins: [
-      process.env.NODE_ENV === "development" ? checker({ typescript: true }) : undefined,
       cloudflareDevProxyVitePlugin(),
       remix({
          future: {
@@ -18,5 +17,6 @@ export default defineConfig({
          },
       }),
       tsconfigPaths(),
+      process.env.NODE_ENV === "development" ? checker({ typescript: true }) : undefined,
    ],
 });

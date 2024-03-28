@@ -22,12 +22,15 @@ export const client = <ResponseBody = unknown, RequestBody = unknown>(
 
    const urlFinal = `${baseUrl}/api/${url}`;
 
-   return fetch(urlFinal, config).then(async (response) => {
+   return fetch(urlFinal, config).then((response) => {
       if (response.ok) {
          return getResponseBody<ResponseBody>(response);
       } else {
-         const error = await getResponseBody<{ message: string }>(response);
-         throw new Error(error.message);
+         throw new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: response.headers,
+         });
       }
    });
 };
