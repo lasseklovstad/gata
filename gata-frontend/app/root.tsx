@@ -1,7 +1,7 @@
-import { Box, Button, ChakraProvider, Container, Heading, Progress, Text } from "@chakra-ui/react";
+import { ChakraProvider, Heading, Text } from "@chakra-ui/react";
 import { withEmotionCache } from "@emotion/react";
 import type { LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
-import { json } from "@remix-run/cloudflare";
+import { json, redirect } from "@remix-run/cloudflare";
 import {
    Link,
    Links,
@@ -17,6 +17,7 @@ import {
 import type { ComponentProps } from "react";
 import { useContext, useEffect } from "react";
 import type { Auth0Profile } from "remix-auth-auth0";
+import "./tailwind.css";
 
 import { getLoggedInUser } from "./api/user.api";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
@@ -24,6 +25,7 @@ import { chakraTheme } from "./styles/chakraTheme";
 import { ClientStyleContext, ServerStyleContext } from "./styles/context";
 import type { IGataUser } from "./types/GataUser.type";
 import { createAuthenticator } from "./utils/auth.server";
+import { Button } from "./components/ui/button";
 
 export const meta: MetaFunction = () => {
    return [
@@ -102,32 +104,30 @@ export function Layout({ children }: ComponentProps<never>) {
 }
 
 export default function App() {
-   const { loggedInUser, isAuthenticated, user, version } = useLoaderData<typeof loader>();
+   const { loggedInUser, isAuthenticated, user } = useLoaderData<typeof loader>();
    const { state } = useNavigation();
    return (
-      <Box sx={{ display: "flex", flexDirection: "column", backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
+      <div className="flex flex-col min-h-lvh">
          <ResponsiveAppBar loggedInUser={loggedInUser} isAuthenticated={isAuthenticated} user={user} />
-         <Progress size="xs" colorScheme="blue" isIndeterminate={state === "loading"} hasStripe />
-         <Container as="main" maxW="6xl" sx={{ mb: 16 }}>
+         <main className="mb-8 max-w-[1000px] w-full me-auto ms-auto px-4">
             <Outlet />
-         </Container>
-         <Container as="footer" sx={{ marginTop: "auto", p: 2, maxW: "6xl", display: "flex", gap: 4 }}>
-            <Text>{version}</Text>
-            <Button as={Link} to="/privacy" variant="link">
-               Privacy
+         </main>
+         <footer className="p-4 flex gap-4 max-w-[1000px] w-full ms-auto me-auto mt-auto">
+            <Button variant="link">
+               <Link to="/privacy">Privacy</Link>
             </Button>
-            <Button as={Link} to="/about" variant="link">
-               About
+            <Button variant="link">
+               <Link to="/about">About</Link>
             </Button>
-         </Container>
-      </Box>
+         </footer>
+      </div>
    );
 }
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
+   const { destroySession, authenticator } = createAuthenticator(context);
    const auth = await createAuthenticator(context).authenticator.isAuthenticated(request);
    const signal = request.signal;
-   const version = "0.0.0";
    if (auth) {
       const user = auth.profile;
       const token = auth.accessToken;
@@ -137,20 +137,21 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
          baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
       }).catch((e) => {
          if (e instanceof Response && e.status === 404) return undefined;
-         else {
+         if (e instanceof Response && e.status === 401) {
+            throw redirect("/logout");
+         } else {
             throw e;
          }
       });
-      return json<LoaderData>({ isAuthenticated: true, loggedInUser, user, version });
+      return json<LoaderData>({ isAuthenticated: true, loggedInUser, user });
    }
-   return json<LoaderData>({ isAuthenticated: false, version });
+   return json<LoaderData>({ isAuthenticated: false });
 };
 
 type LoaderData = {
    loggedInUser?: IGataUser;
    isAuthenticated: boolean;
    user?: Auth0Profile;
-   version: string;
 };
 
 export function ErrorBoundary() {

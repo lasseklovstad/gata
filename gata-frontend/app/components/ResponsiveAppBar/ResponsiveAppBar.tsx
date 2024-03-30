@@ -1,23 +1,19 @@
-import {
-   Box,
-   Button,
-   Container,
-   Flex,
-   IconButton,
-   Img,
-   Menu,
-   MenuButton,
-   MenuItem,
-   MenuList,
-   Text,
-} from "@chakra-ui/react";
-import { Menu as MenuIcon } from "@mui/icons-material";
 import { Link } from "@remix-run/react";
 import type { Auth0Profile } from "remix-auth-auth0";
 
-import { UserMenu } from "./UserMenu";
+import { Menu } from "lucide-react";
 import type { IGataUser } from "../../types/GataUser.type";
 import { isAdmin, isMember } from "../../utils/roleUtils";
+import { Button } from "../ui/button";
+import {
+   DropdownMenu,
+   DropdownMenuContent,
+   DropdownMenuItem,
+   DropdownMenuLabel,
+   DropdownMenuSeparator,
+   DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { UserMenu } from "./UserMenu";
 
 type ResponsiveAppBarProps = {
    loggedInUser: IGataUser | undefined;
@@ -51,61 +47,66 @@ export const ResponsiveAppBar = ({ loggedInUser, user, isAuthenticated }: Respon
    };
 
    return (
-      <Box as="header" bg="blue.500" boxShadow="xl">
-         <Container maxW="6xl" my={2}>
-            <Flex align="center">
-               <Img
-                  src="/logo192.png"
-                  height="40px"
-                  alt="Hesten blå"
-                  sx={{ mr: 2, display: { base: "none", md: "block" } }}
-               />
+      <header className="bg-primary shadow-xl">
+         <div className="py-2 px-4 max-w-[1000px] w-full me-auto ms-auto">
+            <div className="flex items-center">
+               <img src="/logo192.png" alt="Hesten blå" className="h-[48px] mr-2 hidden md:block" />
 
-               <Box sx={{ flexGrow: 1, display: { base: "flex", md: "none" } }}>
-                  <Menu>
-                     <MenuButton as={IconButton} icon={<MenuIcon />} aria-label="Åpne meny" />
-                     <MenuList>
+               <div className="flex grow md:hidden">
+                  <DropdownMenu>
+                     <DropdownMenuTrigger asChild>
+                        <Button aria-label="Åpne meny">
+                           <Menu />
+                        </Button>
+                     </DropdownMenuTrigger>
+                     <DropdownMenuContent>
                         {filteredPages.map((page) => {
                            if (page.url.startsWith("https")) {
                               return (
-                                 <MenuItem key={page.url} as="a" href={page.url} target="_blank">
-                                    <Text textAlign="center">{page.name}</Text>
-                                 </MenuItem>
+                                 <DropdownMenuItem key={page.url} asChild>
+                                    <a href={page.url} target="_blank">
+                                       {page.name}
+                                    </a>
+                                 </DropdownMenuItem>
                               );
                            }
                            return (
-                              <MenuItem key={page.url} as={Link} to={page.url}>
-                                 {page.name}
-                              </MenuItem>
+                              <DropdownMenuItem key={page.url} asChild>
+                                 <Link to={page.url}>{page.name}</Link>
+                              </DropdownMenuItem>
                            );
                         })}
-                        <MenuItem>Rolle: {getRole()}</MenuItem>
-                     </MenuList>
-                  </Menu>
-               </Box>
-               <Text sx={{ flexGrow: 1, display: { base: "flex", md: "none" } }}>
-                  <img src="/logo192.png" style={{ height: "40px" }} alt="Hesten blå" />
-               </Text>
-               <Flex sx={{ flexGrow: 1, flexWrap: "wrap", display: { base: "none", md: "flex" }, gap: 1 }}>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Rolle: {getRole()}</DropdownMenuLabel>
+                     </DropdownMenuContent>
+                  </DropdownMenu>
+               </div>
+               <div className="grow md:hidden">
+                  <img src="/logo192.png" className="h-[40px]" alt="Hesten blå" />
+               </div>
+
+               <div className="grow flex-wrap hidden md:flex gap-1">
                   {filteredPages.map((page) => {
                      if (page.url.startsWith("https")) {
                         return (
-                           <Button key={page.url} as="a" href={page.url} target="_blank">
-                              {page.name}
+                           <Button asChild>
+                              <a href={page.url} target="_blank">
+                                 {page.name}
+                              </a>
                            </Button>
                         );
                      }
                      return (
-                        <Button key={page.url} as={Link} to={page.url}>
-                           {page.name}
+                        <Button asChild>
+                           <Link to={page.url}>{page.name}</Link>
                         </Button>
                      );
                   })}
-               </Flex>
+               </div>
 
                <UserMenu roleText={getRole()} user={user} isAuthenticated={isAuthenticated} />
-            </Flex>
-         </Container>
-      </Box>
+            </div>
+         </div>
+      </header>
    );
 };

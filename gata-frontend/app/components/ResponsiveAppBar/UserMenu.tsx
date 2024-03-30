@@ -1,6 +1,13 @@
-import { Text, Button, IconButton, Menu, MenuItem, Avatar, MenuList, MenuButton } from "@chakra-ui/react";
 import { Form, Link } from "@remix-run/react";
 import type { Auth0Profile } from "remix-auth-auth0";
+import {
+   DropdownMenu,
+   DropdownMenuContent,
+   DropdownMenuItem,
+   DropdownMenuTrigger,
+   DropdownMenuLabel,
+} from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
 
 type UserMenuProps = {
    roleText: string;
@@ -14,18 +21,22 @@ export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => 
       <>
          {isAuthenticated && (
             <>
-               <Menu>
-                  <MenuButton aria-label="Åpne meny" as={IconButton} icon={<Avatar src={photo} size="sm" />} />
-                  <MenuList>
-                     <MenuItem as={Link} to="logout">
-                        <Text textAlign="center">Logg ut</Text>
-                     </MenuItem>
-                     <MenuItem as={Link} to="privacy">
-                        <Text textAlign="center">Privacy</Text>
-                     </MenuItem>
-                     <MenuItem>Rolle: {roleText}</MenuItem>
-                  </MenuList>
-               </Menu>
+               <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                     <Button aria-label="Åpne meny" size="icon">
+                        <img src={photo} className="rounded-full w-[35px]" />
+                     </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                     <DropdownMenuItem asChild>
+                        <Link to="/logout">Logg ut</Link>
+                     </DropdownMenuItem>
+                     <DropdownMenuItem asChild>
+                        <Link to="/privacy">Privacy</Link>
+                     </DropdownMenuItem>
+                     <DropdownMenuLabel>Rolle: {roleText}</DropdownMenuLabel>
+                  </DropdownMenuContent>
+               </DropdownMenu>
             </>
          )}
          {!isAuthenticated && (
