@@ -41,9 +41,7 @@ export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => 
          )}
          {!isAuthenticated && (
             <Form method="POST" action="/login">
-               <Button type="submit" sx={{ my: 2 }}>
-                  Logg inn
-               </Button>
+               <Button type="submit">Logg inn</Button>
             </Form>
          )}
       </>

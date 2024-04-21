@@ -16,12 +16,12 @@ type NewsItemProps = {
 export const NewsItem = ({ report, loggedInUser }: NewsItemProps) => {
    const canEdit = loggedInUser.id === report.createdBy?.id || isAdmin(loggedInUser);
    return (
-      <div className="flex flex-col w-full items-end">
+      <div className="flex flex-col w-full items-end gap-2">
          <div className="flex items-center justify-between w-full">
             <Typography variant="h2">{report.title}</Typography>
             {canEdit && (
-               <Button variant="ghost">
-                  <Link to={`/reportInfo/${report.id}`}>Rediger</Link>
+               <Button variant="ghost" as={Link} to={`/reportInfo/${report.id}`}>
+                  Rediger
                </Button>
             )}
          </div>

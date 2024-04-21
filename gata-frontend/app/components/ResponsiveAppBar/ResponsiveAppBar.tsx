@@ -89,16 +89,14 @@ export const ResponsiveAppBar = ({ loggedInUser, user, isAuthenticated }: Respon
                   {filteredPages.map((page) => {
                      if (page.url.startsWith("https")) {
                         return (
-                           <Button asChild>
-                              <a href={page.url} target="_blank">
-                                 {page.name}
-                              </a>
+                           <Button key={page.url} as="a" href={page.url} target="_blank">
+                              {page.name}
                            </Button>
                         );
                      }
                      return (
-                        <Button asChild>
-                           <Link to={page.url}>{page.name}</Link>
+                        <Button as={Link} to={page.url} key={page.url}>
+                           {page.name}
                         </Button>
                      );
                   })}

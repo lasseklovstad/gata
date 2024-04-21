@@ -1,11 +1,13 @@
-import { Box, Button, Heading, List, ListItem, Tooltip } from "@chakra-ui/react";
-import { Email } from "@mui/icons-material";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Mail } from "lucide-react";
 
 import { getNotMemberUsers } from "~/api/auth0.api";
 import { getLoggedInUser, getUsers } from "~/api/user.api";
 import { PageLayout } from "~/components/PageLayout";
+import { Button } from "~/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
+import { Typography } from "~/components/ui/typography";
 import { ExternalUsersWithNoGataUser } from "~/routes/members/ExternalUsersWithNoGataUser";
 import { UserListItem } from "~/routes/members/UserListItem";
 import { createAuthenticator } from "~/utils/auth.server";
@@ -39,47 +41,53 @@ export default function MemberPage() {
 
    return (
       <PageLayout>
-         <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Heading as="h1" size="xl">
-               Brukere
-            </Heading>
+         <div className="flex justify-between items-center">
+            <Typography variant="h1">Brukere</Typography>
             {isAdmin(loggedInUser) && (
-               <Tooltip label="Send påminnelse om betaling til de som ikke har betalt kontigent">
-                  <Button as={Link} to="contingent" variant="ghost" leftIcon={<Email />} sx={{ mr: 1 }}>
-                     Kontigent
-                  </Button>
-               </Tooltip>
+               <TooltipProvider>
+                  <Tooltip>
+                     <TooltipTrigger asChild>
+                        <Button as={Link} to="contingent">
+                           <Mail className="mr-1" />
+                           Kontigent
+                        </Button>
+                     </TooltipTrigger>
+                     <TooltipContent>
+                        <Typography>Send påminnelse om betaling til de som ikke har betalt kontigent</Typography>
+                     </TooltipContent>
+                  </Tooltip>
+               </TooltipProvider>
             )}
-         </Box>
-         <Heading as="h2" id="admin-title" size="lg">
+         </div>
+         <Typography variant="h2" id="admin-title">
             Administratorer
-         </Heading>
-         <List aria-labelledby="admin-title">
+         </Typography>
+         <ul aria-labelledby="admin-title" className="divide-y">
             {admins.map((user) => {
                return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
             })}
-            {admins.length === 0 && <ListItem>Ingen administratorer funnet</ListItem>}
-         </List>
-         <Heading as="h2" id="member-title" size="lg">
+            {admins.length === 0 && <li>Ingen administratorer funnet</li>}
+         </ul>
+         <Typography variant="h2" id="member-title">
             Medlemmer
-         </Heading>
-         <List aria-labelledby="member-title">
+         </Typography>
+         <ul aria-labelledby="member-title" className="divide-y">
             {members?.map((user) => {
                return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
             })}
-            {members.length === 0 && <ListItem>Ingen medlemmer funnet</ListItem>}
-         </List>
+            {members.length === 0 && <li>Ingen medlemmer funnet</li>}
+         </ul>
          {isAdmin(loggedInUser) && (
             <>
-               <Heading variant="h2" id="non-member-title" size="lg">
+               <Typography variant="h2" id="non-member-title">
                   Ikke medlem
-               </Heading>
-               <List aria-labelledby="non-member-title">
+               </Typography>
+               <ul aria-labelledby="non-member-title" className="divide-y">
                   {nonMembers?.map((user) => {
                      return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
                   })}
-                  {nonMembers?.length === 0 && <ListItem>Ingen andre brukere</ListItem>}
-               </List>
+                  {nonMembers?.length === 0 && <li>Ingen andre brukere</li>}
+               </ul>
                <ExternalUsersWithNoGataUser externalUsers={externalUsers} />
             </>
          )}

@@ -24,11 +24,9 @@ export const News = ({ reportPage, loggedInUser }: NewsProps) => {
             <Typography variant="h1" id={titleId}>
                Nyheter
             </Typography>
-            <Button asChild>
-               <Link to="new">
-                  <Plus className="mr-1" />
-                  Opprett
-               </Link>
+            <Button as={Link} to="new">
+               <Plus className="mr-1" />
+               Opprett
             </Button>
          </div>
          <ul aria-labelledby={titleId}>

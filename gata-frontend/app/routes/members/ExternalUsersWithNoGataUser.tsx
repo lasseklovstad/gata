@@ -1,7 +1,6 @@
-import { Heading, List, ListItem } from "@chakra-ui/react";
-
 import { ExternalUsersWithNoGataUserListItem } from "./ExternalUsersWithNoGataUserListItem";
 import type { IExternalUser } from "../../types/GataUser.type";
+import { Typography } from "~/components/ui/typography";
 
 type Props = {
    externalUsers: IExternalUser[];
@@ -10,15 +9,15 @@ type Props = {
 export const ExternalUsersWithNoGataUser = ({ externalUsers }: Props) => {
    return (
       <>
-         <Heading as="h2" id="external-user-title" size="lg">
+         <Typography variant="h2" id="external-user-title">
             Andre pålogginger
-         </Heading>
-         <List aria-labelledby="external-user-title">
+         </Typography>
+         <ul aria-labelledby="external-user-title" className="divide-y">
             {externalUsers.map((user) => {
                return <ExternalUsersWithNoGataUserListItem key={user.id} user={user} />;
             })}
-            {externalUsers.length === 0 && <ListItem>Ingen andre brukere</ListItem>}
-         </List>
+            {externalUsers.length === 0 && <li>Ingen andre brukere</li>}
+         </ul>
       </>
    );
 };
