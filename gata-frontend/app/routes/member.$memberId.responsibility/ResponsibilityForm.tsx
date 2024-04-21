@@ -1,23 +1,15 @@
-import {
-   AccordionButton,
-   AccordionIcon,
-   AccordionItem,
-   AccordionPanel,
-   Box,
-   Button,
-   Flex,
-   FormControl,
-   FormLabel,
-   Text,
-   Textarea,
-} from "@chakra-ui/react";
-import { Delete, Save } from "@mui/icons-material";
 import { Link, useFetcher } from "@remix-run/react";
 import { useState } from "react";
 
 import type { IGataUser } from "../../types/GataUser.type";
 import type { IResponsibilityYear } from "../../types/ResponsibilityYear.type";
 import { isAdmin } from "../../utils/roleUtils";
+import { Accordion, AccordionBody, AccordionHeading } from "~/components/ui/accordion";
+import { Typography } from "~/components/ui/typography";
+import { Button } from "~/components/ui/button";
+import { Save, Trash } from "lucide-react";
+import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
+import { Textarea } from "~/components/ui/textarea";
 
 type ResponsibilityFormProps = {
    responsibilityYear: IResponsibilityYear;
@@ -37,50 +29,51 @@ export const ResponsibilityForm = ({
 
    return (
       <>
-         <AccordionItem>
-            <AccordionButton>
-               <Flex flex={1}>
-                  <Text as="h3" fontSize="lg">
-                     {responsibility.name}
-                  </Text>
-               </Flex>
-               <Text sx={{ color: "text.secondary", mr: 2 }}>{year}</Text>
-               <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel>
-               <Text color="gray">Beskrivelse: {responsibility.description || "Ingen beskrivelse på ansvarspost"}</Text>
+         <Accordion>
+            <AccordionHeading>
+               <div className="flex justify-between flex-1 items-center">
+                  <Typography variant="largeText">{responsibility.name}</Typography>
+                  <Typography variant="mutedText">{year}</Typography>
+               </div>
+            </AccordionHeading>
+            <AccordionBody>
+               <Typography>Beskrivelse: {responsibility.description || "Ingen beskrivelse på ansvarspost"}</Typography>
                <fetcher.Form method="put" action={id}>
-                  <FormControl>
+                  <FormItem name="text">
                      <FormLabel>Notat</FormLabel>
-                     <Textarea
-                        variant="filled"
-                        name="text"
-                        disabled={!canEditNote}
-                        value={text}
-                        onChange={(ev) => setText(ev.target.value)}
-                        placeholder="Skriv hva du har gjort dette året innenfor din ansvarspost"
-                        sx={{ mb: 1 }}
+                     <FormControl
+                        render={(props) => (
+                           <Textarea
+                              {...props}
+                              disabled={!canEditNote}
+                              value={text}
+                              onChange={(ev) => setText(ev.target.value)}
+                              placeholder="Skriv hva du har gjort dette året innenfor din ansvarspost"
+                           />
+                        )}
                      />
-                  </FormControl>
-                  <Text fontSize="sm" color="gray">
-                     Sist redigert av: {note.lastModifiedBy}, {lastModifiedDate.toLocaleDateString("no")}{" "}
-                     {lastModifiedDate.toLocaleTimeString("no")}
-                  </Text>
-                  <Box sx={{ mt: 2 }}>
+                     <FormDescription>
+                        Sist redigert av: {note.lastModifiedBy}, {lastModifiedDate.toLocaleDateString("no")}{" "}
+                        {lastModifiedDate.toLocaleTimeString("no")}
+                     </FormDescription>
+                  </FormItem>
+                  <div className="flex gap-2 mt-4">
                      {isAdmin(loggedInUser) && (
-                        <Button sx={{ mr: 1 }} leftIcon={<Delete />} as={Link} to={`${id}/delete`}>
+                        <Button as={Link} to={`${id}/delete`}>
+                           <Trash className="mr-2" />
                            Fjern ansvarspost
                         </Button>
                      )}
                      {canEditNote && (
-                        <Button isLoading={fetcher.state !== "idle"} leftIcon={<Save />} type="submit">
+                        <Button isLoading={fetcher.state !== "idle"} type="submit">
+                           <Save className="mr-2" />
                            Lagre
                         </Button>
                      )}
-                  </Box>
+                  </div>
                </fetcher.Form>
-            </AccordionPanel>
-         </AccordionItem>
+            </AccordionBody>
+         </Accordion>
       </>
    );
 };
