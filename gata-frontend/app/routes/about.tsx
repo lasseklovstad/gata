@@ -1,17 +1,18 @@
-import { Heading, Text } from "@chakra-ui/react";
 import { Fragment } from "react";
 
+import { Typography } from "~/components/ui/typography";
 import { PageLayout } from "../components/PageLayout";
 
 export default function About() {
    return (
       <PageLayout>
-         <Heading as="h1">Welcome to Gata - A Digital Hub for Lifelong Connections</Heading>
-         <Text>
+         <Typography variant="h1">Welcome to Gata</Typography>
+         <Typography variant="h2">A Digital Hub for Lifelong Connections</Typography>
+         <Typography className="mb-8">
             Welcome to Gata, a digital space dedicated to celebrating the enduring bonds of friendship. As a group of
             lifelong friends, we&apos;ve established this platform to honor the meaningful connections we&apos;ve
             nurtured over the years.
-         </Text>
+         </Typography>
          {[
             {
                title: "About Us",
@@ -64,10 +65,8 @@ export default function About() {
          ].map(({ title, content }) => {
             return (
                <Fragment key={title}>
-                  <Heading as="h2" size="lg" mt={3}>
-                     {title}
-                  </Heading>
-                  <Text as="p">{content}</Text>
+                  <Typography variant="h2">{title}</Typography>
+                  <Typography className="mb-8">{content}</Typography>
                </Fragment>
             );
          })}
