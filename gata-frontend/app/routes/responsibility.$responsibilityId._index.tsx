@@ -1,26 +1,17 @@
-import {
-   Button,
-   FormControl,
-   FormErrorMessage,
-   FormLabel,
-   Input,
-   Modal,
-   ModalBody,
-   ModalContent,
-   ModalFooter,
-   ModalHeader,
-   ModalOverlay,
-   Textarea,
-} from "@chakra-ui/react";
-import { Save } from "@mui/icons-material";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json, redirect } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
-import { useState } from "react";
+import { SaveIcon } from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
+import { FormControl, FormItem, FormLabel, FormMessage, FormProvider } from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
 
 import type { IResponsibility } from "~/types/Responsibility.type";
 import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
+import { useDialog } from "~/utils/dialogUtils";
 
 export const loader = async ({ request, params, context }: LoaderFunctionArgs) => {
    const token = await createAuthenticator(context).getRequiredAuthToken(request);
@@ -62,47 +53,41 @@ type LoaderData = {
 
 export default function EditResponsibility() {
    const navigate = useNavigate();
+   const { dialogRef } = useDialog({ defaultOpen: true });
    const { responsibility } = useLoaderData<typeof loader>();
    const method = responsibility ? "put" : "post";
    const fetcher = useFetcher<typeof action>();
-   const [name, setName] = useState(responsibility?.name || "");
-   const [description, setDescription] = useState(responsibility?.description || "");
    const error = fetcher.data?.error;
    const onClose = () => navigate("..");
 
    return (
-      <Modal isOpen onClose={onClose}>
-         <ModalOverlay />
-         <ModalContent>
-            <fetcher.Form method={method}>
-               <ModalHeader>{method === "put" ? "Rediger Ansvarspost" : "Ny Ansvarspost"}</ModalHeader>
-               <ModalBody sx={{ display: "flex", flexDirection: "column" }}>
-                  <FormControl isInvalid={!!error?.name} mb={2}>
-                     <FormLabel>Navn</FormLabel>
-                     <Input name="name" variant="filled" value={name} onChange={(ev) => setName(ev.target.value)} />
-                     <FormErrorMessage>{error?.name}</FormErrorMessage>
-                  </FormControl>
+      <Dialog ref={dialogRef} onClose={onClose}>
+         <fetcher.Form method={method} preventScrollReset>
+            <DialogHeading>{method === "put" ? "Rediger Ansvarspost" : "Ny Ansvarspost"}</DialogHeading>
+            <FormProvider errors={error}>
+               <FormItem name="name">
+                  <FormLabel>Navn</FormLabel>
+                  <FormControl
+                     render={(props) => <Input autoComplete="off" defaultValue={responsibility?.name} {...props} />}
+                  />
+                  <FormMessage />
+               </FormItem>
 
-                  <FormControl>
-                     <FormLabel>Beskrivelse</FormLabel>
-                     <Textarea
-                        name="description"
-                        variant="filled"
-                        value={description}
-                        onChange={(ev) => setDescription(ev.target.value)}
-                     />
-                  </FormControl>
-               </ModalBody>
-               <ModalFooter>
-                  <Button type="submit" isLoading={fetcher.state !== "idle"} leftIcon={<Save />}>
-                     Lagre
-                  </Button>
-                  <Button onClick={onClose} variant="ghost">
-                     Avbryt
-                  </Button>
-               </ModalFooter>
-            </fetcher.Form>
-         </ModalContent>
-      </Modal>
+               <FormItem name="description">
+                  <FormLabel>Beskrivelse</FormLabel>
+                  <FormControl render={(props) => <Textarea defaultValue={responsibility?.description} {...props} />} />
+               </FormItem>
+            </FormProvider>
+            <DialogFooter>
+               <Button type="submit" isLoading={fetcher.state !== "idle"}>
+                  <SaveIcon className="mr-1" />
+                  Lagre
+               </Button>
+               <Button onClick={onClose} variant="ghost">
+                  Avbryt
+               </Button>
+            </DialogFooter>
+         </fetcher.Form>
+      </Dialog>
    );
 }

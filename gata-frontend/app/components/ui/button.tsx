@@ -1,12 +1,11 @@
-import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Loader2 } from "lucide-react";
-import React, { ComponentProps, ReactNode, Ref, forwardRef } from "react";
+import React, { ComponentProps, ElementType, ForwardedRef, ReactElement, ReactNode, Ref, forwardRef } from "react";
 
 import { cn } from "~/utils";
 
 const buttonVariants = cva(
-   "inline-flex items-center justify-center whitespace-nowrap uppercase rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+   "inline-flex items-center justify-center whitespace-nowrap uppercase rounded-md text font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
    {
       variants: {
          variant: {
@@ -31,42 +30,31 @@ const buttonVariants = cva(
    }
 );
 
-export interface ButtonProps<T> extends VariantProps<typeof buttonVariants> {
-   as?: T;
-   isLoading?: boolean;
-   children?: ReactNode;
-   className?: string;
-   customRef?: React.RefObject<T>;
-}
+type Props<T extends React.ElementType = "button"> = VariantProps<typeof buttonVariants> &
+   ComponentProps<T> & {
+      as?: T;
+      isLoading?: boolean;
+   };
 
-const ButtonWithoutRef = <T extends React.ElementType = "button">(
-   {
-      className,
-      variant,
-      size,
-      as,
-      children,
-      isLoading,
-      ...props
-   }: ButtonProps<T> & Omit<React.ComponentPropsWithoutRef<T>, keyof ButtonProps<T>>,
-   ref?: Ref<HTMLButtonElement>
-) => {
-   const Comp = as ?? "button";
-   return (
-      <Comp className={cn(buttonVariants({ variant, size, className }))} {...props} ref={ref}>
-         {size === "icon" ? (
-            <>{isLoading ? <Loader2 className=" h-6 w-6 animate-spin" /> : children}</>
-         ) : (
-            <>
-               {isLoading && <Loader2 className="absolute h-6 w-6 animate-spin" />}
-               {children}
-            </>
-         )}
-      </Comp>
-   );
-};
+type ButtonComponent = <T extends React.ElementType = "button">(props: Props<T>) => ReactNode;
 
-const Button = forwardRef(ButtonWithoutRef);
-Button.displayName = "Button";
-
-export { Button, buttonVariants };
+export const Button: ButtonComponent = forwardRef(
+   <T extends React.ElementType = "button">(
+      { className, variant, size, as, children, isLoading, ...props }: Props<T>,
+      ref?: ForwardedRef<ElementType<T>>
+   ) => {
+      const Comp = as ?? "button";
+      return (
+         <Comp className={cn(buttonVariants({ variant, size, className }))} {...props} ref={ref}>
+            {size === "icon" ? (
+               <>{isLoading ? <Loader2 className=" h-6 w-6 animate-spin" /> : children}</>
+            ) : (
+               <>
+                  {isLoading && <Loader2 className="absolute h-6 w-6 animate-spin" />}
+                  {children}
+               </>
+            )}
+         </Comp>
+      );
+   }
+);

@@ -19,5 +19,5 @@ export const action = async ({ request, params, context }: ActionFunctionArgs) =
 };
 
 export default function ConfirmDeleteResponsibility() {
-   return <RouteConfirmFormDialog text="Ved å slette dokumentet mister du all data" backTo=".." method="DELETE" />;
+   return <RouteConfirmFormDialog text="Ved å slette ansvarsposten mister du all data" backTo=".." method="DELETE" />;
 }

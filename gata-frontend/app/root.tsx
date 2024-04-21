@@ -21,11 +21,11 @@ import "./tailwind.css";
 
 import { getLoggedInUser } from "./api/user.api";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
+import { Button } from "./components/ui/button";
 import { chakraTheme } from "./styles/chakraTheme";
 import { ClientStyleContext, ServerStyleContext } from "./styles/context";
 import type { IGataUser } from "./types/GataUser.type";
 import { createAuthenticator } from "./utils/auth.server";
-import { Button } from "./components/ui/button";
 
 export const meta: MetaFunction = () => {
    return [
@@ -113,11 +113,11 @@ export default function App() {
             <Outlet />
          </main>
          <footer className="p-4 flex gap-4 max-w-[1000px] w-full ms-auto me-auto mt-auto">
-            <Button variant="link">
-               <Link to="/privacy">Privacy</Link>
+            <Button variant="link" as={Link} to="/privacy">
+               Privacy
             </Button>
-            <Button variant="link">
-               <Link to="/about">About</Link>
+            <Button variant="link" as={Link} to="/about">
+               About
             </Button>
          </footer>
       </div>
@@ -125,7 +125,6 @@ export default function App() {
 }
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
-   const { destroySession, authenticator } = createAuthenticator(context);
    const auth = await createAuthenticator(context).authenticator.isAuthenticated(request);
    const signal = request.signal;
    if (auth) {

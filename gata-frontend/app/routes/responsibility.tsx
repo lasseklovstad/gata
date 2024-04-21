@@ -50,10 +50,24 @@ export default function ResponsibilityPage() {
                         </div>
                         {isAdmin(loggedInUser) && (
                            <div className="flex items-center">
-                              <Button size="icon" variant="ghost" as={Link} to={id} aria-label="Rediger">
+                              <Button
+                                 size="icon"
+                                 variant="ghost"
+                                 as={Link}
+                                 to={id}
+                                 preventScrollReset
+                                 aria-label="Rediger"
+                              >
                                  <Pencil />
                               </Button>
-                              <Button variant="ghost" as={Link} to={`${id}/delete`} aria-label="Slett">
+                              <Button
+                                 size="icon"
+                                 variant="ghost"
+                                 as={Link}
+                                 to={`${id}/delete`}
+                                 preventScrollReset
+                                 aria-label="Slett"
+                              >
                                  <Trash />
                               </Button>
                            </div>
