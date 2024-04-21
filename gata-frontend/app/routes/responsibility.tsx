@@ -43,7 +43,7 @@ export default function ResponsibilityPage() {
                   <li key={id} className="p-2">
                      <div className="flex">
                         <div className="flex-grow">
-                           <Typography>{name}</Typography>
+                           <Typography variant="largeText">{name}</Typography>
                            <Typography variant="smallText" className="text-gray-500">
                               {description}
                            </Typography>

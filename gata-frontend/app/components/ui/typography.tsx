@@ -46,7 +46,7 @@ const variantElementMap: Record<NonNullable<VariantPropType["variant"]>, string>
    ul: "ul",
 };
 
-export interface TypographyProps extends React.HTMLAttributes<HTMLElement>, VariantProps<typeof typographyVariants> {
+interface TypographyProps extends React.HTMLAttributes<HTMLElement>, VariantProps<typeof typographyVariants> {
    asChild?: boolean;
    as?: string;
 }
@@ -60,4 +60,4 @@ const Typography = React.forwardRef<HTMLElement, TypographyProps>(
 
 Typography.displayName = "Typography";
 
-export { Typography, typographyVariants };
+export { Typography };
