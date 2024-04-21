@@ -1,12 +1,13 @@
-import { Box, Button, Divider, Heading, IconButton, List, ListItem, Text } from "@chakra-ui/react";
-import { Add, Delete, Edit } from "@mui/icons-material";
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Pencil, Plus, Trash } from "lucide-react";
 
 import { getResponsibilities } from "~/api/responsibility.api";
 import { getLoggedInUser } from "~/api/user.api";
 import { PageLayout } from "~/components/PageLayout";
+import { Button } from "~/components/ui/button";
+import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isAdmin } from "~/utils/roleUtils";
 
@@ -26,45 +27,43 @@ export default function ResponsibilityPage() {
 
    return (
       <PageLayout>
-         <Box display="flex" justifyContent="space-between" flexWrap="wrap" alignItems="center">
-            <Heading as="h1">Ansvarsposter</Heading>
+         <div className="flex justify-between items-center">
+            <Typography variant="h1">Ansvarsposter</Typography>
             {isAdmin(loggedInUser) && (
-               <Button leftIcon={<Add />} as={Link} to="new">
+               <Button as={Link} to="new">
+                  <Plus className="mr-1" />
                   Legg til
                </Button>
             )}
-         </Box>
-         <List my={4}>
+         </div>
+         <ul className="divide-y my-4">
             {responsibilities.map((resp) => {
                const { name, id, description } = resp;
                return (
-                  <ListItem key={id}>
-                     <Box display="flex" py={2}>
-                        <Box flex={1}>
-                           <Text>{name}</Text>
-                           <Text color="gray" fontSize="sm">
+                  <li key={id} className="p-2">
+                     <div className="flex">
+                        <div className="flex-grow">
+                           <Typography>{name}</Typography>
+                           <Typography variant="smallText" className="text-gray-500">
                               {description}
-                           </Text>
-                        </Box>
+                           </Typography>
+                        </div>
                         {isAdmin(loggedInUser) && (
-                           <>
-                              <IconButton variant="ghost" as={Link} to={id} icon={<Edit />} aria-label="Rediger" />
-                              <IconButton
-                                 variant="ghost"
-                                 as={Link}
-                                 to={`${id}/delete`}
-                                 icon={<Delete />}
-                                 aria-label="Slett"
-                              />
-                           </>
+                           <div className="flex items-center">
+                              <Button size="icon" variant="ghost" as={Link} to={id} aria-label="Rediger">
+                                 <Pencil />
+                              </Button>
+                              <Button variant="ghost" as={Link} to={`${id}/delete`} aria-label="Slett">
+                                 <Trash />
+                              </Button>
+                           </div>
                         )}
-                     </Box>
-                     <Divider />
-                  </ListItem>
+                     </div>
+                  </li>
                );
             })}
-            {responsibilities.length === 0 && <ListItem>Ingen ansvarsposter, trykk legg til for å lage ny</ListItem>}
-         </List>
+            {responsibilities.length === 0 && <li>Ingen ansvarsposter, trykk legg til for å lage ny</li>}
+         </ul>
          <Outlet />
       </PageLayout>
    );
