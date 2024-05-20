@@ -1,5 +1,3 @@
-import { Avatar, Box, Divider, Flex, Heading, IconButton, List, ListItem } from "@chakra-ui/react";
-import { Delete } from "@mui/icons-material";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json, redirect } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData } from "@remix-run/react";
@@ -18,6 +16,10 @@ import { isAdmin } from "~/utils/roleUtils";
 
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { CircleUser, Trash } from "lucide-react";
+import { Typography } from "~/components/ui/typography";
+import { Button } from "~/components/ui/button";
 
 export const loader = async ({ request, params: { memberId }, context }: LoaderFunctionArgs) => {
    const token = await createAuthenticator(context).getRequiredAuthToken(request);
@@ -118,38 +120,42 @@ export default function MemberInfoPage() {
 
    return (
       <>
-         <Box display="flex" alignItems="center" mb={2}>
-            <Avatar src={member.primaryUser.picture || undefined} sx={{ mr: 1 }} />
-            <Heading as="h1" flex={1}>
+         <div className="flex items-center mb-2 gap-2">
+            <Avatar>
+               <AvatarImage src={member.primaryUser.picture || undefined} />
+               <AvatarFallback>
+                  <CircleUser />
+               </AvatarFallback>
+            </Avatar>
+            <Typography variant="h2" as="h1" className="flex-1">
                Informasjon
-            </Heading>
+            </Typography>
             {isUserAdmin && (
                <>
-                  <IconButton variant="ghost" onClick={openConfirmDialog} icon={<Delete />} aria-label="Slett" />
+                  <Button size="icon" variant="ghost" onClick={openConfirmDialog} aria-label="Slett">
+                     <Trash />
+                  </Button>
                   {ConfirmDialogComponent}
                </>
             )}
-         </Box>
+         </div>
          {loggedInUser.id === member.id && <UserSubscribe user={member} />}
          <UserInfo user={member} loggedInUser={loggedInUser} contingentInfo={contingentInfo} />
 
          {isUserAdmin && (
             <>
                <LinkExternalUserToGataUserSelect user={member} notMemberUsers={notMemberUsers} />
-               <Heading as="h2">Roller</Heading>
-               <List>
+               <Typography variant="h2">Roller</Typography>
+               <ul className="divide-y">
                   {roles.map((role) => {
                      return (
-                        <ListItem key={role.id}>
-                           <Flex p={2} alignItems="center">
-                              <Box flex={1}>{role.name}</Box>
-                              <RoleButton role={role} user={member} />
-                           </Flex>
-                           <Divider />
-                        </ListItem>
+                        <li key={role.id} className="flex justify-between p-2 items-center">
+                           {role.name}
+                           <RoleButton role={role} user={member} />
+                        </li>
                      );
                   })}
-               </List>
+               </ul>
             </>
          )}
       </>

@@ -1,9 +1,9 @@
-import { Heading, Text } from "@chakra-ui/react";
 import type { LoaderFunctionArgs, SerializeFrom } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { useLoaderData, useRouteLoaderData } from "@remix-run/react";
 
 import { PageLayout } from "~/components/PageLayout";
+import { Typography } from "~/components/ui/typography";
 import type { loader as rootLoader } from "~/root";
 import { News } from "~/routes/home/News";
 import type { IGataReport } from "~/types/GataReport.type";
@@ -44,16 +44,16 @@ export default function Home() {
       } else {
          return (
             <PageLayout>
-               <Heading as="h1">Velkommen</Heading>
-               <Text>Du må være medlem for å se nyheter</Text>
+               <Typography variant="h1">Velkommen</Typography>
+               <Typography>Du må være medlem for å se nyheter</Typography>
             </PageLayout>
          );
       }
    } else {
       return (
          <PageLayout>
-            <Heading as="h1">Velkommen</Heading>
-            <Text>Logg inn for å se noe</Text>
+            <Typography variant="h1">Velkommen</Typography>
+            <Typography>Logg inn for å se noe</Typography>
          </PageLayout>
       );
    }
