@@ -1,5 +1,3 @@
-import { ChakraProvider } from "@chakra-ui/react";
-import { withEmotionCache } from "@emotion/react";
 import type { LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
 import { json, redirect } from "@remix-run/cloudflare";
 import {
@@ -15,15 +13,13 @@ import {
    useRouteError,
 } from "@remix-run/react";
 import type { ComponentProps } from "react";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import type { Auth0Profile } from "remix-auth-auth0";
 import "./tailwind.css";
 
 import { getLoggedInUser } from "./api/user.api";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
 import { Button } from "./components/ui/button";
-import { chakraTheme } from "./styles/chakraTheme";
-import { ClientStyleContext, ServerStyleContext } from "./styles/context";
 import type { IGataUser } from "./types/GataUser.type";
 import { createAuthenticator } from "./utils/auth.server";
 import { Typography } from "./components/ui/typography";
@@ -54,26 +50,7 @@ interface DocumentProps {
    children: React.ReactNode;
 }
 
-const Document = withEmotionCache(({ children }: DocumentProps, emotionCache) => {
-   const serverStyleData = useContext(ServerStyleContext);
-   const clientStyleData = useContext(ClientStyleContext);
-
-   // Only executed on client
-   useEffect(() => {
-      // re-link sheet container
-      emotionCache.sheet.container = document.head;
-      // re-inject tags
-      const tags = emotionCache.sheet.tags;
-      emotionCache.sheet.flush();
-      tags.forEach((tag) => {
-         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-         (emotionCache.sheet as any)._insertTag(tag);
-      });
-      // reset cache to reapply global styles
-      clientStyleData?.reset();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, []);
-
+const Document = ({ children }: DocumentProps) => {
    return (
       <html lang="no">
          <head>
@@ -83,9 +60,6 @@ const Document = withEmotionCache(({ children }: DocumentProps, emotionCache) =>
             <meta name="description" content="Nettside for gata" />
             <Meta />
             <Links />
-            {serverStyleData?.map(({ key, ids, css }) => (
-               <style key={key} data-emotion={`${key} ${ids.join(" ")}`} dangerouslySetInnerHTML={{ __html: css }} />
-            ))}
          </head>
          <body>
             {children}
@@ -94,14 +68,10 @@ const Document = withEmotionCache(({ children }: DocumentProps, emotionCache) =>
          </body>
       </html>
    );
-});
+};
 
 export function Layout({ children }: ComponentProps<never>) {
-   return (
-      <Document>
-         <ChakraProvider theme={chakraTheme}>{children}</ChakraProvider>
-      </Document>
-   );
+   return <Document>{children}</Document>;
 }
 
 export default function App() {

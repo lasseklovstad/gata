@@ -1,20 +1,15 @@
-import { Flex, FormControl, FormHelperText, FormLabel, Text } from "@chakra-ui/react";
 import { useFetcher } from "@remix-run/react";
-import type {
-   ChakraStylesConfig,
-   MultiValueProps,
-   MultiValueRemoveProps,
-   OptionBase,
-   OptionProps,
-   Props,
-} from "chakra-react-select";
-import { Select, chakraComponents } from "chakra-react-select";
-import { useId, type ReactNode } from "react";
+import { useId } from "react";
+import Select, { GroupBase, SelectComponentsConfig, StylesConfig, components } from "react-select";
 
-import { ExternalUserIcon } from "~/routes/member.$memberId._index/components/ExternalUserIcon";
-import type { IGataUser, IExternalUser } from "~/types/GataUser.type";
+import type { IExternalUser, IGataUser } from "~/types/GataUser.type";
 
+import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
+import { Typography } from "~/components/ui/typography";
 import { memberIntent } from "../intent";
+import { ExternalUserIcon } from "./ExternalUserIcon";
+import { cn } from "~/utils";
+import { X } from "lucide-react";
 
 type LinkExternalUserToGataUserSelectProps = {
    user: IGataUser;
@@ -27,14 +22,6 @@ export const LinkExternalUserToGataUserSelect = ({
 }: LinkExternalUserToGataUserSelectProps) => {
    const fetcher = useFetcher();
    const selectId = useId();
-   const handleChange: Props<ColorOption, true>["onChange"] = (options) => {
-      const userIds = options.map((o) => o.value);
-      const formData = new FormData();
-      formData.set("userId", id);
-      formData.set("intent", memberIntent.updateLinkedUsers);
-      userIds.forEach((userId) => formData.append("externalUserId", userId));
-      fetcher.submit(formData, { method: "PUT" });
-   };
 
    const menuItems = [...externalUserProviders, ...notMemberUsers];
 
@@ -42,66 +29,88 @@ export const LinkExternalUserToGataUserSelect = ({
       label: user.email,
       value: user.id,
       icon: <ExternalUserIcon user={user} sx={{ mr: 1 }} />,
-      isClearable: !user.primary,
+      isFixed: !!user.primary,
    }));
 
-   const selectedOption = options.filter((option) => !!externalUserProviders.find((user) => user.id === option.value));
-   const inputId = selectId + "-input";
+   const selectedOptions = options.filter((option) => !!externalUserProviders.find((user) => user.id === option.value));
+   type UserOption = (typeof options)[number];
+   const styles: StylesConfig<UserOption, true> = {
+      multiValue: (base, state) => {
+         return state.data.isFixed ? { ...base, paddingRight: "4px" } : base;
+      },
+      multiValueLabel: (base, state) => {
+         return state.data.isFixed ? base : base;
+      },
+      multiValueRemove: (base, state) => {
+         return state.data.isFixed ? { ...base, display: "none" } : base;
+      },
+   };
+   const customComponents: SelectComponentsConfig<UserOption, true, GroupBase<UserOption>> = {
+      Option: ({ children, ...props }) => (
+         <components.Option {...props}>
+            <div className="flex gap-2 items-center">
+               {props.data.icon} {children}
+            </div>
+         </components.Option>
+      ),
+      MultiValue: ({ children, ...props }) => (
+         <components.MultiValue {...props}>
+            <div className="flex gap-2 items-center">
+               {props.data.icon} {children}
+            </div>
+         </components.MultiValue>
+      ),
+      MultiValueRemove: (props) => (
+         <components.MultiValueRemove
+            {...props}
+            innerProps={{
+               ...props.innerProps,
+               "aria-label": `Fjern ${props.data.label}`,
+            }}
+         >
+            <X />
+         </components.MultiValueRemove>
+      ),
+   };
+
    return (
       <>
-         <FormControl sx={{ mt: 1, mb: 1 }} id={inputId}>
+         <FormItem name="123">
             <FormLabel>Epost tilknytninger</FormLabel>
-            <Select<ColorOption, true, never>
-               value={selectedOption}
-               isMulti
-               onChange={handleChange}
-               components={customComponents}
-               options={options}
-               isClearable={false}
-               chakraStyles={chakraStyles}
-               isLoading={fetcher.state !== "idle"}
-               instanceId={selectId}
-               inputId={inputId}
-               required={false}
+            <FormControl
+               render={() => (
+                  <Select
+                     value={selectedOptions}
+                     options={options}
+                     isMulti
+                     onChange={(options) => {
+                        const userIds = options.map((o) => o.value);
+                        const formData = new FormData();
+                        formData.set("userId", id);
+                        formData.set("intent", memberIntent.updateLinkedUsers);
+                        userIds.forEach((userId) => formData.append("externalUserId", userId));
+                        fetcher.submit(formData, { method: "PUT" });
+                     }}
+                     unstyled
+                     styles={styles}
+                     classNames={{
+                        control: () => "border p-2 rounded",
+                        valueContainer: () => "flex gap-2",
+                        multiValue: () => "bg-primary/10 p-0.5 rounded",
+                        multiValueRemove: () => "rounded-full text-gray-500 hover:text-gray-800",
+                        menuList: () => "bg-background p-1 rounded z-10 border",
+                        option: ({ isFocused, isSelected }) =>
+                           cn(isFocused && "bg-primary/10", isSelected && "bg-primary/10", "px-2 py-1"),
+                     }}
+                     isClearable={false}
+                     components={customComponents}
+                  />
+               )}
             />
-            <FormHelperText>
+            <FormDescription>
                Hvis en bruker har logget inn med forskjellige tjenester, kan disse kontoene knyttes sammen her!
-            </FormHelperText>
-         </FormControl>
+            </FormDescription>
+         </FormItem>
       </>
    );
-};
-
-interface ColorOption extends OptionBase {
-   label: string;
-   value: string;
-   icon: ReactNode;
-   isClearable: boolean;
-}
-
-const customComponents = {
-   Option: ({ children, ...props }: OptionProps<ColorOption, true, never>) => (
-      <chakraComponents.Option {...props}>
-         {props.data.icon} {children}
-      </chakraComponents.Option>
-   ),
-   MultiValue: ({ children, ...props }: MultiValueProps<ColorOption, true, never>) => (
-      <chakraComponents.MultiValue {...props}>
-         <Flex alignItems="center">
-            {props.data.icon} <Text>{children}</Text>
-         </Flex>
-      </chakraComponents.MultiValue>
-   ),
-   MultiValueRemove: (props: MultiValueRemoveProps<ColorOption, true, never>) => (
-      <chakraComponents.MultiValueRemove
-         {...props}
-         innerProps={{ ...props.innerProps, "aria-label": `Fjern ${props.data.label}` }}
-      />
-   ),
-};
-
-const chakraStyles: ChakraStylesConfig<ColorOption, true, never> = {
-   multiValueRemove: (provided, state) => {
-      return state.data.isClearable ? provided : { ...provided, display: "none" };
-   },
 };
