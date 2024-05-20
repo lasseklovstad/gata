@@ -97,80 +97,82 @@ export default function ReportInfoPage() {
    const lastModifiedDate = new Date(report.lastModifiedDate);
 
    return (
-      <PageLayout className="space-y-2">
-         <div className="flex justify-between items-center flex-wrap">
-            <Typography variant="h2" id="report-page-title">
-               {report.title}
-            </Typography>
-            {canEdit && (
-               <div className="flex gap-2">
-                  <Button variant="ghost" as={Link} to={`${report.type}/delete`} className="md:flex hidden">
-                     <Trash className="mr-2" />
-                     Slett
-                  </Button>
-                  <Button variant="ghost" as={Link} to={"publish"}>
-                     <Mail className="mr-2" />
-                     Publiser
-                  </Button>
-                  <Button variant="ghost" as={Link} to="edit" className="md:flex hidden">
-                     <Edit className="mr-2" />
-                     Rediger info
-                  </Button>
-                  <Button variant="ghost" size="icon" as={Link} to="delete" className="md:hidden" aria-label="Slett">
-                     <Trash />
-                  </Button>
-                  <Button variant="ghost" size="icon" as={Link} to="edit" className="md:hidden" aria-label="Rediger">
-                     <Edit />
-                  </Button>
-               </div>
-            )}
-         </div>
-         <Typography className="mb-2">{report.description}</Typography>
-         {!editing && (
-            <>
+      <>
+         <PageLayout className="space-y-2">
+            <div className="flex justify-between items-center flex-wrap">
+               <Typography variant="h2" id="report-page-title">
+                  {report.title}
+               </Typography>
                {canEdit && (
-                  <div className="flex justify-end">
-                     <Button onClick={() => setEditing(true)} className="md:flex hidden">
-                        <Edit className="mr-2" />
-                        Rediger innhold
+                  <div className="flex gap-2">
+                     <Button variant="ghost" as={Link} to={`${report.type}/delete`} className="md:flex hidden">
+                        <Trash className="mr-2" />
+                        Slett
                      </Button>
-                     <Button size="icon" onClick={() => setEditing(true)} className="md:hidden" aria-label="Rediger">
+                     <Button variant="ghost" as={Link} to={"publish"}>
+                        <Mail className="mr-2" />
+                        Publiser
+                     </Button>
+                     <Button variant="ghost" as={Link} to="edit" className="md:flex hidden">
+                        <Edit className="mr-2" />
+                        Rediger info
+                     </Button>
+                     <Button variant="ghost" size="icon" as={Link} to="delete" className="md:hidden" aria-label="Slett">
+                        <Trash />
+                     </Button>
+                     <Button variant="ghost" size="icon" as={Link} to="edit" className="md:hidden" aria-label="Rediger">
                         <Edit />
                      </Button>
                   </div>
                )}
-               <div
-                  className="shadow border rounded bg-background p-1 md:p-2"
-                  onDoubleClick={() => {
-                     if (canEdit) {
-                        setEditing(true);
-                     }
-                  }}
-               >
-                  {report.content && (
-                     <ClientOnly>
-                        <RichTextPreview content={report.content} />
-                     </ClientOnly>
+            </div>
+            <Typography className="mb-2">{report.description}</Typography>
+            {!editing && (
+               <>
+                  {canEdit && (
+                     <div className="flex justify-end">
+                        <Button onClick={() => setEditing(true)} className="md:flex hidden">
+                           <Edit className="mr-2" />
+                           Rediger innhold
+                        </Button>
+                        <Button size="icon" onClick={() => setEditing(true)} className="md:hidden" aria-label="Rediger">
+                           <Edit />
+                        </Button>
+                     </div>
                   )}
-                  {!report.content && <Typography>Det er ikke lagt til innhold enda.</Typography>}
-               </div>
-            </>
-         )}
-         {editing && (
-            <ClientOnly>
-               <RichTextEditor
-                  initialContent={report.content}
-                  onCancel={() => setEditing(false)}
-                  onSave={handleSaveContent}
-                  isLoading={fetcher.state !== "idle"}
-               />
-            </ClientOnly>
-         )}
-         <Typography variant="mutedText" className="mt-1 mb-10">
-            Sist redigert av: {report.lastModifiedBy}, {lastModifiedDate.toLocaleDateString("no")}{" "}
-            {lastModifiedDate.toLocaleTimeString("no")}
-         </Typography>
+                  <div
+                     className="shadow border rounded bg-background p-1 md:p-2"
+                     onDoubleClick={() => {
+                        if (canEdit) {
+                           setEditing(true);
+                        }
+                     }}
+                  >
+                     {report.content && (
+                        <ClientOnly>
+                           <RichTextPreview content={report.content} />
+                        </ClientOnly>
+                     )}
+                     {!report.content && <Typography>Det er ikke lagt til innhold enda.</Typography>}
+                  </div>
+               </>
+            )}
+            {editing && (
+               <ClientOnly>
+                  <RichTextEditor
+                     initialContent={report.content}
+                     onCancel={() => setEditing(false)}
+                     onSave={handleSaveContent}
+                     isLoading={fetcher.state !== "idle"}
+                  />
+               </ClientOnly>
+            )}
+            <Typography variant="mutedText" className="mt-1 mb-10">
+               Sist redigert av: {report.lastModifiedBy}, {lastModifiedDate.toLocaleDateString("no")}{" "}
+               {lastModifiedDate.toLocaleTimeString("no")}
+            </Typography>
+         </PageLayout>
          <Outlet />
-      </PageLayout>
+      </>
    );
 }

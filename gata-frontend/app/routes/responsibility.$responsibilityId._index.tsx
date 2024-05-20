@@ -83,7 +83,7 @@ export default function EditResponsibility() {
                   <SaveIcon className="mr-1" />
                   Lagre
                </Button>
-               <Button onClick={onClose} variant="ghost">
+               <Button type="button" onClick={onClose} variant="ghost">
                   Avbryt
                </Button>
             </DialogFooter>

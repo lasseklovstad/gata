@@ -1,10 +1,8 @@
 import type { FormProps } from "@remix-run/react";
 import { useFetcher, useNavigate } from "@remix-run/react";
-import { Typography } from "./ui/typography";
-import { Button } from "./ui/button";
-import { useEffect, useRef } from "react";
-import { Dialog, DialogFooter, DialogHeading } from "./ui/dialog";
 import { useDialog } from "~/utils/dialogUtils";
+import { Button } from "./ui/button";
+import { Dialog, DialogFooter, DialogHeading } from "./ui/dialog";
 
 type RouteConfirmFormDialogProps = {
    title?: string;
@@ -33,7 +31,7 @@ export const RouteConfirmFormDialog = ({
                <Button type="submit" isLoading={fetcher.state !== "idle"}>
                   Jeg er sikker
                </Button>
-               <Button onClick={onClose} variant="ghost">
+               <Button type="button" onClick={onClose} variant="ghost">
                   Avbryt
                </Button>
             </DialogFooter>

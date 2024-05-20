@@ -52,7 +52,7 @@ export default function ConfirmDelete() {
                   <Button type="submit" isLoading={fetcher.state !== "idle"}>
                      Jeg er sikker
                   </Button>
-                  <Button onClick={onClose} variant="ghost">
+                  <Button type="button" onClick={onClose} variant="ghost">
                      Avbryt
                   </Button>
                </ModalFooter>

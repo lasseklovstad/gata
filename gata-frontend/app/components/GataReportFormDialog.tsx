@@ -1,29 +1,22 @@
-import {
-   Button,
-   FormControl,
-   FormErrorMessage,
-   FormLabel,
-   Input,
-   Modal,
-   ModalBody,
-   ModalContent,
-   ModalFooter,
-   ModalHeader,
-   ModalOverlay,
-   Textarea,
-} from "@chakra-ui/react";
-import { Save } from "@mui/icons-material";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { useState } from "react";
 
 import type { gataReportFormDialogLoader, gataReportFormDialogAction } from "./gataReportFormDialog.server";
 import type { GataReportType } from "../types/GataReport.type";
+import { Dialog, DialogFooter, DialogHeading } from "./ui/dialog";
+import { FormControl, FormItem, FormLabel, FormMessage, FormProvider } from "./ui/form";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
+import { Button } from "./ui/button";
+import { Save } from "lucide-react";
+import { useDialog } from "~/utils/dialogUtils";
 
 type GataReportFormDialogProps = {
    type?: GataReportType;
 };
 
 export const GataReportFormDialog = ({ type }: GataReportFormDialogProps) => {
+   const { dialogRef } = useDialog({ defaultOpen: true });
    const { report } = useLoaderData<typeof gataReportFormDialogLoader>();
    const fetcher = useFetcher<typeof gataReportFormDialogAction>();
    const navigate = useNavigate();
@@ -35,38 +28,37 @@ export const GataReportFormDialog = ({ type }: GataReportFormDialogProps) => {
    const onClose = () => navigate("..");
 
    return (
-      <Modal isOpen onClose={onClose}>
-         <ModalOverlay />
-         <ModalContent>
-            <fetcher.Form method={method}>
-               <ModalHeader>{method === "PUT" ? "Rediger informasjon" : "Nytt dokument"}</ModalHeader>
-               <ModalBody sx={{ display: "flex", flexDirection: "column" }}>
-                  <FormControl isInvalid={!!error?.title} isRequired>
-                     <FormLabel>Tittel</FormLabel>
-                     <Input name="title" variant="filled" value={title} onChange={(ev) => setTitle(ev.target.value)} />
-                     <FormErrorMessage>{error?.title}</FormErrorMessage>
-                  </FormControl>
-                  <FormControl>
-                     <FormLabel>Beskrivelse (Valgfri)</FormLabel>
-                     <Textarea
-                        name="description"
-                        variant="filled"
-                        value={description}
-                        onChange={(ev) => setDescription(ev.target.value)}
-                     />
-                  </FormControl>
-                  <input hidden value={report?.type || type} readOnly name="type" />
-               </ModalBody>
-               <ModalFooter gap={2}>
-                  <Button type="submit" isLoading={fetcher.state !== "idle"} leftIcon={<Save />}>
-                     Lagre
-                  </Button>
-                  <Button onClick={onClose} variant="ghost">
-                     Avbryt
-                  </Button>
-               </ModalFooter>
-            </fetcher.Form>
-         </ModalContent>
-      </Modal>
+      <Dialog ref={dialogRef}>
+         <fetcher.Form method={method}>
+            <DialogHeading>{method === "PUT" ? "Rediger informasjon" : "Nytt dokument"}</DialogHeading>
+            <FormProvider errors={error}>
+               <FormItem name="title">
+                  <FormLabel>Tittel</FormLabel>
+                  <FormControl
+                     render={(props) => <Input {...props} value={title} onChange={(ev) => setTitle(ev.target.value)} />}
+                  />
+                  <FormMessage />
+               </FormItem>
+               <FormItem name="description">
+                  <FormLabel>Beskrivelse (Valgfri)</FormLabel>
+                  <FormControl
+                     render={(props) => (
+                        <Textarea {...props} value={description} onChange={(ev) => setDescription(ev.target.value)} />
+                     )}
+                  />
+               </FormItem>
+               <input hidden value={report?.type || type} readOnly name="type" />
+            </FormProvider>
+            <DialogFooter>
+               <Button type="submit" isLoading={fetcher.state !== "idle"}>
+                  <Save className="mr-2" />
+                  Lagre
+               </Button>
+               <Button type="button" onClick={onClose} variant="ghost">
+                  Avbryt
+               </Button>
+            </DialogFooter>
+         </fetcher.Form>
+      </Dialog>
    );
 };
