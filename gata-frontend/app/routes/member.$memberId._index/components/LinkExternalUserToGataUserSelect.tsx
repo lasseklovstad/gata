@@ -28,7 +28,7 @@ export const LinkExternalUserToGataUserSelect = ({
    const options = menuItems.map((user) => ({
       label: user.email,
       value: user.id,
-      icon: <ExternalUserIcon user={user} sx={{ mr: 1 }} />,
+      icon: <ExternalUserIcon user={user} />,
       isFixed: !!user.primary,
    }));
 
