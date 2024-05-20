@@ -54,7 +54,7 @@ export const getActiveMarks = (editor: Editor) => {
    return activeMarks;
 };
 
-export const isMarkActive = (editor: Editor, type: MarkType) => {
+const isMarkActive = (editor: Editor, type: MarkType) => {
    const marks = Editor.marks(editor);
    return marks ? marks[type] === true : false;
 };
