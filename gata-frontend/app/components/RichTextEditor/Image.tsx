@@ -1,4 +1,5 @@
 import { useFetcher } from "@remix-run/react";
+import { Minus, Plus, Trash } from "lucide-react";
 import { useEffect } from "react";
 import type { Element } from "slate";
 import { Transforms } from "slate";
@@ -7,11 +8,10 @@ import { ReactEditor, useFocused, useSelected, useSlate, useSlateStatic } from "
 
 import type { loader as fileLoader } from "~/routes/file.$fileId";
 import type { action as fileAction } from "~/routes/reportInfo.$reportId/route";
-
-import { Minus, Plus, Trash } from "lucide-react";
 import { cn } from "~/utils";
-import { Button } from "../ui/button";
+
 import { replaceSavingImage } from "./withImages";
+import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 
 export const SlateImage = ({ attributes, children, element }: Partial<RenderElementProps>) => {
@@ -107,7 +107,9 @@ const InternalImage = ({ id, selected = false, focused = false, size = 50 }: Ima
 };
 
 const ExternalImage = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
-   return <img src={id} className={cn(selected && focused && "ring", "block my-1")} style={{ width: `${size}%` }} />;
+   return (
+      <img src={id} alt="" className={cn(selected && focused && "ring", "block my-1")} style={{ width: `${size}%` }} />
+   );
 };
 
 export const SavingImage = ({ oldId }: { oldId: string }) => {

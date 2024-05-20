@@ -1,11 +1,11 @@
 import { useFetcher } from "@remix-run/react";
+import { Plus, User } from "lucide-react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
+import { Typography } from "~/components/ui/typography";
 
 import type { IExternalUser } from "../../types/GataUser.type";
-
-import { Plus, User } from "lucide-react";
-import { Button } from "~/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Typography } from "~/components/ui/typography";
 
 type ExternalUsersWithNoGataUserListItemProps = {
    user: IExternalUser;

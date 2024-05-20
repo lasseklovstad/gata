@@ -1,7 +1,8 @@
 import { Link } from "@remix-run/react";
+import { Menu } from "lucide-react";
 import type { Auth0Profile } from "remix-auth-auth0";
 
-import { Menu } from "lucide-react";
+import { UserMenu } from "./UserMenu";
 import type { IGataUser } from "../../types/GataUser.type";
 import { isAdmin, isMember } from "../../utils/roleUtils";
 import { Button } from "../ui/button";
@@ -13,7 +14,6 @@ import {
    DropdownMenuSeparator,
    DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { UserMenu } from "./UserMenu";
 
 type ResponsiveAppBarProps = {
    loggedInUser: IGataUser | undefined;
@@ -64,7 +64,7 @@ export const ResponsiveAppBar = ({ loggedInUser, user, isAuthenticated }: Respon
                            if (page.url.startsWith("https")) {
                               return (
                                  <DropdownMenuItem key={page.url} asChild>
-                                    <a href={page.url} target="_blank">
+                                    <a href={page.url} target="_blank" rel="noreferrer">
                                        {page.name}
                                     </a>
                                  </DropdownMenuItem>

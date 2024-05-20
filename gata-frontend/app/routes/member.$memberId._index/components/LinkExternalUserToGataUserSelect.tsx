@@ -1,15 +1,14 @@
 import { useFetcher } from "@remix-run/react";
-import { useId } from "react";
-import Select, { GroupBase, SelectComponentsConfig, StylesConfig, components } from "react-select";
-
-import type { IExternalUser, IGataUser } from "~/types/GataUser.type";
+import { X } from "lucide-react";
+import type { GroupBase, SelectComponentsConfig, StylesConfig } from "react-select";
+import Select, { components } from "react-select";
 
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
-import { Typography } from "~/components/ui/typography";
-import { memberIntent } from "../intent";
-import { ExternalUserIcon } from "./ExternalUserIcon";
+import type { IExternalUser, IGataUser } from "~/types/GataUser.type";
 import { cn } from "~/utils";
-import { X } from "lucide-react";
+
+import { ExternalUserIcon } from "./ExternalUserIcon";
+import { memberIntent } from "../intent";
 
 type LinkExternalUserToGataUserSelectProps = {
    user: IGataUser;
@@ -21,7 +20,6 @@ export const LinkExternalUserToGataUserSelect = ({
    notMemberUsers,
 }: LinkExternalUserToGataUserSelectProps) => {
    const fetcher = useFetcher();
-   const selectId = useId();
 
    const menuItems = [...externalUserProviders, ...notMemberUsers];
 

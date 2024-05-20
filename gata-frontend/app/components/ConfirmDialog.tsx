@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+
+import { Button } from "./ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "./ui/dialog";
 import { Typography } from "./ui/typography";
-import { Button } from "./ui/button";
 
 type ConfirmDialogProps = {
    onClose: () => void;

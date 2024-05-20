@@ -1,8 +1,10 @@
-import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
+import { AlertCircle, CheckCircle, TriangleAlert } from "lucide-react";
+import * as React from "react";
 
 import { cn } from "~/utils";
-import { AlertCircle, CheckCircle, TriangleAlert } from "lucide-react";
+
+import { Typography } from "./typography";
 
 const alertVariants = cva(
    "relative w-full p-4 [&>svg~*]:pl-8 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
@@ -44,7 +46,9 @@ export const AlertAction = ({ className, ...props }: React.ComponentProps<"div">
 };
 
 const AlertTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
-   ({ className, ...props }, ref) => <h5 ref={ref} className={cn("mb-1 font-medium text-base", className)} {...props} />
+   ({ className, ...props }, ref) => (
+      <Typography variant="h5" ref={ref} className={cn("mb-1 font-medium text-base", className)} {...props} />
+   )
 );
 AlertTitle.displayName = "AlertTitle";
 
@@ -55,4 +59,4 @@ const AlertDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttrib
 );
 AlertDescription.displayName = "AlertDescription";
 
-export { Alert, AlertTitle, AlertDescription };
+export { Alert, AlertDescription, AlertTitle };

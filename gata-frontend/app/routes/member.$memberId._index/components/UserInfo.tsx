@@ -1,17 +1,17 @@
 import { useFetcher } from "@remix-run/react";
 import { useState } from "react";
 
+import { Alert, AlertAction, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
+import { FormControl, FormItem, FormLabel } from "~/components/ui/form";
+import { Select } from "~/components/ui/select";
+import { Typography } from "~/components/ui/typography";
+
 import { SelectPrimaryEmail } from "./SelectPrimaryEmail";
 import type { IContingentInfo } from "../../../types/ContingentInfo.type";
 import type { IGataUser } from "../../../types/GataUser.type";
 import { isAdmin, isMember } from "../../../utils/roleUtils";
 import { memberIntent } from "../intent";
-import { Alert, AlertAction, AlertDescription, AlertTitle } from "~/components/ui/alert";
-import { AlertCircle } from "lucide-react";
-import { Button } from "~/components/ui/button";
-import { Typography } from "~/components/ui/typography";
-import { FormControl, FormItem, FormLabel } from "~/components/ui/form";
-import { Select } from "~/components/ui/select";
 
 type UserInfoProps = {
    user: IGataUser;

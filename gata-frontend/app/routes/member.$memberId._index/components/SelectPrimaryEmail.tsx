@@ -2,9 +2,9 @@ import { useFetcher } from "@remix-run/react";
 
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
 import { Select } from "~/components/ui/select";
+
 import type { IGataUser } from "../../../types/GataUser.type";
 import { memberIntent } from "../intent";
-import { ExternalUserIcon } from "./ExternalUserIcon";
 
 type Props = {
    user: IGataUser;
@@ -35,7 +35,7 @@ export const SelectPrimaryEmail = ({ user }: Props) => {
                   }}
                >
                   {options.map((user) => (
-                     <option value={user.value}>
+                     <option value={user.value} key={user.value}>
                         {user.label}
                         {user.user.id.includes("facebook") && " (Facebook)"}
                         {user.user.id.includes("google") && " (Google)"}

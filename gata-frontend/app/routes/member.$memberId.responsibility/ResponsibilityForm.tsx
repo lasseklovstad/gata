@@ -1,15 +1,16 @@
 import { Link, useFetcher } from "@remix-run/react";
+import { Save, Trash } from "lucide-react";
 import { useState } from "react";
+
+import { Accordion, AccordionBody, AccordionHeading } from "~/components/ui/accordion";
+import { Button } from "~/components/ui/button";
+import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
+import { Textarea } from "~/components/ui/textarea";
+import { Typography } from "~/components/ui/typography";
 
 import type { IGataUser } from "../../types/GataUser.type";
 import type { IResponsibilityYear } from "../../types/ResponsibilityYear.type";
 import { isAdmin } from "../../utils/roleUtils";
-import { Accordion, AccordionBody, AccordionHeading } from "~/components/ui/accordion";
-import { Typography } from "~/components/ui/typography";
-import { Button } from "~/components/ui/button";
-import { Save, Trash } from "lucide-react";
-import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
-import { Textarea } from "~/components/ui/textarea";
 
 type ResponsibilityFormProps = {
    responsibilityYear: IResponsibilityYear;

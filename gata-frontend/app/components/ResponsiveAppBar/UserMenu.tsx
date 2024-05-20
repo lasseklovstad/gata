@@ -1,5 +1,7 @@
 import { Form, Link } from "@remix-run/react";
 import type { Auth0Profile } from "remix-auth-auth0";
+
+import { Button } from "../ui/button";
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -7,7 +9,6 @@ import {
    DropdownMenuTrigger,
    DropdownMenuLabel,
 } from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
 
 type UserMenuProps = {
    roleText: string;
@@ -24,7 +25,7 @@ export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => 
                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                      <Button aria-label="Åpne meny" size="icon">
-                        <img src={photo} className="rounded-full w-[35px]" />
+                        <img alt="" src={photo} className="rounded-full w-[35px]" />
                      </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>

@@ -1,27 +1,11 @@
 import type { RenderElementProps } from "slate-react";
 
-import { Typography } from "../ui/typography";
 import { Image, SavingImage, SlateImage } from "./Image";
+import { Typography } from "../ui/typography";
 
 type RichTextElementProps = {
    outsideContext?: boolean;
 } & Partial<RenderElementProps>;
-
-const getVariant = (type: string) => {
-   if (type === "h2") {
-      return "3xl";
-   }
-   if (type === "h3") {
-      return "2xl";
-   }
-   if (type === "h4") {
-      return "xl";
-   }
-   if (type === "body2") {
-      return "sm";
-   }
-   return "md";
-};
 
 export const RichTextElement = ({ attributes, children, element, outsideContext = false }: RichTextElementProps) => {
    switch (element?.type) {

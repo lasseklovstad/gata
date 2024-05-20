@@ -1,6 +1,8 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { Loader2 } from "lucide-react";
-import React, { ComponentProps, ElementType, ForwardedRef, ReactElement, ReactNode, Ref, forwardRef } from "react";
+import type React from "react";
+import type { ComponentProps, ElementType, ForwardedRef, ReactNode } from "react";
+import { forwardRef } from "react";
 
 import { cn } from "~/utils";
 

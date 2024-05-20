@@ -1,5 +1,5 @@
 /** @type {import('eslint').Linter.Config} */
-export default {
+module.exports = {
    root: true,
    parserOptions: {
       ecmaVersion: "latest",
@@ -7,6 +7,7 @@ export default {
       ecmaFeatures: {
          jsx: true,
       },
+      project: "./tsconfig.json",
    },
    env: {
       browser: true,
@@ -54,6 +55,7 @@ export default {
             endOfLine: "auto",
          },
       ],
+      "react/prop-types": "off",
       "require-await": "warn",
       "@typescript-eslint/no-floating-promises": ["warn"],
       "@typescript-eslint/await-thenable": ["warn"],

@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useParams } from "@remix-run/react";
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
 
 export default function MemberLayout() {
    const { memberId } = useParams();

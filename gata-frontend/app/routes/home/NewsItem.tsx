@@ -2,6 +2,7 @@ import { Link } from "@remix-run/react";
 
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
+
 import { ClientOnly } from "../../components/ClientOnly";
 import { RichTextPreview } from "../../components/RichTextEditor/RichTextPreview";
 import type { IGataReport } from "../../types/GataReport.type";

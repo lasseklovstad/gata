@@ -1,14 +1,15 @@
-import { Plus } from "lucide-react";
 import { Link, Outlet } from "@remix-run/react";
+import { Plus } from "lucide-react";
+import { useId } from "react";
+
+import { Button } from "~/components/ui/button";
+import { Typography } from "~/components/ui/typography";
 
 import { NewsItem } from "./NewsItem";
 import { PageLayout } from "../../components/PageLayout";
 import type { IGataReport } from "../../types/GataReport.type";
 import type { IGataUser } from "../../types/GataUser.type";
 import type { Page } from "../../types/Page.type";
-import { Button } from "~/components/ui/button";
-import { Typography } from "~/components/ui/typography";
-import { useId } from "react";
 
 type NewsProps = {
    reportPage: Page<IGataReport>;

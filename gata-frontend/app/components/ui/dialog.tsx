@@ -1,4 +1,6 @@
-import { ComponentProps, Ref, createContext, forwardRef, useContext, useId } from "react";
+import type { ComponentProps, Ref } from "react";
+import { createContext, forwardRef, useContext, useId } from "react";
+
 import { Typography } from "./typography";
 
 type DialogContext = {

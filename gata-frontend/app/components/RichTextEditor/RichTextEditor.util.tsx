@@ -1,4 +1,5 @@
 import { Editor, Transforms, Element, Text } from "slate";
+
 import type { BlockTypes, ListTypes, MarkType } from "./RichTextEditor.types";
 import { LIST_TYPES } from "./RichTextEditor.types";
 
@@ -49,7 +50,7 @@ export const getActiveMarks = (editor: Editor) => {
    const marks = Editor.marks(editor);
    if (!marks) return [];
    const activeMarks = Object.entries(marks)
-      .filter(([name, value]) => value === true)
+      .filter(([, value]) => value === true)
       .map(([name]) => name);
    return activeMarks;
 };

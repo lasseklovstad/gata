@@ -1,6 +1,7 @@
+import { Typography } from "~/components/ui/typography";
+
 import { ExternalUsersWithNoGataUserListItem } from "./ExternalUsersWithNoGataUserListItem";
 import type { IExternalUser } from "../../types/GataUser.type";
-import { Typography } from "~/components/ui/typography";
 
 type Props = {
    externalUsers: IExternalUser[];

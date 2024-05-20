@@ -1,6 +1,6 @@
 import { redirect, type LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { Typography } from "~/components/ui/typography";
 
+import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 

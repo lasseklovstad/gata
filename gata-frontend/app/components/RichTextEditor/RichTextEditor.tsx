@@ -1,13 +1,12 @@
 import { useSubmit } from "@remix-run/react";
-import { useCallback, useMemo, useRef } from "react";
-import type { Descendant } from "slate";
-import { createEditor } from "slate";
-import { withHistory } from "slate-history";
-import type { RenderElementProps, RenderLeafProps } from "slate-react";
-import { Editable, Slate, withReact } from "slate-react";
-
 import { Loader2, Save } from "lucide-react";
-import { Button } from "../ui/button";
+import { useCallback, useMemo, useRef } from "react";
+import { createEditor } from "slate";
+import type { Descendant } from "slate";
+import { withHistory } from "slate-history";
+import { Editable, Slate, withReact } from "slate-react";
+import type { RenderElementProps, RenderLeafProps } from "slate-react";
+
 import { AddImage } from "./AddImage";
 import { insertTab, toggleMark } from "./RichTextEditor.util";
 import { RichTextElement } from "./RichTextElement";
@@ -15,6 +14,7 @@ import { RichTextLeaf } from "./RichTextLeaf";
 import { TextDecorationGroup } from "./TextDecorationGroup";
 import { TextStyleGroup } from "./TextStyleGroup";
 import { insertImage, withImages } from "./withImages";
+import { Button } from "../ui/button";
 
 type RichTextEditorProps = {
    onCancel: () => void;

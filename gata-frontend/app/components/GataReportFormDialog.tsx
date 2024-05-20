@@ -1,15 +1,16 @@
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
+import { Save } from "lucide-react";
 import { useState } from "react";
 
+import { useDialog } from "~/utils/dialogUtils";
+
 import type { gataReportFormDialogLoader, gataReportFormDialogAction } from "./gataReportFormDialog.server";
-import type { GataReportType } from "../types/GataReport.type";
+import { Button } from "./ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "./ui/dialog";
 import { FormControl, FormItem, FormLabel, FormMessage, FormProvider } from "./ui/form";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { Button } from "./ui/button";
-import { Save } from "lucide-react";
-import { useDialog } from "~/utils/dialogUtils";
+import type { GataReportType } from "../types/GataReport.type";
 
 type GataReportFormDialogProps = {
    type?: GataReportType;

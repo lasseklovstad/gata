@@ -1,8 +1,9 @@
 import { List, ListOrdered } from "lucide-react";
 import { useSlate } from "slate-react";
-import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+
+import type { BlockTypes } from "./RichTextEditor.types";
 import { isBlockActive, toggleBlock } from "./RichTextEditor.util";
-import { BlockTypes, CustomElement } from "./RichTextEditor.types";
+import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 
 const blockTypes = ["h2", "h3", "h4", "body1", "body2", "bulleted-list", "numbered-list"] as BlockTypes[];
 

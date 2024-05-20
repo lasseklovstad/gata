@@ -1,9 +1,11 @@
+import { Link } from "@remix-run/react";
+import { Check, User, X } from "lucide-react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Typography } from "~/components/ui/typography";
+
 import type { IGataUser } from "../../types/GataUser.type";
 import { isMember } from "../../utils/roleUtils";
-import { Link } from "@remix-run/react";
-import { Typography } from "~/components/ui/typography";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Check, User, X } from "lucide-react";
 
 type UserListItemProps = {
    user: IGataUser;

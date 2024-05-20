@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react";
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
+
 import { cn } from "~/utils";
 
 export const Select = ({ className, ...props }: ComponentProps<"select">) => {

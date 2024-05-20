@@ -1,12 +1,16 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json, redirect } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData } from "@remix-run/react";
+import { CircleUser, Trash } from "lucide-react";
 
 import { getNotMemberUsers } from "~/api/auth0.api";
 import { getContingentInfo } from "~/api/contingent.api";
 import { getRoles } from "~/api/role.api";
 import { getLoggedInUser, getUser } from "~/api/user.api";
 import { useConfirmDialog } from "~/components/ConfirmDialog";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
+import { Typography } from "~/components/ui/typography";
 import { LinkExternalUserToGataUserSelect } from "~/routes/member.$memberId._index/components/LinkExternalUserToGataUserSelect";
 import { UserInfo } from "~/routes/member.$memberId._index/components/UserInfo";
 import { UserSubscribe } from "~/routes/member.$memberId._index/components/UserSubscribe";
@@ -16,10 +20,6 @@ import { isAdmin } from "~/utils/roleUtils";
 
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { CircleUser, Trash } from "lucide-react";
-import { Typography } from "~/components/ui/typography";
-import { Button } from "~/components/ui/button";
 
 export const loader = async ({ request, params: { memberId }, context }: LoaderFunctionArgs) => {
    const token = await createAuthenticator(context).getRequiredAuthToken(request);

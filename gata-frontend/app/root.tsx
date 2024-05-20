@@ -9,7 +9,6 @@ import {
    ScrollRestoration,
    isRouteErrorResponse,
    useLoaderData,
-   useNavigation,
    useRouteError,
 } from "@remix-run/react";
 import type { ComponentProps } from "react";
@@ -20,9 +19,9 @@ import "./tailwind.css";
 import { getLoggedInUser } from "./api/user.api";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
 import { Button } from "./components/ui/button";
+import { Typography } from "./components/ui/typography";
 import type { IGataUser } from "./types/GataUser.type";
 import { createAuthenticator } from "./utils/auth.server";
-import { Typography } from "./components/ui/typography";
 
 export const meta: MetaFunction = () => {
    return [
@@ -76,7 +75,6 @@ export function Layout({ children }: ComponentProps<never>) {
 
 export default function App() {
    const { loggedInUser, isAuthenticated, user } = useLoaderData<typeof loader>();
-   const { state } = useNavigation();
    return (
       <div className="flex flex-col min-h-lvh">
          <ResponsiveAppBar loggedInUser={loggedInUser} isAuthenticated={isAuthenticated} user={user} />

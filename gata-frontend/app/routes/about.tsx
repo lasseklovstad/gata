@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 
 import { Typography } from "~/components/ui/typography";
+
 import { PageLayout } from "../components/PageLayout";
 
 export default function About() {

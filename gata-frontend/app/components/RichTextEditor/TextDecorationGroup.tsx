@@ -1,8 +1,9 @@
 import { Bold, Italic, Underline } from "lucide-react";
 import { useSlate } from "slate-react";
-import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
-import { MarkType } from "./RichTextEditor.types";
+
+import type { MarkType } from "./RichTextEditor.types";
 import { getActiveMarks, toggleMark } from "./RichTextEditor.util";
+import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 
 export const TextDecorationGroup = () => {
    const editor = useSlate();

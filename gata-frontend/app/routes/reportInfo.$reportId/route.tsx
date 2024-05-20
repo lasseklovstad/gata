@@ -1,6 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
+import { Edit, Mail, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Descendant } from "slate";
 
@@ -10,15 +11,14 @@ import { ClientOnly } from "~/components/ClientOnly";
 import { PageLayout } from "~/components/PageLayout";
 import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
 import { RichTextPreview } from "~/components/RichTextEditor/RichTextPreview";
+import { Button } from "~/components/ui/button";
+import { Typography } from "~/components/ui/typography";
 import type { IGataReportFile, IGataReportFilePayload } from "~/types/GataReportFile.type";
 import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 import { isAdmin } from "~/utils/roleUtils";
 
 import { reportInfoIntent } from "./intent";
-import { Typography } from "~/components/ui/typography";
-import { Button } from "~/components/ui/button";
-import { Edit, Mail, Trash } from "lucide-react";
 
 export const loader = async ({ request, params: { reportId }, context }: LoaderFunctionArgs) => {
    const token = await createAuthenticator(context).getRequiredAuthToken(request);
