@@ -1,4 +1,4 @@
-import { ChakraProvider, Heading, Text } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 import { withEmotionCache } from "@emotion/react";
 import type { LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
 import { json, redirect } from "@remix-run/cloudflare";
@@ -26,6 +26,7 @@ import { chakraTheme } from "./styles/chakraTheme";
 import { ClientStyleContext, ServerStyleContext } from "./styles/context";
 import type { IGataUser } from "./types/GataUser.type";
 import { createAuthenticator } from "./utils/auth.server";
+import { Typography } from "./components/ui/typography";
 
 export const meta: MetaFunction = () => {
    return [
@@ -163,22 +164,22 @@ export function ErrorBoundary() {
    if (isRouteErrorResponse(error)) {
       return (
          <div>
-            <Heading>
+            <Typography variant="h1">
                {error.status} {error.statusText}
-            </Heading>
-            <Text>{error.data.message}</Text>
+            </Typography>
+            <Typography>{error.data.message}</Typography>
          </div>
       );
    } else if (error instanceof Error) {
       return (
          <div>
-            <Heading>Error</Heading>
-            <Text>{error.message}</Text>
-            <Text>The stack trace is:</Text>
-            <Text as="pre">{error.stack}</Text>
+            <Typography variant="h1">Error</Typography>
+            <Typography>{error.message}</Typography>
+            <Typography>The stack trace is:</Typography>
+            <Typography as="pre">{error.stack}</Typography>
          </div>
       );
    } else {
-      return <Heading>Unknown Error</Heading>;
+      return <Typography variant="h1">Unknown Error</Typography>;
    }
 }
