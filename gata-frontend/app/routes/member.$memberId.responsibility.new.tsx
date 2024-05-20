@@ -1,14 +1,13 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { Link, useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
-import { Select } from "chakra-react-select";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { Save } from "lucide-react";
-import { useState } from "react";
 
 import { getResponsibilities } from "~/api/responsibility.api";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { FormControl, FormItem, FormLabel, FormProvider } from "~/components/ui/form";
+import { Select } from "~/components/ui/select";
 import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
@@ -23,8 +22,6 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
    return json({ responsibilities });
 };
 
-type IOption = { value: string; label: string };
-
 const numberOfYears = 10;
 const todaysYear = new Date().getFullYear();
 const years = Array.from({ length: numberOfYears }, (v, i) => todaysYear - numberOfYears + 2 + i).reverse();
@@ -32,8 +29,6 @@ const years = Array.from({ length: numberOfYears }, (v, i) => todaysYear - numbe
 export default function AddResponsibilityUserDialog() {
    const { responsibilities } = useLoaderData<typeof loader>();
    const { dialogRef } = useDialog({ defaultOpen: true });
-   const [selectedResp, setSelectedResp] = useState<IOption | null>();
-   const [selectedYear, setSelectedYear] = useState<IOption | null>();
    const fetcher = useFetcher();
 
    const responsibilityOptions = responsibilities.map((res) => {
@@ -42,21 +37,23 @@ export default function AddResponsibilityUserDialog() {
 
    return (
       <Dialog ref={dialogRef}>
-         <FormProvider>
-            <fetcher.Form method="post" action="..">
-               <DialogHeading>Legg til ansvarspost</DialogHeading>
+         <fetcher.Form method="post" action="..">
+            <DialogHeading>Legg til ansvarspost</DialogHeading>
+            <FormProvider>
                <FormItem name="responsibilityId">
                   <FormLabel>Velg ansvarspost</FormLabel>
                   <FormControl
                      render={(props) => (
-                        <Select<IOption, false, never>
-                           {...props}
-                           variant="filled"
-                           placeholder="Velg ansvarspost"
-                           onChange={(ev) => setSelectedResp(ev)}
-                           value={selectedResp}
-                           options={responsibilityOptions}
-                        />
+                        <Select {...props} className="w-[180px]" required>
+                           <option value="" disabled selected>
+                              Velg ansvarspost
+                           </option>
+                           {responsibilityOptions.map(({ label, value }) => (
+                              <option key={value} value={value}>
+                                 {label}
+                              </option>
+                           ))}
+                        </Select>
                      )}
                   />
                </FormItem>
@@ -64,29 +61,34 @@ export default function AddResponsibilityUserDialog() {
                   <FormLabel>Velg år</FormLabel>
                   <FormControl
                      render={(props) => (
-                        <Select<{ value: string; label: string }, false, never>
-                           {...props}
-                           placeholder="Velg år"
-                           onChange={(ev) => setSelectedYear(ev)}
-                           value={selectedYear}
-                           options={years.map((res) => {
-                              return { label: res.toString(), value: res.toString() };
-                           })}
-                        />
+                        <Select {...props} className="w-[180px]" required>
+                           <option value="" disabled selected>
+                              Velg år
+                           </option>
+                           {years
+                              .map((res) => {
+                                 return { label: res.toString(), value: res.toString() };
+                              })
+                              .map(({ label, value }) => (
+                                 <option key={value} value={value}>
+                                    {label}
+                                 </option>
+                              ))}
+                        </Select>
                      )}
                   />
                </FormItem>
-               <DialogFooter>
-                  <Button type="submit" isLoading={fetcher.state !== "idle"}>
-                     <Save className="mr-2" />
-                     Lagre
-                  </Button>
-                  <Button as={Link} to=".." variant="ghost">
-                     Avbryt
-                  </Button>
-               </DialogFooter>
-            </fetcher.Form>
-         </FormProvider>
+            </FormProvider>
+            <DialogFooter>
+               <Button type="submit" isLoading={fetcher.state !== "idle"}>
+                  <Save className="mr-2" />
+                  Lagre
+               </Button>
+               <Button as={Link} to=".." variant="ghost">
+                  Avbryt
+               </Button>
+            </DialogFooter>
+         </fetcher.Form>
       </Dialog>
    );
 }
