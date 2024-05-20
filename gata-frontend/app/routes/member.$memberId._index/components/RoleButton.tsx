@@ -1,10 +1,10 @@
-import { Button } from "@chakra-ui/react";
 import { useFetcher } from "@remix-run/react";
 
 import type { IGataRole } from "~/types/GataRole.type";
 import type { IGataUser } from "~/types/GataUser.type";
 
 import { memberIntent } from "../intent";
+import { Button } from "~/components/ui/button";
 
 type Props = {
    role: IGataRole;

@@ -1,4 +1,3 @@
-import { Box, Heading, List, ListItem, Text } from "@chakra-ui/react";
 import { Plus } from "lucide-react";
 import { Link, Outlet } from "@remix-run/react";
 
@@ -37,11 +36,7 @@ export const News = ({ reportPage, loggedInUser }: NewsProps) => {
                   </li>
                );
             })}
-            {reportPage.totalElements === 0 && (
-               <li>
-                  <Text>Det finnes ingen nyheter</Text>
-               </li>
-            )}
+            {reportPage.totalElements === 0 && <li>Det finnes ingen nyheter</li>}
          </ul>
          <Outlet />
       </PageLayout>
