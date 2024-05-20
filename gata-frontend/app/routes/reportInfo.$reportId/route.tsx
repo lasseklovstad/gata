@@ -1,5 +1,3 @@
-import { Box, Button, Heading, IconButton, Text } from "@chakra-ui/react";
-import { Delete, Edit, Email } from "@mui/icons-material";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
@@ -18,6 +16,9 @@ import { client } from "~/utils/client";
 import { isAdmin } from "~/utils/roleUtils";
 
 import { reportInfoIntent } from "./intent";
+import { Typography } from "~/components/ui/typography";
+import { Button } from "~/components/ui/button";
+import { Edit, Mail, Trash } from "lucide-react";
 
 export const loader = async ({ request, params: { reportId }, context }: LoaderFunctionArgs) => {
    const token = await createAuthenticator(context).getRequiredAuthToken(request);
@@ -96,79 +97,50 @@ export default function ReportInfoPage() {
    const lastModifiedDate = new Date(report.lastModifiedDate);
 
    return (
-      <PageLayout>
-         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
-            <Heading as="h1" id="report-page-title">
+      <PageLayout className="space-y-2">
+         <div className="flex justify-between items-center flex-wrap">
+            <Typography variant="h2" id="report-page-title">
                {report.title}
-            </Heading>
+            </Typography>
             {canEdit && (
-               <Box>
-                  <Button
-                     variant="ghost"
-                     leftIcon={<Delete />}
-                     as={Link}
-                     to={`${report.type}/delete`}
-                     sx={{ mr: 1, display: { base: "none", md: "inline-flex" } }}
-                  >
+               <div className="flex gap-2">
+                  <Button variant="ghost" as={Link} to={`${report.type}/delete`} className="md:flex hidden">
+                     <Trash className="mr-2" />
                      Slett
                   </Button>
-                  <Button variant="ghost" leftIcon={<Email />} as={Link} to={"publish"} sx={{ mr: 1 }}>
+                  <Button variant="ghost" as={Link} to={"publish"}>
+                     <Mail className="mr-2" />
                      Publiser
                   </Button>
-                  <Button
-                     variant="ghost"
-                     leftIcon={<Edit />}
-                     as={Link}
-                     to="edit"
-                     sx={{ display: { base: "none", md: "inline-flex" } }}
-                  >
+                  <Button variant="ghost" as={Link} to="edit" className="md:flex hidden">
+                     <Edit className="mr-2" />
                      Rediger info
                   </Button>
-                  <IconButton
-                     variant="ghost"
-                     as={Link}
-                     to="delete"
-                     sx={{ mr: 1, display: { md: "none" } }}
-                     icon={<Delete />}
-                     aria-label="Slett"
-                  />
-                  <IconButton
-                     variant="ghost"
-                     as={Link}
-                     to="edit"
-                     sx={{ display: { md: "none" } }}
-                     icon={<Edit />}
-                     aria-label="Rediger"
-                  />
-               </Box>
+                  <Button variant="ghost" size="icon" as={Link} to="delete" className="md:hidden" aria-label="Slett">
+                     <Trash />
+                  </Button>
+                  <Button variant="ghost" size="icon" as={Link} to="edit" className="md:hidden" aria-label="Rediger">
+                     <Edit />
+                  </Button>
+               </div>
             )}
-         </Box>
-         <Text mb={2}>{report.description}</Text>
+         </div>
+         <Typography className="mb-2">{report.description}</Typography>
          {!editing && (
             <>
                {canEdit && (
-                  <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                     <Button
-                        leftIcon={<Edit />}
-                        onClick={() => setEditing(true)}
-                        sx={{ display: { base: "none", md: "flex" } }}
-                     >
+                  <div className="flex justify-end">
+                     <Button onClick={() => setEditing(true)} className="md:flex hidden">
+                        <Edit className="mr-2" />
                         Rediger innhold
                      </Button>
-                     <IconButton
-                        variant="ghost"
-                        onClick={() => setEditing(true)}
-                        sx={{ display: { md: "none" } }}
-                        aria-label="Rediger"
-                        icon={<Edit />}
-                     />
-                  </Box>
+                     <Button size="icon" onClick={() => setEditing(true)} className="md:hidden" aria-label="Rediger">
+                        <Edit />
+                     </Button>
+                  </div>
                )}
-               <Box
-                  boxShadow="xs"
-                  rounded={4}
-                  bg="white"
-                  sx={{ p: { base: 1, md: 2 } }}
+               <div
+                  className="shadow border rounded bg-background p-1 md:p-2"
                   onDoubleClick={() => {
                      if (canEdit) {
                         setEditing(true);
@@ -180,8 +152,8 @@ export default function ReportInfoPage() {
                         <RichTextPreview content={report.content} />
                      </ClientOnly>
                   )}
-                  {!report.content && <Text>Det er ikke lagt til innhold enda.</Text>}
-               </Box>
+                  {!report.content && <Typography>Det er ikke lagt til innhold enda.</Typography>}
+               </div>
             </>
          )}
          {editing && (
@@ -194,10 +166,10 @@ export default function ReportInfoPage() {
                />
             </ClientOnly>
          )}
-         <Text fontSize="sm" color="gray" sx={{ mt: 1, mb: 10 }}>
+         <Typography variant="mutedText" className="mt-1 mb-10">
             Sist redigert av: {report.lastModifiedBy}, {lastModifiedDate.toLocaleDateString("no")}{" "}
             {lastModifiedDate.toLocaleTimeString("no")}
-         </Text>
+         </Typography>
          <Outlet />
       </PageLayout>
    );
