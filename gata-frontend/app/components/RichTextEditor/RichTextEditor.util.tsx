@@ -1,7 +1,5 @@
 import { Editor, Transforms, Element, Text } from "slate";
-
-import type { BlockTypes } from "./BlockButton";
-import type { ListTypes, MarkType } from "./RichTextEditor.types";
+import type { BlockTypes, ListTypes, MarkType } from "./RichTextEditor.types";
 import { LIST_TYPES } from "./RichTextEditor.types";
 
 const getIsListType = (type: BlockTypes): type is ListTypes => {
@@ -28,7 +26,7 @@ export const toggleBlock = (editor: Editor, type: BlockTypes) => {
    }
 
    if (!isActive && isList) {
-      const block = { type: type, children: [] };
+      const block = { type, children: [] };
       Transforms.wrapNodes(editor, block);
    }
 };
@@ -45,6 +43,15 @@ export const isBlockActive = (editor: Editor, format: BlockTypes) => {
    );
 
    return !!match;
+};
+
+export const getActiveMarks = (editor: Editor) => {
+   const marks = Editor.marks(editor);
+   if (!marks) return [];
+   const activeMarks = Object.entries(marks)
+      .filter(([name, value]) => value === true)
+      .map(([name]) => name);
+   return activeMarks;
 };
 
 export const isMarkActive = (editor: Editor, type: MarkType) => {

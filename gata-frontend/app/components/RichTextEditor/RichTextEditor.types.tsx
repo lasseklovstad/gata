@@ -23,6 +23,8 @@ export type CustomElement = {
    size?: number;
 };
 
+export type BlockTypes = CustomElement["type"];
+
 export type MarkType = "bold" | "italic" | "underline";
 
 type CustomText = { text: string; bold?: boolean; italic?: boolean; underline?: boolean };
