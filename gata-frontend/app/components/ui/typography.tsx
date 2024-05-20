@@ -6,12 +6,12 @@ import { Slot } from "@radix-ui/react-slot";
 const typographyVariants = cva("text-foreground", {
    variants: {
       variant: {
-         h1: "scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl",
-         h2: "scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0",
-         h3: "scroll-m-20 text-2xl font-semibold tracking-tight",
-         h4: "scroll-m-20 text-xl font-semibold tracking-tight",
-         h5: "scroll-m-20 text-lg font-semibold tracking-tight",
-         h6: "scroll-m-20 text-base font-semibold tracking-tight",
+         h1: "scroll-m-20 text-4xl font-semibold lg:text-5xl",
+         h2: "scroll-m-20 pb-2 text-3xl font-semibold first:mt-0",
+         h3: "scroll-m-20 text-2xl font-semibold",
+         h4: "scroll-m-20 text-xl font-semibold",
+         h5: "scroll-m-20 text-lg font-semibold",
+         h6: "scroll-m-20 text-base font-semibold",
          p: "leading-7",
          blockquote: "mt-6 border-l-2 pl-6 italic",
          ul: "my-6 ml-6 list-disc [&>li]:mt-2",
