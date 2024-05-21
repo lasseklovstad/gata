@@ -93,7 +93,10 @@ export class MemberPage {
   }
 
   getResponsibilityButton(name: string) {
-    return this.page.getByRole("button", { name });
+    return this.page
+      .getByRole("group")
+      .filter({ hasText: name })
+      .locator("summary");
   }
 
   goToResponsibilityTab() {
