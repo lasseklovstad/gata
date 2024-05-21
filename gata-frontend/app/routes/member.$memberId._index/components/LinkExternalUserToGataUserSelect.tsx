@@ -35,10 +35,11 @@ export const LinkExternalUserToGataUserSelect = ({
          <FormItem name="externalUserId">
             <FormLabel>Epost tilknytninger</FormLabel>
             <FormControl
-               render={(props) => (
+               render={({ id: inputId, ...props }) => (
                   <Select
                      {...props}
                      {...getSelectDefaultProps<true>()}
+                     inputId={inputId}
                      value={selectedOptions}
                      options={options}
                      isMulti

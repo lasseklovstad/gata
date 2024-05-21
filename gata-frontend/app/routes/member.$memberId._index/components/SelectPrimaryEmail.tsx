@@ -27,10 +27,11 @@ export const SelectPrimaryEmail = ({ user }: Props) => {
       <FormItem name="primaryUserEmail">
          <FormLabel>Primær epost</FormLabel>
          <FormControl
-            render={(props) => (
+            render={({ id: inputId, ...props }) => (
                <Select
                   {...props}
                   {...getSelectDefaultProps<false>()}
+                  inputId={inputId}
                   value={selectedOption}
                   options={options}
                   isMulti={false}
