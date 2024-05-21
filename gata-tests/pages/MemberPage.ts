@@ -97,7 +97,11 @@ export class MemberPage {
   }
 
   goToResponsibilityTab() {
-    return this.page.getByRole("tab", { name: "Ansvarsposter" }).click();
+    return this.page
+      .getByRole("main")
+      .getByRole("navigation")
+      .getByRole("link", { name: "Ansvarsposter" })
+      .click();
   }
 
   async addResponsibility(name: string) {

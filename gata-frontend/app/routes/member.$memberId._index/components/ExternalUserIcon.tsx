@@ -4,6 +4,8 @@ type ExternalUserIconProps = {
    user: IExternalUser;
 };
 
+// SVGs copied from https://simpleicons.org
+
 export const ExternalUserIcon = ({ user }: ExternalUserIconProps) => {
    return (
       <>
