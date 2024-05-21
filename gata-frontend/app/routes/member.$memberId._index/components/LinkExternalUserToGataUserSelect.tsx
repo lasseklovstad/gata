@@ -1,11 +1,9 @@
 import { useFetcher } from "@remix-run/react";
-import { X } from "lucide-react";
-import type { GroupBase, SelectComponentsConfig, StylesConfig } from "react-select";
-import Select, { components } from "react-select";
+import Select from "react-select";
 
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
 import type { IExternalUser, IGataUser } from "~/types/GataUser.type";
-import { cn } from "~/utils";
+import { getSelectDefaultProps } from "~/utils/selectUtils";
 
 import { ExternalUserIcon } from "./ExternalUserIcon";
 import { memberIntent } from "../intent";
@@ -31,53 +29,16 @@ export const LinkExternalUserToGataUserSelect = ({
    }));
 
    const selectedOptions = options.filter((option) => !!externalUserProviders.find((user) => user.id === option.value));
-   type UserOption = (typeof options)[number];
-   const styles: StylesConfig<UserOption, true> = {
-      multiValue: (base, state) => {
-         return state.data.isFixed ? { ...base, paddingRight: "4px" } : base;
-      },
-      multiValueLabel: (base, state) => {
-         return state.data.isFixed ? base : base;
-      },
-      multiValueRemove: (base, state) => {
-         return state.data.isFixed ? { ...base, display: "none" } : base;
-      },
-   };
-   const customComponents: SelectComponentsConfig<UserOption, true, GroupBase<UserOption>> = {
-      Option: ({ children, ...props }) => (
-         <components.Option {...props}>
-            <div className="flex gap-2 items-center">
-               {props.data.icon} {children}
-            </div>
-         </components.Option>
-      ),
-      MultiValue: ({ children, ...props }) => (
-         <components.MultiValue {...props}>
-            <div className="flex gap-2 items-center">
-               {props.data.icon} {children}
-            </div>
-         </components.MultiValue>
-      ),
-      MultiValueRemove: (props) => (
-         <components.MultiValueRemove
-            {...props}
-            innerProps={{
-               ...props.innerProps,
-               "aria-label": `Fjern ${props.data.label}`,
-            }}
-         >
-            <X />
-         </components.MultiValueRemove>
-      ),
-   };
 
    return (
       <>
-         <FormItem name="123">
+         <FormItem name="externalUserId">
             <FormLabel>Epost tilknytninger</FormLabel>
             <FormControl
-               render={() => (
+               render={(props) => (
                   <Select
+                     {...props}
+                     {...getSelectDefaultProps<true>()}
                      value={selectedOptions}
                      options={options}
                      isMulti
@@ -89,19 +50,7 @@ export const LinkExternalUserToGataUserSelect = ({
                         userIds.forEach((userId) => formData.append("externalUserId", userId));
                         fetcher.submit(formData, { method: "PUT" });
                      }}
-                     unstyled
-                     styles={styles}
-                     classNames={{
-                        control: () => "border p-2 rounded",
-                        valueContainer: () => "flex gap-2",
-                        multiValue: () => "bg-primary/10 p-0.5 rounded",
-                        multiValueRemove: () => "rounded-full text-gray-500 hover:text-gray-800",
-                        menuList: () => "bg-background p-1 rounded z-10 border",
-                        option: ({ isFocused, isSelected }) =>
-                           cn(isFocused && "bg-primary/10", isSelected && "bg-primary/10", "px-2 py-1"),
-                     }}
                      isClearable={false}
-                     components={customComponents}
                   />
                )}
             />

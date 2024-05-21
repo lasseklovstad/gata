@@ -1,8 +1,10 @@
 import { useFetcher } from "@remix-run/react";
+import Select from "react-select";
 
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
-import { Select } from "~/components/ui/select";
+import { getSelectDefaultProps } from "~/utils/selectUtils";
 
+import { ExternalUserIcon } from "./ExternalUserIcon";
 import type { IGataUser } from "../../../types/GataUser.type";
 import { memberIntent } from "../intent";
 
@@ -16,8 +18,10 @@ export const SelectPrimaryEmail = ({ user }: Props) => {
    const options = user.externalUserProviders.map((user) => ({
       label: user.email,
       value: user.id,
-      user: user,
+      icon: <ExternalUserIcon user={user} />,
    }));
+
+   const selectedOption = options.filter((option) => user.primaryUser.id === option.value);
 
    return (
       <FormItem name="primaryUserEmail">
@@ -26,23 +30,18 @@ export const SelectPrimaryEmail = ({ user }: Props) => {
             render={(props) => (
                <Select
                   {...props}
-                  value={user.primaryUser.id}
-                  onChange={(event) => {
+                  {...getSelectDefaultProps<false>()}
+                  value={selectedOption}
+                  options={options}
+                  isMulti={false}
+                  onChange={(option) => {
+                     if (!option?.value) return;
                      fetcher.submit(
-                        { primaryUserEmail: event.target.value, intent: memberIntent.updatePrimaryUserEmail },
+                        { primaryUserEmail: option.value, intent: memberIntent.updatePrimaryUserEmail },
                         { method: "POST" }
                      );
                   }}
-               >
-                  {options.map((user) => (
-                     <option value={user.value} key={user.value}>
-                        {user.label}
-                        {user.user.id.includes("facebook") && " (Facebook)"}
-                        {user.user.id.includes("google") && " (Google)"}
-                        {user.user.id.includes("auth0") && " (Auth0)"}
-                     </option>
-                  ))}
-               </Select>
+               />
             )}
          />
          <FormDescription>Denne eposten blir brukt til å sende ut informasjon</FormDescription>

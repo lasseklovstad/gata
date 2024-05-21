@@ -7,7 +7,7 @@ import { getResponsibilities } from "~/api/responsibility.api";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { FormControl, FormItem, FormLabel, FormProvider } from "~/components/ui/form";
-import { Select } from "~/components/ui/select";
+import { NativeSelect } from "~/components/ui/native-select";
 import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
@@ -44,7 +44,7 @@ export default function AddResponsibilityUserDialog() {
                   <FormLabel>Velg ansvarspost</FormLabel>
                   <FormControl
                      render={(props) => (
-                        <Select {...props} className="w-[180px]" required>
+                        <NativeSelect {...props} className="w-[180px]" required>
                            <option value="" disabled selected>
                               Velg ansvarspost
                            </option>
@@ -53,7 +53,7 @@ export default function AddResponsibilityUserDialog() {
                                  {label}
                               </option>
                            ))}
-                        </Select>
+                        </NativeSelect>
                      )}
                   />
                </FormItem>
@@ -61,7 +61,7 @@ export default function AddResponsibilityUserDialog() {
                   <FormLabel>Velg år</FormLabel>
                   <FormControl
                      render={(props) => (
-                        <Select {...props} className="w-[180px]" required>
+                        <NativeSelect {...props} className="w-[180px]" required>
                            <option value="" disabled selected>
                               Velg år
                            </option>
@@ -74,7 +74,7 @@ export default function AddResponsibilityUserDialog() {
                                     {label}
                                  </option>
                               ))}
-                        </Select>
+                        </NativeSelect>
                      )}
                   />
                </FormItem>

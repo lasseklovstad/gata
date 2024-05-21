@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Alert, AlertAction, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { FormControl, FormItem, FormLabel } from "~/components/ui/form";
-import { Select } from "~/components/ui/select";
+import { NativeSelect } from "~/components/ui/native-select";
 import { Typography } from "~/components/ui/typography";
 
 import { SelectPrimaryEmail } from "./SelectPrimaryEmail";
@@ -83,7 +83,7 @@ export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) 
                         <FormLabel>Velg år</FormLabel>
                         <FormControl
                            render={(props) => (
-                              <Select
+                              <NativeSelect
                                  {...props}
                                  onChange={(ev) => setSelectedYear(ev.target.value.toString())}
                                  value={selectedYear}
@@ -98,7 +98,7 @@ export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) 
                                        </option>
                                     );
                                  })}
-                              </Select>
+                              </NativeSelect>
                            )}
                         />
                      </FormItem>

@@ -3,7 +3,7 @@ import type { ComponentProps } from "react";
 
 import { cn } from "~/utils";
 
-export const Select = ({ className, ...props }: ComponentProps<"select">) => {
+export const NativeSelect = ({ className, ...props }: ComponentProps<"select">) => {
    return (
       <div className={cn("relative", className)}>
          <select
