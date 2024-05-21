@@ -24,8 +24,8 @@ class MemberResponsibilityModal {
 
   async fillForm(name: string, year: string) {
     await expect(this.modal).toBeVisible();
-    await selectComboBoxOption(this.page, this.responsibilityCombobox, name);
-    await selectComboBoxOption(this.page, this.yearCombobox, year);
+    await this.responsibilityCombobox.selectOption(name);
+    await this.yearCombobox.selectOption(year);
     await this.saveButton.click();
     await expect(this.modal).toBeHidden();
   }
