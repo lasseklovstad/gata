@@ -87,10 +87,8 @@ export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) 
                                  {...props}
                                  onChange={(ev) => setSelectedYear(ev.target.value.toString())}
                                  value={selectedYear}
+                                 className="max-w-[90px]"
                               >
-                                 <option disabled selected value="">
-                                    Velg år
-                                 </option>
                                  {years.map((year) => {
                                     return (
                                        <option value={year} key={year}>

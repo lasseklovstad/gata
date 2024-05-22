@@ -44,8 +44,8 @@ export default function AddResponsibilityUserDialog() {
                   <FormLabel>Velg ansvarspost</FormLabel>
                   <FormControl
                      render={(props) => (
-                        <NativeSelect {...props} className="w-[180px]" required>
-                           <option value="" disabled selected>
+                        <NativeSelect {...props} defaultValue="" className="w-[180px]" required>
+                           <option value="" disabled>
                               Velg ansvarspost
                            </option>
                            {responsibilityOptions.map(({ label, value }) => (
@@ -61,8 +61,8 @@ export default function AddResponsibilityUserDialog() {
                   <FormLabel>Velg år</FormLabel>
                   <FormControl
                      render={(props) => (
-                        <NativeSelect {...props} className="w-[180px]" required>
-                           <option value="" disabled selected>
+                        <NativeSelect {...props} defaultValue="" className="w-[180px]" required>
+                           <option value="" disabled>
                               Velg år
                            </option>
                            {years
