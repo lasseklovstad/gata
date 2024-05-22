@@ -1,16 +1,14 @@
-import { Text } from "@chakra-ui/react";
 import type { RenderLeafProps } from "slate-react";
+
+import { cn } from "~/utils";
 
 export const RichTextLeaf = ({ leaf, attributes, children }: Partial<RenderLeafProps>) => {
    return (
-      <Text
+      <span
          {...attributes}
-         as="span"
-         variant="inherit"
-         fontWeight={leaf?.bold ? "bold" : "normal"}
-         sx={{ textDecoration: leaf?.underline ? "underline" : "none", fontStyle: leaf?.italic ? "italic" : "none" }}
+         className={cn(leaf?.bold && "font-bold", leaf?.underline && "underline", leaf?.italic && "italic")}
       >
          {children}
-      </Text>
+      </span>
    );
 };

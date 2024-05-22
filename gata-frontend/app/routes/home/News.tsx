@@ -1,6 +1,9 @@
-import { Box, Button, Heading, List, ListItem, Text } from "@chakra-ui/react";
-import { Add } from "@mui/icons-material";
 import { Link, Outlet } from "@remix-run/react";
+import { Plus } from "lucide-react";
+import { useId } from "react";
+
+import { Button } from "~/components/ui/button";
+import { Typography } from "~/components/ui/typography";
 
 import { NewsItem } from "./NewsItem";
 import { PageLayout } from "../../components/PageLayout";
@@ -14,30 +17,28 @@ type NewsProps = {
 };
 
 export const News = ({ reportPage, loggedInUser }: NewsProps) => {
+   const titleId = useId();
    return (
       <PageLayout>
-         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
-            <Heading as="h1" id="news-page-title">
+         <div className="flex items-center justify-between flex-wrap mb-4">
+            <Typography variant="h1" id={titleId}>
                Nyheter
-            </Heading>
-            <Button leftIcon={<Add />} as={Link} to="new">
+            </Typography>
+            <Button as={Link} to="new">
+               <Plus className="mr-1" />
                Opprett
             </Button>
-         </Box>
-         <List aria-labelledby="news-page-title">
+         </div>
+         <ul aria-labelledby={titleId}>
             {reportPage.content.map((report) => {
                return (
-                  <ListItem key={report.id}>
+                  <li key={report.id}>
                      <NewsItem report={report} loggedInUser={loggedInUser} />
-                  </ListItem>
+                  </li>
                );
             })}
-            {reportPage.totalElements === 0 && (
-               <ListItem>
-                  <Text>Det finnes ingen nyheter</Text>
-               </ListItem>
-            )}
-         </List>
+            {reportPage.totalElements === 0 && <li>Det finnes ingen nyheter</li>}
+         </ul>
          <Outlet />
       </PageLayout>
    );

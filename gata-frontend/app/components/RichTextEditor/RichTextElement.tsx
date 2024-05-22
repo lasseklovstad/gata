@@ -1,27 +1,11 @@
-import { Heading, ListItem, OrderedList, Text, UnorderedList } from "@chakra-ui/react";
 import type { RenderElementProps } from "slate-react";
 
-import { SlateImage, Image, SavingImage } from "./Image";
+import { Image, SavingImage, SlateImage } from "./Image";
+import { Typography } from "../ui/typography";
 
 type RichTextElementProps = {
    outsideContext?: boolean;
 } & Partial<RenderElementProps>;
-
-const getVariant = (type: string) => {
-   if (type === "h2") {
-      return "3xl";
-   }
-   if (type === "h3") {
-      return "2xl";
-   }
-   if (type === "h4") {
-      return "xl";
-   }
-   if (type === "body2") {
-      return "sm";
-   }
-   return "md";
-};
 
 export const RichTextElement = ({ attributes, children, element, outsideContext = false }: RichTextElementProps) => {
    switch (element?.type) {
@@ -32,36 +16,36 @@ export const RichTextElement = ({ attributes, children, element, outsideContext 
       case "h5":
       case "h6":
          return (
-            <Heading as={element.type} {...attributes} fontSize={getVariant(element.type)} mb={2}>
+            <Typography variant={element.type} {...attributes} className="mb-2">
                {children}
-            </Heading>
+            </Typography>
          );
       case "body1":
+         return <Typography {...attributes}>{children}</Typography>;
       case "body2":
          return (
-            <Text {...attributes} fontSize={getVariant(element.type)}>
+            <Typography {...attributes} variant="smallText">
                {children}
-            </Text>
+            </Typography>
          );
       case "list-item":
-         return <ListItem {...attributes}>{children}</ListItem>;
       case "native-list-item":
          return (
-            <Text as="li" {...attributes}>
+            <li {...attributes} className="ml-6">
                {children}
-            </Text>
+            </li>
          );
       case "bulleted-list":
          return (
-            <UnorderedList p={2} {...attributes}>
+            <ul {...attributes} className="list-disc">
                {children}
-            </UnorderedList>
+            </ul>
          );
       case "numbered-list":
          return (
-            <OrderedList p={2} {...attributes}>
+            <ol {...attributes} className="list-decimal">
                {children}
-            </OrderedList>
+            </ol>
          );
       case "saving-image":
          return !outsideContext ? <SavingImage oldId={element.imageId!} /> : null;
@@ -74,10 +58,6 @@ export const RichTextElement = ({ attributes, children, element, outsideContext 
             <Image id={element?.imageId || ""} size={element?.size} />
          );
       default:
-         return (
-            <Text {...attributes} variant="body1">
-               {children}
-            </Text>
-         );
+         return <Typography {...attributes}>{children}</Typography>;
    }
 };

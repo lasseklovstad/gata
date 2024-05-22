@@ -1,19 +1,11 @@
-import {
-   Alert,
-   AlertDescription,
-   AlertIcon,
-   AlertTitle,
-   Box,
-   Button,
-   Flex,
-   FormControl,
-   FormLabel,
-   Heading,
-   Select,
-   Text,
-} from "@chakra-ui/react";
 import { useFetcher } from "@remix-run/react";
 import { useState } from "react";
+
+import { Alert, AlertAction, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
+import { FormControl, FormItem, FormLabel } from "~/components/ui/form";
+import { NativeSelect } from "~/components/ui/native-select";
+import { Typography } from "~/components/ui/typography";
 
 import { SelectPrimaryEmail } from "./SelectPrimaryEmail";
 import type { IContingentInfo } from "../../../types/ContingentInfo.type";
@@ -42,85 +34,89 @@ export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) 
    const getContingent = () => {
       const hasPaid = !!user.contingents.find((c) => c.year.toString(10) === selectedYear)?.isPaid;
       return (
-         <Alert status={hasPaid ? "success" : "warning"} sx={{ justifyContent: "space-between", flexWrap: "wrap" }}>
-            <Flex>
-               <AlertIcon />
-               <Box>
-                  <AlertTitle>Status: {hasPaid ? "Betalt" : "Ikke betalt"}</AlertTitle>
-                  {!hasPaid && (
-                     <AlertDescription>
-                        {contingentInfo.size}kr til {contingentInfo.bank}
-                     </AlertDescription>
-                  )}
-               </Box>
-            </Flex>
-            <input readOnly hidden value={hasPaid ? "true" : "false"} name="hasPaid" />
-            {isAdmin(loggedInUser) && (
-               <Button
-                  isLoading={fetcher.state !== "idle"}
-                  variant="outline"
-                  type="submit"
-                  name="intent"
-                  value={memberIntent.updateContingent}
-               >
-                  {hasPaid ? "Marker som ikke betalt" : "Marker som betalt"}
-               </Button>
+         <Alert variant={hasPaid ? "success" : "warning"} className="my-2">
+            <AlertTitle>Status: {hasPaid ? "Betalt" : "Ikke betalt"}</AlertTitle>
+            {!hasPaid && (
+               <AlertDescription>
+                  {contingentInfo.size}kr til {contingentInfo.bank}
+               </AlertDescription>
             )}
+            <AlertAction>
+               <input readOnly hidden value={hasPaid ? "true" : "false"} name="hasPaid" />
+               {isAdmin(loggedInUser) && (
+                  <Button
+                     isLoading={fetcher.state !== "idle"}
+                     variant="outline"
+                     type="submit"
+                     name="intent"
+                     value={memberIntent.updateContingent}
+                  >
+                     {hasPaid ? "Marker som ikke betalt" : "Marker som betalt"}
+                  </Button>
+               )}
+            </AlertAction>
          </Alert>
       );
    };
    return (
       <>
-         <Box my={4}>
-            <Text variant="body1">
+         <div className="my-4">
+            <Typography>
                <strong>Navn:</strong> {user.primaryUser.name}
-            </Text>
+            </Typography>
             {isAdmin(loggedInUser) ? (
                <SelectPrimaryEmail user={user} />
             ) : (
-               <Text variant="body1">
+               <Typography>
                   <strong>Email:</strong> {user.primaryUser.email}
-               </Text>
+               </Typography>
             )}
-         </Box>
+         </div>
          {isMember(user) ? (
             <>
-               <Heading as="h2" size="lg" mb={2}>
+               <Typography variant="h2" className="mb-2">
                   Kontingent
-               </Heading>
+               </Typography>
                <fetcher.Form method="POST">
-                  <Box boxShadow="md" bg="white" rounded={4} sx={{ p: 2, mb: 4 }}>
-                     <FormControl mb={1}>
+                  <div className="shadow bg-background rounded p-2 mb-4">
+                     <FormItem name="year">
                         <FormLabel>Velg år</FormLabel>
-                        <Select
-                           name="year"
-                           width={100}
-                           placeholder="Velg år"
-                           onChange={(ev) => setSelectedYear(ev.target.value.toString())}
-                           value={selectedYear}
-                        >
-                           {years.map((year) => {
-                              return (
-                                 <option value={year} key={year}>
-                                    {year}
-                                 </option>
-                              );
-                           })}
-                        </Select>
-                     </FormControl>
+                        <FormControl
+                           render={(props) => (
+                              <NativeSelect
+                                 {...props}
+                                 onChange={(ev) => setSelectedYear(ev.target.value.toString())}
+                                 value={selectedYear}
+                                 className="max-w-[90px]"
+                              >
+                                 {years.map((year) => {
+                                    return (
+                                       <option value={year} key={year}>
+                                          {year}
+                                       </option>
+                                    );
+                                 })}
+                              </NativeSelect>
+                           )}
+                        />
+                     </FormItem>
                      {getContingent()}
                      {notPaidYears.length > 0 ? (
-                        <Alert status="error">
-                           Du har gjenstående betalinger for følgende år: {notPaidYears.sort().join(", ")}
+                        <Alert variant="destructive">
+                           <AlertTitle>
+                              Du har gjenstående betalinger for følgende år: {notPaidYears.sort().join(", ")}
+                           </AlertTitle>
                         </Alert>
                      ) : (
-                        <Alert status="success">Du har ingen gjenstående betalinger</Alert>
+                        <Alert variant="success">
+                           <AlertTitle>Du har ingen gjenstående betalinger</AlertTitle>
+                        </Alert>
                      )}
-                  </Box>
+                  </div>
                </fetcher.Form>
             </>
          ) : (
-            <Alert status="info" my={4}>
+            <Alert className="my-4">
                <AlertTitle>Kontingent</AlertTitle>
                <AlertDescription>Bruker må vær medlem for å registrere kontingent</AlertDescription>
             </Alert>

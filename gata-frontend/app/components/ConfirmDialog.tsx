@@ -1,5 +1,8 @@
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import { Button } from "./ui/button";
+import { Dialog, DialogFooter, DialogHeading } from "./ui/dialog";
+import { Typography } from "./ui/typography";
 
 type ConfirmDialogProps = {
    onClose: () => void;
@@ -11,26 +14,34 @@ type ConfirmDialogProps = {
 };
 
 const ConfirmDialog = ({ text, onClose, onConfirm, open, title, showOnlyOk }: ConfirmDialogProps) => {
+   const ref = useRef<HTMLDialogElement>(null);
+
+   useEffect(() => {
+      if (!ref.current) return;
+      if (open) {
+         ref.current.showModal();
+      } else {
+         ref.current.close();
+      }
+   }, [open]);
+
    return (
-      <Modal isOpen={open} onClose={onClose}>
-         <ModalOverlay />
-         <ModalContent>
-            <ModalHeader>{title || "Er du sikker?"}</ModalHeader>
-            <ModalBody>{text}</ModalBody>
-            <ModalFooter gap={2}>
-               {showOnlyOk ? (
-                  <Button onClick={onClose}>Ok</Button>
-               ) : (
-                  <>
-                     <Button onClick={onConfirm}>Jeg er sikker</Button>
-                     <Button onClick={onClose} variant="ghost">
-                        Avbryt
-                     </Button>
-                  </>
-               )}
-            </ModalFooter>
-         </ModalContent>
-      </Modal>
+      <Dialog ref={ref} onClose={onClose}>
+         <DialogHeading>{title || "Er du sikker?"}</DialogHeading>
+         <Typography>{text}</Typography>
+         <DialogFooter>
+            {showOnlyOk ? (
+               <Button onClick={onClose}>Ok</Button>
+            ) : (
+               <>
+                  <Button onClick={onConfirm}>Jeg er sikker</Button>
+                  <Button onClick={onClose} variant="ghost">
+                     Avbryt
+                  </Button>
+               </>
+            )}
+         </DialogFooter>
+      </Dialog>
    );
 };
 

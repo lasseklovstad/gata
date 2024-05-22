@@ -1,7 +1,9 @@
-import { Avatar, Box, Divider, Flex, Text } from "@chakra-ui/react";
-import { Check, Clear } from "@mui/icons-material";
+import { Link } from "@remix-run/react";
+import { Check, User, X } from "lucide-react";
 
-import { ListItemLink } from "../../components/ListItemLink";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Typography } from "~/components/ui/typography";
+
 import type { IGataUser } from "../../types/GataUser.type";
 import { isMember } from "../../utils/roleUtils";
 
@@ -13,35 +15,39 @@ type UserListItemProps = {
 export const UserListItem = ({ user, isLoggedInUserAdmin }: UserListItemProps) => {
    const isCurrentContingentPaid = user.contingents.find((c) => c.year === new Date().getFullYear())?.isPaid;
    return (
-      <ListItemLink to={`/member/${user.id}`}>
-         <Flex gap={2} p={2}>
-            <Avatar src={user.primaryUser.picture || undefined} />
-            <Box>
-               <Text>{user.primaryUser.name}</Text>
-               <Text color="gray" fontSize="sm">
-                  Sist innlogget: {new Date(user.primaryUser.lastLogin).toLocaleDateString("no")}
-               </Text>
-               {isLoggedInUserAdmin && isMember(user) && (
-                  <Text
-                     fontSize="sm"
-                     color={isCurrentContingentPaid ? "green" : "red"}
-                     alignItems="center"
-                     display="flex"
-                  >
-                     {isCurrentContingentPaid ? (
-                        <>
-                           <Check /> Betalt kontigent
-                        </>
-                     ) : (
-                        <>
-                           <Clear /> Ikke betalt kontigent
-                        </>
-                     )}
-                  </Text>
-               )}
-            </Box>
-         </Flex>
-         <Divider />
-      </ListItemLink>
+      <li className="hover:bg-blue-50">
+         <Link to={`/member/${user.id}`}>
+            <div className="flex gap-4 p-2 items-center">
+               <Avatar>
+                  <AvatarImage src={user.primaryUser.picture || undefined} alt={user.primaryUser.name} />
+                  <AvatarFallback>
+                     <User />
+                  </AvatarFallback>
+               </Avatar>
+               <div>
+                  <Typography variant="largeText">{user.primaryUser.name}</Typography>
+                  <Typography variant="smallText" className="text-gray-500">
+                     Sist innlogget: {new Date(user.primaryUser.lastLogin).toLocaleDateString("no")}
+                  </Typography>
+                  {isLoggedInUserAdmin && isMember(user) && (
+                     <Typography
+                        variant="smallText"
+                        className={`${isCurrentContingentPaid ? "text-green-500" : "text-red-500"} flex items-center`}
+                     >
+                        {isCurrentContingentPaid ? (
+                           <>
+                              <Check /> Betalt kontigent
+                           </>
+                        ) : (
+                           <>
+                              <X /> Ikke betalt kontigent
+                           </>
+                        )}
+                     </Typography>
+                  )}
+               </div>
+            </div>
+         </Link>
+      </li>
    );
 };

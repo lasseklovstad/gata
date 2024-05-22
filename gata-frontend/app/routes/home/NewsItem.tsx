@@ -1,5 +1,7 @@
-import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
 import { Link } from "@remix-run/react";
+
+import { Button } from "~/components/ui/button";
+import { Typography } from "~/components/ui/typography";
 
 import { ClientOnly } from "../../components/ClientOnly";
 import { RichTextPreview } from "../../components/RichTextEditor/RichTextPreview";
@@ -15,28 +17,26 @@ type NewsItemProps = {
 export const NewsItem = ({ report, loggedInUser }: NewsItemProps) => {
    const canEdit = loggedInUser.id === report.createdBy?.id || isAdmin(loggedInUser);
    return (
-      <Box sx={{ display: "flex", flexDirection: "column", width: "100%", alignItems: "flex-end" }}>
-         <Flex alignItems="center" width="100%">
-            <Heading flex={1} as="h2" size="md">
-               {report.title}
-            </Heading>
+      <div className="flex flex-col w-full items-end gap-2">
+         <div className="flex items-center justify-between w-full">
+            <Typography variant="h2">{report.title}</Typography>
             {canEdit && (
-               <Button as={Link} to={`/reportInfo/${report.id}`} variant="ghost">
+               <Button variant="ghost" as={Link} to={`/reportInfo/${report.id}`}>
                   Rediger
                </Button>
             )}
-         </Flex>
-         <Box boxShadow="xs" rounded={4} sx={{ p: { base: 1, md: 2 }, width: "100%" }}>
+         </div>
+         <div className="border-[1.7px] shadow-md rounded-md w-full p-4 ">
             {report.content && (
                <ClientOnly>
                   <RichTextPreview content={report.content} />
                </ClientOnly>
             )}
-            {!report.content && <Text>Det er ikke lagt til innhold enda.</Text>}
-         </Box>
-         <Text fontSize="sm" color="gray">
+            {!report.content && <Typography>Det er ikke lagt til innhold enda.</Typography>}
+         </div>
+         <Typography className="text-gray-600">
             Dato endret: {new Date(report.lastModifiedDate).toLocaleDateString("no")}
-         </Text>
-      </Box>
+         </Typography>
+      </div>
    );
 };

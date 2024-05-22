@@ -1,28 +1,20 @@
-import { Box, Button, ButtonGroup, CircularProgress, Divider } from "@chakra-ui/react";
-import {
-   FormatBold,
-   FormatItalic,
-   FormatListBulleted,
-   FormatListNumbered,
-   FormatUnderlined,
-   Save,
-} from "@mui/icons-material";
 import { useSubmit } from "@remix-run/react";
+import { Loader2, Save } from "lucide-react";
 import { useCallback, useMemo, useRef } from "react";
-import type { Descendant } from "slate";
 import { createEditor } from "slate";
+import type { Descendant } from "slate";
 import { withHistory } from "slate-history";
-import type { RenderElementProps, RenderLeafProps } from "slate-react";
 import { Editable, Slate, withReact } from "slate-react";
+import type { RenderElementProps, RenderLeafProps } from "slate-react";
 
 import { AddImage } from "./AddImage";
-import { BlockButton } from "./BlockButton";
-import { MarkButton } from "./MarkButton";
 import { insertTab, toggleMark } from "./RichTextEditor.util";
 import { RichTextElement } from "./RichTextElement";
 import { RichTextLeaf } from "./RichTextLeaf";
+import { TextDecorationGroup } from "./TextDecorationGroup";
+import { TextStyleGroup } from "./TextStyleGroup";
 import { insertImage, withImages } from "./withImages";
-import { LoadingButton } from "../Loading";
+import { Button } from "../ui/button";
 
 type RichTextEditorProps = {
    onCancel: () => void;
@@ -68,68 +60,29 @@ export const RichTextEditor = ({ onCancel, onSave, isLoading, initialContent }: 
                }
             }}
          >
-            <Box boxShadow="xl" sx={{ mt: 1 }}>
-               <Box
-                  bg="white"
-                  zIndex={1}
-                  sx={{
-                     display: "flex",
-                     justifyContent: "space-between",
-                     flexWrap: "wrap-reverse",
-                     alignItems: "center",
-                     position: "sticky",
-                     top: "0",
-                  }}
-               >
-                  <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center" }}>
-                     <ButtonGroup isAttached aria-label="Velg tekststørrelse" sx={{ p: 1 }}>
-                        <BlockButton type="h2">H2</BlockButton>
-                        <BlockButton type="h3">H3</BlockButton>
-                        <BlockButton type="h4">H4</BlockButton>
-                        <BlockButton type="body1">Normal</BlockButton>
-                        <BlockButton type="body2">Liten</BlockButton>
-                        <BlockButton type="bulleted-list">
-                           <FormatListBulleted />
-                        </BlockButton>
-                        <BlockButton type="numbered-list">
-                           <FormatListNumbered />
-                        </BlockButton>
-                     </ButtonGroup>
-
-                     <ButtonGroup isAttached aria-label="Velg tekststørrelse" sx={{ p: 1 }}>
-                        <MarkButton type="bold">
-                           <FormatBold />
-                        </MarkButton>
-                        <MarkButton type="italic">
-                           <FormatItalic />
-                        </MarkButton>
-                        <MarkButton type="underline">
-                           <FormatUnderlined />
-                        </MarkButton>
-                     </ButtonGroup>
+            <div className="shadow mt-1 divide-y">
+               <div className="bg-background p-1 z-10 sticky top-0 flex flex-wrap-reverse items-center justify-between">
+                  <div className="flex p-1 gap-2 flex-wrap items-center">
+                     <TextStyleGroup />
+                     <TextDecorationGroup />
                      <AddImage
                         onAddImage={(url) => {
                            insertImage(editor, url);
                         }}
                      />
-                     {isLoading && <CircularProgress isIndeterminate />}
-                  </Box>
-                  <Box sx={{ p: 1 }}>
-                     <Button variant="ghost" onClick={() => onCancel()} sx={{ mr: 1 }}>
+                     {isLoading && <Loader2 className=" h-6 w-6 animate-spin" />}
+                  </div>
+                  <div className="flex gap-2">
+                     <Button variant="ghost" onClick={() => onCancel()}>
                         Avbryt
                      </Button>
-                     <LoadingButton
-                        leftIcon={<Save />}
-                        isLoading={isLoading}
-                        onClick={() => handleSave(true)}
-                        sx={{ mr: 1 }}
-                     >
+                     <Button isLoading={isLoading} onClick={() => handleSave(true)}>
+                        <Save className="mr-2" />
                         Lagre
-                     </LoadingButton>
-                  </Box>
-               </Box>
-               <Divider />
-               <Box sx={{ p: 2, minHeight: "600px" }}>
+                     </Button>
+                  </div>
+               </div>
+               <div className="p-2 min-[600px]:">
                   <Editable
                      aria-label="Rediger innhold"
                      style={{ minHeight: "600px", padding: "6px" }}
@@ -179,8 +132,8 @@ export const RichTextEditor = ({ onCancel, onSave, isLoading, initialContent }: 
                         }
                      }}
                   />
-               </Box>
-            </Box>
+               </div>
+            </div>
          </Slate>
       </>
    );

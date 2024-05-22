@@ -1,23 +1,15 @@
-import {
-   Button,
-   FormControl,
-   FormLabel,
-   Modal,
-   ModalBody,
-   ModalContent,
-   ModalFooter,
-   ModalHeader,
-   ModalOverlay,
-} from "@chakra-ui/react";
-import { Save } from "@mui/icons-material";
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { Link, useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
-import { Select } from "chakra-react-select";
-import { useState } from "react";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
+import { Save } from "lucide-react";
 
 import { getResponsibilities } from "~/api/responsibility.api";
+import { Button } from "~/components/ui/button";
+import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
+import { FormControl, FormItem, FormLabel, FormProvider } from "~/components/ui/form";
+import { NativeSelect } from "~/components/ui/native-select";
 import { createAuthenticator } from "~/utils/auth.server";
+import { useDialog } from "~/utils/dialogUtils";
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
    const token = await createAuthenticator(context).getRequiredAuthToken(request);
@@ -30,17 +22,13 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
    return json({ responsibilities });
 };
 
-type IOption = { value: string; label: string };
-
 const numberOfYears = 10;
 const todaysYear = new Date().getFullYear();
 const years = Array.from({ length: numberOfYears }, (v, i) => todaysYear - numberOfYears + 2 + i).reverse();
 
 export default function AddResponsibilityUserDialog() {
    const { responsibilities } = useLoaderData<typeof loader>();
-   const navigate = useNavigate();
-   const [selectedResp, setSelectedResp] = useState<IOption | null>();
-   const [selectedYear, setSelectedYear] = useState<IOption | null>();
+   const { dialogRef } = useDialog({ defaultOpen: true });
    const fetcher = useFetcher();
 
    const responsibilityOptions = responsibilities.map((res) => {
@@ -48,46 +36,59 @@ export default function AddResponsibilityUserDialog() {
    });
 
    return (
-      <Modal isOpen onClose={() => navigate("..")}>
-         <ModalOverlay />
-         <ModalContent>
-            <fetcher.Form method="post" action="..">
-               <ModalHeader>Legg til ansvarspost</ModalHeader>
-               <ModalBody>
-                  <FormControl>
-                     <FormLabel>Velg ansvarspost</FormLabel>
-                     <Select<IOption, false, never>
-                        name="responsibilityId"
-                        variant="filled"
-                        placeholder="Velg ansvarspost"
-                        onChange={(ev) => setSelectedResp(ev)}
-                        value={selectedResp}
-                        options={responsibilityOptions}
-                     />
-                  </FormControl>
-                  <FormControl>
-                     <FormLabel>Velg år</FormLabel>
-                     <Select<{ value: string; label: string }, false, never>
-                        placeholder="Velg år"
-                        name="year"
-                        onChange={(ev) => setSelectedYear(ev)}
-                        value={selectedYear}
-                        options={years.map((res) => {
-                           return { label: res.toString(), value: res.toString() };
-                        })}
-                     />
-                  </FormControl>
-               </ModalBody>
-               <ModalFooter gap={2}>
-                  <Button type="submit" isLoading={fetcher.state !== "idle"} leftIcon={<Save />}>
-                     Lagre
-                  </Button>
-                  <Button as={Link} to=".." variant="ghost">
-                     Avbryt
-                  </Button>
-               </ModalFooter>
-            </fetcher.Form>
-         </ModalContent>
-      </Modal>
+      <Dialog ref={dialogRef}>
+         <fetcher.Form method="post" action="..">
+            <DialogHeading>Legg til ansvarspost</DialogHeading>
+            <FormProvider>
+               <FormItem name="responsibilityId">
+                  <FormLabel>Velg ansvarspost</FormLabel>
+                  <FormControl
+                     render={(props) => (
+                        <NativeSelect {...props} defaultValue="" className="w-[180px]" required>
+                           <option value="" disabled>
+                              Velg ansvarspost
+                           </option>
+                           {responsibilityOptions.map(({ label, value }) => (
+                              <option key={value} value={value}>
+                                 {label}
+                              </option>
+                           ))}
+                        </NativeSelect>
+                     )}
+                  />
+               </FormItem>
+               <FormItem name="year">
+                  <FormLabel>Velg år</FormLabel>
+                  <FormControl
+                     render={(props) => (
+                        <NativeSelect {...props} defaultValue="" className="w-[180px]" required>
+                           <option value="" disabled>
+                              Velg år
+                           </option>
+                           {years
+                              .map((res) => {
+                                 return { label: res.toString(), value: res.toString() };
+                              })
+                              .map(({ label, value }) => (
+                                 <option key={value} value={value}>
+                                    {label}
+                                 </option>
+                              ))}
+                        </NativeSelect>
+                     )}
+                  />
+               </FormItem>
+            </FormProvider>
+            <DialogFooter>
+               <Button type="submit" isLoading={fetcher.state !== "idle"}>
+                  <Save className="mr-2" />
+                  Lagre
+               </Button>
+               <Button as={Link} to=".." variant="ghost">
+                  Avbryt
+               </Button>
+            </DialogFooter>
+         </fetcher.Form>
+      </Dialog>
    );
 }

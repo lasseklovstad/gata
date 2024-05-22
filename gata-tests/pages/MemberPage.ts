@@ -1,8 +1,4 @@
 import { expect, Locator, Page } from "@playwright/test";
-import {
-  selectComboBoxOption,
-  selectSingleComboBoxOption,
-} from "../utils/combobox";
 import { ConfirmModal } from "./ConfirmModal";
 
 class MemberResponsibilityModal {
@@ -24,8 +20,8 @@ class MemberResponsibilityModal {
 
   async fillForm(name: string, year: string) {
     await expect(this.modal).toBeVisible();
-    await selectComboBoxOption(this.page, this.responsibilityCombobox, name);
-    await selectComboBoxOption(this.page, this.yearCombobox, year);
+    await this.responsibilityCombobox.selectOption(name);
+    await this.yearCombobox.selectOption(year);
     await this.saveButton.click();
     await expect(this.modal).toBeHidden();
   }
@@ -73,12 +69,19 @@ export class MemberPage {
   }
 
   async linkUser(name: string) {
-    await selectComboBoxOption(this.page, this.linkUserSelect, name);
+    await expect(this.linkUserSelect).toBeVisible();
+    await this.linkUserSelect.fill(name);
+    await this.page
+      .getByRole("option", { name: "Auth0 " + name, exact: true })
+      .click();
     await expect(this.getRemoveLinkedUserButton(name)).toBeVisible();
   }
 
   async changePrimaryUser(name: string) {
-    await selectSingleComboBoxOption(this.page, this.primaryUserSelect, name);
+    await this.primaryUserSelect.click();
+    await this.page
+      .getByRole("option", { name: "Auth0 " + name, exact: true })
+      .click();
     await expect(this.page.getByText(`Navn: ${name}`)).toBeVisible();
   }
 
@@ -93,11 +96,18 @@ export class MemberPage {
   }
 
   getResponsibilityButton(name: string) {
-    return this.page.getByRole("button", { name });
+    return this.page
+      .getByRole("group")
+      .filter({ hasText: name })
+      .locator("summary");
   }
 
   goToResponsibilityTab() {
-    return this.page.getByRole("tab", { name: "Ansvarsposter" }).click();
+    return this.page
+      .getByRole("main")
+      .getByRole("navigation")
+      .getByRole("link", { name: "Ansvarsposter" })
+      .click();
   }
 
   async addResponsibility(name: string) {

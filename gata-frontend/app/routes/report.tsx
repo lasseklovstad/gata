@@ -1,13 +1,13 @@
-import { Box, Button, Divider, Heading, List, ListItem, Text } from "@chakra-ui/react";
-import { Add } from "@mui/icons-material";
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Plus } from "lucide-react";
 
 import { getReportsSimple } from "~/api/report.api";
 import { getLoggedInUser } from "~/api/user.api";
-import { ListItemLink } from "~/components/ListItemLink";
 import { PageLayout } from "~/components/PageLayout";
+import { Button } from "~/components/ui/button";
+import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isAdmin } from "~/utils/roleUtils";
 
@@ -25,43 +25,30 @@ export default function ReportPage() {
    const { loggedInUser, reports } = useLoaderData<typeof loader>();
    return (
       <PageLayout>
-         <Box
-            sx={{
-               display: "flex",
-               justifyContent: "space-between",
-               alignItems: "center",
-               flexWrap: "wrap",
-            }}
-         >
-            <Heading variant="h1" id="report-page-title">
+         <div className="flex justify-between items-center">
+            <Typography variant="h1" id="report-page-title">
                Aktuelle dokumenter
-            </Heading>
+            </Typography>
             {isAdmin(loggedInUser) && (
-               <Button leftIcon={<Add />} as={Link} to="new">
+               <Button as={Link} to="new">
+                  <Plus className="mr-2" />
                   Opprett
                </Button>
             )}
-         </Box>
-         <List aria-labelledby="report-page-title">
+         </div>
+         <ul aria-labelledby="report-page-title" className="divide-y my-4">
             {reports.content.map((report) => {
                return (
-                  <ListItemLink key={report.id} to={`/reportInfo/${report.id}`}>
-                     <Box py={2}>
-                        <Text>{report.title}</Text>
-                        <Text color="gray" fontSize="sm">
-                           {report.description}
-                        </Text>
-                     </Box>
-                     <Divider />
-                  </ListItemLink>
+                  <li key={report.id} className="hover:bg-blue-50">
+                     <Link to={`/reportInfo/${report.id}`} className="w-full p-2 block">
+                        <Typography variant="largeText">{report.title}</Typography>
+                        <Typography className="text-gray-500">{report.description}</Typography>
+                     </Link>
+                  </li>
                );
             })}
-            {reports.totalElements === 0 && (
-               <ListItem>
-                  <Text>Det finnes ingen dokumenter enda!</Text>
-               </ListItem>
-            )}
-         </List>
+            {reports.totalElements === 0 && <li>Det finnes ingen dokumenter enda!</li>}
+         </ul>
          <Outlet />
       </PageLayout>
    );

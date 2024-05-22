@@ -1,6 +1,9 @@
-import { Avatar, Box, Divider, Flex, IconButton, ListItem, Text } from "@chakra-ui/react";
-import { Add } from "@mui/icons-material";
 import { useFetcher } from "@remix-run/react";
+import { Plus, User } from "lucide-react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
+import { Typography } from "~/components/ui/typography";
 
 import type { IExternalUser } from "../../types/GataUser.type";
 
@@ -16,23 +19,22 @@ export const ExternalUsersWithNoGataUserListItem = ({ user }: ExternalUsersWithN
    };
 
    return (
-      <ListItem>
-         <Flex gap={2} p={2}>
-            <Avatar src={user.picture || undefined} />
-            <Box flex={1} overflow="hidden">
-               <Text>{user.name}</Text>
-               <Text color="gray" fontSize="sm">
-                  Sist innlogget: {new Date(user.lastLogin).toLocaleDateString("no")}
-               </Text>
-            </Box>
-            <IconButton
-               onClick={handleAddClick}
-               isLoading={fetcher.state !== "idle"}
-               icon={<Add />}
-               aria-label="Legg til"
-            />
-         </Flex>
-         <Divider />
-      </ListItem>
+      <li className="flex gap-4 items-center p-2">
+         <Avatar>
+            <AvatarImage src={user.picture || undefined} alt="" />
+            <AvatarFallback>
+               <User />
+            </AvatarFallback>
+         </Avatar>
+         <div className="flex-grow">
+            <Typography variant="largeText">{user.name}</Typography>
+            <Typography variant="smallText" className="text-gray-500">
+               Sist innlogget: {new Date(user.lastLogin).toLocaleDateString("no")}
+            </Typography>
+         </div>
+         <Button size="icon" onClick={handleAddClick} isLoading={fetcher.state !== "idle"} aria-label="Legg til">
+            <Plus />
+         </Button>
+      </li>
    );
 };

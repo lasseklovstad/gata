@@ -1,9 +1,11 @@
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
 import type { ActionFunctionArgs } from "@remix-run/cloudflare";
 import { useFetcher, useNavigate } from "@remix-run/react";
 
+import { Button } from "~/components/ui/button";
+import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
+import { useDialog } from "~/utils/dialogUtils";
 
 export const loader = () => {
    // Todo: Hent ut brukere som ikke har betalt kontingent
@@ -20,44 +22,39 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
 };
 
 export default function ConfirmDelete() {
+   const { dialogRef } = useDialog({ defaultOpen: true });
    const fetcher = useFetcher<typeof action>();
    const navigate = useNavigate();
    const onClose = () => navigate("..");
 
    if (fetcher.data && fetcher.data.ok) {
       return (
-         <Modal isOpen onClose={onClose}>
-            <ModalOverlay />
-            <ModalContent>
-               <ModalHeader>Vellykket</ModalHeader>
-               <ModalBody>
-                  Det ble sent en email til: {fetcher.data.emails.length ? fetcher.data.emails.join(", ") : "Ingen"}
-               </ModalBody>
-               <ModalFooter>
-                  <Button onClick={onClose}>Ok</Button>
-               </ModalFooter>
-            </ModalContent>
-         </Modal>
+         <Dialog ref={dialogRef}>
+            <DialogHeading>Vellykket</DialogHeading>
+            Det ble sent en email til: {fetcher.data.emails.length ? fetcher.data.emails.join(", ") : "Ingen"}
+            <DialogFooter>
+               <Button type="button" onClick={onClose}>
+                  Ok
+               </Button>
+            </DialogFooter>
+         </Dialog>
       );
    }
 
    return (
-      <Modal isOpen onClose={onClose}>
-         <ModalOverlay />
-         <ModalContent>
-            <fetcher.Form method="POST">
-               <ModalHeader>Er du sikker?</ModalHeader>
-               <ModalBody>Er du sikker du vil sende e-post til alle brukere som ikke har betalt?</ModalBody>
-               <ModalFooter gap={2}>
-                  <Button type="submit" isLoading={fetcher.state !== "idle"}>
-                     Jeg er sikker
-                  </Button>
-                  <Button onClick={onClose} variant="ghost">
-                     Avbryt
-                  </Button>
-               </ModalFooter>
-            </fetcher.Form>
-         </ModalContent>
-      </Modal>
+      <Dialog ref={dialogRef}>
+         <fetcher.Form method="POST">
+            <DialogHeading>Er du sikker?</DialogHeading>
+            Er du sikker du vil sende e-post til alle brukere som ikke har betalt?
+            <DialogFooter>
+               <Button type="submit" isLoading={fetcher.state !== "idle"}>
+                  Jeg er sikker
+               </Button>
+               <Button type="button" onClick={onClose} variant="ghost">
+                  Avbryt
+               </Button>
+            </DialogFooter>
+         </fetcher.Form>
+      </Dialog>
    );
 }

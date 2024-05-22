@@ -1,6 +1,6 @@
-import { Text } from "@chakra-ui/react";
 import { redirect, type LoaderFunctionArgs } from "@remix-run/cloudflare";
 
+import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
@@ -18,5 +18,5 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
 };
 
 export default function RegisterLogin() {
-   return <Text>Registrerer bruker...</Text>;
+   return <Typography>Registrerer bruker...</Typography>;
 }

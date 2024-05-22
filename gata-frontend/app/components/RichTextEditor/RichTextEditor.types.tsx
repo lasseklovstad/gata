@@ -4,7 +4,7 @@ import type { ReactEditor } from "slate-react";
 export type ListTypes = "numbered-list" | "bulleted-list" | "list-item" | "mui-list" | "native-list-item";
 export const LIST_TYPES: ListTypes[] = ["numbered-list", "bulleted-list", "mui-list"];
 
-export type CustomElement = {
+type CustomElement = {
    type:
       | "h1"
       | "h2"
@@ -22,6 +22,8 @@ export type CustomElement = {
    imageId?: string | null;
    size?: number;
 };
+
+export type BlockTypes = CustomElement["type"];
 
 export type MarkType = "bold" | "italic" | "underline";
 

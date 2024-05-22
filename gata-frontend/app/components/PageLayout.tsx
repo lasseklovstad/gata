@@ -1,14 +1,12 @@
-import { Box } from "@chakra-ui/react";
 import type { ReactNode } from "react";
+
+import { cn } from "~/utils";
 
 type PageLayoutProps = {
    children: ReactNode;
+   className?: string;
 };
 
-export const PageLayout = ({ children }: PageLayoutProps) => {
-   return (
-      <Box py={4} px={{ base: 0, md: 4 }}>
-         {children}
-      </Box>
-   );
+export const PageLayout = ({ children, className }: PageLayoutProps) => {
+   return <div className={cn("py-4 md:px-4 px-0", className)}>{children}</div>;
 };

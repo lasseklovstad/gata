@@ -1,6 +1,6 @@
-import { Button } from "@chakra-ui/react";
 import { useFetcher } from "@remix-run/react";
 
+import { Button } from "~/components/ui/button";
 import type { IGataRole } from "~/types/GataRole.type";
 import type { IGataUser } from "~/types/GataUser.type";
 

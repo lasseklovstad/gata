@@ -1,6 +1,5 @@
-import { Box, ButtonGroup, Image as ChakraImage, IconButton, Skeleton } from "@chakra-ui/react";
-import { Add, Delete, Remove } from "@mui/icons-material";
 import { useFetcher } from "@remix-run/react";
+import { Minus, Plus, Trash } from "lucide-react";
 import { useEffect } from "react";
 import type { Element } from "slate";
 import { Transforms } from "slate";
@@ -9,8 +8,11 @@ import { ReactEditor, useFocused, useSelected, useSlate, useSlateStatic } from "
 
 import type { loader as fileLoader } from "~/routes/file.$fileId";
 import type { action as fileAction } from "~/routes/reportInfo.$reportId/route";
+import { cn } from "~/utils";
 
 import { replaceSavingImage } from "./withImages";
+import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 
 export const SlateImage = ({ attributes, children, element }: Partial<RenderElementProps>) => {
    const editor = useSlateStatic();
@@ -22,55 +24,52 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
       <div {...attributes}>
          {children}
 
-         <Box contentEditable={false} position="relative">
+         <div contentEditable={false} className="relative">
             <Image id={element?.imageId ?? ""} selected={selected} focused={focused} size={element?.size} />
 
-            <IconButton
+            <Button
+               size="icon"
                onMouseDown={(ev) => ev.preventDefault()}
                onClick={() => {
                   Transforms.removeNodes(editor, { at: path });
                }}
-               sx={{
-                  display: selected && focused ? undefined : "none",
-                  position: "absolute",
-                  top: "0.5em",
-                  left: "0.5em",
-                  zIndex: 100,
-               }}
-               icon={<Delete />}
+               className={cn(selected && focused ? undefined : "hidden", "absolute top-[0.5em] left-[0.5em] z-50")}
                aria-label="Slett bilde"
-            />
-            <ButtonGroup
-               sx={{
-                  display: selected && focused ? undefined : "none",
-                  position: "absolute",
-                  top: "0.5em",
-                  right: "0.5em",
-                  zIndex: 100,
-               }}
+            >
+               <Trash />
+            </Button>
+            <div
+               className={cn(
+                  selected && focused ? undefined : "hidden",
+                  "absolute top-[0.5em] right-[0.5em] z-50 space-x-2"
+               )}
             >
                {element?.size && element.size > 10 && (
-                  <IconButton
+                  <Button
+                     size="icon"
                      onMouseDown={(ev) => ev.preventDefault()}
                      onClick={() => {
                         Transforms.setNodes<Element>(editor, { type: "image", size: (element?.size || 0) - 10 });
                      }}
-                     icon={<Remove />}
                      aria-label="Reduser størrelse"
-                  />
+                  >
+                     <Minus />
+                  </Button>
                )}
                {element?.size && element.size < 100 && (
-                  <IconButton
+                  <Button
+                     size="icon"
                      onMouseDown={(ev) => ev.preventDefault()}
                      onClick={() => {
                         Transforms.setNodes<Element>(editor, { type: "image", size: (element?.size || 0) + 10 });
                      }}
-                     icon={<Add />}
                      aria-label="Øk størrelse"
-                  />
+                  >
+                     <Plus />
+                  </Button>
                )}
-            </ButtonGroup>
-         </Box>
+            </div>
+         </div>
       </div>
    );
 };
@@ -101,35 +100,15 @@ const InternalImage = ({ id, selected = false, focused = false, size = 50 }: Ima
    const imageSrc = fetcher.data?.data || fetcher.data?.cloudUrl;
    return (
       <>
-         {fetcher.state !== "idle" && <Skeleton variant="rectangular" width={400} height={300} />}
-         {fetcher.data && (
-            <ChakraImage
-               src={imageSrc}
-               sx={{
-                  boxShadow: selected && focused ? "0 0 0 3px #B4D5FF" : "none",
-                  display: "block",
-                  width: `${size}%`,
-                  mt: 1,
-                  mb: 1,
-               }}
-            />
-         )}
+         {fetcher.state !== "idle" && <Skeleton className="w-[400px] h-[300px]" />}
+         {fetcher.data && <ExternalImage id={imageSrc ?? ""} size={size} selected={selected} focused={focused} />}
       </>
    );
 };
 
 const ExternalImage = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
    return (
-      <ChakraImage
-         src={id}
-         sx={{
-            boxShadow: selected && focused ? "0 0 0 3px #B4D5FF" : "none",
-            display: "block",
-            width: `${size}%`,
-            mt: 1,
-            mb: 1,
-         }}
-      />
+      <img src={id} alt="" className={cn(selected && focused && "ring", "block my-1")} style={{ width: `${size}%` }} />
    );
 };
 
@@ -143,5 +122,5 @@ export const SavingImage = ({ oldId }: { oldId: string }) => {
       }
    }, [editor, fetcher, oldId]);
 
-   return <Skeleton variant="rectangular" width={400} height={300} />;
+   return <Skeleton className="w-[400px] h-[300px]" />;
 };
