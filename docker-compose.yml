@@ -8,8 +8,6 @@ services:
       - POSTGRES_PASSWORD=password
     expose:
       - 5432
-    volumes:
-      - "./postgres/data:/var/lib/postgresql/data"
     networks:
       - dockernet
     ports:
@@ -22,8 +20,8 @@ services:
       - DB_PORT=5432
       - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
       - AUTH0_DOMAIN=${AUTH0_DOMAIN}
-      - CLOUDINARY_URL=${CLOUDINARY_URL}
-      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - CLOUDINARY_URL=${CLOUDINARY_URL:-NA}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY:-NA}
       - GATA_MAKE_FIRST_USER_ADMIN=true
     build:
       context: .

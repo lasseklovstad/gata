@@ -19,7 +19,7 @@ export class GataHeader {
       name: "Aktuelle dokumenter",
     });
     this.menuButton = page.getByRole("button", { name: "Åpne meny" });
-    this.menu = page.getByRole("banner").getByRole("menu");
+    this.menu = page.getByRole("menu");
     this.page = page;
   }
 
@@ -28,11 +28,9 @@ export class GataHeader {
   ) {
     await this.menuButton.click();
     await expect(this.menu).toBeVisible();
-    const roleButton = this.menu
-      .getByRole("menuitem")
-      .filter({ hasText: role });
+    const roleButton = this.menu.filter({ hasText: role });
     await expect(roleButton).toBeVisible();
-    await roleButton.click();
+    await this.page.keyboard.press("Escape");
     await expect(this.menu).toBeHidden();
   }
 }

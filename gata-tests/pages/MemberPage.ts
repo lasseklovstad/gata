@@ -73,12 +73,16 @@ export class MemberPage {
   }
 
   async linkUser(name: string) {
-    await selectComboBoxOption(this.page, this.linkUserSelect, name);
+    await selectComboBoxOption(this.page, this.linkUserSelect, "Auth0 " + name);
     await expect(this.getRemoveLinkedUserButton(name)).toBeVisible();
   }
 
   async changePrimaryUser(name: string) {
-    await selectSingleComboBoxOption(this.page, this.primaryUserSelect, name);
+    await selectSingleComboBoxOption(
+      this.page,
+      this.primaryUserSelect,
+      "Auth0 " + name
+    );
     await expect(this.page.getByText(`Navn: ${name}`)).toBeVisible();
   }
 

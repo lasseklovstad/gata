@@ -7,9 +7,7 @@ export const selectComboBoxOption = async (
 ) => {
   await expect(comboBox).toBeVisible();
   await comboBox.fill(optionName);
-  await page
-    .getByRole("option", { name: "Auth0 " + optionName, exact: true })
-    .click();
+  await page.getByRole("option", { name: optionName, exact: true }).click();
 };
 
 export const selectSingleComboBoxOption = async (
@@ -19,7 +17,5 @@ export const selectSingleComboBoxOption = async (
 ) => {
   await expect(comboBox).toBeVisible();
   await comboBox.click();
-  await page
-    .getByRole("option", { name: "Auth0 " + optionName, exact: true })
-    .click();
+  await page.getByRole("option", { name: optionName, exact: true }).click();
 };
