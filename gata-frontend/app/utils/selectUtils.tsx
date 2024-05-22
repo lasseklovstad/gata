@@ -1,7 +1,8 @@
 import { X } from "lucide-react";
-import type { ReactNode } from "react";
-import type { ClassNamesConfig, GroupBase, SelectComponentsConfig, StylesConfig } from "react-select";
+import type { ComponentProps, ReactNode } from "react";
 import { components } from "react-select";
+import type Select from "react-select";
+import type { ClassNamesConfig, GroupBase, SelectComponentsConfig, StylesConfig } from "react-select";
 
 import { cn } from "~/utils";
 
@@ -70,5 +71,7 @@ export const getSelectDefaultProps = <IsMulti extends boolean>() => {
          cn(isFocused && "bg-primary/10", isSelected && "bg-primary/10", "px-2 py-1"),
    } satisfies ClassNamesConfig<Option, IsMulti, GroupBase<Option>>;
 
-   return { components: customComponents, classNames, styles };
+   return { components: customComponents, classNames, styles, unstyled: true } satisfies Partial<
+      ComponentProps<typeof Select<Option, IsMulti, GroupBase<Option>>>
+   >;
 };
