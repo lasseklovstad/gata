@@ -1,8 +1,4 @@
 import { expect, Locator, Page } from "@playwright/test";
-import {
-  selectComboBoxOption,
-  selectSingleComboBoxOption,
-} from "../utils/combobox";
 import { ConfirmModal } from "./ConfirmModal";
 
 class MemberResponsibilityModal {
@@ -73,16 +69,19 @@ export class MemberPage {
   }
 
   async linkUser(name: string) {
-    await selectComboBoxOption(this.page, this.linkUserSelect, "Auth0 " + name);
+    await expect(this.linkUserSelect).toBeVisible();
+    await this.linkUserSelect.fill(name);
+    await this.page
+      .getByRole("option", { name: "Auth0 " + name, exact: true })
+      .click();
     await expect(this.getRemoveLinkedUserButton(name)).toBeVisible();
   }
 
   async changePrimaryUser(name: string) {
-    await selectSingleComboBoxOption(
-      this.page,
-      this.primaryUserSelect,
-      "Auth0 " + name
-    );
+    await this.primaryUserSelect.click();
+    await this.page
+      .getByRole("option", { name: "Auth0 " + name, exact: true })
+      .click();
     await expect(this.page.getByText(`Navn: ${name}`)).toBeVisible();
   }
 
