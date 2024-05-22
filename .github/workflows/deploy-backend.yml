@@ -7,6 +7,9 @@ on:
       - 'gata-frontend/**'
       - 'gata-tests/**'
       - '.github/**'
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
   deploy:
