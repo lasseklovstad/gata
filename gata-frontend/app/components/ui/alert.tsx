@@ -42,7 +42,7 @@ const Alert = React.forwardRef<
 Alert.displayName = "Alert";
 
 export const AlertAction = ({ className, ...props }: React.ComponentProps<"div">) => {
-   return <div className={cn("absolute top-4 right-4", className)} {...props} />;
+   return <div className={cn("flex my-2", className)} {...props} />;
 };
 
 const AlertTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
