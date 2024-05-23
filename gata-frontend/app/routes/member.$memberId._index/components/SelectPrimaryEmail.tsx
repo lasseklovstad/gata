@@ -41,7 +41,7 @@ export const SelectPrimaryEmail = ({ user }: Props) => {
                   >
                      <ListboxButton
                         id={buttonId}
-                        className="relative border rounded bg-background flex gap-2 py-2 px-1 w-full data-[focus]:ring-2 data-[focus]:ring-ring data-[focus]:ring-offset-2"
+                        className="relative border outline-none rounded bg-background flex gap-2 py-2 px-1 w-full data-[focus]:ring-2 data-[focus]:ring-ring data-[focus]:ring-offset-2"
                      >
                         {selectedOption?.icon} <span className="mr-2 overflow-hidden">{selectedOption?.label}</span>
                         <ChevronDown
