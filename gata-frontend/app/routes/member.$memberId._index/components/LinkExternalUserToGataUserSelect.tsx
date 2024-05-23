@@ -23,17 +23,21 @@ export const LinkExternalUserToGataUserSelect = ({
    const fetcher = useFetcher();
    const [query, setQuery] = useState("");
    const inputRef = useRef<HTMLInputElement>(null);
+   const buttonRef = useRef<HTMLButtonElement>(null);
 
-   const menuItems = [...externalUserProviders, ...notMemberUsers];
-
-   const options = menuItems.map((user) => ({
+   const options = notMemberUsers.map((user) => ({
       label: user.email,
       value: user.id,
       icon: <ExternalUserIcon user={user} />,
       isFixed: !!user.primary,
    }));
 
-   const selectedOptions = options.filter((option) => !!externalUserProviders.find((user) => user.id === option.value));
+   const selectedOptions = externalUserProviders.map((user) => ({
+      label: user.email,
+      value: user.id,
+      icon: <ExternalUserIcon user={user} />,
+      isFixed: !!user.primary,
+   }));
 
    const filteredPeople =
       query === ""
@@ -41,6 +45,8 @@ export const LinkExternalUserToGataUserSelect = ({
          : options.filter((person) => {
               return person.label.toLowerCase().includes(query.toLowerCase());
            });
+
+   type Option = (typeof options)[number];
 
    const handleChange = (newSelectedOptions: typeof options | null) => {
       if (!newSelectedOptions) return;
@@ -51,7 +57,6 @@ export const LinkExternalUserToGataUserSelect = ({
       userIds.forEach((userId) => formData.append("externalUserId", userId));
       fetcher.submit(formData, { method: "PUT" });
       setQuery("");
-      inputRef.current?.blur();
    };
    return (
       <>
@@ -59,7 +64,13 @@ export const LinkExternalUserToGataUserSelect = ({
             <FormLabel>Epost tilknytninger</FormLabel>
             <FormControl
                render={({ id: inputId }) => (
-                  <Combobox multiple value={selectedOptions} onChange={handleChange} onClose={() => setQuery("")}>
+                  <Combobox
+                     onChange={(option: Option | null) => {
+                        if (!option) return;
+                        handleChange([...selectedOptions, option]);
+                     }}
+                     onClose={() => setQuery("")}
+                  >
                      {selectedOptions.length > 0 && (
                         <ul className="flex gap-2 flex-wrap">
                            {selectedOptions.map((person) => (
@@ -90,12 +101,12 @@ export const LinkExternalUserToGataUserSelect = ({
                         <ComboboxInput
                            className="border outline-none w-full py-2 px-1 bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 rounded"
                            id={inputId}
-                           value={query}
                            placeholder="Søk epost"
                            onChange={(event) => setQuery(event.target.value)}
+                           value={query}
                            ref={inputRef}
                         />
-                        <ComboboxButton className="absolute inset-y-0 right-0 px-2.5">
+                        <ComboboxButton ref={buttonRef} className="absolute inset-y-0 right-0 px-2.5">
                            <ChevronDown className="size-6" />
                         </ComboboxButton>
                      </div>
