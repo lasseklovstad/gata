@@ -45,7 +45,7 @@ export class MemberPage {
     this.linkUserSelect = page.getByRole("combobox", {
       name: "Epost tilknytninger",
     });
-    this.primaryUserSelect = page.getByRole("combobox", {
+    this.primaryUserSelect = page.getByRole("button", {
       name: "Primær epost",
     });
     this.responsibilityModal = new MemberResponsibilityModal(page);
