@@ -3,6 +3,8 @@ name: 'Deploy backend'
 on:
   workflow_dispatch:
   push:
+    branches:
+      - 'main'
     paths-ignore:
       - 'gata-frontend/**'
       - 'gata-tests/**'
