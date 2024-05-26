@@ -2,18 +2,18 @@ import { Link, Outlet } from "@remix-run/react";
 import { Plus } from "lucide-react";
 import { useId } from "react";
 
+import type { User } from "~/.server/db/user";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 
 import { NewsItem } from "./NewsItem";
 import { PageLayout } from "../../components/PageLayout";
 import type { IGataReport } from "../../types/GataReport.type";
-import type { IGataUser } from "../../types/GataUser.type";
 import type { Page } from "../../types/Page.type";
 
 type NewsProps = {
    reportPage: Page<IGataReport>;
-   loggedInUser: IGataUser;
+   loggedInUser: User;
 };
 
 export const News = ({ reportPage, loggedInUser }: NewsProps) => {

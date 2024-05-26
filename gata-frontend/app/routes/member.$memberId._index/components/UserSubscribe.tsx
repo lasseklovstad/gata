@@ -1,13 +1,13 @@
 import { useFetcher } from "@remix-run/react";
 
+import type { User } from "~/.server/db/user";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 
-import type { IGataUser } from "../../../types/GataUser.type";
 import { memberIntent } from "../intent";
 
 interface UserSubscribeProps {
-   user: IGataUser;
+   user: User;
 }
 
 export const UserSubscribe = ({ user }: UserSubscribeProps) => {

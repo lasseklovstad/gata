@@ -2,15 +2,15 @@ import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headless
 import { useFetcher } from "@remix-run/react";
 import { ChevronDown } from "lucide-react";
 
+import type { User } from "~/.server/db/user";
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
 import { getPrimaryUser } from "~/utils/userUtils";
 
 import { ExternalUserIcon } from "./ExternalUserIcon";
-import type { IGataUser } from "../../../types/GataUser.type";
 import { memberIntent } from "../intent";
 
 type Props = {
-   user: IGataUser;
+   user: User;
 };
 
 export const SelectPrimaryEmail = ({ user }: Props) => {

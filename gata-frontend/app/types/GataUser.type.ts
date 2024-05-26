@@ -1,7 +1,4 @@
 import type { ExternalUser } from "db/schema";
-import type { User } from "~/.server/db/user";
-
-export type IGataUser = User;
 
 export interface ISimpleGataUser {
    id: string;

@@ -1,15 +1,15 @@
 import { Link } from "@remix-run/react";
-import { Check, User, X } from "lucide-react";
+import { Check, X, User as UserIcon } from "lucide-react";
 
+import type { User } from "~/.server/db/user";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Typography } from "~/components/ui/typography";
 import { getPrimaryUser } from "~/utils/userUtils";
 
-import type { IGataUser } from "../../types/GataUser.type";
 import { isMember } from "../../utils/roleUtils";
 
 type UserListItemProps = {
-   user: IGataUser;
+   user: User;
    isLoggedInUserAdmin: boolean;
 };
 
@@ -22,7 +22,7 @@ export const UserListItem = ({ user, isLoggedInUserAdmin }: UserListItemProps) =
                <Avatar>
                   <AvatarImage src={getPrimaryUser(user).picture || undefined} alt={getPrimaryUser(user).name ?? ""} />
                   <AvatarFallback>
-                     <User />
+                     <UserIcon />
                   </AvatarFallback>
                </Avatar>
                <div>

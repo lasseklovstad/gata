@@ -2,20 +2,20 @@ import { Link, useFetcher } from "@remix-run/react";
 import { Save, Trash } from "lucide-react";
 import { useState } from "react";
 
+import type { User } from "~/.server/db/user";
 import { Accordion, AccordionBody, AccordionHeading } from "~/components/ui/accordion";
 import { Button } from "~/components/ui/button";
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
 import { Textarea } from "~/components/ui/textarea";
 import { Typography } from "~/components/ui/typography";
 
-import type { IGataUser } from "../../types/GataUser.type";
 import type { IResponsibilityYear } from "../../types/ResponsibilityYear.type";
 import { isAdmin } from "../../utils/roleUtils";
 
 type ResponsibilityFormProps = {
    responsibilityYear: IResponsibilityYear;
-   user: IGataUser;
-   loggedInUser: IGataUser;
+   user: User;
+   loggedInUser: User;
 };
 
 export const ResponsibilityForm = ({

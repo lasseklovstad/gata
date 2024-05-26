@@ -3,17 +3,18 @@ import { useFetcher } from "@remix-run/react";
 import { ChevronDown, X } from "lucide-react";
 import { useRef, useState } from "react";
 
+import type { ExternalUser } from "db/schema";
+import type { User } from "~/.server/db/user";
 import { Button } from "~/components/ui/button";
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
-import type { IExternalUser, IGataUser } from "~/types/GataUser.type";
 import { cn } from "~/utils";
 
 import { ExternalUserIcon } from "./ExternalUserIcon";
 import { memberIntent } from "../intent";
 
 type LinkExternalUserToGataUserSelectProps = {
-   user: IGataUser;
-   notMemberUsers: IExternalUser[];
+   user: User;
+   notMemberUsers: ExternalUser[];
 };
 
 export const LinkExternalUserToGataUserSelect = ({
