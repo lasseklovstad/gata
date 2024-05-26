@@ -2,27 +2,27 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudfla
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Mail } from "lucide-react";
 
+import { getUsers } from "~/.server/db/user";
 import { getNotMemberUsers } from "~/api/auth0.api";
-import { getLoggedInUser, getUsers } from "~/api/user.api";
 import { PageLayout } from "~/components/PageLayout";
 import { Button } from "~/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
 import { Typography } from "~/components/ui/typography";
+import { useRootLoader } from "~/root";
 import { ExternalUsersWithNoGataUser } from "~/routes/members/ExternalUsersWithNoGataUser";
 import { UserListItem } from "~/routes/members/UserListItem";
 import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
-import { isAdmin } from "~/utils/roleUtils";
+import { isAdmin, isMember } from "~/utils/roleUtils";
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
    const { signal } = request;
    const token = await createAuthenticator(context).getRequiredAuthToken(request);
-   const [loggedInUser, users, externalUsers] = await Promise.all([
-      getLoggedInUser({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
-      getUsers({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+   const [users, externalUsers] = await Promise.all([
+      getUsers(context),
       getNotMemberUsers({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
    ]);
-   return { loggedInUser, users, externalUsers };
+   return { users, externalUsers };
 };
 
 export const action = async ({ request, context }: ActionFunctionArgs) => {
@@ -33,11 +33,12 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
 };
 
 export default function MemberPage() {
-   const { loggedInUser, users, externalUsers } = useLoaderData<typeof loader>();
+   const { users, externalUsers } = useLoaderData<typeof loader>();
+   const { loggedInUser } = useRootLoader();
 
-   const admins = users.filter((user) => user.isUserAdmin);
-   const members = users.filter((user) => user.isUserMember && !user.isUserAdmin);
-   const nonMembers = users.filter((user) => !user.isUserMember && !user.isUserAdmin);
+   const admins = users.filter(isAdmin);
+   const members = users.filter((user) => isMember(user) && !isAdmin(user));
+   const nonMembers = users.filter((user) => !isMember(user) && !isAdmin(user));
 
    return (
       <PageLayout>

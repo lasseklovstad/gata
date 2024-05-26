@@ -1,5 +1,4 @@
-import type { LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
-import { json, redirect } from "@remix-run/cloudflare";
+import type { LinksFunction, LoaderFunctionArgs, MetaFunction, SerializeFrom } from "@remix-run/cloudflare";
 import {
    Link,
    Links,
@@ -10,17 +9,16 @@ import {
    isRouteErrorResponse,
    useLoaderData,
    useRouteError,
+   useRouteLoaderData,
 } from "@remix-run/react";
 import type { ComponentProps } from "react";
 import { useEffect } from "react";
-import type { Auth0Profile } from "remix-auth-auth0";
 import "./tailwind.css";
 
-import { getLoggedInUser } from "./api/user.api";
+import { getUserFromExternalUserId } from "./.server/db/user";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
 import { Button } from "./components/ui/button";
 import { Typography } from "./components/ui/typography";
-import type { IGataUser } from "./types/GataUser.type";
 import { createAuthenticator } from "./utils/auth.server";
 
 export const meta: MetaFunction = () => {
@@ -74,10 +72,10 @@ export function Layout({ children }: ComponentProps<never>) {
 }
 
 export default function App() {
-   const { loggedInUser, isAuthenticated, user } = useLoaderData<typeof loader>();
+   const { auth0User, loggedInUser } = useLoaderData<typeof loader>();
    return (
       <div className="flex flex-col min-h-lvh">
-         <ResponsiveAppBar loggedInUser={loggedInUser} isAuthenticated={isAuthenticated} user={user} />
+         <ResponsiveAppBar auth0User={auth0User} loggedInUser={loggedInUser} />
          <main className="mb-8 max-w-[1000px] w-full me-auto ms-auto px-4">
             <Outlet />
          </main>
@@ -94,32 +92,13 @@ export default function App() {
 }
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
-   const auth = await createAuthenticator(context).authenticator.isAuthenticated(request);
-   const signal = request.signal;
-   if (auth) {
-      const user = auth.profile;
-      const token = auth.accessToken;
-      const loggedInUser = await getLoggedInUser({
-         token,
-         signal,
-         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-      }).catch((e) => {
-         if (e instanceof Response && e.status === 404) return undefined;
-         if (e instanceof Response && e.status === 401) {
-            throw redirect("/logout");
-         } else {
-            throw e;
-         }
-      });
-      return json<LoaderData>({ isAuthenticated: true, loggedInUser, user });
-   }
-   return json<LoaderData>({ isAuthenticated: false });
+   const auth0User = await createAuthenticator(context).authenticator.isAuthenticated(request);
+   const loggedInUser = auth0User ? await getUserFromExternalUserId(context, auth0User.profile.id ?? "") : undefined;
+   return { auth0User, loggedInUser };
 };
 
-type LoaderData = {
-   loggedInUser?: IGataUser;
-   isAuthenticated: boolean;
-   user?: Auth0Profile;
+export const useRootLoader = () => {
+   return useRouteLoaderData("root") as SerializeFrom<typeof loader>;
 };
 
 export function ErrorBoundary() {

@@ -5,8 +5,8 @@ import { Edit, Mail, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Descendant } from "slate";
 
+import { getUserFromExternalUserId } from "~/.server/db/user";
 import { getReport } from "~/api/report.api";
-import { getLoggedInUser } from "~/api/user.api";
 import { ClientOnly } from "~/components/ClientOnly";
 import { PageLayout } from "~/components/PageLayout";
 import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
@@ -21,10 +21,11 @@ import { isAdmin } from "~/utils/roleUtils";
 import { reportInfoIntent } from "./intent";
 
 export const loader = async ({ request, params: { reportId }, context }: LoaderFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
+   const { accessToken: token, profile } = await createAuthenticator(context).getRequiredAuth(request);
    const signal = request.signal;
+   if (!profile.id) throw new Error("Profile id required");
    const [loggedInUser, report] = await Promise.all([
-      getLoggedInUser({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getUserFromExternalUserId(context, profile.id),
       getReport({ token, signal, reportId, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
    ]);
    return json({ report, loggedInUser });

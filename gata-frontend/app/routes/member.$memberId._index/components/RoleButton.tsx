@@ -12,7 +12,7 @@ type Props = {
 };
 
 export const RoleButton = ({ role, user }: Props) => {
-   const hasRole = !!user.roles.find((r) => r.name === role.name);
+   const hasRole = !!user.roles.find((r) => r.roleId === role.id);
    const fetcher = useFetcher();
    return (
       <fetcher.Form method={hasRole ? "DELETE" : "POST"}>

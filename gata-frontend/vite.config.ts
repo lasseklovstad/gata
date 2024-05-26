@@ -3,12 +3,14 @@ import { defineConfig } from "vite";
 import checker from "vite-plugin-checker";
 import tsconfigPaths from "vite-tsconfig-paths";
 
+import { getLoadContext } from "./load-context";
+
 export default defineConfig({
    server: {
       port: 3000,
    },
    plugins: [
-      cloudflareDevProxyVitePlugin(),
+      cloudflareDevProxyVitePlugin({ getLoadContext }),
       remix({
          future: {
             v3_fetcherPersist: true,

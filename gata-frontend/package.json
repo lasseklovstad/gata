@@ -13,7 +13,8 @@
       "lint:fix": "npm run lint -- --fix",
       "lint:ci": "npm run lint -- --max-warnings 0",
       "knip": "knip",
-      "typecheck": "tsc"
+      "typecheck": "tsc",
+      "db:generate": "drizzle-kit introspect"
    },
    "dependencies": {
       "@headlessui/react": "^2.0.3",
@@ -27,9 +28,11 @@
       "@remix-run/react": "2.9.2",
       "class-variance-authority": "^0.7.0",
       "clsx": "^2.1.0",
+      "drizzle-orm": "^0.30.10",
       "isbot": "^5.1.6",
       "lucide-react": "^0.379.0",
       "miniflare": "3.20240512.0",
+      "postgres": "^3.4.4",
       "react": "18.3.1",
       "react-dom": "18.3.1",
       "remix-auth": "3.6.0",
@@ -48,6 +51,7 @@
       "@typescript-eslint/eslint-plugin": "7.10.0",
       "@typescript-eslint/parser": "7.10.0",
       "autoprefixer": "^10.4.19",
+      "drizzle-kit": "^0.21.4",
       "eslint": "8.57.0",
       "eslint-config-prettier": "9.1.0",
       "eslint-import-resolver-typescript": "3.6.1",

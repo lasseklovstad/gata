@@ -17,7 +17,7 @@ type LinkExternalUserToGataUserSelectProps = {
 };
 
 export const LinkExternalUserToGataUserSelect = ({
-   user: { externalUserProviders, id },
+   user: { externalUsers, id },
    notMemberUsers,
 }: LinkExternalUserToGataUserSelectProps) => {
    const fetcher = useFetcher();
@@ -26,17 +26,17 @@ export const LinkExternalUserToGataUserSelect = ({
    const buttonRef = useRef<HTMLButtonElement>(null);
 
    const options = notMemberUsers.map((user) => ({
-      label: user.email,
+      label: user.email ?? "",
       value: user.id,
       icon: <ExternalUserIcon user={user} />,
-      isFixed: !!user.primary,
+      isFixed: !!user.primaryUser,
    }));
 
-   const selectedOptions = externalUserProviders.map((user) => ({
-      label: user.email,
+   const selectedOptions = externalUsers.map((user) => ({
+      label: user.email ?? "",
       value: user.id,
       icon: <ExternalUserIcon user={user} />,
-      isFixed: !!user.primary,
+      isFixed: !!user.primaryUser,
    }));
 
    const filteredPeople =

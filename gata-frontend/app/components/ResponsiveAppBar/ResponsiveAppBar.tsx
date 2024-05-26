@@ -1,9 +1,10 @@
 import { Link } from "@remix-run/react";
 import { Menu } from "lucide-react";
-import type { Auth0Profile } from "remix-auth-auth0";
+
+import type { User } from "~/.server/db/user";
+import type { Auth0User } from "~/utils/auth.server";
 
 import { UserMenu } from "./UserMenu";
-import type { IGataUser } from "../../types/GataUser.type";
 import { isAdmin, isMember } from "../../utils/roleUtils";
 import { Button } from "../ui/button";
 import {
@@ -16,14 +17,14 @@ import {
 } from "../ui/dropdown-menu";
 
 type ResponsiveAppBarProps = {
-   loggedInUser: IGataUser | undefined;
-   isAuthenticated: boolean;
-   user: Auth0Profile | undefined;
+   auth0User: Auth0User | null;
+   loggedInUser: User | undefined;
 };
 
-export const ResponsiveAppBar = ({ loggedInUser, user, isAuthenticated }: ResponsiveAppBarProps) => {
+export const ResponsiveAppBar = ({ auth0User, loggedInUser }: ResponsiveAppBarProps) => {
    const isUserMember = isMember(loggedInUser);
    const isUserAdmin = isAdmin(loggedInUser);
+
    const filteredPages = [
       { name: "Hjem", url: "" },
       { name: "Min side", url: `member/${loggedInUser?.id}`, isMember: true },
@@ -102,7 +103,7 @@ export const ResponsiveAppBar = ({ loggedInUser, user, isAuthenticated }: Respon
                   })}
                </div>
 
-               <UserMenu roleText={getRole()} user={user} isAuthenticated={isAuthenticated} />
+               <UserMenu roleText={getRole()} user={auth0User?.profile} isAuthenticated={!!auth0User} />
             </div>
          </div>
       </header>

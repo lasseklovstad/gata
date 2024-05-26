@@ -1,9 +1,14 @@
-import type { IGataUser } from "../types/GataUser.type";
+import type { User } from "~/.server/db/user";
 
-export const isMember = (user?: IGataUser) => {
-   return !!user?.isUserMember;
+enum RoleName {
+   Member,
+   Admin,
+}
+
+export const isMember = (user?: User) => {
+   return !!user?.roles.some(({ role }) => role.roleName === RoleName.Member);
 };
 
-export const isAdmin = (user?: IGataUser) => {
-   return !!user?.isUserAdmin;
+export const isAdmin = (user?: User) => {
+   return !!user?.roles.some(({ role }) => role.roleName === RoleName.Admin);
 };
