@@ -5,7 +5,7 @@ import { Edit, Mail, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Descendant } from "slate";
 
-import { getUserFromExternalUserId } from "~/.server/db/user";
+import { getRequiredUserFromExternalUserId } from "~/.server/db/user";
 import { getReport } from "~/api/report.api";
 import { ClientOnly } from "~/components/ClientOnly";
 import { PageLayout } from "~/components/PageLayout";
@@ -25,7 +25,7 @@ export const loader = async ({ request, params: { reportId }, context }: LoaderF
    const signal = request.signal;
    if (!profile.id) throw new Error("Profile id required");
    const [loggedInUser, report] = await Promise.all([
-      getUserFromExternalUserId(context, profile.id),
+      getRequiredUserFromExternalUserId(context, profile.id),
       getReport({ token, signal, reportId, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
    ]);
    return json({ report, loggedInUser });

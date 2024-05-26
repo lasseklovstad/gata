@@ -3,7 +3,7 @@ import { redirect } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { CircleUser, Trash } from "lucide-react";
 
-import { getUser, getUserFromExternalUserId } from "~/.server/db/user";
+import { getUser, getRequiredUserFromExternalUserId } from "~/.server/db/user";
 import { getNotMemberUsers } from "~/api/auth0.api";
 import { getContingentInfo } from "~/api/contingent.api";
 import { getRoles } from "~/api/role.api";
@@ -31,7 +31,7 @@ export const loader = async ({ request, params: { memberId }, context }: LoaderF
 
    const [member, loggedInUser, roles, contingentInfo, notMemberUsers] = await Promise.all([
       getUser(context, memberId),
-      getUserFromExternalUserId(context, profile.id),
+      getRequiredUserFromExternalUserId(context, profile.id),
       getRoles({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
       getContingentInfo({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
       getNotMemberUsers({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),

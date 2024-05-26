@@ -15,20 +15,32 @@ export const getUser = async (context: AppLoadContext, userId: string) => {
    return userResult;
 };
 
-export const getUserFromExternalUserId = async (context: AppLoadContext, externalUserId: string) => {
-   const userResult = await context.db.query.user.findFirst({
+export const getOptionalUserFromExternalUserId = async (context: AppLoadContext, externalUserId: string) => {
+   const userResult = await context.db.query.externalUser.findFirst({
+      columns: {},
+      where: eq(externalUser.id, externalUserId),
       with: {
-         externalUsers: {
-            where: eq(externalUser.id, externalUserId),
+         gataUser: {
+            with: {
+               externalUsers: true,
+               roles: { with: { role: true }, columns: { roleId: true } },
+               contingents: true,
+            },
          },
-         roles: { with: { role: true }, columns: { roleId: true } },
-         contingents: true,
       },
    });
    if (!userResult) {
-      throw new Error("Fant ingen bruker");
+      throw new Error("Fant ingen ekstern bruker med id " + externalUserId);
    }
-   return userResult;
+   return userResult.gataUser;
+};
+
+export const getRequiredUserFromExternalUserId = async (context: AppLoadContext, externalUserId: string) => {
+   const user = await getOptionalUserFromExternalUserId(context, externalUserId);
+   if (!user) {
+      throw new Error("Fant ingen gata bruker for ekstern bruker med id " + externalUserId);
+   }
+   return user;
 };
 
 export const getUsers = (context: AppLoadContext) => {

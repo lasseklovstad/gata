@@ -15,7 +15,7 @@ import type { ComponentProps } from "react";
 import { useEffect } from "react";
 import "./tailwind.css";
 
-import { getUserFromExternalUserId } from "./.server/db/user";
+import { getOptionalUserFromExternalUserId } from "./.server/db/user";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
 import { Button } from "./components/ui/button";
 import { Typography } from "./components/ui/typography";
@@ -93,7 +93,9 @@ export default function App() {
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
    const auth0User = await createAuthenticator(context).authenticator.isAuthenticated(request);
-   const loggedInUser = auth0User ? await getUserFromExternalUserId(context, auth0User.profile.id ?? "") : undefined;
+   const loggedInUser = auth0User
+      ? (await getOptionalUserFromExternalUserId(context, auth0User.profile.id ?? "")) || undefined
+      : undefined;
    return { auth0User, loggedInUser };
 };
 
