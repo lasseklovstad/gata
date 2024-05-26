@@ -1,9 +1,8 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, redirect, useLoaderData } from "@remix-run/react";
 import { Mail } from "lucide-react";
 
-import { getUsers } from "~/.server/db/user";
-import { getNotMemberUsers } from "~/api/auth0.api";
+import { getUsers, getNotMemberUsers } from "~/.server/db/user";
 import { PageLayout } from "~/components/PageLayout";
 import { Button } from "~/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
@@ -16,12 +15,8 @@ import { client } from "~/utils/client";
 import { isAdmin, isMember } from "~/utils/roleUtils";
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
-   const { signal } = request;
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
-   const [users, externalUsers] = await Promise.all([
-      getUsers(context),
-      getNotMemberUsers({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
-   ]);
+   await createAuthenticator(context).getRequiredUser(request);
+   const [users, externalUsers] = await Promise.all([getUsers(context), getNotMemberUsers(context)]);
    return { users, externalUsers };
 };
 

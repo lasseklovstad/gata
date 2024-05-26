@@ -1,6 +1,6 @@
 import type { User } from "~/.server/db/user";
 
-enum RoleName {
+export enum RoleName {
    Member,
    Admin,
 }

@@ -3,6 +3,8 @@ import { Authenticator } from "remix-auth";
 import type { Auth0Profile } from "remix-auth-auth0";
 import { Auth0Strategy } from "remix-auth-auth0";
 
+import { getOptionalUserFromExternalUserId } from "~/.server/db/user";
+
 export type Auth0User = { profile: Auth0Profile; accessToken: string };
 
 export const createAuthenticator = (context: AppLoadContext) => {
@@ -39,10 +41,7 @@ export const createAuthenticator = (context: AppLoadContext) => {
    const { getSession, destroySession } = sessionStorage;
 
    const getRequiredAuthToken = async (request: Request) => {
-      const auth = await authenticator.isAuthenticated(request);
-      if (auth === null) {
-         throw redirect("/home");
-      }
+      const auth = await authenticator.isAuthenticated(request, { failureRedirect: "/home" });
       return auth.accessToken;
    };
 
@@ -54,5 +53,21 @@ export const createAuthenticator = (context: AppLoadContext) => {
       return auth;
    };
 
-   return { getSession, destroySession, getRequiredAuthToken, authenticator, getRequiredAuth };
+   const getRequiredUser = async (request: Request) => {
+      const auth = await authenticator.isAuthenticated(request);
+      if (!auth) {
+         throw redirect("/home");
+      }
+      const user = auth.profile.id
+         ? (await getOptionalUserFromExternalUserId(context, auth.profile.id)) ?? undefined
+         : undefined;
+
+      if (!user) {
+         throw redirect("/home");
+      }
+
+      return user;
+   };
+
+   return { getSession, destroySession, getRequiredAuthToken, authenticator, getRequiredAuth, getRequiredUser };
 };

@@ -1,6 +1,6 @@
 import { AppLoadContext } from "@remix-run/cloudflare";
 import { externalUser, user } from "db/schema";
-import { eq } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 
 export type User = Awaited<ReturnType<typeof getUser>>;
 
@@ -47,4 +47,8 @@ export const getUsers = (context: AppLoadContext) => {
    return context.db.query.user.findMany({
       with: { externalUsers: true, roles: { with: { role: true }, columns: { roleId: true } }, contingents: true },
    });
+};
+
+export const getNotMemberUsers = (context: AppLoadContext) => {
+   return context.db.query.externalUser.findMany({ where: isNull(externalUser.userId) });
 };
