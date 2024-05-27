@@ -1,9 +1,2 @@
-Lag en ny fil `.env` med følgende innhold:
-
-```bash
-VITE_AUTH0_CLIENT_ID=""
-VITE_AUTH0_DOMAIN="gataersamla.eu.auth0.com"
-VITE_AUTH0_AUDIENCE="https://gataersamla.no"
-```
-
-Hent verdiene fra auth0.
+Lag en ny fil `.dev.vars` med innhold slik `template-env` fil. 
+Hvis man skal kjøre migreringer mot db må man legge til `.env` fil med APP_DATABASE_URL også

@@ -38,10 +38,20 @@ type GetLoadContext = (args: {
 
 // Shared implementation compatible with Vite, Wrangler, and Cloudflare Pages
 export const getLoadContext: GetLoadContext = ({ context }) => {
-   const queryClient = postgres(context.cloudflare.env.APP_DATABASE_URL);
-   const db = drizzle(queryClient, { schema });
+   const db = getDb(context.cloudflare.env.APP_DATABASE_URL);
    return {
       ...context,
       db,
    };
+};
+
+// Use singleton to avoid number of connections grows beyond 100
+
+let db: PostgresJsDatabase<typeof schema> | undefined;
+
+const getDb = (databaseUrl: string) => {
+   if (db) return db;
+   const queryClient = postgres(databaseUrl);
+   db = drizzle(queryClient, { schema });
+   return db;
 };

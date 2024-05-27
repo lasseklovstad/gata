@@ -15,7 +15,7 @@
       "knip": "knip",
       "typecheck": "tsc",
       "db:generate": "drizzle-kit introspect",
-      "db:studio": "npm run drizzle-kit studio"
+      "db:studio": "drizzle-kit studio"
    },
    "dependencies": {
       "@headlessui/react": "^2.0.3",
