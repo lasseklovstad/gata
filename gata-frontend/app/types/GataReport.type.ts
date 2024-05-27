@@ -22,7 +22,7 @@ export interface IGataReportSimple {
    type: GataReportType;
 }
 
-export type GataReportType = "DOCUMENT" | "NEWS";
+type GataReportType = "DOCUMENT" | "NEWS";
 
 export enum ReportType {
    DOCUMENT,
