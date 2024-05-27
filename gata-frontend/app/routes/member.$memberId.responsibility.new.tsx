@@ -2,8 +2,8 @@ import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { Save } from "lucide-react";
+import { getResponsibilities } from "~/.server/db/responsibility";
 
-import { getResponsibilities } from "~/api/responsibility.api";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { FormControl, FormItem, FormLabel, FormProvider } from "~/components/ui/form";
@@ -12,13 +12,8 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
-   const signal = request.signal;
-   const responsibilities = await getResponsibilities({
-      token,
-      signal,
-      baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-   });
+   await createAuthenticator(context).getRequiredUser(request);
+   const responsibilities = await getResponsibilities(context);
    return json({ responsibilities });
 };
 

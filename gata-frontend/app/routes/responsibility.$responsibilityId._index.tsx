@@ -2,27 +2,24 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudfla
 import { json, redirect } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { SaveIcon } from "lucide-react";
+import { getResponsibility } from "~/.server/db/responsibility";
 
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { FormControl, FormItem, FormLabel, FormMessage, FormProvider } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
-import type { IResponsibility } from "~/types/Responsibility.type";
 import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 import { useDialog } from "~/utils/dialogUtils";
 
 export const loader = async ({ request, params, context }: LoaderFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
-   if (params.responsibilityId !== "new") {
-      const responsibility = await client<IResponsibility>(`responsibility/${params.responsibilityId}`, {
-         token,
-         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-      });
-      return json<LoaderData>({ responsibility });
-   }
-   return json<LoaderData>({ responsibility: undefined });
+   await createAuthenticator(context).getRequiredUser(request);
+   if (!params.responsibilityId) throw new Error("ResponsibilityId is required in url!");
+   return {
+      responsibility:
+         params.responsibilityId !== "new" ? await getResponsibility(context, params.responsibilityId) : undefined,
+   };
 };
 
 export const action = async ({ request, params, context }: ActionFunctionArgs) => {
@@ -45,10 +42,6 @@ export const action = async ({ request, params, context }: ActionFunctionArgs) =
       });
       return redirect("/responsibility");
    }
-};
-
-type LoaderData = {
-   responsibility: IResponsibility | undefined;
 };
 
 export default function EditResponsibility() {

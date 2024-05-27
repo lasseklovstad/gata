@@ -37,7 +37,9 @@ export const responsibilityNote = pgTable(
       lastModifiedBy: varchar("last_modified_by", { length: 255 }),
       lastModifiedDate: timestamp("last_modified_date", { mode: "string" }),
       text: text("text"),
-      responsibilityYearId: uuid("resonsibility_year_id").references(() => responsibilityYear.id),
+      responsibilityYearId: uuid("resonsibility_year_id")
+         .references(() => responsibilityYear.id)
+         .notNull(),
    },
    (table) => {
       return {
@@ -50,9 +52,11 @@ export const responsibilityNote = pgTable(
 
 export const responsibility = pgTable("responsibility", {
    id: uuid("id").primaryKey().notNull(),
-   description: varchar("description", { length: 255 }),
-   name: varchar("name", { length: 255 }),
+   description: varchar("description", { length: 255 }).notNull(),
+   name: varchar("name", { length: 255 }).notNull(),
 });
+
+type Responsibility = typeof responsibility.$inferSelect;
 
 export const reportFile = pgTable("gata_report_file", {
    id: uuid("id").primaryKey().notNull(),
@@ -64,15 +68,21 @@ export const reportFile = pgTable("gata_report_file", {
 
 export const contingent = pgTable("gata_contingent", {
    id: uuid("id").primaryKey().notNull(),
-   userId: uuid("gata_user_id").references(() => user.id),
+   userId: uuid("gata_user_id")
+      .references(() => user.id)
+      .notNull(),
    isPaid: boolean("is_paid").notNull(),
    year: smallint("year").notNull(),
 });
 
 export const responsibilityYear = pgTable("responsibility_year", {
    id: uuid("id").primaryKey().notNull(),
-   responsibilityId: uuid("responsibility_id").references(() => responsibility.id),
-   userId: uuid("user_id").references(() => user.id),
+   responsibilityId: uuid("responsibility_id")
+      .references(() => responsibility.id)
+      .notNull(),
+   userId: uuid("user_id")
+      .references(() => user.id)
+      .notNull(),
    year: smallint("year").default(2022).notNull(),
 });
 
@@ -112,13 +122,13 @@ export const gataReport = pgTable("gata_report", {
    description: varchar("description", { length: 255 }),
    lastModifiedBy: varchar("last_modified_by", { length: 255 }),
    lastModifiedDate: timestamp("last_modified_date", { mode: "string" }),
-   title: varchar("title", { length: 255 }),
+   title: varchar("title", { length: 255 }).notNull(),
    type: integer("type"),
    createdBy: uuid("created_by").references(() => user.id),
 });
 
 export const externalUserRelations = relations(externalUser, ({ one }) => ({
-   gataUser: one(user, {
+   user: one(user, {
       fields: [externalUser.userId],
       references: [user.id],
    }),
@@ -133,7 +143,7 @@ export const gata_userRelations = relations(user, ({ many }) => ({
 }));
 
 export const gata_user_rolesRelations = relations(userRoles, ({ one }) => ({
-   gataUser: one(user, {
+   user: one(user, {
       fields: [userRoles.usersId],
       references: [user.id],
    }),
@@ -154,9 +164,9 @@ export const responsibility_noteRelations = relations(responsibilityNote, ({ one
    }),
 }));
 
-export const responsibility_yearRelations = relations(responsibilityYear, ({ one, many }) => ({
-   responsibilityNotes: many(responsibilityNote),
-   gataUser: one(user, {
+export const responsibility_yearRelations = relations(responsibilityYear, ({ one }) => ({
+   note: one(responsibilityNote),
+   user: one(user, {
       fields: [responsibilityYear.userId],
       references: [user.id],
    }),

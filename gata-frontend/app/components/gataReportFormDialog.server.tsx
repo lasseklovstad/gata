@@ -5,17 +5,11 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
 import type { IGataReportSimple } from "../types/GataReport.type";
+import { getReportSimple } from "~/.server/db/report";
 
 export const gataReportFormDialogLoader = async ({ request, params, context }: LoaderFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
-   if (params.reportId) {
-      const report = await client<IGataReportSimple>(`report/${params.reportId}/simple`, {
-         token,
-         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-      });
-      return json<GataReportFormDialogLoaderData>({ report });
-   }
-   return json<GataReportFormDialogLoaderData>({ report: undefined });
+   await createAuthenticator(context).getRequiredUser(request);
+   return { report: params.reportId ? await getReportSimple(context, params.reportId) : undefined };
 };
 
 export const gataReportFormDialogAction = async ({ request, params, context }: ActionFunctionArgs) => {
@@ -44,7 +38,3 @@ export const gataReportFormDialogAction = async ({ request, params, context }: A
       return redirect(`/reportInfo/${params.reportId}`);
    }
 };
-
-interface GataReportFormDialogLoaderData {
-   report: IGataReportSimple | undefined;
-}

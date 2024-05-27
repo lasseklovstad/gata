@@ -3,8 +3,7 @@ import { json, redirect } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Plus } from "lucide-react";
 
-import { getUser, getRequiredUserFromExternalUserId } from "~/.server/db/user";
-import { getResponsibilityYears } from "~/api/user.api";
+import { getUser, getRequiredUserFromExternalUserId, getResponsibilityYears } from "~/.server/db/user";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
@@ -23,7 +22,7 @@ export const loader = async ({ request, params: { memberId }, context }: LoaderF
    const [loggedInUser, member, responsibilityYears] = await Promise.all([
       getRequiredUserFromExternalUserId(context, profile.id),
       getUser(context, memberId),
-      getResponsibilityYears({ memberId, token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getResponsibilityYears(context, memberId),
    ]);
    return json({ loggedInUser, responsibilityYears, member });
 };
