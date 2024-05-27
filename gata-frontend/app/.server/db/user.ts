@@ -35,14 +35,6 @@ export const getOptionalUserFromExternalUserId = async (context: AppLoadContext,
    return userResult.user;
 };
 
-export const getRequiredUserFromExternalUserId = async (context: AppLoadContext, externalUserId: string) => {
-   const user = await getOptionalUserFromExternalUserId(context, externalUserId);
-   if (!user) {
-      throw new Error("Fant ingen gata bruker for ekstern bruker med id " + externalUserId);
-   }
-   return user;
-};
-
 export const getUsers = (context: AppLoadContext) => {
    return context.db.query.user.findMany({
       with: { externalUsers: true, roles: { with: { role: true }, columns: { roleId: true } }, contingents: true },
