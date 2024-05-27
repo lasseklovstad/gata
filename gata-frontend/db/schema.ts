@@ -15,8 +15,8 @@ export type ExternalUser = typeof externalUser.$inferSelect;
 
 export const role = pgTable("gata_role", {
    id: uuid("id").primaryKey().notNull(),
-   name: varchar("name", { length: 255 }),
-   roleName: smallint("role_name").default(0),
+   name: varchar("name", { length: 255 }).notNull(),
+   roleName: smallint("role_name").default(0).notNull(),
 });
 
 export type Role = typeof role.$inferSelect;
@@ -55,8 +55,6 @@ export const responsibility = pgTable("responsibility", {
    description: varchar("description", { length: 255 }).notNull(),
    name: varchar("name", { length: 255 }).notNull(),
 });
-
-type Responsibility = typeof responsibility.$inferSelect;
 
 export const reportFile = pgTable("gata_report_file", {
    id: uuid("id").primaryKey().notNull(),
@@ -123,7 +121,7 @@ export const gataReport = pgTable("gata_report", {
    lastModifiedBy: varchar("last_modified_by", { length: 255 }),
    lastModifiedDate: timestamp("last_modified_date", { mode: "string" }),
    title: varchar("title", { length: 255 }).notNull(),
-   type: integer("type"),
+   type: integer("type").notNull(),
    createdBy: uuid("created_by").references(() => user.id),
 });
 

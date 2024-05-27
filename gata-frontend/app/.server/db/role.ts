@@ -1,5 +1,5 @@
 import { AppLoadContext } from "@remix-run/cloudflare";
 
-export const getRoles = (context: AppLoadContext) => {
-   return context.db.query.role.findMany();
+export const getRoles = async (context: AppLoadContext) => {
+   return await context.db.query.role.findMany();
 };

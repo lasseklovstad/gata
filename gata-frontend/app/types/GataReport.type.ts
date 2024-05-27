@@ -23,3 +23,8 @@ export interface IGataReportSimple {
 }
 
 export type GataReportType = "DOCUMENT" | "NEWS";
+
+export enum ReportType {
+   DOCUMENT,
+   NEWS,
+}

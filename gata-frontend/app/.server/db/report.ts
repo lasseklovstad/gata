@@ -1,6 +1,7 @@
 import { AppLoadContext } from "@remix-run/cloudflare";
 import { gataReport, user } from "db/schema";
 import { eq, sql } from "drizzle-orm";
+import { ReportType } from "~/types/GataReport.type";
 
 export const getReportsSimple = async (context: AppLoadContext) => {
    return await context.db
@@ -23,7 +24,7 @@ export const getReportSimple = async (context: AppLoadContext, reportId: string)
    if (!result) {
       throw new Error("Finner ikke rapport med id " + reportId);
    }
-   return result;
+   return { ...result, type: ReportType[result.type] };
 };
 
 export const getReport = async (context: AppLoadContext, reportId: string) => {
@@ -45,5 +46,5 @@ export const getReport = async (context: AppLoadContext, reportId: string) => {
    if (!result) {
       throw new Error("Finner ikke rapport med id " + reportId);
    }
-   return result;
+   return { ...result, type: ReportType[result.type] };
 };
