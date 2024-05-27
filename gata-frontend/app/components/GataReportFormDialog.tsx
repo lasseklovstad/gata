@@ -10,10 +10,9 @@ import { Dialog, DialogFooter, DialogHeading } from "./ui/dialog";
 import { FormControl, FormItem, FormLabel, FormMessage, FormProvider } from "./ui/form";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import type { GataReportType } from "../types/GataReport.type";
 
 type GataReportFormDialogProps = {
-   type?: GataReportType;
+   type?: "DOCUMENT" | "NEWS";
 };
 
 export const GataReportFormDialog = ({ type }: GataReportFormDialogProps) => {
