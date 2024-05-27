@@ -3,21 +3,22 @@ import { useFetcher } from "@remix-run/react";
 import { ChevronDown, X } from "lucide-react";
 import { useRef, useState } from "react";
 
+import type { ExternalUser } from "db/schema";
+import type { User } from "~/.server/db/user";
 import { Button } from "~/components/ui/button";
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
-import type { IExternalUser, IGataUser } from "~/types/GataUser.type";
 import { cn } from "~/utils";
 
 import { ExternalUserIcon } from "./ExternalUserIcon";
 import { memberIntent } from "../intent";
 
 type LinkExternalUserToGataUserSelectProps = {
-   user: IGataUser;
-   notMemberUsers: IExternalUser[];
+   user: User;
+   notMemberUsers: ExternalUser[];
 };
 
 export const LinkExternalUserToGataUserSelect = ({
-   user: { externalUserProviders, id },
+   user: { externalUsers, id },
    notMemberUsers,
 }: LinkExternalUserToGataUserSelectProps) => {
    const fetcher = useFetcher();
@@ -26,17 +27,17 @@ export const LinkExternalUserToGataUserSelect = ({
    const buttonRef = useRef<HTMLButtonElement>(null);
 
    const options = notMemberUsers.map((user) => ({
-      label: user.email,
+      label: user.email ?? "",
       value: user.id,
       icon: <ExternalUserIcon user={user} />,
-      isFixed: !!user.primary,
+      isFixed: !!user.primaryUser,
    }));
 
-   const selectedOptions = externalUserProviders.map((user) => ({
-      label: user.email,
+   const selectedOptions = externalUsers.map((user) => ({
+      label: user.email ?? "",
       value: user.id,
       icon: <ExternalUserIcon user={user} />,
-      isFixed: !!user.primary,
+      isFixed: !!user.primaryUser,
    }));
 
    const filteredPeople =

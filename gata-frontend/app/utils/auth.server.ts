@@ -1,9 +1,14 @@
-import { type AppLoadContext, createCookieSessionStorage, redirect } from "@remix-run/cloudflare";
+import { createCookieSessionStorage, redirect, type AppLoadContext } from "@remix-run/cloudflare";
 import { Authenticator } from "remix-auth";
 import type { Auth0Profile } from "remix-auth-auth0";
 import { Auth0Strategy } from "remix-auth-auth0";
 
-export const createAuthenticator = ({ cloudflare: { env } }: AppLoadContext) => {
+import { getOptionalUserFromExternalUserId } from "~/.server/db/user";
+
+export type Auth0User = { profile: Auth0Profile; accessToken: string };
+
+export const createAuthenticator = (context: AppLoadContext) => {
+   const env = context.cloudflare.env;
    const sessionStorage = createCookieSessionStorage({
       cookie: {
          name: "_remix_session",
@@ -15,7 +20,7 @@ export const createAuthenticator = ({ cloudflare: { env } }: AppLoadContext) => 
       },
    });
 
-   const authenticator = new Authenticator<{ profile: Auth0Profile; accessToken: string }>(sessionStorage);
+   const authenticator = new Authenticator<Auth0User>(sessionStorage);
 
    const auth0Strategy = new Auth0Strategy(
       {
@@ -25,10 +30,9 @@ export const createAuthenticator = ({ cloudflare: { env } }: AppLoadContext) => 
          clientSecret: env.AUTH0_CLIENT_SECRET!,
          domain: env.AUTH0_DOMAIN!,
       },
-      // eslint-disable-next-line require-await
-      async ({ profile, accessToken }) => {
+      ({ profile, accessToken }) => {
          // Get the user data from your DB or API using the tokens and profile
-         return { profile, accessToken };
+         return Promise.resolve({ profile, accessToken });
       }
    );
 
@@ -37,12 +41,33 @@ export const createAuthenticator = ({ cloudflare: { env } }: AppLoadContext) => 
    const { getSession, destroySession } = sessionStorage;
 
    const getRequiredAuthToken = async (request: Request) => {
-      const auth = await authenticator.isAuthenticated(request);
-      if (auth === null) {
-         throw redirect("/home");
-      }
+      const auth = await authenticator.isAuthenticated(request, { failureRedirect: "/home" });
       return auth.accessToken;
    };
 
-   return { getSession, destroySession, getRequiredAuthToken, authenticator };
+   const getRequiredAuth = async (request: Request) => {
+      const auth = await authenticator.isAuthenticated(request);
+      if (!auth) {
+         throw redirect("/home");
+      }
+      return auth;
+   };
+
+   const getRequiredUser = async (request: Request) => {
+      const auth = await authenticator.isAuthenticated(request);
+      if (!auth) {
+         throw redirect("/home");
+      }
+      const user = auth.profile.id
+         ? (await getOptionalUserFromExternalUserId(context, auth.profile.id)) ?? undefined
+         : undefined;
+
+      if (!user) {
+         throw redirect("/home");
+      }
+
+      return user;
+   };
+
+   return { getSession, destroySession, getRequiredAuthToken, authenticator, getRequiredAuth, getRequiredUser };
 };

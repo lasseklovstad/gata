@@ -3,7 +3,8 @@ import { json, redirect } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Plus } from "lucide-react";
 
-import { getLoggedInUser, getResponsibilityYears, getUser } from "~/api/user.api";
+import { getUser, getRequiredUserFromExternalUserId } from "~/.server/db/user";
+import { getResponsibilityYears } from "~/api/user.api";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
@@ -13,11 +14,15 @@ import { client } from "~/utils/client";
 import { isAdmin, isMember } from "~/utils/roleUtils";
 
 export const loader = async ({ request, params: { memberId }, context }: LoaderFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
+   const { accessToken: token, profile } = await createAuthenticator(context).getRequiredAuth(request);
    const signal = request.signal;
+
+   if (!memberId) throw new Error("Member id required");
+   if (!profile.id) throw new Error("Profile id required");
+
    const [loggedInUser, member, responsibilityYears] = await Promise.all([
-      getLoggedInUser({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
-      getUser({ memberId, token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getRequiredUserFromExternalUserId(context, profile.id),
+      getUser(context, memberId),
       getResponsibilityYears({ memberId, token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
    ]);
    return json({ loggedInUser, responsibilityYears, member });

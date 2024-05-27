@@ -1,12 +1,11 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { json, redirect } from "@remix-run/cloudflare";
+import { redirect } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { CircleUser, Trash } from "lucide-react";
 
-import { getNotMemberUsers } from "~/api/auth0.api";
+import { getUser, getRequiredUserFromExternalUserId, getNotMemberUsers } from "~/.server/db/user";
 import { getContingentInfo } from "~/api/contingent.api";
 import { getRoles } from "~/api/role.api";
-import { getLoggedInUser, getUser } from "~/api/user.api";
 import { useConfirmDialog } from "~/components/ConfirmDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -17,21 +16,26 @@ import { UserSubscribe } from "~/routes/member.$memberId._index/components/UserS
 import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 import { isAdmin } from "~/utils/roleUtils";
+import { getPrimaryUser } from "~/utils/userUtils";
 
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
 
 export const loader = async ({ request, params: { memberId }, context }: LoaderFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
+   const { accessToken: token, profile } = await createAuthenticator(context).getRequiredAuth(request);
    const signal = request.signal;
+
+   if (!memberId) throw new Error("Member id required");
+   if (!profile.id) throw new Error("Profile id required");
+
    const [member, loggedInUser, roles, contingentInfo, notMemberUsers] = await Promise.all([
-      getUser({ memberId, token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
-      getLoggedInUser({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getUser(context, memberId),
+      getRequiredUserFromExternalUserId(context, profile.id),
       getRoles({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
       getContingentInfo({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
-      getNotMemberUsers({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getNotMemberUsers(context),
    ]);
-   return json({ member, contingentInfo, loggedInUser, roles, notMemberUsers });
+   return { member, contingentInfo, roles, notMemberUsers, loggedInUser };
 };
 
 export const action = async ({ request, params: { memberId }, context }: ActionFunctionArgs) => {
@@ -74,7 +78,6 @@ export const action = async ({ request, params: { memberId }, context }: ActionF
       case memberIntent.updateLinkedUsers: {
          const userId = String(formData.get("userId"));
          const body = formData.getAll("externalUserId");
-         console.log({ userId, body });
          await client(`user/${userId}/externaluserproviders`, {
             method: "PUT",
             body,
@@ -108,7 +111,7 @@ export const action = async ({ request, params: { memberId }, context }: ActionF
 };
 
 export default function MemberInfoPage() {
-   const { member, contingentInfo, loggedInUser, roles, notMemberUsers } = useLoaderData<typeof loader>();
+   const { member, contingentInfo, roles, notMemberUsers, loggedInUser } = useLoaderData<typeof loader>();
    const fetcher = useFetcher();
    const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog({
       text: "Ved å slette mister vi all informasjon knyttet til brukeren",
@@ -122,7 +125,7 @@ export default function MemberInfoPage() {
       <>
          <div className="flex items-center mb-2 gap-2">
             <Avatar>
-               <AvatarImage src={member.primaryUser.picture || undefined} />
+               <AvatarImage src={getPrimaryUser(member).picture || undefined} />
                <AvatarFallback>
                   <CircleUser />
                </AvatarFallback>

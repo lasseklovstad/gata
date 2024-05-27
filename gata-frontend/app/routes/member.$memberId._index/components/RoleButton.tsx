@@ -1,18 +1,18 @@
 import { useFetcher } from "@remix-run/react";
 
+import type { User } from "~/.server/db/user";
 import { Button } from "~/components/ui/button";
 import type { IGataRole } from "~/types/GataRole.type";
-import type { IGataUser } from "~/types/GataUser.type";
 
 import { memberIntent } from "../intent";
 
 type Props = {
    role: IGataRole;
-   user: IGataUser;
+   user: User;
 };
 
 export const RoleButton = ({ role, user }: Props) => {
-   const hasRole = !!user.roles.find((r) => r.name === role.name);
+   const hasRole = !!user.roles.find((r) => r.roleId === role.id);
    const fetcher = useFetcher();
    return (
       <fetcher.Form method={hasRole ? "DELETE" : "POST"}>

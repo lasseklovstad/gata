@@ -81,6 +81,7 @@ jobs:
           AUTH0_AUDIENCE: "https://gataersamla.no"
           AUTH0_COOKIE_SECRET: "s3cret"
           BACKEND_BASE_URL: "http://localhost:8080"
+          APP_DATABASE_URL: "postgres://postgres:password@localhost:5433/postgres"
         run: |
           touch .dev.vars
           echo "AUTH0_DOMAIN=$AUTH0_DOMAIN" >> .dev.vars
@@ -89,6 +90,7 @@ jobs:
           echo "AUTH0_CLIENT_SECRET=$AUTH0_CLIENT_SECRET" >> .dev.vars
           echo "AUTH0_COOKIE_SECRET=$AUTH0_COOKIE_SECRET" >> .dev.vars
           echo "BACKEND_BASE_URL=$BACKEND_BASE_URL" >> .dev.vars
+          echo "APP_DATABASE_URL=$APP_DATABASE_URL" >> .dev.vars
       - name: Install frontend dependencies
         working-directory: ./gata-frontend
         run: |

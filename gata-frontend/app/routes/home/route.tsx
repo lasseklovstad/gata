@@ -1,10 +1,10 @@
-import type { LoaderFunctionArgs, SerializeFrom } from "@remix-run/cloudflare";
+import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { useLoaderData, useRouteLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 
 import { PageLayout } from "~/components/PageLayout";
 import { Typography } from "~/components/ui/typography";
-import type { loader as rootLoader } from "~/root";
+import { useRootLoader } from "~/root";
 import { News } from "~/routes/home/News";
 import type { IGataReport } from "~/types/GataReport.type";
 import type { Page } from "~/types/Page.type";
@@ -36,9 +36,9 @@ export type LoaderData = {
 };
 
 export default function Home() {
-   const { loggedInUser, isAuthenticated } = useRouteLoaderData("root") as SerializeFrom<typeof rootLoader>;
+   const { auth0User, loggedInUser } = useRootLoader();
    const { reportPage } = useLoaderData<typeof loader>();
-   if (isAuthenticated) {
+   if (auth0User) {
       if (loggedInUser && isMember(loggedInUser) && reportPage) {
          return <News reportPage={reportPage} loggedInUser={loggedInUser} />;
       } else {

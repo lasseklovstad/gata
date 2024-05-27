@@ -1,21 +1,22 @@
 import { useFetcher } from "@remix-run/react";
 import { useState } from "react";
 
+import type { User } from "~/.server/db/user";
 import { Alert, AlertAction, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { FormControl, FormItem, FormLabel } from "~/components/ui/form";
 import { NativeSelect } from "~/components/ui/native-select";
 import { Typography } from "~/components/ui/typography";
+import { getPrimaryUser } from "~/utils/userUtils";
 
 import { SelectPrimaryEmail } from "./SelectPrimaryEmail";
 import type { IContingentInfo } from "../../../types/ContingentInfo.type";
-import type { IGataUser } from "../../../types/GataUser.type";
 import { isAdmin, isMember } from "../../../utils/roleUtils";
 import { memberIntent } from "../intent";
 
 type UserInfoProps = {
-   user: IGataUser;
-   loggedInUser: IGataUser;
+   user: User;
+   loggedInUser: User;
    contingentInfo: IContingentInfo;
 };
 
@@ -62,13 +63,13 @@ export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) 
       <>
          <div className="my-4">
             <Typography>
-               <strong>Navn:</strong> {user.primaryUser.name}
+               <strong>Navn:</strong> {getPrimaryUser(user).name}
             </Typography>
             {isAdmin(loggedInUser) ? (
                <SelectPrimaryEmail user={user} />
             ) : (
                <Typography>
-                  <strong>Email:</strong> {user.primaryUser.email}
+                  <strong>Email:</strong> {getPrimaryUser(user).email}
                </Typography>
             )}
          </div>

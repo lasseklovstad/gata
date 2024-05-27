@@ -1,16 +1,4 @@
-import type { IGataContingent } from "./GataContingent.type";
-import type { IGataRole } from "./GataRole.type";
-
-export interface IGataUser {
-   id: string;
-   externalUserProviders: IExternalUser[];
-   primaryUser: IExternalUser;
-   isUserAdmin: boolean;
-   isUserMember: boolean;
-   roles: IGataRole[];
-   contingents: IGataContingent[];
-   subscribe: boolean;
-}
+import type { ExternalUser } from "db/schema";
 
 export interface ISimpleGataUser {
    id: string;
@@ -18,11 +6,4 @@ export interface ISimpleGataUser {
    externalUserProviderId: string;
 }
 
-export interface IExternalUser {
-   email: string;
-   id: string;
-   lastLogin: string;
-   name: string;
-   picture: string | null;
-   primary: boolean;
-}
+export type IExternalUser = ExternalUser;
