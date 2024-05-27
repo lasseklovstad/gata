@@ -2,8 +2,8 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudfla
 import { json, redirect } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { SaveIcon } from "lucide-react";
-import { getResponsibility } from "~/.server/db/responsibility";
 
+import { getResponsibility } from "~/.server/db/responsibility";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { FormControl, FormItem, FormLabel, FormMessage, FormProvider } from "~/components/ui/form";

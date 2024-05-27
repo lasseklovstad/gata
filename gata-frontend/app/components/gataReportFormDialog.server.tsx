@@ -1,11 +1,11 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json, redirect } from "@remix-run/cloudflare";
 
+import { getReportSimple } from "~/.server/db/report";
 import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
 
 import type { IGataReportSimple } from "../types/GataReport.type";
-import { getReportSimple } from "~/.server/db/report";
 
 export const gataReportFormDialogLoader = async ({ request, params, context }: LoaderFunctionArgs) => {
    await createAuthenticator(context).getRequiredUser(request);

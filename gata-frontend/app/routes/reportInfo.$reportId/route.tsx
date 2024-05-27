@@ -5,7 +5,7 @@ import { Edit, Mail, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Descendant } from "slate";
 
-import { getRequiredUserFromExternalUserId } from "~/.server/db/user";
+import { getReport } from "~/.server/db/report";
 import { ClientOnly } from "~/components/ClientOnly";
 import { PageLayout } from "~/components/PageLayout";
 import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
@@ -18,7 +18,6 @@ import { client } from "~/utils/client";
 import { isAdmin } from "~/utils/roleUtils";
 
 import { reportInfoIntent } from "./intent";
-import { getReport } from "~/.server/db/report";
 
 export const loader = async ({ request, params: { reportId }, context }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator(context).getRequiredUser(request);

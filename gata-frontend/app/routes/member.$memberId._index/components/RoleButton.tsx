@@ -1,10 +1,10 @@
 import { useFetcher } from "@remix-run/react";
 
+import type { Role } from "db/schema";
 import type { User } from "~/.server/db/user";
 import { Button } from "~/components/ui/button";
 
 import { memberIntent } from "../intent";
-import { Role } from "db/schema";
 
 type Props = {
    role: Role;

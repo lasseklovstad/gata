@@ -2,8 +2,8 @@ import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Pencil, Plus, Trash } from "lucide-react";
-import { getResponsibilities } from "~/.server/db/responsibility";
 
+import { getResponsibilities } from "~/.server/db/responsibility";
 import { PageLayout } from "~/components/PageLayout";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";

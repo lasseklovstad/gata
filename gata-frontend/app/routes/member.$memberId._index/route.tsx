@@ -3,7 +3,9 @@ import { redirect } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { CircleUser, Trash } from "lucide-react";
 
-import { getUser, getRequiredUserFromExternalUserId, getNotMemberUsers } from "~/.server/db/user";
+import { getContingentInfo } from "~/.server/db/contigent";
+import { getRoles } from "~/.server/db/role";
+import { getNotMemberUsers, getUser } from "~/.server/db/user";
 import { useConfirmDialog } from "~/components/ConfirmDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -18,8 +20,6 @@ import { getPrimaryUser } from "~/utils/userUtils";
 
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
-import { getRoles } from "~/.server/db/role";
-import { getContingentInfo } from "~/.server/db/contigent";
 
 export const loader = async ({ request, params: { memberId }, context }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
