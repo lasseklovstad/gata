@@ -125,6 +125,8 @@ export const gataReport = pgTable("gata_report", {
    createdBy: uuid("created_by").references(() => user.id),
 });
 
+export type GataReport = typeof gataReport.$inferSelect;
+
 export const externalUserRelations = relations(externalUser, ({ one }) => ({
    user: one(user, {
       fields: [externalUser.userId],

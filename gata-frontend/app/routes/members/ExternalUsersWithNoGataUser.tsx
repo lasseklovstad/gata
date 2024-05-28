@@ -1,10 +1,10 @@
+import type { ExternalUser } from "db/schema";
 import { Typography } from "~/components/ui/typography";
 
 import { ExternalUsersWithNoGataUserListItem } from "./ExternalUsersWithNoGataUserListItem";
-import type { IExternalUser } from "../../types/GataUser.type";
 
 type Props = {
-   externalUsers: IExternalUser[];
+   externalUsers: ExternalUser[];
 };
 
 export const ExternalUsersWithNoGataUser = ({ externalUsers }: Props) => {

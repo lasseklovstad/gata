@@ -7,13 +7,14 @@ import { getReportsSimple } from "~/.server/db/report";
 import { PageLayout } from "~/components/PageLayout";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
+import { ReportType } from "~/types/GataReport.type";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isAdmin } from "~/utils/roleUtils";
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
 
-   const [reports] = await Promise.all([getReportsSimple(context)]);
+   const [reports] = await Promise.all([getReportsSimple(context, ReportType.DOCUMENT)]);
    return json({ reports, loggedInUser });
 };
 

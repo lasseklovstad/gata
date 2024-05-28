@@ -6,10 +6,26 @@ import { ReportSchema } from "~/utils/formSchema";
 import { getPrimaryUser } from "~/utils/userUtils";
 import { User } from "./user";
 
-export const getReportsSimple = async (context: AppLoadContext) => {
+export const getReportsSimple = async (context: AppLoadContext, reportType: ReportType) => {
    return await context.db
       .select({ id: gataReport.id, title: gataReport.title, description: gataReport.description })
       .from(gataReport)
+      .where(eq(gataReport.type, reportType))
+      .limit(50);
+};
+
+export const getReportsWithContent = async (context: AppLoadContext, reportType: ReportType) => {
+   return await context.db
+      .select({
+         id: gataReport.id,
+         title: gataReport.title,
+         description: gataReport.description,
+         content: sql<string>`convert_from(loread(lo_open(${gataReport.content}::int, x'40000'::int), x'40000'::int),  'UTF8')`,
+         createdBy: gataReport.createdBy,
+         lastModifiedDate: gataReport.lastModifiedDate,
+      })
+      .from(gataReport)
+      .where(eq(gataReport.type, reportType))
       .limit(50);
 };
 

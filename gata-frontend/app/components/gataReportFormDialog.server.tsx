@@ -3,7 +3,6 @@ import { json, redirect } from "@remix-run/cloudflare";
 
 import { getReportSimple, insertReport, updateReport } from "~/.server/db/report";
 import { createAuthenticator } from "~/utils/auth.server";
-
 import { reportSchema } from "~/utils/formSchema";
 import { isAdmin } from "~/utils/roleUtils";
 
