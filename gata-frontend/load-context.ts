@@ -52,8 +52,12 @@ export const getLoadContext: GetLoadContext = ({ context }) => {
 let db: PostgresJsDatabase<typeof schema> | undefined;
 
 const getDb = (databaseUrl: string) => {
-   if (db && import.meta.env.DEV) return db;
+   if (process.env.NODE_ENV === "production") return initDb(databaseUrl);
+   if (db) return db;
+   return (db = initDb(databaseUrl));
+};
+
+const initDb = (databaseUrl: string) => {
    const queryClient = postgres(databaseUrl);
-   db = drizzle(queryClient, { schema });
-   return db;
+   return drizzle(queryClient, { schema });
 };
