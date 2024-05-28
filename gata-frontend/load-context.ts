@@ -38,26 +38,20 @@ type GetLoadContext = (args: {
    context: { cloudflare: Cloudflare }; // load context _before_ augmentation
 }) => AppLoadContext;
 
+// Function to get or create the database connection
+const getDatabase = (cloudflare: Cloudflare & { db?: PostgresJsDatabase<typeof schema> }) => {
+   if (!cloudflare.db) {
+      const queryClient = postgres(cloudflare.env.APP_DATABASE_URL);
+      cloudflare.db = drizzle(queryClient, { schema });
+   }
+   return cloudflare.db;
+};
+
 // Shared implementation compatible with Vite, Wrangler, and Cloudflare Pages
 export const getLoadContext: GetLoadContext = ({ context }) => {
-   const db = getDb(context.cloudflare.env.APP_DATABASE_URL);
+   const db = getDatabase(context.cloudflare);
    return {
       ...context,
       db,
    };
-};
-
-// Use singleton to avoid number of connections grows beyond 100
-
-let db: PostgresJsDatabase<typeof schema> | undefined;
-
-const getDb = (databaseUrl: string) => {
-   if (process.env.NODE_ENV === "production") return initDb(databaseUrl);
-   if (db) return db;
-   return (db = initDb(databaseUrl));
-};
-
-const initDb = (databaseUrl: string) => {
-   const queryClient = postgres(databaseUrl);
-   return drizzle(queryClient, { schema });
 };
