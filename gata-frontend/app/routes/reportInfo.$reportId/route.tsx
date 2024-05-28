@@ -5,8 +5,7 @@ import { Edit, Mail, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Descendant } from "slate";
 
-import { getRequiredUserFromExternalUserId } from "~/.server/db/user";
-import { getReport } from "~/api/report.api";
+import { getReport } from "~/.server/db/report";
 import { ClientOnly } from "~/components/ClientOnly";
 import { PageLayout } from "~/components/PageLayout";
 import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
@@ -21,14 +20,10 @@ import { isAdmin } from "~/utils/roleUtils";
 import { reportInfoIntent } from "./intent";
 
 export const loader = async ({ request, params: { reportId }, context }: LoaderFunctionArgs) => {
-   const { accessToken: token, profile } = await createAuthenticator(context).getRequiredAuth(request);
-   const signal = request.signal;
-   if (!profile.id) throw new Error("Profile id required");
-   const [loggedInUser, report] = await Promise.all([
-      getRequiredUserFromExternalUserId(context, profile.id),
-      getReport({ token, signal, reportId, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
-   ]);
-   return json({ report, loggedInUser });
+   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+   if (!reportId) throw new Error("ReportId id required");
+   const [report] = await Promise.all([getReport(context, reportId)]);
+   return { report, loggedInUser };
 };
 
 export const action = async ({ request, params, context }: ActionFunctionArgs) => {
@@ -64,7 +59,7 @@ export const action = async ({ request, params, context }: ActionFunctionArgs) =
 
 export default function ReportInfoPage() {
    const { report, loggedInUser } = useLoaderData<typeof loader>();
-   const canEdit = report.createdBy?.id === loggedInUser.id || isAdmin(loggedInUser);
+   const canEdit = report.createdBy === loggedInUser.id || isAdmin(loggedInUser);
    const [editing, setEditing] = useState(false);
    const fetcher = useFetcher<typeof action>();
 
@@ -95,7 +90,7 @@ export default function ReportInfoPage() {
       }
    }, [fetcher.data, fetcher.state]);
 
-   const lastModifiedDate = new Date(report.lastModifiedDate);
+   const lastModifiedDate = new Date(report.lastModifiedDate ?? "");
 
    return (
       <>

@@ -3,8 +3,7 @@ import { json } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Plus } from "lucide-react";
 
-import { getRequiredUserFromExternalUserId } from "~/.server/db/user";
-import { getReportsSimple } from "~/api/report.api";
+import { getReportsSimple } from "~/.server/db/report";
 import { PageLayout } from "~/components/PageLayout";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
@@ -12,15 +11,9 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { isAdmin } from "~/utils/roleUtils";
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
-   const { accessToken: token, profile } = await createAuthenticator(context).getRequiredAuth(request);
-   const signal = request.signal;
+   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
 
-   if (!profile.id) throw new Error("Profile id is required");
-
-   const [loggedInUser, reports] = await Promise.all([
-      getRequiredUserFromExternalUserId(context, profile.id),
-      getReportsSimple({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
-   ]);
+   const [reports] = await Promise.all([getReportsSimple(context)]);
    return json({ reports, loggedInUser });
 };
 
@@ -40,7 +33,7 @@ export default function ReportPage() {
             )}
          </div>
          <ul aria-labelledby="report-page-title" className="divide-y my-4">
-            {reports.content.map((report) => {
+            {reports.map((report) => {
                return (
                   <li key={report.id} className="hover:bg-blue-50">
                      <Link to={`/reportInfo/${report.id}`} className="w-full p-2 block">
@@ -50,7 +43,7 @@ export default function ReportPage() {
                   </li>
                );
             })}
-            {reports.totalElements === 0 && <li>Det finnes ingen dokumenter enda!</li>}
+            {reports.length === 0 && <li>Det finnes ingen dokumenter enda!</li>}
          </ul>
          <Outlet />
       </PageLayout>

@@ -1,13 +1,13 @@
 import { useFetcher } from "@remix-run/react";
 
+import type { Role } from "db/schema";
 import type { User } from "~/.server/db/user";
 import { Button } from "~/components/ui/button";
-import type { IGataRole } from "~/types/GataRole.type";
 
 import { memberIntent } from "../intent";
 
 type Props = {
-   role: IGataRole;
+   role: Role;
    user: User;
 };
 

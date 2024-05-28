@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { AlertCircle, CheckCircle, TriangleAlert } from "lucide-react";
+import { AlertCircle, CheckCircle, InfoIcon, TriangleAlert } from "lucide-react";
 import * as React from "react";
 
 import { cn } from "~/utils";
@@ -11,7 +11,7 @@ const alertVariants = cva(
    {
       variants: {
          variant: {
-            default: "bg-background text-foreground",
+            default: "bg-blue-50 text-foreground border rounded",
             destructive: "bg-destructive/30 [&>svg]:text-destructive",
             success: "bg-green-500/30 [&>svg]:text-green-500",
             warning: "bg-yellow-500/30 [&>svg]:text-yellow-800",
@@ -26,7 +26,7 @@ const alertVariants = cva(
 const Alert = React.forwardRef<
    HTMLDivElement,
    React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, children, ...props }, ref) => (
+>(({ className, variant = "default", children, ...props }, ref) => (
    <div
       ref={ref}
       role={variant === "destructive" ? "alert" : "status"}
@@ -36,6 +36,7 @@ const Alert = React.forwardRef<
       {variant === "destructive" ? <AlertCircle /> : null}
       {variant === "warning" ? <TriangleAlert /> : null}
       {variant === "success" ? <CheckCircle /> : null}
+      {variant === "default" ? <InfoIcon /> : null}
       {children}
    </div>
 ));

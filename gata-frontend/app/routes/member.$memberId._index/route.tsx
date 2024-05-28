@@ -3,9 +3,9 @@ import { redirect } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { CircleUser, Trash } from "lucide-react";
 
-import { getUser, getRequiredUserFromExternalUserId, getNotMemberUsers } from "~/.server/db/user";
-import { getContingentInfo } from "~/api/contingent.api";
-import { getRoles } from "~/api/role.api";
+import { getContingentInfo } from "~/.server/db/contigent";
+import { getRoles } from "~/.server/db/role";
+import { getNotMemberUsers, getUser } from "~/.server/db/user";
 import { useConfirmDialog } from "~/components/ConfirmDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -22,17 +22,14 @@ import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
 
 export const loader = async ({ request, params: { memberId }, context }: LoaderFunctionArgs) => {
-   const { accessToken: token, profile } = await createAuthenticator(context).getRequiredAuth(request);
-   const signal = request.signal;
+   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
 
    if (!memberId) throw new Error("Member id required");
-   if (!profile.id) throw new Error("Profile id required");
 
-   const [member, loggedInUser, roles, contingentInfo, notMemberUsers] = await Promise.all([
+   const [member, roles, contingentInfo, notMemberUsers] = await Promise.all([
       getUser(context, memberId),
-      getRequiredUserFromExternalUserId(context, profile.id),
-      getRoles({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
-      getContingentInfo({ token, signal, baseUrl: context.cloudflare.env.BACKEND_BASE_URL }),
+      getRoles(context),
+      getContingentInfo(context),
       getNotMemberUsers(context),
    ]);
    return { member, contingentInfo, roles, notMemberUsers, loggedInUser };

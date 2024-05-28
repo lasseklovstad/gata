@@ -20,6 +20,8 @@ interface Env {
    AUTH0_COOKIE_SECRET: string;
    BACKEND_BASE_URL: string;
    APP_DATABASE_URL: string;
+   DEFAULT_CONTINGENT_SIZE: string;
+   CONTINGENT_BANK: string;
 }
 
 type Cloudflare = Omit<PlatformProxy<Env>, "dispose">;
@@ -36,10 +38,18 @@ type GetLoadContext = (args: {
    context: { cloudflare: Cloudflare }; // load context _before_ augmentation
 }) => AppLoadContext;
 
+// Function to get or create the database connection
+const getDatabase = (cloudflare: Cloudflare & { db?: PostgresJsDatabase<typeof schema> }) => {
+   if (!cloudflare.db) {
+      const queryClient = postgres(cloudflare.env.APP_DATABASE_URL);
+      cloudflare.db = drizzle(queryClient, { schema });
+   }
+   return cloudflare.db;
+};
+
 // Shared implementation compatible with Vite, Wrangler, and Cloudflare Pages
 export const getLoadContext: GetLoadContext = ({ context }) => {
-   const queryClient = postgres(context.cloudflare.env.APP_DATABASE_URL);
-   const db = drizzle(queryClient, { schema });
+   const db = getDatabase(context.cloudflare);
    return {
       ...context,
       db,
