@@ -3,15 +3,16 @@ import { json, redirect } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { SaveIcon } from "lucide-react";
 
-import { getResponsibility } from "~/.server/db/responsibility";
+import { getResponsibility, insertResponsibility, updateResponsibility } from "~/.server/db/responsibility";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { FormControl, FormItem, FormLabel, FormMessage, FormProvider } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { createAuthenticator } from "~/utils/auth.server";
-import { client } from "~/utils/client";
 import { useDialog } from "~/utils/dialogUtils";
+import { responsibilitySchema } from "~/utils/formSchema";
+import { isAdmin } from "~/utils/roleUtils";
 
 export const loader = async ({ request, params, context }: LoaderFunctionArgs) => {
    await createAuthenticator(context).getRequiredUser(request);
@@ -23,23 +24,21 @@ export const loader = async ({ request, params, context }: LoaderFunctionArgs) =
 };
 
 export const action = async ({ request, params, context }: ActionFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
-   const body = Object.fromEntries(await request.formData());
-   if (!body.name) {
-      return json({ error: { name: "Navn må fylles ut" } }, { status: 400 });
+   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+   if (!isAdmin(loggedInUser)) {
+      throw new Error("Du har ikke tilgang til å endre denne ressursen");
+   }
+   const responsibility = responsibilitySchema.safeParse(await request.formData());
+   if (responsibility.error) {
+      return json({ ...responsibility.error.formErrors }, { status: 400 });
    }
 
    if (request.method === "POST") {
-      await client("responsibility", { method: "POST", body, token, baseUrl: context.cloudflare.env.BACKEND_BASE_URL });
+      await insertResponsibility(context, responsibility.data);
       return redirect("/responsibility");
    }
-   if (request.method === "PUT") {
-      await client(`responsibility/${params.responsibilityId}`, {
-         method: "PUT",
-         body,
-         token,
-         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-      });
+   if (request.method === "PUT" && params.responsibilityId) {
+      await updateResponsibility(context, params.responsibilityId, responsibility.data);
       return redirect("/responsibility");
    }
 };
@@ -50,7 +49,8 @@ export default function EditResponsibility() {
    const { responsibility } = useLoaderData<typeof loader>();
    const method = responsibility ? "put" : "post";
    const fetcher = useFetcher<typeof action>();
-   const error = fetcher.data?.error;
+   const error = fetcher.data?.fieldErrors;
+   console.log(error);
    const onClose = () => navigate("..");
 
    return (

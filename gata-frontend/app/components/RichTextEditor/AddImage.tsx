@@ -31,7 +31,7 @@ export const AddImage = ({ onAddImage }: AddImageProps) => {
          </Button>
          <Dialog ref={dialogRef}>
             <DialogHeading>Legg til bilde</DialogHeading>
-            <FormProvider errors={{ url: error }}>
+            <FormProvider errors={{ url: [error] }}>
                <FormItem name="url">
                   <FormLabel>Bilde url</FormLabel>
                   <FormControl

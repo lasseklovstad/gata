@@ -23,7 +23,7 @@ export const GataReportFormDialog = ({ type }: GataReportFormDialogProps) => {
    const method = report ? "PUT" : "POST";
    const [title, setTitle] = useState(report?.title || "");
    const [description, setDescription] = useState(report?.description || "");
-   const error = fetcher.data?.error;
+   const error = fetcher.data?.fieldErrors;
 
    const onClose = () => navigate("..");
 

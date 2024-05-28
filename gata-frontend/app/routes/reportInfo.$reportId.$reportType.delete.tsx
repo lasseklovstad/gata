@@ -1,19 +1,15 @@
 import type { ActionFunctionArgs } from "@remix-run/cloudflare";
 import { redirect } from "@remix-run/cloudflare";
 
+import { deleteReport } from "~/.server/db/report";
 import { RouteConfirmFormDialog } from "~/components/RouteConfirmFormDialog";
 import { createAuthenticator } from "~/utils/auth.server";
-import { client } from "~/utils/client";
 
 export const action = async ({ request, params, context }: ActionFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
+   await createAuthenticator(context).getRequiredUser(request);
 
-   if (request.method === "DELETE") {
-      await client(`report/${params.reportId}`, {
-         method: "DELETE",
-         token,
-         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-      });
+   if (request.method === "DELETE" && params.reportId) {
+      await deleteReport(context, params.reportId);
       return redirect(params.reportType === "NEWS" ? "/" : "/report");
    }
 };

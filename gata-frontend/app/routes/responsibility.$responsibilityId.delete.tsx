@@ -1,19 +1,20 @@
 import type { ActionFunctionArgs } from "@remix-run/cloudflare";
 import { redirect } from "@remix-run/cloudflare";
 
+import { deleteResponsibility } from "~/.server/db/responsibility";
 import { RouteConfirmFormDialog } from "~/components/RouteConfirmFormDialog";
 import { createAuthenticator } from "~/utils/auth.server";
-import { client } from "~/utils/client";
+import { isAdmin } from "~/utils/roleUtils";
 
 export const action = async ({ request, params, context }: ActionFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
+   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
 
-   if (request.method === "DELETE") {
-      await client(`responsibility/${params.responsibilityId}`, {
-         method: "DELETE",
-         token,
-         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-      });
+   if (!isAdmin(loggedInUser)) {
+      throw new Error("Du har ikke tilgang til å endre denne ressursen");
+   }
+
+   if (request.method === "DELETE" && params.responsibilityId) {
+      await deleteResponsibility(context, params.responsibilityId);
       return redirect("/responsibility");
    }
 };

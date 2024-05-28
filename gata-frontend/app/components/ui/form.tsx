@@ -5,7 +5,7 @@ import { Label } from "~/components/ui/label";
 import { cn } from "~/utils";
 
 type FormContextValue = {
-   errors?: Record<string, string>;
+   errors?: Record<string, string[]>;
 };
 
 const FormContext = createContext<FormContextValue | undefined>(undefined);
@@ -40,7 +40,7 @@ const useFormField = () => {
 type FormItemContextValue = {
    id: string;
    name: string;
-   error: string | undefined;
+   error: string[] | undefined;
 };
 
 const FormItemContext = createContext<FormItemContextValue | undefined>(undefined);

@@ -1,11 +1,11 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json, redirect } from "@remix-run/cloudflare";
 
-import { getReportSimple } from "~/.server/db/report";
+import { getReportSimple, insertReport, updateReport } from "~/.server/db/report";
 import { createAuthenticator } from "~/utils/auth.server";
-import { client } from "~/utils/client";
 
-import type { IGataReportSimple } from "../types/GataReport.type";
+import { reportSchema } from "~/utils/formSchema";
+import { isAdmin } from "~/utils/roleUtils";
 
 export const gataReportFormDialogLoader = async ({ request, params, context }: LoaderFunctionArgs) => {
    await createAuthenticator(context).getRequiredUser(request);
@@ -13,28 +13,22 @@ export const gataReportFormDialogLoader = async ({ request, params, context }: L
 };
 
 export const gataReportFormDialogAction = async ({ request, params, context }: ActionFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
-   const body = Object.fromEntries(await request.formData());
-   if (!body.title) {
-      return json({ error: { title: "Tittel må fylles ut" } }, { status: 400 });
+   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+   if (!isAdmin(loggedInUser)) {
+      throw new Error("Du har ikke tilgang til å endre denne ressursen");
+   }
+   const form = reportSchema.safeParse(await request.formData());
+   if (form.error) {
+      return json({ ...form.error.formErrors }, { status: 400 });
    }
 
    if (request.method === "POST") {
-      const response = await client<IGataReportSimple>("report", {
-         method: "POST",
-         body,
-         token,
-         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-      });
-      return redirect(`/reportInfo/${response.id}`);
+      const [{ reportId }] = await insertReport(context, form.data, loggedInUser);
+      console.log("redirect to", reportId);
+      return redirect(`/reportInfo/${reportId}`);
    }
-   if (request.method === "PUT") {
-      await client(`report/${params.reportId}`, {
-         method: "PUT",
-         body,
-         token,
-         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-      });
+   if (request.method === "PUT" && params.reportId) {
+      await updateReport(context, params.reportId, form.data, loggedInUser);
       return redirect(`/reportInfo/${params.reportId}`);
    }
 };
