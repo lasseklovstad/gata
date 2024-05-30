@@ -1,9 +1,9 @@
 import { AppLoadContext } from "@remix-run/cloudflare";
-import sendGrid, { ResponseError } from "@sendgrid/mail";
+import sendGrid, { type ResponseError } from "@sendgrid/mail";
 
 type MailData = {
    to: string;
-   text: string;
+   html: string;
    subject: string;
 };
 
@@ -12,19 +12,18 @@ export async function sendMail(context: AppLoadContext, mailData: MailData) {
 
    await sendGrid
       .send({
-         from: "hesten.bla@gataersamla.no",
+         from: {
+            email: "hesten.bla@gataersamla.no",
+            name: "Hesten Blå",
+         },
          ...mailData,
       })
       .then(
          () => {
             console.log("Email sent success");
          },
-         (error: Error | ResponseError) => {
+         (error: Error) => {
             console.error(error);
-
-            if (error instanceof ResponseError) {
-               console.error(error.response.body);
-            }
          }
       );
 }

@@ -2,7 +2,7 @@ import { Link } from "@remix-run/react";
 import { Menu } from "lucide-react";
 
 import type { User } from "~/.server/db/user";
-import type { Auth0User } from "~/utils/auth.server";
+import type { Auth0User } from "~/types/Auth0User";
 
 import { UserMenu } from "./UserMenu";
 import { isAdmin, isMember } from "../../utils/roleUtils";

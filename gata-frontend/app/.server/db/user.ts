@@ -1,5 +1,5 @@
 import { AppLoadContext } from "@remix-run/cloudflare";
-import { externalUser, responsibilityYear, role, user, userRoles } from "db/schema";
+import { contingent, externalUser, responsibilityYear, role, user, userRoles } from "db/schema";
 import { and, count, eq, inArray, isNull, ne, notInArray, sql } from "drizzle-orm";
 import { Auth0User } from "~/types/Auth0User";
 import { RoleName } from "~/utils/roleUtils";
@@ -143,4 +143,21 @@ export const updatePrimaryEmail = async (context: AppLoadContext, userId: string
 
 export const deleteExternalUser = async (context: AppLoadContext, externalUserId: string) => {
    await context.db.delete(externalUser).where(eq(externalUser.id, externalUserId));
+};
+
+export const getSubscribedUsers = async (context: AppLoadContext) => {
+   return await context.db
+      .select({ id: user.id, name: externalUser.name, email: externalUser.email })
+      .from(user)
+      .leftJoin(externalUser, eq(externalUser.userId, user.id))
+      .where(and(eq(externalUser.primaryUser, true), eq(user.subscribe, true)));
+};
+
+export const getUsersThatHasNotPaidContingent = async (context: AppLoadContext, year: number) => {
+   const usersContingent = await context.db
+      .select({ id: user.id, name: externalUser.name, email: externalUser.email, isPaid: contingent.isPaid })
+      .from(user)
+      .leftJoin(contingent, and(eq(contingent.userId, user.id), eq(contingent.year, year)))
+      .leftJoin(externalUser, and(eq(externalUser.userId, user.id), eq(externalUser.primaryUser, true)));
+   return usersContingent.filter((user) => !user.isPaid);
 };
