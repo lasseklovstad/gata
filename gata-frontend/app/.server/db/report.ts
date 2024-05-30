@@ -1,6 +1,6 @@
 import { AppLoadContext } from "@remix-run/cloudflare";
 import { gataReport } from "db/schema";
-import { eq, sql } from "drizzle-orm";
+import { asc, desc, eq, sql } from "drizzle-orm";
 import { ReportType } from "~/types/GataReport.type";
 import { ReportSchema } from "~/utils/formSchema";
 import { getPrimaryUser } from "~/utils/userUtils";
@@ -11,6 +11,7 @@ export const getReportsSimple = async (context: AppLoadContext, reportType: Repo
       .select({ id: gataReport.id, title: gataReport.title, description: gataReport.description })
       .from(gataReport)
       .where(eq(gataReport.type, reportType))
+      .orderBy(desc(gataReport.createdDate))
       .limit(50);
 };
 
@@ -20,12 +21,13 @@ export const getReportsWithContent = async (context: AppLoadContext, reportType:
          id: gataReport.id,
          title: gataReport.title,
          description: gataReport.description,
-         content: sql<string>`convert_from(loread(lo_open(${gataReport.content}::int, x'40000'::int), x'40000'::int),  'UTF8')`,
+         content: gataReport.content,
          createdBy: gataReport.createdBy,
          lastModifiedDate: gataReport.lastModifiedDate,
       })
       .from(gataReport)
       .where(eq(gataReport.type, reportType))
+      .orderBy(desc(gataReport.createdDate))
       .limit(50);
 };
 
@@ -53,7 +55,7 @@ export const getReport = async (context: AppLoadContext, reportId: string) => {
          title: gataReport.title,
          description: gataReport.description,
          lastModifiedBy: gataReport.lastModifiedBy,
-         content: sql<string>`convert_from(loread(lo_open(${gataReport.content}::int, x'40000'::int), x'40000'::int),  'UTF8')`,
+         content: gataReport.content,
          lastModifiedDate: gataReport.lastModifiedDate,
          createdBy: gataReport.createdBy,
          type: gataReport.type,
@@ -79,6 +81,7 @@ export const insertReport = async (context: AppLoadContext, values: ReportSchema
          createdBy: loggedInUser.id,
          lastModifiedBy: primaryUser.name,
          lastModifiedDate: sql`now()`,
+         createdDate: sql`now()`,
       })
       .returning({ reportId: gataReport.id });
 };
@@ -103,4 +106,21 @@ export const updateReport = async (
 
 export const deleteReport = async (context: AppLoadContext, reportId: string) => {
    await context.db.delete(gataReport).where(eq(gataReport.id, reportId));
+};
+
+export const updateReportContent = async (
+   context: AppLoadContext,
+   reportId: string,
+   content: string,
+   loggedInUser: User
+) => {
+   const primaryUser = getPrimaryUser(loggedInUser);
+   await context.db
+      .update(gataReport)
+      .set({
+         content,
+         lastModifiedBy: primaryUser.name,
+         lastModifiedDate: sql`now()`,
+      })
+      .where(eq(gataReport.id, reportId));
 };

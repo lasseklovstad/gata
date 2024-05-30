@@ -1,5 +1,5 @@
 import { useFetcher } from "@remix-run/react";
-import { Plus, User } from "lucide-react";
+import { Plus, Trash, User, X } from "lucide-react";
 
 import type { ExternalUser } from "db/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -14,11 +14,15 @@ export const ExternalUsersWithNoGataUserListItem = ({ user }: ExternalUsersWithN
    const fetcher = useFetcher();
 
    const handleAddClick = () => {
-      fetcher.submit({ externalUserId: user.id }, { method: "post" });
+      fetcher.submit({ externalUserId: user.id }, { method: "POST" });
+   };
+
+   const handleDeleteClick = () => {
+      fetcher.submit({ externalUserId: user.id }, { method: "DELETE" });
    };
 
    return (
-      <li className="flex gap-4 items-center p-2">
+      <li className="flex gap-2 items-center p-2">
          <Avatar>
             <AvatarImage src={user.picture || undefined} alt="" />
             <AvatarFallback>
@@ -31,7 +35,23 @@ export const ExternalUsersWithNoGataUserListItem = ({ user }: ExternalUsersWithN
                Sist innlogget: {new Date(user.lastLogin ?? "").toLocaleDateString("no")}
             </Typography>
          </div>
-         <Button size="icon" onClick={handleAddClick} isLoading={fetcher.state !== "idle"} aria-label="Legg til">
+
+         <Button
+            size="icon"
+            variant="ghost"
+            onClick={handleDeleteClick}
+            isLoading={fetcher.state !== "idle"}
+            aria-label="Fjern"
+         >
+            <Trash />
+         </Button>
+         <Button
+            size="icon"
+            variant="ghost"
+            onClick={handleAddClick}
+            isLoading={fetcher.state !== "idle"}
+            aria-label="Legg til"
+         >
             <Plus />
          </Button>
       </li>

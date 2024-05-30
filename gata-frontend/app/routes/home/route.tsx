@@ -22,6 +22,7 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
 export default function Home() {
    const { auth0User, loggedInUser } = useRootLoader();
    const { reports } = useLoaderData<typeof loader>();
+   console.log(reports);
    if (auth0User) {
       if (loggedInUser && isMember(loggedInUser) && reports) {
          return <News reports={reports} loggedInUser={loggedInUser} />;

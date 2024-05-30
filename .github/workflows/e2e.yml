@@ -63,6 +63,20 @@ jobs:
 
   playwright:
     runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:latest
+        ports:
+          - 5433:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Cloning repo
         uses: actions/checkout@v4
@@ -84,6 +98,7 @@ jobs:
           APP_DATABASE_URL: "postgres://postgres:password@localhost:5433/postgres"
           DEFAULT_CONTINGENT_SIZE: 600
           CONTINGENT_BANK: 000.0123.1230.123
+          MAKE_FIRST_USER_ADMIN: true
         run: |
           touch .dev.vars
           echo "AUTH0_DOMAIN=$AUTH0_DOMAIN" >> .dev.vars
@@ -95,6 +110,7 @@ jobs:
           echo "APP_DATABASE_URL=$APP_DATABASE_URL" >> .dev.vars
           echo "DEFAULT_CONTINGENT_SIZE=$DEFAULT_CONTINGENT_SIZE" >> .dev.vars
           echo "CONTINGENT_BANK=$CONTINGENT_BANK" >> .dev.vars
+          echo "MAKE_FIRST_USER_ADMIN=$MAKE_FIRST_USER_ADMIN" >> .dev.vars
       - name: Install frontend dependencies
         working-directory: ./gata-frontend
         run: |
@@ -103,6 +119,11 @@ jobs:
         working-directory: ./gata-frontend
         run: |
           npm run build
+
+      - name: Run db migrations
+        working-directory: ./gata-frontend
+        run: |
+          npm run db:migrate
 
       - name: Install npm dependencies and check typescript
         working-directory: ./gata-tests
@@ -127,11 +148,6 @@ jobs:
       - name: Run E2E tests
         working-directory: ./gata-tests
         env:
-          # Backend environments
-          AUTH0_DOMAIN: "gataersamla.eu.auth0.com"
-          AUTH0_AUDIENCE: "https://gataersamla.no"
-          SENDGRID_API_KEY: NA
-          CLOUDINARY_URL: NA
           # Playwright environments
           PLAYWRIGHT_ADMIN_USERNAME: ${{secrets.E2E_PLAYWRIGHT_ADMIN_USERNAME}}
           PLAYWRIGHT_ADMIN_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_ADMIN_PASSWORD}}
@@ -153,14 +169,3 @@ jobs:
         with:
           name: playwright-report
           path: gata-tests/playwright-report
-
-      - name: Write docker compose logs to file
-        if: always()
-        run: docker-compose logs > E2E-LOGS.txt
-
-      - name: Upload logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: E2E-LOGS.txt
-          path: E2E-LOGS.txt

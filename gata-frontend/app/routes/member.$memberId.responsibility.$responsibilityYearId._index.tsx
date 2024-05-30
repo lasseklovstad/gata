@@ -1,20 +1,19 @@
 import type { ActionFunctionArgs } from "@remix-run/cloudflare";
 import { redirect } from "@remix-run/cloudflare";
 
+import { updateResponsibilityNote } from "~/.server/db/responsibility";
 import { createAuthenticator } from "~/utils/auth.server";
-import { client } from "~/utils/client";
+import { updateResponsibilityYearSchema } from "~/utils/formSchema";
 
 export const action = async ({ request, params, context }: ActionFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
+   if (!params.responsibilityYearId) {
+      throw new Error("ResponsibilityYearId id required");
+   }
+   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
 
    if (request.method === "PUT") {
-      const body = Object.fromEntries(await request.formData());
-      await client(`user/${params.memberId}/responsibilityyear/${params.responsibilityYearId}/note`, {
-         method: "PUT",
-         body,
-         token,
-         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-      });
+      const { text } = updateResponsibilityYearSchema.parse(await request.formData());
+      await updateResponsibilityNote(context, params.responsibilityYearId, text, loggedInUser);
    }
 
    return redirect(`/member/${params.memberId}/responsibility`);

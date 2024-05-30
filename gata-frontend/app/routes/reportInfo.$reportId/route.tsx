@@ -5,19 +5,19 @@ import { Edit, Mail, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Descendant } from "slate";
 
-import { getReport } from "~/.server/db/report";
+import { getReport, updateReportContent } from "~/.server/db/report";
 import { ClientOnly } from "~/components/ClientOnly";
 import { PageLayout } from "~/components/PageLayout";
 import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
 import { RichTextPreview } from "~/components/RichTextEditor/RichTextPreview";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
-import type { IGataReportFile, IGataReportFilePayload } from "~/types/GataReportFile.type";
 import { createAuthenticator } from "~/utils/auth.server";
-import { client } from "~/utils/client";
 import { isAdmin } from "~/utils/roleUtils";
 
+import { uploadImage } from "~/.server/services/cloudinaryService";
 import { reportInfoIntent } from "./intent";
+import { insertReportFile } from "~/.server/db/reportFile";
 
 export const loader = async ({ request, params: { reportId }, context }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
@@ -27,29 +27,32 @@ export const loader = async ({ request, params: { reportId }, context }: LoaderF
 };
 
 export const action = async ({ request, params, context }: ActionFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
+   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
    const formData = await request.formData();
    const intent = String(formData.get("intent"));
 
+   if (!params.reportId) {
+      throw new Error("Report id is required");
+   }
+
    switch (intent) {
       case reportInfoIntent.updateContentIntent: {
-         const body = JSON.parse(String(formData.get("content")));
-         await client(`report/${params.reportId}/content`, {
-            method: "PUT",
-            body,
-            token,
-            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-         });
+         await updateReportContent(context, params.reportId, String(formData.get("content")), loggedInUser);
          return json({ ok: true, close: formData.get("close"), intent: reportInfoIntent.updateContentIntent } as const);
       }
       case reportInfoIntent.postFileIntent: {
-         const dataBody = String(formData.get("data"));
-         const response = await client<IGataReportFile, IGataReportFilePayload>("file/cloud", {
-            body: { data: dataBody, reportId: params.reportId! },
-            token,
-            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
+         const data = String(formData.get("data"));
+         const { public_id, secure_url } = await uploadImage(context, data);
+         const [file] = await insertReportFile(context, {
+            reportId: params.reportId,
+            cloudId: public_id,
+            cloudUrl: secure_url,
          });
-         return json({ ok: true, file: response, intent: reportInfoIntent.postFileIntent } as const);
+         return json({
+            ok: true,
+            file,
+            intent: reportInfoIntent.postFileIntent,
+         } as const);
       }
       default: {
          throw new Response(`Invalid intent "${intent}"`, { status: 400 });

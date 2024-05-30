@@ -3,9 +3,16 @@ import { redirect } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { CircleUser, Trash } from "lucide-react";
 
-import { getContingentInfo } from "~/.server/db/contigent";
-import { getRoles } from "~/.server/db/role";
-import { getNotMemberUsers, getUser } from "~/.server/db/user";
+import { getContingentInfo, updateContingent } from "~/.server/db/contigent";
+import { deleteRole, getRoles, insertRole } from "~/.server/db/role";
+import {
+   deleteUser,
+   getNotMemberUsers,
+   getUser,
+   updateLinkedExternalUsers,
+   updatePrimaryEmail,
+   updateUserSubscribe,
+} from "~/.server/db/user";
 import { useConfirmDialog } from "~/components/ConfirmDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -14,8 +21,7 @@ import { LinkExternalUserToGataUserSelect } from "~/routes/member.$memberId._ind
 import { UserInfo } from "~/routes/member.$memberId._index/components/UserInfo";
 import { UserSubscribe } from "~/routes/member.$memberId._index/components/UserSubscribe";
 import { createAuthenticator } from "~/utils/auth.server";
-import { client } from "~/utils/client";
-import { isAdmin } from "~/utils/roleUtils";
+import { isAdmin, requireAdminRole } from "~/utils/roleUtils";
 import { getPrimaryUser } from "~/utils/userUtils";
 
 import { RoleButton } from "./components/RoleButton";
@@ -36,69 +42,52 @@ export const loader = async ({ request, params: { memberId }, context }: LoaderF
 };
 
 export const action = async ({ request, params: { memberId }, context }: ActionFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
+   if (!memberId) {
+      throw new Error("Member id required");
+   }
+   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
    const formData = await request.formData();
    const intent = String(formData.get("intent"));
 
    switch (intent) {
       case memberIntent.deleteUser: {
-         await client(`user/${memberId}`, {
-            method: "DELETE",
-            token,
-            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-         });
+         requireAdminRole(loggedInUser);
+         if (loggedInUser.id === memberId) {
+            throw new Error("Du kan ikke slette deg selv");
+         }
+         await deleteUser(context, memberId);
          return redirect("/members");
       }
       case memberIntent.updateRole: {
+         requireAdminRole(loggedInUser);
          const roleId = String(formData.get("roleId"));
-         await client(`role/${roleId}/user/${memberId}`, {
-            method: request.method, // PUT or DELETE
-            token,
-            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-         });
+         if (request.method === "DELETE") {
+            await deleteRole(context, roleId, memberId);
+         } else if (request.method === "POST") {
+            await insertRole(context, roleId, memberId);
+         }
          return { ok: true };
       }
       case memberIntent.updateContingent: {
-         const year = String(formData.get("year"));
+         const year = Number(formData.get("year"));
          const hasPaid = String(formData.get("hasPaid"));
          const isPaid = !(hasPaid === "true");
-         const body = { year, isPaid };
-         await client(`user/${memberId}/contingent`, {
-            method: "POST",
-            body,
-            token,
-            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-         });
+         await updateContingent(context, memberId, year, isPaid);
 
          return { ok: true };
       }
       case memberIntent.updateLinkedUsers: {
-         const userId = String(formData.get("userId"));
-         const body = formData.getAll("externalUserId");
-         await client(`user/${userId}/externaluserproviders`, {
-            method: "PUT",
-            body,
-            token,
-            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-         });
+         const externalUserIds = formData.getAll("externalUserId").map(String);
+         await updateLinkedExternalUsers(context, memberId, externalUserIds);
          return { ok: true };
       }
       case memberIntent.updatePrimaryUserEmail: {
          const primaryUserEmail = String(formData.get("primaryUserEmail"));
-         await client(`user/${memberId}/primaryuser`, {
-            method: "PUT",
-            body: primaryUserEmail,
-            token,
-            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-         });
+         await updatePrimaryEmail(context, memberId, primaryUserEmail);
          return { ok: true };
       }
       case memberIntent.updateSubscribe: {
-         await client(`user/${memberId}/subscribe`, {
-            method: "PUT",
-            token,
-            baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-         });
+         await updateUserSubscribe(context, memberId);
          return { ok: true };
       }
       default: {

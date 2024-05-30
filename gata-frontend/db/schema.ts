@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { boolean, integer, pgTable, smallint, text, timestamp, unique, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, primaryKey, smallint, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const externalUser = pgTable("external_user", {
    id: varchar("id", { length: 255 }).primaryKey().notNull(),
@@ -7,7 +7,7 @@ export const externalUser = pgTable("external_user", {
    email: varchar("email", { length: 255 }),
    picture: varchar("picture", { length: 500 }),
    lastLogin: varchar("last_login", { length: 255 }),
-   userId: uuid("user_id").references(() => user.id),
+   userId: uuid("user_id").references(() => user.id, { onDelete: "set null" }),
    primaryUser: boolean("primary_user").notNull(),
 });
 
@@ -24,31 +24,22 @@ export type Role = typeof role.$inferSelect;
 export const userRoles = pgTable("gata_user_roles", {
    usersId: uuid("users_id")
       .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: "cascade" }),
    roleId: uuid("roles_id")
       .notNull()
       .references(() => role.id),
 });
 
-export const responsibilityNote = pgTable(
-   "responsibility_note",
-   {
-      id: uuid("id").primaryKey().notNull(),
-      lastModifiedBy: varchar("last_modified_by", { length: 255 }),
-      lastModifiedDate: timestamp("last_modified_date", { mode: "string" }),
-      text: text("text"),
-      responsibilityYearId: uuid("resonsibility_year_id")
-         .references(() => responsibilityYear.id)
-         .notNull(),
-   },
-   (table) => {
-      return {
-         uc_responsibility_noteresonsibility_year_id_col: unique("uc_responsibility_noteresonsibility_year_id_col").on(
-            table.responsibilityYearId
-         ),
-      };
-   }
-);
+export const responsibilityNote = pgTable("responsibility_note", {
+   id: uuid("id").primaryKey().notNull(),
+   lastModifiedBy: varchar("last_modified_by", { length: 255 }),
+   lastModifiedDate: timestamp("last_modified_date", { mode: "string" }),
+   text: text("text"),
+   responsibilityYearId: uuid("resonsibility_year_id")
+      .references(() => responsibilityYear.id, { onDelete: "cascade" })
+      .unique()
+      .notNull(),
+});
 
 export const responsibility = pgTable("responsibility", {
    id: uuid("id").primaryKey().notNull(),
@@ -64,14 +55,17 @@ export const reportFile = pgTable("gata_report_file", {
    cloudId: varchar("cloud_id", { length: 255 }),
 });
 
-export const contingent = pgTable("gata_contingent", {
-   id: uuid("id").primaryKey().notNull(),
-   userId: uuid("gata_user_id")
-      .references(() => user.id)
-      .notNull(),
-   isPaid: boolean("is_paid").notNull(),
-   year: smallint("year").notNull(),
-});
+export const contingent = pgTable(
+   "gata_contingent",
+   {
+      userId: uuid("gata_user_id")
+         .references(() => user.id, { onDelete: "cascade" })
+         .notNull(),
+      isPaid: boolean("is_paid").notNull(),
+      year: smallint("year").notNull(),
+   },
+   (table) => ({ pk: primaryKey({ columns: [table.year, table.userId] }) })
+);
 
 export const responsibilityYear = pgTable("responsibility_year", {
    id: uuid("id").primaryKey().notNull(),
@@ -79,7 +73,7 @@ export const responsibilityYear = pgTable("responsibility_year", {
       .references(() => responsibility.id)
       .notNull(),
    userId: uuid("user_id")
-      .references(() => user.id)
+      .references(() => user.id, { onDelete: "cascade" })
       .notNull(),
    year: smallint("year").default(2022).notNull(),
 });
@@ -122,7 +116,7 @@ export const gataReport = pgTable("gata_report", {
    lastModifiedDate: timestamp("last_modified_date", { mode: "string" }),
    title: varchar("title", { length: 255 }).notNull(),
    type: integer("type").notNull(),
-   createdBy: uuid("created_by").references(() => user.id),
+   createdBy: uuid("created_by").references(() => user.id, { onDelete: "set null" }),
 });
 
 export type GataReport = typeof gataReport.$inferSelect;

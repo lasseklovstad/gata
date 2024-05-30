@@ -2,6 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudfla
 import { redirect } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Plus } from "lucide-react";
+import { insertResponsibilityYear } from "~/.server/db/responsibility";
 
 import { getResponsibilityYears, getUser } from "~/.server/db/user";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
@@ -10,6 +11,7 @@ import { Typography } from "~/components/ui/typography";
 import { ResponsibilityForm } from "~/routes/member.$memberId.responsibility/ResponsibilityForm";
 import { createAuthenticator } from "~/utils/auth.server";
 import { client } from "~/utils/client";
+import { newResponsibilityYearSchema } from "~/utils/formSchema";
 import { isAdmin, isMember } from "~/utils/roleUtils";
 
 export const loader = async ({ request, params: { memberId }, context }: LoaderFunctionArgs) => {
@@ -25,15 +27,13 @@ export const loader = async ({ request, params: { memberId }, context }: LoaderF
 };
 
 export const action = async ({ request, params, context }: ActionFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
+   if (!params.memberId) {
+      throw new Error("Member id required");
+   }
+   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
    if (request.method === "POST") {
-      const form = Object.fromEntries(await request.formData());
-      await client(`user/${params.memberId}/responsibilityyear`, {
-         method: "POST",
-         body: form,
-         token,
-         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-      });
+      const form = newResponsibilityYearSchema.parse(await request.formData());
+      await insertResponsibilityYear(context, params.memberId, form.responsibilityId, form.year, loggedInUser);
    }
    return redirect(`/member/${params.memberId}/responsibility`);
 };

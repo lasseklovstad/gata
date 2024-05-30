@@ -53,7 +53,6 @@ export const LinkExternalUserToGataUserSelect = ({
       if (!newSelectedOptions) return;
       const userIds = newSelectedOptions.map((o) => o.value);
       const formData = new FormData();
-      formData.set("userId", id);
       formData.set("intent", memberIntent.updateLinkedUsers);
       userIds.forEach((userId) => formData.append("externalUserId", userId));
       fetcher.submit(formData, { method: "PUT" });

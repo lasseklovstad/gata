@@ -4,7 +4,7 @@ import { json, redirect } from "@remix-run/cloudflare";
 import { getReportSimple, insertReport, updateReport } from "~/.server/db/report";
 import { createAuthenticator } from "~/utils/auth.server";
 import { reportSchema } from "~/utils/formSchema";
-import { isAdmin } from "~/utils/roleUtils";
+import { isMember } from "~/utils/roleUtils";
 
 export const gataReportFormDialogLoader = async ({ request, params, context }: LoaderFunctionArgs) => {
    await createAuthenticator(context).getRequiredUser(request);
@@ -13,7 +13,7 @@ export const gataReportFormDialogLoader = async ({ request, params, context }: L
 
 export const gataReportFormDialogAction = async ({ request, params, context }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
-   if (!isAdmin(loggedInUser)) {
+   if (!isMember(loggedInUser)) {
       throw new Error("Du har ikke tilgang til å endre denne ressursen");
    }
    const form = reportSchema.safeParse(await request.formData());
