@@ -1,7 +1,7 @@
 import { AppLoadContext } from "@remix-run/cloudflare";
 import { externalUser, responsibilityYear, role, user, userRoles } from "db/schema";
 import { and, count, eq, inArray, isNull, ne, notInArray, sql } from "drizzle-orm";
-import { Auth0User } from "~/utils/auth.server";
+import { Auth0User } from "~/types/Auth0User";
 import { RoleName } from "~/utils/roleUtils";
 
 export type User = Awaited<ReturnType<typeof getUser>>;

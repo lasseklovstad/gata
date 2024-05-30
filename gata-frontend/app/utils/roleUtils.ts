@@ -18,9 +18,3 @@ export const requireAdminRole = (user: User) => {
       throw new Error("Du har ikke tilgang til denne ressursen");
    }
 };
-
-export const requireMemberRole = (user: User) => {
-   if (!isMember(user)) {
-      throw new Error("Du har ikke tilgang til denne ressursen");
-   }
-};

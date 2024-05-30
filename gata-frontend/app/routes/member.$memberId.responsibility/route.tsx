@@ -2,15 +2,14 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudfla
 import { redirect } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Plus } from "lucide-react";
-import { insertResponsibilityYear } from "~/.server/db/responsibility";
 
+import { insertResponsibilityYear } from "~/.server/db/responsibility";
 import { getResponsibilityYears, getUser } from "~/.server/db/user";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { ResponsibilityForm } from "~/routes/member.$memberId.responsibility/ResponsibilityForm";
 import { createAuthenticator } from "~/utils/auth.server";
-import { client } from "~/utils/client";
 import { newResponsibilityYearSchema } from "~/utils/formSchema";
 import { isAdmin, isMember } from "~/utils/roleUtils";
 

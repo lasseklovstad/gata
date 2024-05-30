@@ -18,7 +18,7 @@ type LinkExternalUserToGataUserSelectProps = {
 };
 
 export const LinkExternalUserToGataUserSelect = ({
-   user: { externalUsers, id },
+   user: { externalUsers },
    notMemberUsers,
 }: LinkExternalUserToGataUserSelectProps) => {
    const fetcher = useFetcher();

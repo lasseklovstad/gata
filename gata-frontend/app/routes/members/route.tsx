@@ -11,7 +11,6 @@ import { useRootLoader } from "~/root";
 import { ExternalUsersWithNoGataUser } from "~/routes/members/ExternalUsersWithNoGataUser";
 import { UserListItem } from "~/routes/members/UserListItem";
 import { createAuthenticator } from "~/utils/auth.server";
-import { client } from "~/utils/client";
 import { RoleName, isAdmin, isMember } from "~/utils/roleUtils";
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {

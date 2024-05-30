@@ -1,5 +1,5 @@
 import { useFetcher } from "@remix-run/react";
-import { Plus, Trash, User, X } from "lucide-react";
+import { Plus, Trash, User } from "lucide-react";
 
 import type { ExternalUser } from "db/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";

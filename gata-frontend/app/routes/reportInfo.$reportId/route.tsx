@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import type { Descendant } from "slate";
 
 import { getReport, updateReportContent } from "~/.server/db/report";
+import { insertReportFile } from "~/.server/db/reportFile";
+import { uploadImage } from "~/.server/services/cloudinaryService";
 import { ClientOnly } from "~/components/ClientOnly";
 import { PageLayout } from "~/components/PageLayout";
 import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
@@ -15,9 +17,7 @@ import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isAdmin } from "~/utils/roleUtils";
 
-import { uploadImage } from "~/.server/services/cloudinaryService";
 import { reportInfoIntent } from "./intent";
-import { insertReportFile } from "~/.server/db/reportFile";
 
 export const loader = async ({ request, params: { reportId }, context }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
