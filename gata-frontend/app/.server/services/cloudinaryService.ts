@@ -1,5 +1,5 @@
 import { AppLoadContext } from "@remix-run/cloudflare";
-import crypto from "crypto";
+import crypto from "node:crypto";
 
 const generateSignature = (paramsToSign: Record<string, string | number>, apiSecret: string) => {
    const paramsString = Object.keys(paramsToSign)
