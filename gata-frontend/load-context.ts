@@ -26,6 +26,7 @@ interface Env {
    CLOUDINARY_API_KEY: string;
    CLOUDINARY_NAME: string;
    MAKE_FIRST_USER_ADMIN: string;
+   SENDGRID_API_KEY: string;
 }
 
 type Cloudflare = Omit<PlatformProxy<Env>, "dispose">;
