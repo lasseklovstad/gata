@@ -16,7 +16,7 @@ export type ExternalUser = typeof externalUser.$inferSelect;
 export const role = pgTable("gata_role", {
    id: uuid("id").primaryKey().notNull(),
    name: varchar("name", { length: 255 }).notNull(),
-   roleName: smallint("role_name").default(0).notNull(),
+   roleName: smallint("role_name").default(0).notNull().unique(),
 });
 
 export type Role = typeof role.$inferSelect;
