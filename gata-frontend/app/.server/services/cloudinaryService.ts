@@ -42,3 +42,31 @@ export const uploadImage = async ({ cloudflare: { env } }: AppLoadContext, data:
    const result = await response.json();
    return result as { public_id: string; secure_url: string };
 };
+
+export const deleteImage = async ({ cloudflare: { env } }: AppLoadContext, publicId: string) => {
+   const url = `https://api.cloudinary.com/v1_1/${env.CLOUDINARY_NAME}/image/destroy`;
+   const formData = new FormData();
+   formData.set("api_key", env.CLOUDINARY_API_KEY);
+   formData.set("public_id", publicId);
+
+   const timestamp = Math.floor(Date.now() / 1000);
+   const paramsToSign = {
+      timestamp,
+      public_id: publicId,
+   };
+
+   const signature = generateSignature(paramsToSign, env.CLOUDINARY_API_SECRET);
+   formData.set("signature", signature);
+   formData.set("timestamp", timestamp.toString());
+
+   const response = await fetch(url, {
+      method: "POST",
+      body: formData,
+   });
+
+   if (!response.ok) {
+      const result = await response.json();
+      console.error(JSON.stringify(result));
+      throw new Error(`Cloudinary upload failed: ${response.statusText}`);
+   }
+};

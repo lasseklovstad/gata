@@ -1,10 +1,11 @@
 import { AppLoadContext } from "@remix-run/cloudflare";
-import { gataReport } from "db/schema";
-import { asc, desc, eq, sql } from "drizzle-orm";
+import { gataReport, reportFile } from "db/schema";
+import { desc, eq, sql } from "drizzle-orm";
 import { ReportType } from "~/types/GataReport.type";
 import { ReportSchema } from "~/utils/formSchema";
 import { getPrimaryUser } from "~/utils/userUtils";
 import { User } from "./user";
+import { deleteImage } from "../services/cloudinaryService";
 
 export const getReportsSimple = async (context: AppLoadContext, reportType: ReportType) => {
    return await context.db
@@ -105,7 +106,19 @@ export const updateReport = async (
 };
 
 export const deleteReport = async (context: AppLoadContext, reportId: string) => {
-   await context.db.delete(gataReport).where(eq(gataReport.id, reportId));
+   await context.db.transaction(async (tx) => {
+      const reportFiles = await tx.select().from(reportFile).where(eq(reportFile.reportId, reportId));
+      await Promise.all(
+         reportFiles.map(async (file) => {
+            if (!file.cloudId) {
+               throw new Error("No cloud id!");
+            }
+            await deleteImage(context, file.cloudId);
+            await tx.delete(reportFile).where(eq(reportFile.id, file.id));
+         })
+      );
+      await tx.delete(gataReport).where(eq(gataReport.id, reportId));
+   });
 };
 
 export const updateReportContent = async (
