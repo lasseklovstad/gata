@@ -107,7 +107,7 @@ export function ErrorBoundary() {
    const error = useRouteError();
 
    useEffect(() => {
-      console.log(error);
+      console.log(JSON.stringify(error));
    }, [error]);
 
    if (isRouteErrorResponse(error)) {

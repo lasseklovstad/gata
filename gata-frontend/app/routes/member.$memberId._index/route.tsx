@@ -21,12 +21,12 @@ import { LinkExternalUserToGataUserSelect } from "~/routes/member.$memberId._ind
 import { UserInfo } from "~/routes/member.$memberId._index/components/UserInfo";
 import { UserSubscribe } from "~/routes/member.$memberId._index/components/UserSubscribe";
 import { createAuthenticator } from "~/utils/auth.server";
+import { badRequest } from "~/utils/responseUtils";
 import { isAdmin, requireAdminRole } from "~/utils/roleUtils";
 import { getPrimaryUser } from "~/utils/userUtils";
 
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
-import { badRequest } from "~/utils/responseUtils";
 
 export const loader = async ({ request, params: { memberId }, context }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
@@ -44,7 +44,7 @@ export const loader = async ({ request, params: { memberId }, context }: LoaderF
 
 export const action = async ({ request, params: { memberId }, context }: ActionFunctionArgs) => {
    if (!memberId) {
-      throw badRequest("Member id required");
+      badRequest("Member id required");
    }
    const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
    const formData = await request.formData();
@@ -54,7 +54,7 @@ export const action = async ({ request, params: { memberId }, context }: ActionF
       case memberIntent.deleteUser: {
          requireAdminRole(loggedInUser);
          if (loggedInUser.id === memberId) {
-            throw badRequest("Du kan ikke slette deg selv!");
+            badRequest("Du kan ikke slette deg selv!");
          }
          await deleteUser(context, memberId);
          return redirect("/members");

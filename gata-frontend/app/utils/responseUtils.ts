@@ -1,1 +1,3 @@
-export const badRequest = (message: string) => new Response(message, { status: 400 });
+export const badRequest = (message: string) => {
+   throw new Response(message, { status: 400 });
+};
