@@ -45,7 +45,7 @@ export const getNotMemberUsers = (context: AppLoadContext) => {
 };
 
 export const deleteUser = async (context: AppLoadContext, userId: string) => {
-   context.db.transaction(async (tx) => {
+   await context.db.transaction(async (tx) => {
       // Then remove the user
       await tx.update(externalUser).set({ primaryUser: false }).where(eq(externalUser.userId, userId));
       await tx.delete(user).where(eq(user.id, userId));
@@ -97,7 +97,7 @@ export const getNumberOfAdmins = async (context: AppLoadContext) => {
 };
 
 export const insertUser = async (context: AppLoadContext, auth0UserId: string, roleName?: RoleName) => {
-   context.db.transaction(async (tx) => {
+   await context.db.transaction(async (tx) => {
       const [createdUser] = await tx
          .insert(user)
          .values({ id: sql`gen_random_uuid()`, subscribe: false })
