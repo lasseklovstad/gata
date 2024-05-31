@@ -1,19 +1,18 @@
 import type { ActionFunctionArgs } from "@remix-run/cloudflare";
 import { redirect } from "@remix-run/cloudflare";
 
+import { deleteResponsibilityYear } from "~/.server/db/responsibility";
 import { RouteConfirmFormDialog } from "~/components/RouteConfirmFormDialog";
 import { createAuthenticator } from "~/utils/auth.server";
-import { client } from "~/utils/client";
 
 export const action = async ({ request, params, context }: ActionFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
+   if (!params.responsibilityYearId) {
+      throw new Error("ResponsibilityYearId id required");
+   }
+   await createAuthenticator(context).getRequiredUser(request);
 
    if (request.method === "DELETE") {
-      await client(`user/${params.memberId}/responsibilityyear/${params.responsibilityYearId}`, {
-         method: "DELETE",
-         token,
-         baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-      });
+      await deleteResponsibilityYear(context, params.responsibilityYearId);
    }
 
    return redirect(`/member/${params.memberId}/responsibility`);

@@ -1,0 +1,32 @@
+name: Migrate db
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "gata-frontend"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  migrate-database:
+    runs-on: ubuntu-latest
+    env:
+      APP_DATABASE_URL: ${{ secrets.APP_PROD_DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Download deps
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: gata-frontend
+      - name: Migrate with drizzle
+        working-directory: gata-frontend
+        run: |
+          npm run db:migrate

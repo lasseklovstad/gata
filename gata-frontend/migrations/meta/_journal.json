@@ -8,6 +8,20 @@
       "when": 1716642581965,
       "tag": "0000_fat_leader",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1717083727941,
+      "tag": "0001_kind_ben_grimm",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1717183332659,
+      "tag": "0002_new_skaar",
+      "breakpoints": true
     }
   ]
 }

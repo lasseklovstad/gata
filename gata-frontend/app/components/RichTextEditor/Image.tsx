@@ -108,7 +108,9 @@ const InternalImage = ({ id, selected = false, focused = false, size = 50 }: Ima
 
 const ExternalImage = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
    return (
-      <img src={id} alt="" className={cn(selected && focused && "ring", "block my-1")} style={{ width: `${size}%` }} />
+      <object data={id} className={cn(selected && focused && "ring", "block my-1")} style={{ width: `${size}%` }}>
+         <img src="/image404.png" alt="Not found" />
+      </object>
    );
 };
 

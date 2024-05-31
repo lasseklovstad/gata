@@ -1,7 +1,7 @@
-import type { IExternalUser } from "../../../types/GataUser.type";
+import type { ExternalUser } from "db/schema";
 
 type ExternalUserIconProps = {
-   user: IExternalUser;
+   user: ExternalUser;
 };
 
 // SVGs copied from https://simpleicons.org

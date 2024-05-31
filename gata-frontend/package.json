@@ -44,7 +44,9 @@
       "slate-history": "0.100.0",
       "slate-react": "0.104.0",
       "tailwind-merge": "^2.2.2",
-      "tailwindcss-animate": "^1.0.7"
+      "tailwindcss-animate": "^1.0.7",
+      "zod": "^3.23.8",
+      "zod-form-data": "^2.0.2"
    },
    "devDependencies": {
       "@cloudflare/workers-types": "^4.20240320.1",
@@ -67,6 +69,7 @@
       "knip": "5.17.3",
       "postcss": "^8.4.38",
       "prettier": "3.2.5",
+      "remix-development-tools": "^4.1.6",
       "tailwindcss": "^3.4.3",
       "typescript": "5.4.5",
       "vite": "5.2.12",

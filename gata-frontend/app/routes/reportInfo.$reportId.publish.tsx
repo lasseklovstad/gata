@@ -2,28 +2,48 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudfla
 import { json } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 
+import { getReport } from "~/.server/db/report";
+import { getSubscribedUsers } from "~/.server/db/user";
+import { sendMail } from "~/.server/services/sendgrid";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { createAuthenticator } from "~/utils/auth.server";
-import { client } from "~/utils/client";
 import { useDialog } from "~/utils/dialogUtils";
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
-   const reportEmails = await client<string[]>(`report/publishemails`, {
-      token,
-      baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
-   });
+   await createAuthenticator(context).getRequiredUser(request);
+
+   const reportEmails = await getSubscribedUsers(context);
    return { reportEmails };
 };
 
 export const action = async ({ request, params, context }: ActionFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
-   const emails = await client<string[]>(`report/${params.reportId}/publish`, {
-      token,
-      baseUrl: context.cloudflare.env.BACKEND_BASE_URL,
+   if (!params.reportId) {
+      throw new Error("Report id is required");
+   }
+   await createAuthenticator(context).getRequiredUser(request);
+   const reportEmails = await getSubscribedUsers(context);
+   const report = await getReport(context, params.reportId);
+   const url = new URL(request.url);
+   await sendMail(context, {
+      html: `
+      <h1>Nytt fra Gata</h1>
+      <p>Det har kommet en oppdatering på ${url.origin}!</p>
+      <h2>${report.title}</h2>
+      <p>${report.description}</p>
+      <p>
+         <a href='${url.origin}/reportInfo/${report.id}'>Trykk her for å lese hele saken!</a>
+      </p>
+      `,
+      to: reportEmails.map((user) => {
+         if (!user.email) {
+            throw new Error("Bruker har ikke email " + user.id);
+         }
+         return { email: user.email };
+      }),
+      subject: `Nytt fra Gata! ${report.title}`,
    });
-   return json({ ok: true, emails });
+   return json({ ok: true, emails: reportEmails.map((user) => user.email) });
 };
 
 export default function PublishReport() {
@@ -51,7 +71,7 @@ export default function PublishReport() {
       <Dialog ref={dialogRef}>
          <fetcher.Form method="POST">
             <DialogHeading>Er du sikker?</DialogHeading>
-            Er du sikker du vil sende e-post til disse brukerne: {reportEmails.join(", ")}?
+            Er du sikker du vil sende e-post til disse brukerne: {reportEmails.map((user) => user.email).join(", ")}?
             <DialogFooter>
                <Button type="submit" isLoading={fetcher.state !== "idle"}>
                   Jeg er sikker

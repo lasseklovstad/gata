@@ -2,7 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudfla
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Mail } from "lucide-react";
 
-import { getNotMemberUsers, getUsers } from "~/.server/db/user";
+import { deleteExternalUser, getNotMemberUsers, getUsers, insertUser } from "~/.server/db/user";
 import { PageLayout } from "~/components/PageLayout";
 import { Button } from "~/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
@@ -11,7 +11,6 @@ import { useRootLoader } from "~/root";
 import { ExternalUsersWithNoGataUser } from "~/routes/members/ExternalUsersWithNoGataUser";
 import { UserListItem } from "~/routes/members/UserListItem";
 import { createAuthenticator } from "~/utils/auth.server";
-import { client } from "~/utils/client";
 import { isAdmin, isMember } from "~/utils/roleUtils";
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
@@ -21,10 +20,20 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request, context }: ActionFunctionArgs) => {
-   const token = await createAuthenticator(context).getRequiredAuthToken(request);
-   const form = Object.fromEntries(await request.formData());
-   await client("user", { method: "POST", body: form, token, baseUrl: context.cloudflare.env.BACKEND_BASE_URL });
-   return { ok: true };
+   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+   if (!isAdmin(loggedInUser)) {
+      throw new Error("Du har ikke tilgang");
+   }
+   const form = await request.formData();
+   const externalUserId = String(form.get("externalUserId"));
+   if (request.method === "POST") {
+      await insertUser(context, externalUserId);
+      return { ok: true };
+   }
+   if (request.method === "DELETE") {
+      await deleteExternalUser(context, externalUserId);
+      return { ok: true };
+   }
 };
 
 export default function MemberPage() {

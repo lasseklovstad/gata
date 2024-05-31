@@ -1,11 +1,9 @@
 import { createCookieSessionStorage, redirect, type AppLoadContext } from "@remix-run/cloudflare";
 import { Authenticator } from "remix-auth";
-import type { Auth0Profile } from "remix-auth-auth0";
 import { Auth0Strategy } from "remix-auth-auth0";
 
 import { getOptionalUserFromExternalUserId } from "~/.server/db/user";
-
-export type Auth0User = { profile: Auth0Profile; accessToken: string };
+import type { Auth0User } from "~/types/Auth0User";
 
 export const createAuthenticator = (context: AppLoadContext) => {
    const env = context.cloudflare.env;

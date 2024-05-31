@@ -1,21 +1,21 @@
 import { Link } from "@remix-run/react";
 
+import type { GataReport } from "db/schema";
 import type { User } from "~/.server/db/user";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 
 import { ClientOnly } from "../../components/ClientOnly";
 import { RichTextPreview } from "../../components/RichTextEditor/RichTextPreview";
-import type { IGataReport } from "../../types/GataReport.type";
 import { isAdmin } from "../../utils/roleUtils";
 
 type NewsItemProps = {
-   report: IGataReport;
+   report: Pick<GataReport, "id" | "title" | "content" | "createdBy" | "lastModifiedDate">;
    loggedInUser: User;
 };
 
 export const NewsItem = ({ report, loggedInUser }: NewsItemProps) => {
-   const canEdit = loggedInUser.id === report.createdBy?.id || isAdmin(loggedInUser);
+   const canEdit = loggedInUser.id === report.createdBy || isAdmin(loggedInUser);
    return (
       <div className="flex flex-col w-full items-end gap-2">
          <div className="flex items-center justify-between w-full">
@@ -35,7 +35,7 @@ export const NewsItem = ({ report, loggedInUser }: NewsItemProps) => {
             {!report.content && <Typography>Det er ikke lagt til innhold enda.</Typography>}
          </div>
          <Typography className="text-gray-600">
-            Dato endret: {new Date(report.lastModifiedDate).toLocaleDateString("no")}
+            Dato endret: {new Date(report.lastModifiedDate ?? "").toLocaleDateString("no")}
          </Typography>
       </div>
    );

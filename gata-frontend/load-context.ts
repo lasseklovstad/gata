@@ -22,6 +22,11 @@ interface Env {
    APP_DATABASE_URL: string;
    DEFAULT_CONTINGENT_SIZE: string;
    CONTINGENT_BANK: string;
+   CLOUDINARY_API_SECRET: string;
+   CLOUDINARY_API_KEY: string;
+   CLOUDINARY_NAME: string;
+   MAKE_FIRST_USER_ADMIN: string;
+   SENDGRID_API_KEY: string;
 }
 
 type Cloudflare = Omit<PlatformProxy<Env>, "dispose">;
