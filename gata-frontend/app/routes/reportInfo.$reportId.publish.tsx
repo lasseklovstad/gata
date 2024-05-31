@@ -1,14 +1,13 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
+
 import { getReport } from "~/.server/db/report";
 import { getSubscribedUsers } from "~/.server/db/user";
 import { sendMail } from "~/.server/services/sendgrid";
-
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { createAuthenticator } from "~/utils/auth.server";
-import { client } from "~/utils/client";
 import { useDialog } from "~/utils/dialogUtils";
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
@@ -26,26 +25,24 @@ export const action = async ({ request, params, context }: ActionFunctionArgs) =
    const reportEmails = await getSubscribedUsers(context);
    const report = await getReport(context, params.reportId);
    const url = new URL(request.url);
-   await Promise.all(
-      reportEmails.map((user) => {
+   await sendMail(context, {
+      html: `
+      <h1>Nytt fra Gata</h1>
+      <p>Det har kommet en oppdatering på ${url.origin}!</p>
+      <h2>${report.title}</h2>
+      <p>${report.description}</p>
+      <p>
+         <a href='${url.origin}/reportInfo/${report.id}'>Trykk her for å lese hele saken!</a>
+      </p>
+      `,
+      to: reportEmails.map((user) => {
          if (!user.email) {
             throw new Error("Bruker har ikke email " + user.id);
          }
-         return sendMail(context, {
-            html: `
-            <h1>Nytt fra Gata</h1>
-            <p>Det har kommet en oppdatering på ${url.origin}!</p>
-            <h2>${report.title}</h2>
-            <p>${report.description}</p>
-            <p>
-               <a href='${url.origin}/reportInfo/${report.id}'>Trykk her for å lese hele saken!</a>
-            </p>
-            `,
-            to: user.email,
-            subject: `Nytt fra Gata! ${report.title}`,
-         });
-      })
-   );
+         return { email: user.email };
+      }),
+      subject: `Nytt fra Gata! ${report.title}`,
+   });
    return json({ ok: true, emails: reportEmails.map((user) => user.email) });
 };
 

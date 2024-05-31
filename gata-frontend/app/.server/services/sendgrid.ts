@@ -1,29 +1,53 @@
 import { AppLoadContext } from "@remix-run/cloudflare";
-import sendGrid, { type ResponseError } from "@sendgrid/mail";
 
 type MailData = {
-   to: string;
+   to: { email: string }[];
    html: string;
    subject: string;
 };
 
-export async function sendMail(context: AppLoadContext, mailData: MailData) {
-   sendGrid.setApiKey(context.cloudflare.env.SENDGRID_API_KEY);
+const from = {
+   email: "hesten.bla@gataersamla.no",
+   name: "Hesten Blå",
+};
 
-   await sendGrid
-      .send({
-         from: {
-            email: "hesten.bla@gataersamla.no",
-            name: "Hesten Blå",
+export const sendMail = async (context: AppLoadContext, mailData: MailData) => {
+   const apiKey = context.cloudflare.env.SENDGRID_API_KEY;
+   const url = "https://api.sendgrid.com/v3/mail/send";
+
+   const emailData = {
+      personalizations: [
+         {
+            to: mailData.to,
+            subject: mailData.subject,
          },
-         ...mailData,
-      })
-      .then(
-         () => {
-            console.log("Email sent success");
+      ],
+      from,
+      content: [
+         {
+            type: "text/html",
+            value: mailData.html,
          },
-         (error: Error) => {
-            console.error(error);
-         }
-      );
-}
+      ],
+   };
+
+   try {
+      const response = await fetch(url, {
+         method: "POST",
+         headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+         },
+         body: JSON.stringify(emailData),
+      });
+
+      if (response.ok) {
+         console.log("Email sent successfully!");
+      } else {
+         const errorData = await response.json();
+         console.error("Error sending email:", errorData);
+      }
+   } catch (error) {
+      console.error("Network error:", error);
+   }
+};

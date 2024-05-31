@@ -1,9 +1,9 @@
 import type { ActionFunctionArgs } from "@remix-run/cloudflare";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
+
 import { getContingentInfo } from "~/.server/db/contigent";
 import { getUsersThatHasNotPaidContingent } from "~/.server/db/user";
 import { sendMail } from "~/.server/services/sendgrid";
-
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { createAuthenticator } from "~/utils/auth.server";
@@ -25,22 +25,20 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
    const { size, bank } = getContingentInfo(context);
    const usersNotPaid = await getUsersThatHasNotPaidContingent(context, today.getFullYear());
    const url = new URL(request.url);
-   await Promise.all(
-      usersNotPaid.map((user) => {
+   await sendMail(context, {
+      html: `
+      <h1>Betal kontigent</h1>
+      <p>Du har ikke betalt kontigenten på ${size}kr til ${bank}!</p>
+      <p>Se det på ${url.origin}</p>
+      `,
+      to: usersNotPaid.map((user) => {
          if (!user.email) {
             throw new Error("Bruker har ikke email " + user.id);
          }
-         return sendMail(context, {
-            html: `
-            <h1>Betal kontigent</h1>
-            <p>Du har ikke betalt kontigenten på ${size}kr til ${bank}!</p>
-            <p>Se det på ${url.origin}</p>
-            `,
-            to: user.email,
-            subject: `Du har ikke betalt Gata kontigenten for ${today.getFullYear()}!`,
-         });
-      })
-   );
+         return { email: user.email };
+      }),
+      subject: `Du har ikke betalt Gata kontigenten for ${today.getFullYear()}!`,
+   });
    return { ok: true, emails: usersNotPaid.map((user) => user.email) };
 };
 
