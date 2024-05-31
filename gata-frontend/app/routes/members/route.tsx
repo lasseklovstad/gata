@@ -27,7 +27,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
    const form = await request.formData();
    const externalUserId = String(form.get("externalUserId"));
    if (request.method === "POST") {
-      await insertUser(context, externalUserId, RoleName.Member);
+      await insertUser(context, externalUserId);
       return { ok: true };
    }
    if (request.method === "DELETE") {

@@ -96,7 +96,7 @@ export const getNumberOfAdmins = async (context: AppLoadContext) => {
       .where(eq(role.roleName, RoleName.Admin));
 };
 
-export const insertUser = async (context: AppLoadContext, auth0UserId: string, roleName: RoleName) => {
+export const insertUser = async (context: AppLoadContext, auth0UserId: string, roleName?: RoleName) => {
    context.db.transaction(async (tx) => {
       const [createdUser] = await tx
          .insert(user)
@@ -106,8 +106,10 @@ export const insertUser = async (context: AppLoadContext, auth0UserId: string, r
          .update(externalUser)
          .set({ userId: createdUser.id, primaryUser: true })
          .where(eq(externalUser.id, auth0UserId));
-      const [userRole] = await tx.selectDistinct().from(role).where(eq(role.roleName, roleName));
-      await tx.insert(userRoles).values({ usersId: createdUser.id, roleId: userRole.id });
+      if (roleName !== undefined) {
+         const [userRole] = await tx.selectDistinct().from(role).where(eq(role.roleName, roleName));
+         await tx.insert(userRoles).values({ usersId: createdUser.id, roleId: userRole.id });
+      }
    });
 };
 
