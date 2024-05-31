@@ -44,7 +44,7 @@ export const loader = async ({ request, params: { memberId }, context }: LoaderF
 
 export const action = async ({ request, params: { memberId }, context }: ActionFunctionArgs) => {
    if (!memberId) {
-      badRequest("Member id required");
+      return badRequest("Member id required");
    }
    const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
    const formData = await request.formData();
@@ -54,7 +54,7 @@ export const action = async ({ request, params: { memberId }, context }: ActionF
       case memberIntent.deleteUser: {
          requireAdminRole(loggedInUser);
          if (loggedInUser.id === memberId) {
-            badRequest("Du kan ikke slette deg selv!");
+            return badRequest("Du kan ikke slette deg selv!");
          }
          await deleteUser(context, memberId);
          return redirect("/members");
