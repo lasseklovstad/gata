@@ -116,7 +116,7 @@ export function ErrorBoundary() {
             <Typography variant="h1">
                {error.status} {error.statusText}
             </Typography>
-            <Typography>{error.data.message}</Typography>
+            <Typography>{error.data}</Typography>
          </div>
       );
    } else if (error instanceof Error) {

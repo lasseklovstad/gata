@@ -23,7 +23,6 @@ export const gataReportFormDialogAction = async ({ request, params, context }: A
 
    if (request.method === "POST") {
       const [{ reportId }] = await insertReport(context, form.data, loggedInUser);
-      console.log("redirect to", reportId);
       return redirect(`/reportInfo/${reportId}`);
    }
    if (request.method === "PUT" && params.reportId) {
