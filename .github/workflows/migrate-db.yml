@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "gata-frontend"
+      - "gata-frontend/**"
   workflow_dispatch:
 
 concurrency:
