@@ -1,4 +1,0 @@
-AUTH0_DOMAIN="gataersamla.eu.auth0.com"
-AUTH0_AUDIENCE="https://gataersamla.no"
-SENDGRID_API_KEY="xxx"
-CLOUDINARY_URL="xxx"
