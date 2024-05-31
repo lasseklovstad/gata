@@ -132,15 +132,6 @@ jobs:
           npm ci
           npm run typescript
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build backend image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          load: true
-
       - name: Install playwright
         working-directory: ./gata-tests
         run: |
@@ -157,8 +148,6 @@ jobs:
           PLAYWRIGHT_NONMEMBER_USERNAME: ${{secrets.E2E_PLAYWRIGHT_NONMEMBER_USERNAME}}
           PLAYWRIGHT_NONMEMBER_PASSWORD: ${{secrets.E2E_PLAYWRIGHT_NONMEMBER_PASSWORD}}
           PLAYWRIGHT_BASE_URL: http://localhost:3000
-
-
           # DEBUG: pw:webserver
           # DEBUG: pw:api
         run: |
