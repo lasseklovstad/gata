@@ -2,9 +2,9 @@ import { relations } from "drizzle-orm";
 import { boolean, integer, pgTable, primaryKey, smallint, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const externalUser = pgTable("external_user", {
-   id: varchar("id", { length: 255 }).primaryKey().notNull(),
+   id: varchar("id", { length: 255 }).primaryKey(),
    name: varchar("name", { length: 255 }),
-   email: varchar("email", { length: 255 }),
+   email: varchar("email", { length: 255 }).notNull(),
    picture: varchar("picture", { length: 500 }),
    lastLogin: varchar("last_login", { length: 255 }),
    userId: uuid("user_id").references(() => user.id, { onDelete: "set null" }),
@@ -31,9 +31,9 @@ export const userRoles = pgTable("gata_user_roles", {
 });
 
 export const responsibilityNote = pgTable("responsibility_note", {
-   id: uuid("id").primaryKey().notNull(),
+   id: uuid("id").primaryKey().defaultRandom(),
    lastModifiedBy: varchar("last_modified_by", { length: 255 }),
-   lastModifiedDate: timestamp("last_modified_date", { mode: "string" }),
+   lastModifiedDate: timestamp("last_modified_date", { mode: "string" }).defaultNow(),
    text: text("text"),
    responsibilityYearId: uuid("resonsibility_year_id")
       .references(() => responsibilityYear.id, { onDelete: "cascade" })
@@ -42,13 +42,13 @@ export const responsibilityNote = pgTable("responsibility_note", {
 });
 
 export const responsibility = pgTable("responsibility", {
-   id: uuid("id").primaryKey().notNull(),
+   id: uuid("id").primaryKey().defaultRandom(),
    description: varchar("description", { length: 255 }).notNull(),
    name: varchar("name", { length: 255 }).notNull(),
 });
 
 export const reportFile = pgTable("gata_report_file", {
-   id: uuid("id").primaryKey().notNull(),
+   id: uuid("id").primaryKey().defaultRandom(),
    data: text("data"),
    reportId: uuid("report_id").references(() => gataReport.id),
    cloudUrl: varchar("cloud_url", { length: 255 }),
@@ -68,52 +68,28 @@ export const contingent = pgTable(
 );
 
 export const responsibilityYear = pgTable("responsibility_year", {
-   id: uuid("id").primaryKey().notNull(),
+   id: uuid("id").primaryKey().defaultRandom(),
    responsibilityId: uuid("responsibility_id")
       .references(() => responsibility.id)
       .notNull(),
    userId: uuid("user_id")
       .references(() => user.id, { onDelete: "cascade" })
       .notNull(),
-   year: smallint("year").default(2022).notNull(),
-});
-
-export const databasechangeloglock = pgTable("databasechangeloglock", {
-   id: integer("id").primaryKey().notNull(),
-   locked: boolean("locked").notNull(),
-   lockgranted: timestamp("lockgranted", { mode: "string" }),
-   lockedby: varchar("lockedby", { length: 255 }),
-});
-
-export const databasechangelog = pgTable("databasechangelog", {
-   id: varchar("id", { length: 255 }).notNull(),
-   author: varchar("author", { length: 255 }).notNull(),
-   filename: varchar("filename", { length: 255 }).notNull(),
-   dateexecuted: timestamp("dateexecuted", { mode: "string" }).notNull(),
-   orderexecuted: integer("orderexecuted").notNull(),
-   exectype: varchar("exectype", { length: 10 }).notNull(),
-   md5sum: varchar("md5sum", { length: 35 }),
-   description: varchar("description", { length: 255 }),
-   comments: varchar("comments", { length: 255 }),
-   tag: varchar("tag", { length: 255 }),
-   liquibase: varchar("liquibase", { length: 20 }),
-   contexts: varchar("contexts", { length: 255 }),
-   labels: varchar("labels", { length: 255 }),
-   deployment_id: varchar("deployment_id", { length: 10 }),
+   year: smallint("year").notNull(),
 });
 
 export const user = pgTable("gata_user", {
-   id: uuid("id").primaryKey().notNull(),
-   subscribe: boolean("subscribe").notNull(),
+   id: uuid("id").primaryKey().defaultRandom(),
+   subscribe: boolean("subscribe").default(false).notNull(),
 });
 
 export const gataReport = pgTable("gata_report", {
-   id: uuid("id").primaryKey().notNull(),
+   id: uuid("id").primaryKey().defaultRandom(),
    content: text("content"),
-   createdDate: timestamp("created_date", { mode: "string" }),
+   createdDate: timestamp("created_date", { mode: "string" }).defaultNow(),
    description: varchar("description", { length: 255 }),
    lastModifiedBy: varchar("last_modified_by", { length: 255 }),
-   lastModifiedDate: timestamp("last_modified_date", { mode: "string" }),
+   lastModifiedDate: timestamp("last_modified_date", { mode: "string" }).defaultNow(),
    title: varchar("title", { length: 255 }).notNull(),
    type: integer("type").notNull(),
    createdBy: uuid("created_by").references(() => user.id, { onDelete: "set null" }),

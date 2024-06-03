@@ -18,7 +18,7 @@ export const getResponsibility = async (context: AppLoadContext, responsibilityI
 };
 
 export const insertResponsibility = async (context: AppLoadContext, values: ResponsibilitySchema) => {
-   await context.db.insert(responsibility).values({ id: sql`gen_random_uuid()`, ...values });
+   await context.db.insert(responsibility).values(values);
 };
 
 export const updateResponsibility = async (
@@ -48,12 +48,10 @@ export const insertResponsibilityYear = async (
    await context.db.transaction(async (tx) => {
       const [{ id }] = await tx
          .insert(responsibilityYear)
-         .values({ id: sql`gen_random_uuid()`, responsibilityId, year, userId })
+         .values({ responsibilityId, year, userId })
          .returning({ id: responsibilityYear.id });
       await tx.insert(responsibilityNote).values({
-         id: sql`gen_random_uuid()`,
          responsibilityYearId: id,
-         lastModifiedDate: sql`now()`,
          lastModifiedBy: getPrimaryUser(loggedInUser).name,
       });
    });

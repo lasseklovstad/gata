@@ -68,19 +68,23 @@ export const getResponsibilityYears = (context: AppLoadContext, userId: string) 
 export const insertOrUpdateExternalUser = async (context: AppLoadContext, auth0User: Auth0User) => {
    const email = auth0User.profile.emails && auth0User.profile.emails[0];
    const photo = auth0User.profile.photos && auth0User.profile.photos[0];
-   if (!auth0User.profile.id) {
+   const id = auth0User.profile.id;
+   if (!id) {
       throw new Error("Bruker har ikke en id!");
    }
+   if (!email?.value) {
+      throw new Error("Bruker har ikke en email?! " + id);
+   }
    const values = {
-      email: email?.value,
+      email: email.value,
       lastLogin: sql`now()`,
-      name: auth0User.profile.displayName,
+      name: auth0User.profile.displayName ?? email.value,
       picture: photo?.value,
    };
    return await context.db
       .insert(externalUser)
       .values({
-         id: auth0User.profile.id,
+         id,
          primaryUser: false,
          ...values,
       })
@@ -99,10 +103,7 @@ export const getNumberOfAdmins = async (context: AppLoadContext) => {
 
 export const insertUser = async (context: AppLoadContext, auth0UserId: string, roleName?: RoleName) => {
    await context.db.transaction(async (tx) => {
-      const [createdUser] = await tx
-         .insert(user)
-         .values({ id: sql`gen_random_uuid()`, subscribe: false })
-         .returning({ id: user.id });
+      const [createdUser] = await tx.insert(user).values({}).returning({ id: user.id });
       await tx
          .update(externalUser)
          .set({ userId: createdUser.id, primaryUser: true })

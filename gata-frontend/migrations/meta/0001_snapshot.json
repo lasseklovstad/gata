@@ -1,7 +1,5 @@
 {
-  "id": "6bf78284-44c4-4f1c-8736-7aee0bff80bc",
-  "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "6",
+  "version": "7",
   "dialect": "postgresql",
   "tables": {
     "public.gata_contingent": {
@@ -32,15 +30,15 @@
         "gata_contingent_gata_user_id_gata_user_id_fk": {
           "name": "gata_contingent_gata_user_id_gata_user_id_fk",
           "tableFrom": "gata_contingent",
-          "tableTo": "gata_user",
           "columnsFrom": [
             "gata_user_id"
           ],
+          "tableTo": "gata_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -234,15 +232,15 @@
         "external_user_user_id_gata_user_id_fk": {
           "name": "external_user_user_id_gata_user_id_fk",
           "tableFrom": "external_user",
-          "tableTo": "gata_user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "gata_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         }
       },
       "compositePrimaryKeys": {},
@@ -312,15 +310,15 @@
         "gata_report_created_by_gata_user_id_fk": {
           "name": "gata_report_created_by_gata_user_id_fk",
           "tableFrom": "gata_report",
-          "tableTo": "gata_user",
           "columnsFrom": [
             "created_by"
           ],
+          "tableTo": "gata_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         }
       },
       "compositePrimaryKeys": {},
@@ -366,15 +364,15 @@
         "gata_report_file_report_id_gata_report_id_fk": {
           "name": "gata_report_file_report_id_gata_report_id_fk",
           "tableFrom": "gata_report_file",
-          "tableTo": "gata_report",
           "columnsFrom": [
             "report_id"
           ],
+          "tableTo": "gata_report",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -448,25 +446,25 @@
         "responsibility_note_resonsibility_year_id_responsibility_year_id_fk": {
           "name": "responsibility_note_resonsibility_year_id_responsibility_year_id_fk",
           "tableFrom": "responsibility_note",
-          "tableTo": "responsibility_year",
           "columnsFrom": [
             "resonsibility_year_id"
           ],
+          "tableTo": "responsibility_year",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "responsibility_note_resonsibility_year_id_unique": {
           "name": "responsibility_note_resonsibility_year_id_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "resonsibility_year_id"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
@@ -505,28 +503,28 @@
         "responsibility_year_responsibility_id_responsibility_id_fk": {
           "name": "responsibility_year_responsibility_id_responsibility_id_fk",
           "tableFrom": "responsibility_year",
-          "tableTo": "responsibility",
           "columnsFrom": [
             "responsibility_id"
           ],
+          "tableTo": "responsibility",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "responsibility_year_user_id_gata_user_id_fk": {
           "name": "responsibility_year_user_id_gata_user_id_fk",
           "tableFrom": "responsibility_year",
-          "tableTo": "gata_user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "gata_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -605,28 +603,28 @@
         "gata_user_roles_users_id_gata_user_id_fk": {
           "name": "gata_user_roles_users_id_gata_user_id_fk",
           "tableFrom": "gata_user_roles",
-          "tableTo": "gata_user",
           "columnsFrom": [
             "users_id"
           ],
+          "tableTo": "gata_user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "gata_user_roles_roles_id_gata_role_id_fk": {
           "name": "gata_user_roles_roles_id_gata_role_id_fk",
           "tableFrom": "gata_user_roles",
-          "tableTo": "gata_role",
           "columnsFrom": [
             "roles_id"
           ],
+          "tableTo": "gata_role",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -636,8 +634,10 @@
   "enums": {},
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "6bf78284-44c4-4f1c-8736-7aee0bff80bc",
+  "prevId": "00000000-0000-0000-0000-000000000000"
 }
