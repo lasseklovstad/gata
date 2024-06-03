@@ -16,7 +16,7 @@ export const withImages = (editor: Editor, submit: SubmitFunction) => {
    editor.insertData = (data) => {
       const { files } = data;
       const text = data.getData("text/plain");
-      if (!text && files && files.length > 0) {
+      if (!text && files.length > 0) {
          for (let i = 0; i < files.length; i++) {
             const file = files.item(i);
             const [mime] = file!.type.split("/");

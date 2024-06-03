@@ -153,7 +153,7 @@ export const getSubscribedUsers = async (context: AppLoadContext) => {
    return await context.db
       .select({ id: user.id, name: externalUser.name, email: externalUser.email })
       .from(user)
-      .leftJoin(externalUser, eq(externalUser.userId, user.id))
+      .innerJoin(externalUser, eq(externalUser.userId, user.id))
       .where(and(eq(externalUser.primaryUser, true), eq(user.subscribe, true)));
 };
 
@@ -162,6 +162,6 @@ export const getUsersThatHasNotPaidContingent = async (context: AppLoadContext, 
       .select({ id: user.id, name: externalUser.name, email: externalUser.email, isPaid: contingent.isPaid })
       .from(user)
       .leftJoin(contingent, and(eq(contingent.userId, user.id), eq(contingent.year, year)))
-      .leftJoin(externalUser, and(eq(externalUser.userId, user.id), eq(externalUser.primaryUser, true)));
+      .innerJoin(externalUser, and(eq(externalUser.userId, user.id), eq(externalUser.primaryUser, true)));
    return usersContingent.filter((user) => !user.isPaid);
 };

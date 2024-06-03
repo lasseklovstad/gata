@@ -3,10 +3,10 @@ import { boolean, integer, pgTable, primaryKey, smallint, text, timestamp, uuid,
 
 export const externalUser = pgTable("external_user", {
    id: varchar("id", { length: 255 }).primaryKey(),
-   name: varchar("name", { length: 255 }),
+   name: varchar("name", { length: 255 }).notNull(),
    email: varchar("email", { length: 255 }).notNull(),
    picture: varchar("picture", { length: 500 }),
-   lastLogin: varchar("last_login", { length: 255 }),
+   lastLogin: timestamp("last_login", { mode: "string" }).notNull().defaultNow(),
    userId: uuid("user_id").references(() => user.id, { onDelete: "set null" }),
    primaryUser: boolean("primary_user").notNull(),
 });
@@ -32,9 +32,9 @@ export const userRoles = pgTable("gata_user_roles", {
 
 export const responsibilityNote = pgTable("responsibility_note", {
    id: uuid("id").primaryKey().defaultRandom(),
-   lastModifiedBy: varchar("last_modified_by", { length: 255 }),
-   lastModifiedDate: timestamp("last_modified_date", { mode: "string" }).defaultNow(),
-   text: text("text"),
+   lastModifiedBy: varchar("last_modified_by", { length: 255 }).notNull(),
+   lastModifiedDate: timestamp("last_modified_date", { mode: "string" }).defaultNow().notNull(),
+   text: text("text").notNull().default(""),
    responsibilityYearId: uuid("resonsibility_year_id")
       .references(() => responsibilityYear.id, { onDelete: "cascade" })
       .unique()
@@ -50,7 +50,9 @@ export const responsibility = pgTable("responsibility", {
 export const reportFile = pgTable("gata_report_file", {
    id: uuid("id").primaryKey().defaultRandom(),
    data: text("data"),
-   reportId: uuid("report_id").references(() => gataReport.id),
+   reportId: uuid("report_id")
+      .references(() => gataReport.id)
+      .notNull(),
    cloudUrl: varchar("cloud_url", { length: 255 }),
    cloudId: varchar("cloud_id", { length: 255 }),
 });
@@ -86,10 +88,10 @@ export const user = pgTable("gata_user", {
 export const gataReport = pgTable("gata_report", {
    id: uuid("id").primaryKey().defaultRandom(),
    content: text("content"),
-   createdDate: timestamp("created_date", { mode: "string" }).defaultNow(),
-   description: varchar("description", { length: 255 }),
-   lastModifiedBy: varchar("last_modified_by", { length: 255 }),
-   lastModifiedDate: timestamp("last_modified_date", { mode: "string" }).defaultNow(),
+   createdDate: timestamp("created_date", { mode: "string" }).defaultNow().notNull(),
+   description: varchar("description", { length: 255 }).default("").notNull(),
+   lastModifiedBy: varchar("last_modified_by", { length: 255 }).notNull(),
+   lastModifiedDate: timestamp("last_modified_date", { mode: "string" }).defaultNow().notNull(),
    title: varchar("title", { length: 255 }).notNull(),
    type: integer("type").notNull(),
    createdBy: uuid("created_by").references(() => user.id, { onDelete: "set null" }),

@@ -15,7 +15,7 @@ export const UserSubscribe = ({ user }: UserSubscribeProps) => {
 
    return (
       <div>
-         <Typography>{!user?.subscribe && "Du kan få tilsendt notifikasjon på epost. "}</Typography>
+         <Typography>{!user.subscribe && "Du kan få tilsendt notifikasjon på epost. "}</Typography>
          <fetcher.Form method="PUT">
             <input hidden name="userId" defaultValue={user.id} />
             <Button

@@ -77,7 +77,7 @@ export default function MemberPage() {
             Medlemmer
          </Typography>
          <ul aria-labelledby="member-title" className="divide-y">
-            {members?.map((user) => {
+            {members.map((user) => {
                return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
             })}
             {members.length === 0 && <li>Ingen medlemmer funnet</li>}
@@ -88,10 +88,10 @@ export default function MemberPage() {
                   Ikke medlem
                </Typography>
                <ul aria-labelledby="non-member-title" className="divide-y">
-                  {nonMembers?.map((user) => {
+                  {nonMembers.map((user) => {
                      return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
                   })}
-                  {nonMembers?.length === 0 && <li>Ingen andre brukere</li>}
+                  {nonMembers.length === 0 && <li>Ingen andre brukere</li>}
                </ul>
                <ExternalUsersWithNoGataUser externalUsers={externalUsers} />
             </>

@@ -49,7 +49,7 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
                      size="icon"
                      onMouseDown={(ev) => ev.preventDefault()}
                      onClick={() => {
-                        Transforms.setNodes<Element>(editor, { type: "image", size: (element?.size || 0) - 10 });
+                        Transforms.setNodes<Element>(editor, { type: "image", size: (element.size || 0) - 10 });
                      }}
                      aria-label="Reduser størrelse"
                   >
@@ -61,7 +61,7 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
                      size="icon"
                      onMouseDown={(ev) => ev.preventDefault()}
                      onClick={() => {
-                        Transforms.setNodes<Element>(editor, { type: "image", size: (element?.size || 0) + 10 });
+                        Transforms.setNodes<Element>(editor, { type: "image", size: (element.size || 0) + 10 });
                      }}
                      aria-label="Øk størrelse"
                   >

@@ -35,12 +35,7 @@ export const action = async ({ request, params, context }: ActionFunctionArgs) =
          <a href='${url.origin}/reportInfo/${report.id}'>Trykk her for å lese hele saken!</a>
       </p>
       `,
-      to: reportEmails.map((user) => {
-         if (!user.email) {
-            throw new Error("Bruker har ikke email " + user.id);
-         }
-         return { email: user.email };
-      }),
+      to: reportEmails.map((user) => ({ email: user.email })),
       subject: `Nytt fra Gata! ${report.title}`,
    });
    return json({ ok: true, emails: reportEmails.map((user) => user.email) });
