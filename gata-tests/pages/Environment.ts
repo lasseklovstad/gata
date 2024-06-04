@@ -6,6 +6,7 @@ export class Environment {
   memberPassword: string;
   nonMemberUsername: string;
   nonMemberPassword: string;
+  skipSetup: boolean;
 
   constructor() {
     this.baseUrl = this.validateEnv("PLAYWRIGHT_BASE_URL");
@@ -17,6 +18,7 @@ export class Environment {
 
     this.nonMemberPassword = this.validateEnv("PLAYWRIGHT_NONMEMBER_PASSWORD");
     this.nonMemberUsername = this.validateEnv("PLAYWRIGHT_NONMEMBER_USERNAME");
+    this.skipSetup = process.env.SKIP_SETUP === "true";
   }
 
   private validateEnv(key: string): string {

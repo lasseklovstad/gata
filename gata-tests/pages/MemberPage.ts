@@ -77,6 +77,31 @@ export class MemberPage {
     await expect(this.getRemoveLinkedUserButton(name)).toBeVisible();
   }
 
+  async markContingentAsPaid(year: number, isPaid: boolean) {
+    await this.page
+      .getByRole("combobox", { name: "Velg år" })
+      .selectOption(year.toString());
+
+    const paidContingentStatusText = this.page.getByText(
+      /Status: (Ikke betalt|Betalt)/
+    );
+    await expect(paidContingentStatusText).toBeVisible();
+    const isPaidCurrentYear = !(
+      await paidContingentStatusText.innerText()
+    ).includes("Ikke betalt");
+
+    if (isPaid && !isPaidCurrentYear) {
+      await this.page
+        .getByRole("button", { name: "Marker som betalt" })
+        .click();
+    }
+    if (!isPaid && isPaidCurrentYear) {
+      await this.page
+        .getByRole("button", { name: "Marker som ikke betalt" })
+        .click();
+    }
+  }
+
   async changePrimaryUser(name: string) {
     await this.primaryUserSelect.click();
     await this.page
