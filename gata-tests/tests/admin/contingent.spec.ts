@@ -12,7 +12,7 @@ import {
 
 test.use({ storageState: "adminStorageState.json" });
 
-test.describe.serial.only("Contingent", () => {
+test.describe.serial("Contingent", () => {
   test("Should show that member and admin should pay contingent", async ({
     page,
   }) => {
