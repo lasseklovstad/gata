@@ -1,6 +1,6 @@
 import { AppLoadContext } from "@remix-run/cloudflare";
 import { contingent, externalUser, responsibilityYear, role, user, userRoles } from "db/schema";
-import { and, count, desc, eq, inArray, isNull, ne, notInArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull, ne, notInArray, or, sql } from "drizzle-orm";
 import { Auth0User } from "~/types/Auth0User";
 import { RoleName } from "~/utils/roleUtils";
 
@@ -154,14 +154,25 @@ export const getSubscribedUsers = async (context: AppLoadContext) => {
       .select({ id: user.id, name: externalUser.name, email: externalUser.email })
       .from(user)
       .innerJoin(externalUser, eq(externalUser.userId, user.id))
-      .where(and(eq(externalUser.primaryUser, true), eq(user.subscribe, true)));
+      .innerJoin(userRoles, eq(userRoles.usersId, user.id))
+      .innerJoin(role, eq(role.id, userRoles.roleId))
+      .where(and(eq(externalUser.primaryUser, true), eq(user.subscribe, true), eq(role.roleName, RoleName.Member)));
 };
 
 export const getUsersThatHasNotPaidContingent = async (context: AppLoadContext, year: number) => {
-   const usersContingent = await context.db
-      .select({ id: user.id, name: externalUser.name, email: externalUser.email, isPaid: contingent.isPaid })
+   return await context.db
+      .select({ id: user.id, name: externalUser.name, email: externalUser.email })
       .from(user)
       .leftJoin(contingent, and(eq(contingent.userId, user.id), eq(contingent.year, year)))
-      .innerJoin(externalUser, and(eq(externalUser.userId, user.id), eq(externalUser.primaryUser, true)));
-   return usersContingent.filter((user) => !user.isPaid);
+      .innerJoin(externalUser, eq(externalUser.userId, user.id))
+      .innerJoin(userRoles, eq(userRoles.usersId, user.id))
+      .innerJoin(role, eq(role.id, userRoles.roleId))
+      .where(
+         and(
+            eq(externalUser.primaryUser, true),
+            // If nothing registered contingent isPaid value is null
+            or(eq(contingent.isPaid, false), isNull(contingent.isPaid)),
+            eq(role.roleName, RoleName.Member)
+         )
+      );
 };

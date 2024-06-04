@@ -6,7 +6,7 @@ export const externalUser = pgTable("external_user", {
    name: varchar("name", { length: 255 }).notNull(),
    email: varchar("email", { length: 255 }).notNull(),
    picture: varchar("picture", { length: 500 }),
-   lastLogin: timestamp("last_login", { mode: "string" }).notNull().defaultNow(),
+   lastLogin: text("last_login").notNull(),
    userId: uuid("user_id").references(() => user.id, { onDelete: "set null" }),
    primaryUser: boolean("primary_user").notNull(),
 });

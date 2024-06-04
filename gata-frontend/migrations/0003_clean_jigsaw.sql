@@ -2,8 +2,7 @@ DROP TABLE "databasechangelog";--> statement-breakpoint
 DROP TABLE "databasechangeloglock";--> statement-breakpoint
 ALTER TABLE "external_user" ALTER COLUMN "name" SET NOT NULL;--> statement-breakpoint
 ALTER TABLE "external_user" ALTER COLUMN "email" SET NOT NULL;--> statement-breakpoint
-ALTER TABLE "external_user" ALTER COLUMN "last_login" SET DATA TYPE timestamp;--> statement-breakpoint
-ALTER TABLE "external_user" ALTER COLUMN "last_login" SET DEFAULT now();--> statement-breakpoint
+ALTER TABLE "external_user" ALTER COLUMN "last_login" SET DATA TYPE text;--> statement-breakpoint
 ALTER TABLE "external_user" ALTER COLUMN "last_login" SET NOT NULL;--> statement-breakpoint
 ALTER TABLE "gata_report" ALTER COLUMN "id" SET DEFAULT gen_random_uuid();--> statement-breakpoint
 ALTER TABLE "gata_report" ALTER COLUMN "created_date" SET DEFAULT now();--> statement-breakpoint
