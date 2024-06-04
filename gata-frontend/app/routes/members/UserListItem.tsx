@@ -4,7 +4,6 @@ import { Check, X, User as UserIcon } from "lucide-react";
 import type { User } from "~/.server/db/user";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Typography } from "~/components/ui/typography";
-import { getPrimaryUser } from "~/utils/userUtils";
 
 import { isMember } from "../../utils/roleUtils";
 
@@ -20,15 +19,15 @@ export const UserListItem = ({ user, isLoggedInUserAdmin }: UserListItemProps) =
          <Link to={`/member/${user.id}`}>
             <div className="flex gap-4 p-2 items-center">
                <Avatar>
-                  <AvatarImage src={getPrimaryUser(user).picture || undefined} alt={getPrimaryUser(user).name} />
+                  <AvatarImage src={user.primaryUser.picture || undefined} alt={user.primaryUser.name} />
                   <AvatarFallback>
                      <UserIcon />
                   </AvatarFallback>
                </Avatar>
                <div>
-                  <Typography variant="largeText">{getPrimaryUser(user).name}</Typography>
+                  <Typography variant="largeText">{user.primaryUser.name}</Typography>
                   <Typography variant="smallText" className="text-gray-500">
-                     Sist innlogget: {new Date(getPrimaryUser(user).lastLogin).toLocaleDateString("no")}
+                     Sist innlogget: {new Date(user.primaryUser.lastLogin).toLocaleDateString("no")}
                   </Typography>
                   {isLoggedInUserAdmin && isMember(user) && (
                      <Typography

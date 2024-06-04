@@ -23,7 +23,6 @@ import { UserSubscribe } from "~/routes/member.$memberId._index/components/UserS
 import { createAuthenticator } from "~/utils/auth.server";
 import { badRequest } from "~/utils/responseUtils";
 import { isAdmin, requireAdminRole } from "~/utils/roleUtils";
-import { getPrimaryUser } from "~/utils/userUtils";
 
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
@@ -112,7 +111,7 @@ export default function MemberInfoPage() {
       <>
          <div className="flex items-center mb-2 gap-2">
             <Avatar>
-               <AvatarImage src={getPrimaryUser(member).picture || undefined} />
+               <AvatarImage src={member.primaryUser.picture || undefined} />
                <AvatarFallback>
                   <CircleUser />
                </AvatarFallback>

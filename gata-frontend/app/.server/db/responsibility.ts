@@ -2,7 +2,6 @@ import { AppLoadContext } from "@remix-run/cloudflare";
 import { responsibility, responsibilityNote, responsibilityYear } from "db/schema";
 import { asc, eq, sql } from "drizzle-orm";
 import { ResponsibilitySchema } from "~/utils/formSchema";
-import { getPrimaryUser } from "~/utils/userUtils";
 import { User } from "./user";
 
 export const getResponsibilities = (context: AppLoadContext) => {
@@ -52,7 +51,7 @@ export const insertResponsibilityYear = async (
          .returning({ id: responsibilityYear.id });
       await tx.insert(responsibilityNote).values({
          responsibilityYearId: id,
-         lastModifiedBy: getPrimaryUser(loggedInUser).name,
+         lastModifiedBy: loggedInUser.primaryUser.name,
       });
    });
 };
@@ -69,6 +68,6 @@ export const updateResponsibilityNote = async (
 ) => {
    await context.db
       .update(responsibilityNote)
-      .set({ text, lastModifiedDate: sql`now()`, lastModifiedBy: getPrimaryUser(loggedInUser).name })
+      .set({ text, lastModifiedDate: sql`now()`, lastModifiedBy: loggedInUser.primaryUser.name })
       .where(eq(responsibilityNote.responsibilityYearId, responsibilityYearId));
 };
