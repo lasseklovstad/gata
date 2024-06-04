@@ -3,6 +3,8 @@ import { env } from "../pages/Environment";
 import { LoginPage } from "../pages/LoginPage";
 import { setupUserRoles } from "../utils/setup";
 
+test.skip(env.skipSetup);
+
 test.describe.serial("Global Setup", () => {
   test("Login admin", async ({ page }) => {
     const memberLogin = new LoginPage(page);

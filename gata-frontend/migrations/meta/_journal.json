@@ -22,6 +22,13 @@
       "when": 1717183332659,
       "tag": "0002_new_skaar",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1717516509340,
+      "tag": "0003_clean_jigsaw",
+      "breakpoints": true
     }
   ]
 }

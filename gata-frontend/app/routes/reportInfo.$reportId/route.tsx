@@ -85,7 +85,6 @@ export default function ReportInfoPage() {
       if (
          fetcher.state === "idle" &&
          fetcher.data &&
-         fetcher.data.ok &&
          fetcher.data.intent === reportInfoIntent.updateContentIntent &&
          fetcher.data.close === "true"
       ) {
@@ -93,7 +92,7 @@ export default function ReportInfoPage() {
       }
    }, [fetcher.data, fetcher.state]);
 
-   const lastModifiedDate = new Date(report.lastModifiedDate ?? "");
+   const lastModifiedDate = new Date(report.lastModifiedDate);
 
    return (
       <>

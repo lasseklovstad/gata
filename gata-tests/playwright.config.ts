@@ -13,7 +13,7 @@ require("dotenv").config();
 const config: PlaywrightTestConfig = {
   testDir: "./tests",
   /* Maximum time one test can run for. */
-  timeout: 60 * 1000,
+  timeout: 30 * 1000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -42,8 +42,6 @@ const config: PlaywrightTestConfig = {
     trace: process.env.CI ? "retain-on-failure" : "on",
     baseURL: process.env.PLAYWRIGHT_BASE_URL,
   },
-
-  /* Configure projects for major browsers */
   projects: [
     {
       name: "setup",
@@ -60,48 +58,15 @@ const config: PlaywrightTestConfig = {
       },
       testIgnore: ["globalSetup.spec.ts"],
     },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: {
-    //     ...devices['Pixel 5'],
-    //   },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: {
-    //     ...devices['iPhone 12'],
-    //   },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: {
-    //     channel: 'msedge',
-    //   },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: {
-    //     channel: 'chrome',
-    //   },
-    // },
   ],
-
-  /* Folder for test artifacts such as screenshots, videos, traces, etc. */
-  // outputDir: 'test-results/',
-
-  /* Run your local dev server before starting the tests */
   webServer: [
     {
       timeout: 60 * 1000,
       command: "npm run start",
       cwd: "../gata-frontend",
-      url: process.env.PLAYWRIGHT_BASE_URL +"/health",
+      url: process.env.PLAYWRIGHT_BASE_URL + "/health",
       reuseExistingServer: !process.env.CI,
-    }
+    },
   ],
 };
 

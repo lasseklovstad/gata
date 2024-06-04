@@ -76,13 +76,10 @@ export const insertReport = async (context: AppLoadContext, values: ReportSchema
    return await context.db
       .insert(gataReport)
       .values({
-         id: sql`gen_random_uuid()`,
          ...values,
          type: ReportType[values.type],
          createdBy: loggedInUser.id,
          lastModifiedBy: primaryUser.name,
-         lastModifiedDate: sql`now()`,
-         createdDate: sql`now()`,
       })
       .returning({ reportId: gataReport.id });
 };

@@ -1,6 +1,6 @@
 import { AppLoadContext } from "@remix-run/cloudflare";
 import { contingent, externalUser, responsibilityYear, role, user, userRoles } from "db/schema";
-import { and, count, desc, eq, inArray, isNull, ne, notInArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull, ne, notInArray, or, sql } from "drizzle-orm";
 import { Auth0User } from "~/types/Auth0User";
 import { RoleName } from "~/utils/roleUtils";
 
@@ -68,19 +68,23 @@ export const getResponsibilityYears = (context: AppLoadContext, userId: string) 
 export const insertOrUpdateExternalUser = async (context: AppLoadContext, auth0User: Auth0User) => {
    const email = auth0User.profile.emails && auth0User.profile.emails[0];
    const photo = auth0User.profile.photos && auth0User.profile.photos[0];
-   if (!auth0User.profile.id) {
+   const id = auth0User.profile.id;
+   if (!id) {
       throw new Error("Bruker har ikke en id!");
    }
+   if (!email?.value) {
+      throw new Error("Bruker har ikke en email?! " + id);
+   }
    const values = {
-      email: email?.value,
+      email: email.value,
       lastLogin: sql`now()`,
-      name: auth0User.profile.displayName,
+      name: auth0User.profile.displayName ?? email.value,
       picture: photo?.value,
    };
    return await context.db
       .insert(externalUser)
       .values({
-         id: auth0User.profile.id,
+         id,
          primaryUser: false,
          ...values,
       })
@@ -99,10 +103,7 @@ export const getNumberOfAdmins = async (context: AppLoadContext) => {
 
 export const insertUser = async (context: AppLoadContext, auth0UserId: string, roleName?: RoleName) => {
    await context.db.transaction(async (tx) => {
-      const [createdUser] = await tx
-         .insert(user)
-         .values({ id: sql`gen_random_uuid()`, subscribe: false })
-         .returning({ id: user.id });
+      const [createdUser] = await tx.insert(user).values({}).returning({ id: user.id });
       await tx
          .update(externalUser)
          .set({ userId: createdUser.id, primaryUser: true })
@@ -152,15 +153,26 @@ export const getSubscribedUsers = async (context: AppLoadContext) => {
    return await context.db
       .select({ id: user.id, name: externalUser.name, email: externalUser.email })
       .from(user)
-      .leftJoin(externalUser, eq(externalUser.userId, user.id))
-      .where(and(eq(externalUser.primaryUser, true), eq(user.subscribe, true)));
+      .innerJoin(externalUser, eq(externalUser.userId, user.id))
+      .innerJoin(userRoles, eq(userRoles.usersId, user.id))
+      .innerJoin(role, eq(role.id, userRoles.roleId))
+      .where(and(eq(externalUser.primaryUser, true), eq(user.subscribe, true), eq(role.roleName, RoleName.Member)));
 };
 
 export const getUsersThatHasNotPaidContingent = async (context: AppLoadContext, year: number) => {
-   const usersContingent = await context.db
-      .select({ id: user.id, name: externalUser.name, email: externalUser.email, isPaid: contingent.isPaid })
+   return await context.db
+      .select({ id: user.id, name: externalUser.name, email: externalUser.email })
       .from(user)
       .leftJoin(contingent, and(eq(contingent.userId, user.id), eq(contingent.year, year)))
-      .leftJoin(externalUser, and(eq(externalUser.userId, user.id), eq(externalUser.primaryUser, true)));
-   return usersContingent.filter((user) => !user.isPaid);
+      .innerJoin(externalUser, eq(externalUser.userId, user.id))
+      .innerJoin(userRoles, eq(userRoles.usersId, user.id))
+      .innerJoin(role, eq(role.id, userRoles.roleId))
+      .where(
+         and(
+            eq(externalUser.primaryUser, true),
+            // If nothing registered contingent isPaid value is null
+            or(eq(contingent.isPaid, false), isNull(contingent.isPaid)),
+            eq(role.roleName, RoleName.Member)
+         )
+      );
 };

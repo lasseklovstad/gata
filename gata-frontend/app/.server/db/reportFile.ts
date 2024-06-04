@@ -1,15 +1,9 @@
 import { AppLoadContext } from "@remix-run/cloudflare";
 import { reportFile } from "db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export const insertReportFile = async (context: AppLoadContext, values: Omit<typeof reportFile.$inferInsert, "id">) => {
-   return await context.db
-      .insert(reportFile)
-      .values({
-         id: sql`gen_random_uuid()`,
-         ...values,
-      })
-      .returning();
+   return await context.db.insert(reportFile).values(values).returning();
 };
 
 export const getReportFile = async (context: AppLoadContext, fileId: string) => {

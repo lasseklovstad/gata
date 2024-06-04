@@ -9,11 +9,16 @@ export class MemberOverviewPage {
   private readonly listLoggedInUsers: Locator;
   private readonly listNotMembers: Locator;
   private readonly listAdmins: Locator;
+  readonly buttonContingent: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.header = new GataHeader(page);
     this.pageTitle = page.getByRole("heading", { name: "Brukere" });
+    this.buttonContingent = page.getByRole("link", {
+      name: "Kontigent",
+      exact: true,
+    });
     this.listMembers = page.getByRole("list", { name: "Medlemmer" });
     this.listAdmins = page.getByRole("list", { name: "Administrator" });
     this.listNotMembers = page.getByRole("list", { name: "Ikke medlem" });

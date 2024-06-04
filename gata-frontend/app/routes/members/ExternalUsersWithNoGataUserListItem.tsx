@@ -32,7 +32,7 @@ export const ExternalUsersWithNoGataUserListItem = ({ user }: ExternalUsersWithN
          <div className="flex-grow">
             <Typography variant="largeText">{user.name}</Typography>
             <Typography variant="smallText" className="text-gray-500">
-               Sist innlogget: {new Date(user.lastLogin ?? "").toLocaleDateString("no")}
+               Sist innlogget: {new Date(user.lastLogin).toLocaleDateString("no")}
             </Typography>
          </div>
 

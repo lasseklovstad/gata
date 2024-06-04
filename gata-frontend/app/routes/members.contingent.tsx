@@ -31,12 +31,7 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
       <p>Du har ikke betalt kontigenten på ${size}kr til ${bank}!</p>
       <p>Se det på ${url.origin}</p>
       `,
-      to: usersNotPaid.map((user) => {
-         if (!user.email) {
-            throw new Error("Bruker har ikke email " + user.id);
-         }
-         return { email: user.email };
-      }),
+      to: usersNotPaid.map((user) => ({ email: user.email })),
       subject: `Du har ikke betalt Gata kontigenten for ${today.getFullYear()}!`,
    });
    return { ok: true, emails: usersNotPaid.map((user) => user.email) };

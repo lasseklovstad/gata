@@ -63,6 +63,7 @@ module.exports = {
       "@typescript-eslint/consistent-type-imports": "error",
       "react/display-name": "off",
       "import/no-cycle": "warn",
+      "@typescript-eslint/no-unnecessary-condition": "warn",
       "import/order": [
          "warn",
          {

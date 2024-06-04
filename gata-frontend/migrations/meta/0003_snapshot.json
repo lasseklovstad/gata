@@ -1,4 +1,6 @@
 {
+  "id": "a1d1f5c0-2923-421c-9a32-089e9c21f79e",
+  "prevId": "d60d74d0-2057-4141-a4f8-8e7d034d3c4c",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -30,15 +32,15 @@
         "gata_contingent_gata_user_id_gata_user_id_fk": {
           "name": "gata_contingent_gata_user_id_gata_user_id_fk",
           "tableFrom": "gata_contingent",
+          "tableTo": "gata_user",
           "columnsFrom": [
             "gata_user_id"
           ],
-          "tableTo": "gata_user",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -50,134 +52,6 @@
           ]
         }
       },
-      "uniqueConstraints": {}
-    },
-    "public.databasechangelog": {
-      "name": "databasechangelog",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "author": {
-          "name": "author",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "filename": {
-          "name": "filename",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "dateexecuted": {
-          "name": "dateexecuted",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "orderexecuted": {
-          "name": "orderexecuted",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "exectype": {
-          "name": "exectype",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "md5sum": {
-          "name": "md5sum",
-          "type": "varchar(35)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "description": {
-          "name": "description",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "comments": {
-          "name": "comments",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "tag": {
-          "name": "tag",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "liquibase": {
-          "name": "liquibase",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "contexts": {
-          "name": "contexts",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "labels": {
-          "name": "labels",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "deployment_id": {
-          "name": "deployment_id",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.databasechangeloglock": {
-      "name": "databasechangeloglock",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "locked": {
-          "name": "locked",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "lockgranted": {
-          "name": "lockgranted",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "lockedby": {
-          "name": "lockedby",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
     "public.external_user": {
@@ -194,13 +68,13 @@
           "name": "name",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "email": {
           "name": "email",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "picture": {
           "name": "picture",
@@ -210,9 +84,9 @@
         },
         "last_login": {
           "name": "last_login",
-          "type": "varchar(255)",
+          "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "user_id": {
           "name": "user_id",
@@ -232,15 +106,15 @@
         "external_user_user_id_gata_user_id_fk": {
           "name": "external_user_user_id_gata_user_id_fk",
           "tableFrom": "external_user",
+          "tableTo": "gata_user",
           "columnsFrom": [
             "user_id"
           ],
-          "tableTo": "gata_user",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "set null"
+          "onDelete": "set null",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -254,7 +128,8 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "content": {
           "name": "content",
@@ -266,25 +141,28 @@
           "name": "created_date",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "now()"
         },
         "description": {
           "name": "description",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "''"
         },
         "last_modified_by": {
           "name": "last_modified_by",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "last_modified_date": {
           "name": "last_modified_date",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "now()"
         },
         "title": {
           "name": "title",
@@ -310,15 +188,15 @@
         "gata_report_created_by_gata_user_id_fk": {
           "name": "gata_report_created_by_gata_user_id_fk",
           "tableFrom": "gata_report",
+          "tableTo": "gata_user",
           "columnsFrom": [
             "created_by"
           ],
-          "tableTo": "gata_user",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "set null"
+          "onDelete": "set null",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -332,7 +210,8 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "data": {
           "name": "data",
@@ -344,7 +223,7 @@
           "name": "report_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "cloud_url": {
           "name": "cloud_url",
@@ -364,15 +243,15 @@
         "gata_report_file_report_id_gata_report_id_fk": {
           "name": "gata_report_file_report_id_gata_report_id_fk",
           "tableFrom": "gata_report_file",
+          "tableTo": "gata_report",
           "columnsFrom": [
             "report_id"
           ],
-          "tableTo": "gata_report",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -386,7 +265,8 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "description": {
           "name": "description",
@@ -414,25 +294,28 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "last_modified_by": {
           "name": "last_modified_by",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "last_modified_date": {
           "name": "last_modified_date",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "now()"
         },
         "text": {
           "name": "text",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "''"
         },
         "resonsibility_year_id": {
           "name": "resonsibility_year_id",
@@ -446,25 +329,25 @@
         "responsibility_note_resonsibility_year_id_responsibility_year_id_fk": {
           "name": "responsibility_note_resonsibility_year_id_responsibility_year_id_fk",
           "tableFrom": "responsibility_note",
+          "tableTo": "responsibility_year",
           "columnsFrom": [
             "resonsibility_year_id"
           ],
-          "tableTo": "responsibility_year",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "responsibility_note_resonsibility_year_id_unique": {
           "name": "responsibility_note_resonsibility_year_id_unique",
+          "nullsNotDistinct": false,
           "columns": [
             "resonsibility_year_id"
-          ],
-          "nullsNotDistinct": false
+          ]
         }
       }
     },
@@ -476,7 +359,8 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "responsibility_id": {
           "name": "responsibility_id",
@@ -494,8 +378,7 @@
           "name": "year",
           "type": "smallint",
           "primaryKey": false,
-          "notNull": true,
-          "default": 2022
+          "notNull": true
         }
       },
       "indexes": {},
@@ -503,28 +386,28 @@
         "responsibility_year_responsibility_id_responsibility_id_fk": {
           "name": "responsibility_year_responsibility_id_responsibility_id_fk",
           "tableFrom": "responsibility_year",
+          "tableTo": "responsibility",
           "columnsFrom": [
             "responsibility_id"
           ],
-          "tableTo": "responsibility",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         },
         "responsibility_year_user_id_gata_user_id_fk": {
           "name": "responsibility_year_user_id_gata_user_id_fk",
           "tableFrom": "responsibility_year",
+          "tableTo": "gata_user",
           "columnsFrom": [
             "user_id"
           ],
-          "tableTo": "gata_user",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -560,10 +443,10 @@
       "uniqueConstraints": {
         "gata_role_role_name_unique": {
           "name": "gata_role_role_name_unique",
+          "nullsNotDistinct": false,
           "columns": [
             "role_name"
-          ],
-          "nullsNotDistinct": false
+          ]
         }
       }
     },
@@ -575,13 +458,15 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "subscribe": {
           "name": "subscribe",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": false
         }
       },
       "indexes": {},
@@ -611,28 +496,28 @@
         "gata_user_roles_users_id_gata_user_id_fk": {
           "name": "gata_user_roles_users_id_gata_user_id_fk",
           "tableFrom": "gata_user_roles",
+          "tableTo": "gata_user",
           "columnsFrom": [
             "users_id"
           ],
-          "tableTo": "gata_user",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         },
         "gata_user_roles_roles_id_gata_role_id_fk": {
           "name": "gata_user_roles_roles_id_gata_role_id_fk",
           "tableFrom": "gata_user_roles",
+          "tableTo": "gata_role",
           "columnsFrom": [
             "roles_id"
           ],
-          "tableTo": "gata_role",
           "columnsTo": [
             "id"
           ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -642,10 +527,8 @@
   "enums": {},
   "schemas": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "id": "d60d74d0-2057-4141-a4f8-8e7d034d3c4c",
-  "prevId": "6bf78284-44c4-4f1c-8736-7aee0bff80bc"
+    "tables": {}
+  }
 }

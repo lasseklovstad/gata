@@ -20,7 +20,7 @@ export const UserListItem = ({ user, isLoggedInUserAdmin }: UserListItemProps) =
          <Link to={`/member/${user.id}`}>
             <div className="flex gap-4 p-2 items-center">
                <Avatar>
-                  <AvatarImage src={getPrimaryUser(user).picture || undefined} alt={getPrimaryUser(user).name ?? ""} />
+                  <AvatarImage src={getPrimaryUser(user).picture || undefined} alt={getPrimaryUser(user).name} />
                   <AvatarFallback>
                      <UserIcon />
                   </AvatarFallback>
@@ -28,7 +28,7 @@ export const UserListItem = ({ user, isLoggedInUserAdmin }: UserListItemProps) =
                <div>
                   <Typography variant="largeText">{getPrimaryUser(user).name}</Typography>
                   <Typography variant="smallText" className="text-gray-500">
-                     Sist innlogget: {new Date(getPrimaryUser(user).lastLogin ?? "").toLocaleDateString("no")}
+                     Sist innlogget: {new Date(getPrimaryUser(user).lastLogin).toLocaleDateString("no")}
                   </Typography>
                   {isLoggedInUserAdmin && isMember(user) && (
                      <Typography

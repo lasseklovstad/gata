@@ -27,14 +27,14 @@ export const LinkExternalUserToGataUserSelect = ({
    const buttonRef = useRef<HTMLButtonElement>(null);
 
    const options = notMemberUsers.map((user) => ({
-      label: user.email ?? "",
+      label: user.email,
       value: user.id,
       icon: <ExternalUserIcon user={user} />,
       isFixed: !!user.primaryUser,
    }));
 
    const selectedOptions = externalUsers.map((user) => ({
-      label: user.email ?? "",
+      label: user.email,
       value: user.id,
       icon: <ExternalUserIcon user={user} />,
       isFixed: !!user.primaryUser,
