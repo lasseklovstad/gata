@@ -5,8 +5,8 @@ import { ChevronDown } from "lucide-react";
 import type { User } from "~/.server/db/user";
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
 
-import { memberIntent } from "../intent";
 import { ExternalUserIcon } from "./ExternalUserIcon";
+import { memberIntent } from "../intent";
 
 type Props = {
    user: User;

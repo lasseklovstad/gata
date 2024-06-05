@@ -8,10 +8,10 @@ import { FormControl, FormItem, FormLabel } from "~/components/ui/form";
 import { NativeSelect } from "~/components/ui/native-select";
 import { Typography } from "~/components/ui/typography";
 
+import { SelectPrimaryEmail } from "./SelectPrimaryEmail";
 import type { IContingentInfo } from "../../../types/ContingentInfo.type";
 import { isAdmin, isMember } from "../../../utils/roleUtils";
 import { memberIntent } from "../intent";
-import { SelectPrimaryEmail } from "./SelectPrimaryEmail";
 
 type UserInfoProps = {
    user: User;
