@@ -40,7 +40,7 @@ export const ExternalUsersWithNoGataUserListItem = ({ user }: ExternalUsersWithN
             size="icon"
             variant="ghost"
             onClick={handleDeleteClick}
-            isLoading={fetcher.state !== "idle"}
+            isLoading={fetcher.state !== "idle" && fetcher.formMethod === "DELETE"}
             aria-label="Fjern"
          >
             <Trash />
@@ -49,7 +49,7 @@ export const ExternalUsersWithNoGataUserListItem = ({ user }: ExternalUsersWithN
             size="icon"
             variant="ghost"
             onClick={handleAddClick}
-            isLoading={fetcher.state !== "idle"}
+            isLoading={fetcher.state !== "idle" && fetcher.formMethod === "POST"}
             aria-label="Legg til"
          >
             <Plus />

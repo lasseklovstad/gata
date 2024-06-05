@@ -4,7 +4,6 @@ import { ChevronDown } from "lucide-react";
 
 import type { User } from "~/.server/db/user";
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
-import { getPrimaryUser } from "~/utils/userUtils";
 
 import { ExternalUserIcon } from "./ExternalUserIcon";
 import { memberIntent } from "../intent";
@@ -22,7 +21,7 @@ export const SelectPrimaryEmail = ({ user }: Props) => {
       icon: <ExternalUserIcon user={user} />,
    }));
 
-   const selectedOption = options.find((option) => getPrimaryUser(user).id === option.value);
+   const selectedOption = options.find((option) => user.primaryExternalUserId === option.value);
 
    return (
       <>

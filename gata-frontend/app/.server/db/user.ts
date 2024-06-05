@@ -9,7 +9,12 @@ export type User = Awaited<ReturnType<typeof getUser>>;
 export const getUser = async (context: AppLoadContext, userId: string) => {
    const userResult = await context.db.query.user.findFirst({
       where: eq(user.id, userId),
-      with: { externalUsers: true, roles: { with: { role: true }, columns: { roleId: true } }, contingents: true },
+      with: {
+         externalUsers: true,
+         roles: { with: { role: true }, columns: { roleId: true } },
+         contingents: true,
+         primaryUser: true,
+      },
    });
    if (!userResult) {
       throw new Error("Fant ingen bruker");
@@ -27,6 +32,7 @@ export const getOptionalUserFromExternalUserId = async (context: AppLoadContext,
                externalUsers: true,
                roles: { with: { role: true }, columns: { roleId: true } },
                contingents: true,
+               primaryUser: true,
             },
          },
       },
@@ -36,7 +42,12 @@ export const getOptionalUserFromExternalUserId = async (context: AppLoadContext,
 
 export const getUsers = (context: AppLoadContext) => {
    return context.db.query.user.findMany({
-      with: { externalUsers: true, roles: { with: { role: true }, columns: { roleId: true } }, contingents: true },
+      with: {
+         externalUsers: true,
+         roles: { with: { role: true }, columns: { roleId: true } },
+         contingents: true,
+         primaryUser: true,
+      },
    });
 };
 
@@ -45,11 +56,7 @@ export const getNotMemberUsers = (context: AppLoadContext) => {
 };
 
 export const deleteUser = async (context: AppLoadContext, userId: string) => {
-   await context.db.transaction(async (tx) => {
-      // Then remove the user
-      await tx.update(externalUser).set({ primaryUser: false }).where(eq(externalUser.userId, userId));
-      await tx.delete(user).where(eq(user.id, userId));
-   });
+   await context.db.delete(user).where(eq(user.id, userId));
 };
 
 export type ResponsibilityYear = Awaited<ReturnType<typeof getResponsibilityYears>>[number];
@@ -85,7 +92,6 @@ export const insertOrUpdateExternalUser = async (context: AppLoadContext, auth0U
       .insert(externalUser)
       .values({
          id,
-         primaryUser: false,
          ...values,
       })
       .onConflictDoUpdate({ target: externalUser.id, set: values })
@@ -103,11 +109,11 @@ export const getNumberOfAdmins = async (context: AppLoadContext) => {
 
 export const insertUser = async (context: AppLoadContext, auth0UserId: string, roleName?: RoleName) => {
    await context.db.transaction(async (tx) => {
-      const [createdUser] = await tx.insert(user).values({}).returning({ id: user.id });
-      await tx
-         .update(externalUser)
-         .set({ userId: createdUser.id, primaryUser: true })
-         .where(eq(externalUser.id, auth0UserId));
+      const [createdUser] = await tx
+         .insert(user)
+         .values({ primaryExternalUserId: auth0UserId })
+         .returning({ id: user.id });
+      await tx.update(externalUser).set({ userId: createdUser.id }).where(eq(externalUser.id, auth0UserId));
       if (roleName !== undefined) {
          const [userRole] = await tx.selectDistinct().from(role).where(eq(role.roleName, roleName));
          await tx.insert(userRoles).values({ usersId: createdUser.id, roleId: userRole.id });
@@ -133,16 +139,7 @@ export const updateLinkedExternalUsers = async (context: AppLoadContext, userId:
 };
 
 export const updatePrimaryEmail = async (context: AppLoadContext, userId: string, primaryExternalUserId: string) => {
-   await context.db.transaction(async (tx) => {
-      await tx
-         .update(externalUser)
-         .set({ primaryUser: false })
-         .where(and(eq(externalUser.userId, userId), ne(externalUser.id, primaryExternalUserId)));
-      await tx
-         .update(externalUser)
-         .set({ primaryUser: true })
-         .where(and(eq(externalUser.userId, userId), eq(externalUser.id, primaryExternalUserId)));
-   });
+   await context.db.update(user).set({ primaryExternalUserId }).where(eq(user.id, userId));
 };
 
 export const deleteExternalUser = async (context: AppLoadContext, externalUserId: string) => {
@@ -153,10 +150,10 @@ export const getSubscribedUsers = async (context: AppLoadContext) => {
    return await context.db
       .select({ id: user.id, name: externalUser.name, email: externalUser.email })
       .from(user)
-      .innerJoin(externalUser, eq(externalUser.userId, user.id))
+      .innerJoin(externalUser, eq(externalUser.id, user.primaryExternalUserId))
       .innerJoin(userRoles, eq(userRoles.usersId, user.id))
       .innerJoin(role, eq(role.id, userRoles.roleId))
-      .where(and(eq(externalUser.primaryUser, true), eq(user.subscribe, true), eq(role.roleName, RoleName.Member)));
+      .where(and(eq(user.subscribe, true), eq(role.roleName, RoleName.Member)));
 };
 
 export const getUsersThatHasNotPaidContingent = async (context: AppLoadContext, year: number) => {
@@ -164,12 +161,11 @@ export const getUsersThatHasNotPaidContingent = async (context: AppLoadContext, 
       .select({ id: user.id, name: externalUser.name, email: externalUser.email })
       .from(user)
       .leftJoin(contingent, and(eq(contingent.userId, user.id), eq(contingent.year, year)))
-      .innerJoin(externalUser, eq(externalUser.userId, user.id))
+      .innerJoin(externalUser, eq(externalUser.id, user.primaryExternalUserId))
       .innerJoin(userRoles, eq(userRoles.usersId, user.id))
       .innerJoin(role, eq(role.id, userRoles.roleId))
       .where(
          and(
-            eq(externalUser.primaryUser, true),
             // If nothing registered contingent isPaid value is null
             or(eq(contingent.isPaid, false), isNull(contingent.isPaid)),
             eq(role.roleName, RoleName.Member)

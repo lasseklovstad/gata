@@ -7,7 +7,6 @@ import { Button } from "~/components/ui/button";
 import { FormControl, FormItem, FormLabel } from "~/components/ui/form";
 import { NativeSelect } from "~/components/ui/native-select";
 import { Typography } from "~/components/ui/typography";
-import { getPrimaryUser } from "~/utils/userUtils";
 
 import { SelectPrimaryEmail } from "./SelectPrimaryEmail";
 import type { IContingentInfo } from "../../../types/ContingentInfo.type";
@@ -63,13 +62,13 @@ export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) 
       <>
          <div className="my-4">
             <Typography>
-               <strong>Navn:</strong> {getPrimaryUser(user).name}
+               <strong>Navn:</strong> {user.primaryUser.name}
             </Typography>
             {isAdmin(loggedInUser) ? (
                <SelectPrimaryEmail user={user} />
             ) : (
                <Typography>
-                  <strong>Email:</strong> {getPrimaryUser(user).email}
+                  <strong>Email:</strong> {user.primaryUser.email}
                </Typography>
             )}
          </div>

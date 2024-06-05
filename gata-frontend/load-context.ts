@@ -18,7 +18,6 @@ interface Env {
    AUTH0_AUDIENCE: string;
    AUTH0_CLIENT_SECRET: string;
    AUTH0_COOKIE_SECRET: string;
-   BACKEND_BASE_URL: string;
    APP_DATABASE_URL: string;
    DEFAULT_CONTINGENT_SIZE: string;
    CONTINGENT_BANK: string;

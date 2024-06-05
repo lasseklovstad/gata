@@ -3,9 +3,8 @@ import { gataReport, reportFile } from "db/schema";
 import { desc, eq, sql } from "drizzle-orm";
 import { ReportType } from "~/types/GataReport.type";
 import { ReportSchema } from "~/utils/formSchema";
-import { getPrimaryUser } from "~/utils/userUtils";
-import { User } from "./user";
 import { deleteImage } from "../services/cloudinaryService";
+import { User } from "./user";
 
 export const getReportsSimple = async (context: AppLoadContext, reportType: ReportType) => {
    return await context.db
@@ -72,7 +71,7 @@ export const getReport = async (context: AppLoadContext, reportId: string) => {
 };
 
 export const insertReport = async (context: AppLoadContext, values: ReportSchema, loggedInUser: User) => {
-   const primaryUser = getPrimaryUser(loggedInUser);
+   const primaryUser = loggedInUser.primaryUser;
    return await context.db
       .insert(gataReport)
       .values({
@@ -90,7 +89,7 @@ export const updateReport = async (
    values: ReportSchema,
    loggedInUser: User
 ) => {
-   const primaryUser = getPrimaryUser(loggedInUser);
+   const primaryUser = loggedInUser.primaryUser;
    await context.db
       .update(gataReport)
       .set({
@@ -124,7 +123,7 @@ export const updateReportContent = async (
    content: string,
    loggedInUser: User
 ) => {
-   const primaryUser = getPrimaryUser(loggedInUser);
+   const primaryUser = loggedInUser.primaryUser;
    await context.db
       .update(gataReport)
       .set({

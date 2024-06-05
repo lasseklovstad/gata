@@ -1,5 +1,26 @@
 import { relations } from "drizzle-orm";
-import { boolean, integer, pgTable, primaryKey, smallint, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+   boolean,
+   foreignKey,
+   integer,
+   pgTable,
+   primaryKey,
+   smallint,
+   text,
+   timestamp,
+   uuid,
+   varchar,
+   AnyPgColumn,
+} from "drizzle-orm/pg-core";
+
+export const user = pgTable("gata_user", {
+   id: uuid("id").primaryKey().defaultRandom(),
+   subscribe: boolean("subscribe").default(false).notNull(),
+   primaryExternalUserId: varchar("primary_external_user_id", { length: 255 })
+      .notNull()
+      .unique()
+      .references((): AnyPgColumn => externalUser.id),
+});
 
 export const externalUser = pgTable("external_user", {
    id: varchar("id", { length: 255 }).primaryKey(),
@@ -8,7 +29,6 @@ export const externalUser = pgTable("external_user", {
    picture: varchar("picture", { length: 500 }),
    lastLogin: text("last_login").notNull(),
    userId: uuid("user_id").references(() => user.id, { onDelete: "set null" }),
-   primaryUser: boolean("primary_user").notNull(),
 });
 
 export type ExternalUser = typeof externalUser.$inferSelect;
@@ -80,11 +100,6 @@ export const responsibilityYear = pgTable("responsibility_year", {
    year: smallint("year").notNull(),
 });
 
-export const user = pgTable("gata_user", {
-   id: uuid("id").primaryKey().defaultRandom(),
-   subscribe: boolean("subscribe").default(false).notNull(),
-});
-
 export const gataReport = pgTable("gata_report", {
    id: uuid("id").primaryKey().defaultRandom(),
    content: text("content"),
@@ -106,12 +121,16 @@ export const externalUserRelations = relations(externalUser, ({ one }) => ({
    }),
 }));
 
-export const gata_userRelations = relations(user, ({ many }) => ({
+export const gata_userRelations = relations(user, ({ many, one }) => ({
    externalUsers: many(externalUser),
    roles: many(userRoles),
    contingents: many(contingent),
    responsibilityYears: many(responsibilityYear),
    gataReports: many(gataReport),
+   primaryUser: one(externalUser, {
+      fields: [user.primaryExternalUserId],
+      references: [externalUser.id],
+   }),
 }));
 
 export const gata_user_rolesRelations = relations(userRoles, ({ one }) => ({
