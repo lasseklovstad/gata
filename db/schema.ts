@@ -1,17 +1,6 @@
 import { relations } from "drizzle-orm";
-import {
-   boolean,
-   foreignKey,
-   integer,
-   pgTable,
-   primaryKey,
-   smallint,
-   text,
-   timestamp,
-   uuid,
-   varchar,
-   AnyPgColumn,
-} from "drizzle-orm/pg-core";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, primaryKey, smallint, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const user = pgTable("gata_user", {
    id: uuid("id").primaryKey().defaultRandom(),

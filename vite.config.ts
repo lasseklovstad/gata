@@ -1,6 +1,7 @@
 import { cloudflareDevProxyVitePlugin, vitePlugin as remix } from "@remix-run/dev";
 import { remixDevTools } from "remix-development-tools";
 import { defineConfig } from "vite";
+// eslint-disable-next-line import/no-named-as-default
 import checker from "vite-plugin-checker";
 import tsconfigPaths from "vite-tsconfig-paths";
 

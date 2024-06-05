@@ -9,7 +9,7 @@
       "deploy": "wrangler pages deploy ./build/client",
       "dev": "remix vite:dev",
       "start": "wrangler pages dev ./build/client --port 3000",
-      "lint": "eslint ./app --ext .js,.jsx,.ts,.tsx,.mjs,.cjs",
+      "lint": "eslint .",
       "lint:fix": "npm run lint -- --fix",
       "lint:ci": "npm run lint -- --max-warnings 0",
       "knip": "knip",
