@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1716642581965,
-      "tag": "0000_fat_leader",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1717083727941,
-      "tag": "0001_kind_ben_grimm",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1717183332659,
-      "tag": "0002_new_skaar",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1717516509340,
-      "tag": "0003_clean_jigsaw",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1717532606348,
-      "tag": "0004_round_umar",
+      "when": 1717692508509,
+      "tag": "0000_red_fabian_cortez",
       "breakpoints": true
     }
   ]

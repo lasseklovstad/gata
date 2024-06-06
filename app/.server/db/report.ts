@@ -96,7 +96,7 @@ export const updateReport = async (
          ...values,
          type: ReportType[values.type],
          lastModifiedBy: primaryUser.name,
-         lastModifiedDate: sql`now()`,
+         lastModifiedDate: sql`(CURRENT_TIMESTAMP)`,
       })
       .where(eq(gataReport.id, reportId));
 };
@@ -129,7 +129,7 @@ export const updateReportContent = async (
       .set({
          content,
          lastModifiedBy: primaryUser.name,
-         lastModifiedDate: sql`now()`,
+         lastModifiedDate: sql`(CURRENT_TIMESTAMP)`,
       })
       .where(eq(gataReport.id, reportId));
 };

@@ -84,7 +84,7 @@ export const insertOrUpdateExternalUser = async (context: AppLoadContext, auth0U
    }
    const values = {
       email: email.value,
-      lastLogin: sql`now()`,
+      lastLogin: sql`(CURRENT_TIMESTAMP)`,
       name: auth0User.profile.displayName ?? email.value,
       picture: photo?.value,
    };

@@ -68,6 +68,6 @@ export const updateResponsibilityNote = async (
 ) => {
    await context.db
       .update(responsibilityNote)
-      .set({ text, lastModifiedDate: sql`now()`, lastModifiedBy: loggedInUser.primaryUser.name })
+      .set({ text, lastModifiedDate: sql`(CURRENT_TIMESTAMP)`, lastModifiedBy: loggedInUser.primaryUser.name })
       .where(eq(responsibilityNote.responsibilityYearId, responsibilityYearId));
 };

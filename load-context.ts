@@ -1,7 +1,8 @@
 import type { AppLoadContext } from "@remix-run/cloudflare";
-import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+// eslint-disable-next-line import/no-named-as-default
+import Database from "better-sqlite3";
+import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
 import { type PlatformProxy } from "wrangler";
 
 import * as schema from "./db/schema";
@@ -33,7 +34,7 @@ type Cloudflare = Omit<PlatformProxy<Env>, "dispose">;
 declare module "@remix-run/cloudflare" {
    interface AppLoadContext {
       cloudflare: Cloudflare;
-      db: PostgresJsDatabase<typeof schema>;
+      db: BetterSQLite3Database<typeof schema>;
    }
 }
 
@@ -43,9 +44,9 @@ type GetLoadContext = (args: {
 }) => AppLoadContext;
 
 // Function to get or create the database connection
-const getDatabase = (cloudflare: Cloudflare & { db?: PostgresJsDatabase<typeof schema> }) => {
+const getDatabase = (cloudflare: Cloudflare & { db?: BetterSQLite3Database<typeof schema> }) => {
    if (!cloudflare.db) {
-      const queryClient = postgres(cloudflare.env.APP_DATABASE_URL);
+      const queryClient = new Database(cloudflare.env.APP_DATABASE_URL);
       cloudflare.db = drizzle(queryClient, { schema });
    }
    return cloudflare.db;
