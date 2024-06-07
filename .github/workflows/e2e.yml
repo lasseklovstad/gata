@@ -60,23 +60,10 @@ jobs:
       AUTH0_CLIENT_SECRET: ${{secrets.AUTH0_CLIENT_SECRET}}
       AUTH0_AUDIENCE: "https://gataersamla.no"
       AUTH0_COOKIE_SECRET: "s3cret"
-      APP_DATABASE_URL: "postgres://postgres:password@localhost:5433/postgres"
+      APP_DATABASE_URL: "./sqlite.db"
       DEFAULT_CONTINGENT_SIZE: 600
       CONTINGENT_BANK: 000.0123.1230.123
       MAKE_FIRST_USER_ADMIN: true
-    services:
-      db:
-        image: postgres:latest
-        ports:
-          - 5433:5432
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
       - name: Cloning repo
@@ -86,20 +73,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Create .dev.vars file for frontend
-        run: |
-          touch .dev.vars
-          echo "AUTH0_DOMAIN=$AUTH0_DOMAIN" >> .dev.vars
-          echo "AUTH0_CLIENT_ID=$AUTH0_CLIENT_ID" >> .dev.vars
-          echo "AUTH0_AUDIENCE=$AUTH0_AUDIENCE" >> .dev.vars
-          echo "AUTH0_CLIENT_SECRET=$AUTH0_CLIENT_SECRET" >> .dev.vars
-          echo "AUTH0_COOKIE_SECRET=$AUTH0_COOKIE_SECRET" >> .dev.vars
-          echo "BACKEND_BASE_URL=$BACKEND_BASE_URL" >> .dev.vars
-          echo "APP_DATABASE_URL=$APP_DATABASE_URL" >> .dev.vars
-          echo "DEFAULT_CONTINGENT_SIZE=$DEFAULT_CONTINGENT_SIZE" >> .dev.vars
-          echo "CONTINGENT_BANK=$CONTINGENT_BANK" >> .dev.vars
-          echo "MAKE_FIRST_USER_ADMIN=$MAKE_FIRST_USER_ADMIN" >> .dev.vars
 
       - name: Download deps
         uses: bahmutov/npm-install@v1

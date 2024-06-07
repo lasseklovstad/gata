@@ -7,12 +7,13 @@
     "**/.client/**/*.ts",
     "**/.client/**/*.tsx",
     ".eslintrc.cjs",
-    "postcss.config.cjs"
+    "postcss.config.cjs",
+    "server.js"
   ],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "types": ["@remix-run/cloudflare", "vite/client"],
+    "types": ["@remix-run/node", "vite/client"],
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",

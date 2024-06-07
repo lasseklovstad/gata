@@ -1,5 +1,6 @@
-import { AppLoadContext } from "@remix-run/cloudflare";
+import { AppLoadContext } from "@remix-run/node";
 import crypto from "node:crypto";
+import { env } from "~/utils/env.server";
 
 const generateSignature = (paramsToSign: Record<string, string | number>, apiSecret: string) => {
    const paramsString = Object.keys(paramsToSign)
@@ -13,7 +14,7 @@ const generateSignature = (paramsToSign: Record<string, string | number>, apiSec
       .digest("hex");
 };
 
-export const uploadImage = async ({ cloudflare: { env } }: AppLoadContext, data: string) => {
+export const uploadImage = async (context: AppLoadContext, data: string) => {
    const url = `https://api.cloudinary.com/v1_1/${env.CLOUDINARY_NAME}/image/upload`;
    const formData = new FormData();
    formData.set("file", data);
@@ -43,7 +44,7 @@ export const uploadImage = async ({ cloudflare: { env } }: AppLoadContext, data:
    return result as { public_id: string; secure_url: string };
 };
 
-export const deleteImage = async ({ cloudflare: { env } }: AppLoadContext, publicId: string) => {
+export const deleteImage = async (context: AppLoadContext, publicId: string) => {
    const url = `https://api.cloudinary.com/v1_1/${env.CLOUDINARY_NAME}/image/destroy`;
    const formData = new FormData();
    formData.set("api_key", env.CLOUDINARY_API_KEY);

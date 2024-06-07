@@ -1,13 +1,14 @@
-import { AppLoadContext } from "@remix-run/cloudflare";
+import { AppLoadContext } from "@remix-run/node";
 import { gataReport, reportFile } from "db/schema";
 import { desc, eq, sql } from "drizzle-orm";
 import { ReportType } from "~/types/GataReport.type";
 import { ReportSchema } from "~/utils/formSchema";
 import { deleteImage } from "../services/cloudinaryService";
 import { User } from "./user";
+import { db } from "db/config.server";
 
 export const getReportsSimple = async (context: AppLoadContext, reportType: ReportType) => {
-   return await context.db
+   return await db
       .select({ id: gataReport.id, title: gataReport.title, description: gataReport.description })
       .from(gataReport)
       .where(eq(gataReport.type, reportType))
@@ -16,7 +17,7 @@ export const getReportsSimple = async (context: AppLoadContext, reportType: Repo
 };
 
 export const getReportsWithContent = async (context: AppLoadContext, reportType: ReportType) => {
-   return await context.db
+   return await db
       .select({
          id: gataReport.id,
          title: gataReport.title,
@@ -32,7 +33,7 @@ export const getReportsWithContent = async (context: AppLoadContext, reportType:
 };
 
 export const getReportSimple = async (context: AppLoadContext, reportId: string) => {
-   const [result] = await context.db
+   const [result] = await db
       .select({
          id: gataReport.id,
          title: gataReport.title,
@@ -49,7 +50,7 @@ export const getReportSimple = async (context: AppLoadContext, reportId: string)
 };
 
 export const getReport = async (context: AppLoadContext, reportId: string) => {
-   const [result] = await context.db
+   const [result] = await db
       .select({
          id: gataReport.id,
          title: gataReport.title,
@@ -72,7 +73,7 @@ export const getReport = async (context: AppLoadContext, reportId: string) => {
 
 export const insertReport = async (context: AppLoadContext, values: ReportSchema, loggedInUser: User) => {
    const primaryUser = loggedInUser.primaryUser;
-   return await context.db
+   return await db
       .insert(gataReport)
       .values({
          ...values,
@@ -90,7 +91,7 @@ export const updateReport = async (
    loggedInUser: User
 ) => {
    const primaryUser = loggedInUser.primaryUser;
-   await context.db
+   await db
       .update(gataReport)
       .set({
          ...values,
@@ -102,7 +103,7 @@ export const updateReport = async (
 };
 
 export const deleteReport = async (context: AppLoadContext, reportId: string) => {
-   await context.db.transaction(async (tx) => {
+   await db.transaction(async (tx) => {
       const reportFiles = await tx.select().from(reportFile).where(eq(reportFile.reportId, reportId));
       await Promise.all(
          reportFiles.map(async (file) => {
@@ -124,7 +125,7 @@ export const updateReportContent = async (
    loggedInUser: User
 ) => {
    const primaryUser = loggedInUser.primaryUser;
-   await context.db
+   await db
       .update(gataReport)
       .set({
          content,

@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs } from "@remix-run/cloudflare";
-import { redirect } from "@remix-run/cloudflare";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 
 import { deleteReport } from "~/.server/db/report";
 import { RouteConfirmFormDialog } from "~/components/RouteConfirmFormDialog";
