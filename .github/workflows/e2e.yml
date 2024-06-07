@@ -81,10 +81,6 @@ jobs:
         run: |
           npm run build
 
-      - name: Run db migrations
-        run: |
-          npm run db:migrate
-
       - name: Install playwright
         run: |
           npx playwright install --with-deps chromium

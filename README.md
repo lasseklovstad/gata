@@ -91,6 +91,12 @@ docker exec "dokku.postgres.gatadatabase" su - postgres -c "createdb -E utf8  ga
 dokku logs gata
 ```
 
+## Fly 
+### Secrets
+```bash
+fly secrets set NAME="VALUE" NAME="VALUE"
+```
+
 ## Connect to db and creating backup
 
 ```bash
