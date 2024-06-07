@@ -83,7 +83,7 @@ CREATE TABLE `gata_user_roles` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX `responsibility_note_resonsibility_year_id_unique` ON `responsibility_note` (`resonsibility_year_id`);--> statement-breakpoint
 CREATE UNIQUE INDEX `gata_role_role_name_unique` ON `gata_role` (`role_name`);--> statement-breakpoint
-CREATE UNIQUE INDEX `gata_user_primary_external_user_id_unique` ON `gata_user` (`primary_external_user_id`);
+CREATE UNIQUE INDEX `gata_user_primary_external_user_id_unique` ON `gata_user` (`primary_external_user_id`);--> statement-breakpoint
 
-INSERT INTO gata_role VALUES ('251f5cec-ae94-43a6-9f05-54d602c3b254', 'Administrator', 1);
+INSERT INTO gata_role VALUES ('251f5cec-ae94-43a6-9f05-54d602c3b254', 'Administrator', 1);--> statement-breakpoint
 INSERT INTO gata_role VALUES ('8f7756ea-43dd-45d1-9703-12d9f3fbc23b', 'Medlem', 0);
