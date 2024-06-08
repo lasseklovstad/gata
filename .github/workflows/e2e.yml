@@ -64,6 +64,7 @@ jobs:
       DEFAULT_CONTINGENT_SIZE: 600
       CONTINGENT_BANK: 000.0123.1230.123
       MAKE_FIRST_USER_ADMIN: true
+      NODE_ENV: production
 
     steps:
       - name: Cloning repo
