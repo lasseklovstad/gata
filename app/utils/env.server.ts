@@ -12,4 +12,5 @@ export const env = {
    CLOUDINARY_NAME: process.env.CLOUDINARY_NAME!,
    MAKE_FIRST_USER_ADMIN: process.env.MAKE_FIRST_USER_ADMIN!,
    SENDGRID_API_KEY: process.env.SENDGRID_API_KEY!,
+   VERSION: process.env.npm_package_version!,
 };

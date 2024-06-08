@@ -20,6 +20,7 @@ import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar
 import { Button } from "./components/ui/button";
 import { Typography } from "./components/ui/typography";
 import { createAuthenticator } from "./utils/auth.server";
+import { env } from "./utils/env.server";
 
 export const meta: MetaFunction = () => {
    return [
@@ -72,20 +73,21 @@ export function Layout({ children }: ComponentProps<never>) {
 }
 
 export default function App() {
-   const { auth0User, loggedInUser } = useLoaderData<typeof loader>();
+   const { auth0User, loggedInUser, version } = useLoaderData<typeof loader>();
    return (
       <div className="flex flex-col min-h-lvh">
          <ResponsiveAppBar auth0User={auth0User} loggedInUser={loggedInUser} />
          <main className="mb-8 max-w-[1000px] w-full me-auto ms-auto px-4">
             <Outlet />
          </main>
-         <footer className="p-4 flex gap-4 max-w-[1000px] w-full ms-auto me-auto mt-auto">
+         <footer className="p-4 flex gap-4 max-w-[1000px] w-full ms-auto me-auto mt-auto items-center">
             <Button variant="link" as={Link} to="/privacy">
                Privacy
             </Button>
             <Button variant="link" as={Link} to="/about">
                About
             </Button>
+            Versjon: {version}
          </footer>
       </div>
    );
@@ -96,7 +98,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
    const loggedInUser = auth0User
       ? (await getOptionalUserFromExternalUserId(auth0User.profile.id ?? "")) || undefined
       : undefined;
-   return { auth0User, loggedInUser };
+   const version = env.VERSION;
+   return { auth0User, loggedInUser, version };
 };
 
 export const useRootLoader = () => {
