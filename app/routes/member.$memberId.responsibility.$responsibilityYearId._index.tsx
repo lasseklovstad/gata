@@ -5,15 +5,15 @@ import { updateResponsibilityNote } from "~/.server/db/responsibility";
 import { createAuthenticator } from "~/utils/auth.server";
 import { updateResponsibilityYearSchema } from "~/utils/formSchema";
 
-export const action = async ({ request, params, context }: ActionFunctionArgs) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    if (!params.responsibilityYearId) {
       throw new Error("ResponsibilityYearId id required");
    }
-   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+   const loggedInUser = await createAuthenticator().getRequiredUser(request);
 
    if (request.method === "PUT") {
       const { text } = updateResponsibilityYearSchema.parse(await request.formData());
-      await updateResponsibilityNote(context, params.responsibilityYearId, text, loggedInUser);
+      await updateResponsibilityNote(params.responsibilityYearId, text, loggedInUser);
    }
 
    return redirect(`/member/${params.memberId}/responsibility`);

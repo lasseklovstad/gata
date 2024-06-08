@@ -14,17 +14,16 @@ import { useDialog } from "~/utils/dialogUtils";
 import { responsibilitySchema } from "~/utils/formSchema";
 import { isAdmin } from "~/utils/roleUtils";
 
-export const loader = async ({ request, params, context }: LoaderFunctionArgs) => {
-   await createAuthenticator(context).getRequiredUser(request);
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+   await createAuthenticator().getRequiredUser(request);
    if (!params.responsibilityId) throw new Error("ResponsibilityId is required in url!");
    return {
-      responsibility:
-         params.responsibilityId !== "new" ? await getResponsibility(context, params.responsibilityId) : undefined,
+      responsibility: params.responsibilityId !== "new" ? await getResponsibility(params.responsibilityId) : undefined,
    };
 };
 
-export const action = async ({ request, params, context }: ActionFunctionArgs) => {
-   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+export const action = async ({ request, params }: ActionFunctionArgs) => {
+   const loggedInUser = await createAuthenticator().getRequiredUser(request);
    if (!isAdmin(loggedInUser)) {
       throw new Error("Du har ikke tilgang til å endre denne ressursen");
    }
@@ -34,11 +33,11 @@ export const action = async ({ request, params, context }: ActionFunctionArgs) =
    }
 
    if (request.method === "POST") {
-      await insertResponsibility(context, responsibility.data);
+      await insertResponsibility(responsibility.data);
       return redirect("/responsibility");
    }
    if (request.method === "PUT" && params.responsibilityId) {
-      await updateResponsibility(context, params.responsibilityId, responsibility.data);
+      await updateResponsibility(params.responsibilityId, responsibility.data);
       return redirect("/responsibility");
    }
 };

@@ -5,6 +5,7 @@
 
 app = 'gata-app'
 primary_region = 'arn'
+kill_timeout = 300
 
 [mounts]
 source = "data"

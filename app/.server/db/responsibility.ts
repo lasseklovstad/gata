@@ -1,15 +1,16 @@
-import { AppLoadContext } from "@remix-run/node";
-import { responsibility, responsibilityNote, responsibilityYear } from "db/schema";
 import { asc, eq, sql } from "drizzle-orm";
-import { ResponsibilitySchema } from "~/utils/formSchema";
-import { User } from "./user";
-import { db } from "db/config.server";
 
-export const getResponsibilities = (context: AppLoadContext) => {
+import { db } from "db/config.server";
+import { responsibility, responsibilityNote, responsibilityYear } from "db/schema";
+import type { ResponsibilitySchema } from "~/utils/formSchema";
+
+import type { User } from "./user";
+
+export const getResponsibilities = () => {
    return db.query.responsibility.findMany({ orderBy: asc(responsibility.name) });
 };
 
-export const getResponsibility = async (context: AppLoadContext, responsibilityId: string) => {
+export const getResponsibility = async (responsibilityId: string) => {
    const result = await db.query.responsibility.findFirst({ where: eq(responsibility.id, responsibilityId) });
    if (!result) {
       throw new Error("Could not find resposibility with id " + responsibilityId);
@@ -17,19 +18,15 @@ export const getResponsibility = async (context: AppLoadContext, responsibilityI
    return result;
 };
 
-export const insertResponsibility = async (context: AppLoadContext, values: ResponsibilitySchema) => {
+export const insertResponsibility = async (values: ResponsibilitySchema) => {
    await db.insert(responsibility).values(values);
 };
 
-export const updateResponsibility = async (
-   context: AppLoadContext,
-   responsibilityId: string,
-   values: ResponsibilitySchema
-) => {
+export const updateResponsibility = async (responsibilityId: string, values: ResponsibilitySchema) => {
    await db.update(responsibility).set(values).where(eq(responsibility.id, responsibilityId));
 };
 
-export const deleteResponsibility = async (context: AppLoadContext, responsibilityId: string) => {
+export const deleteResponsibility = async (responsibilityId: string) => {
    try {
       await db.delete(responsibility).where(eq(responsibility.id, responsibilityId));
    } catch (error) {
@@ -39,7 +36,6 @@ export const deleteResponsibility = async (context: AppLoadContext, responsibili
 };
 
 export const insertResponsibilityYear = async (
-   context: AppLoadContext,
    userId: string,
    responsibilityId: string,
    year: number,
@@ -57,16 +53,11 @@ export const insertResponsibilityYear = async (
    });
 };
 
-export const deleteResponsibilityYear = async (context: AppLoadContext, responsibilityYearId: string) => {
+export const deleteResponsibilityYear = async (responsibilityYearId: string) => {
    await db.delete(responsibilityYear).where(eq(responsibilityYear.id, responsibilityYearId));
 };
 
-export const updateResponsibilityNote = async (
-   context: AppLoadContext,
-   responsibilityYearId: string,
-   text: string,
-   loggedInUser: User
-) => {
+export const updateResponsibilityNote = async (responsibilityYearId: string, text: string, loggedInUser: User) => {
    await db
       .update(responsibilityNote)
       .set({ text, lastModifiedDate: sql`(CURRENT_TIMESTAMP)`, lastModifiedBy: loggedInUser.primaryUser.name })

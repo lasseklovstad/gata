@@ -1,4 +1,3 @@
-import { AppLoadContext } from "@remix-run/node";
 import { env } from "~/utils/env.server";
 
 type MailData = {
@@ -12,7 +11,7 @@ const from = {
    name: "Hesten Blå",
 };
 
-export const sendMail = async (context: AppLoadContext, mailData: MailData) => {
+export const sendMail = async (mailData: MailData) => {
    const apiKey = env.SENDGRID_API_KEY;
    const url = "https://api.sendgrid.com/v3/mail/send";
 

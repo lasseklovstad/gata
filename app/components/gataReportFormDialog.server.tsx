@@ -6,13 +6,13 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { reportSchema } from "~/utils/formSchema";
 import { isMember } from "~/utils/roleUtils";
 
-export const gataReportFormDialogLoader = async ({ request, params, context }: LoaderFunctionArgs) => {
-   await createAuthenticator(context).getRequiredUser(request);
-   return { report: params.reportId ? await getReportSimple(context, params.reportId) : undefined };
+export const gataReportFormDialogLoader = async ({ request, params }: LoaderFunctionArgs) => {
+   await createAuthenticator().getRequiredUser(request);
+   return { report: params.reportId ? await getReportSimple(params.reportId) : undefined };
 };
 
-export const gataReportFormDialogAction = async ({ request, params, context }: ActionFunctionArgs) => {
-   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+export const gataReportFormDialogAction = async ({ request, params }: ActionFunctionArgs) => {
+   const loggedInUser = await createAuthenticator().getRequiredUser(request);
    if (!isMember(loggedInUser)) {
       throw new Error("Du har ikke tilgang til å endre denne ressursen");
    }
@@ -22,11 +22,11 @@ export const gataReportFormDialogAction = async ({ request, params, context }: A
    }
 
    if (request.method === "POST") {
-      const [{ reportId }] = await insertReport(context, form.data, loggedInUser);
+      const [{ reportId }] = await insertReport(form.data, loggedInUser);
       return redirect(`/reportInfo/${reportId}`);
    }
    if (request.method === "PUT" && params.reportId) {
-      await updateReport(context, params.reportId, form.data, loggedInUser);
+      await updateReport(params.reportId, form.data, loggedInUser);
       return redirect(`/reportInfo/${params.reportId}`);
    }
 };

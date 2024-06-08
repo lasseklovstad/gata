@@ -11,9 +11,9 @@ import { NativeSelect } from "~/components/ui/native-select";
 import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
-export const loader = async ({ request, context }: LoaderFunctionArgs) => {
-   await createAuthenticator(context).getRequiredUser(request);
-   const responsibilities = await getResponsibilities(context);
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+   await createAuthenticator().getRequiredUser(request);
+   const responsibilities = await getResponsibilities();
    return json({ responsibilities });
 };
 

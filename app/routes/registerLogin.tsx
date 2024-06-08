@@ -6,14 +6,14 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { env } from "~/utils/env.server";
 import { RoleName } from "~/utils/roleUtils";
 
-export const loader = async ({ request, context }: LoaderFunctionArgs) => {
-   const user = await createAuthenticator(context).authenticator.isAuthenticated(request);
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+   const user = await createAuthenticator().authenticator.isAuthenticated(request);
    if (user) {
-      const [externalUser] = await insertOrUpdateExternalUser(context, user);
+      const [externalUser] = await insertOrUpdateExternalUser(user);
       if (env.MAKE_FIRST_USER_ADMIN === "true") {
-         const [{ count }] = await getNumberOfAdmins(context);
+         const [{ count }] = await getNumberOfAdmins();
          if (count === 0) {
-            await insertUser(context, externalUser.id, RoleName.Admin);
+            await insertUser(externalUser.id, RoleName.Admin);
          }
       }
       return redirect("/home");

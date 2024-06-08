@@ -1,4 +1,4 @@
-import { createCookieSessionStorage, redirect, type AppLoadContext } from "@remix-run/node";
+import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import { Authenticator } from "remix-auth";
 import { Auth0Strategy } from "remix-auth-auth0";
 
@@ -7,7 +7,7 @@ import type { Auth0User } from "~/types/Auth0User";
 
 import { env } from "./env.server";
 
-export const createAuthenticator = (context: AppLoadContext) => {
+export const createAuthenticator = () => {
    const sessionStorage = createCookieSessionStorage({
       cookie: {
          name: "_remix_session",
@@ -58,7 +58,7 @@ export const createAuthenticator = (context: AppLoadContext) => {
          throw redirect("/home");
       }
       const user = auth.profile.id
-         ? (await getOptionalUserFromExternalUserId(context, auth.profile.id)) ?? undefined
+         ? (await getOptionalUserFromExternalUserId(auth.profile.id)) ?? undefined
          : undefined;
 
       if (!user) {

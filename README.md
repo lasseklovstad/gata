@@ -95,6 +95,8 @@ dokku logs gata
 ```
 
 ## Fly 
+### Config
+[See config at](https://fly.io/docs/reference/configuration/)
 ## Setup
 ````bash
 fly login
@@ -105,6 +107,11 @@ fly volumes create data
 fly launch --no-deploy
 ## Deploy fly app
 fly deploy
+
+# https://fly.io/docs/networking/custom-domain/
+## Add domains
+fly certs add gataersamla.no
+fly certs add www.gataersamla.no
 ```
 
 

@@ -5,11 +5,11 @@ import { deleteReport } from "~/.server/db/report";
 import { RouteConfirmFormDialog } from "~/components/RouteConfirmFormDialog";
 import { createAuthenticator } from "~/utils/auth.server";
 
-export const action = async ({ request, params, context }: ActionFunctionArgs) => {
-   await createAuthenticator(context).getRequiredUser(request);
+export const action = async ({ request, params }: ActionFunctionArgs) => {
+   await createAuthenticator().getRequiredUser(request);
 
    if (request.method === "DELETE" && params.reportId) {
-      await deleteReport(context, params.reportId);
+      await deleteReport(params.reportId);
       return redirect(params.reportType === "NEWS" ? "/" : "/report");
    }
 };

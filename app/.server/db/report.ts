@@ -1,13 +1,14 @@
-import { AppLoadContext } from "@remix-run/node";
-import { gataReport, reportFile } from "db/schema";
 import { desc, eq, sql } from "drizzle-orm";
-import { ReportType } from "~/types/GataReport.type";
-import { ReportSchema } from "~/utils/formSchema";
-import { deleteImage } from "../services/cloudinaryService";
-import { User } from "./user";
-import { db } from "db/config.server";
 
-export const getReportsSimple = async (context: AppLoadContext, reportType: ReportType) => {
+import { db } from "db/config.server";
+import { gataReport, reportFile } from "db/schema";
+import { ReportType } from "~/types/GataReport.type";
+import type { ReportSchema } from "~/utils/formSchema";
+
+import type { User } from "./user";
+import { deleteImage } from "../services/cloudinaryService";
+
+export const getReportsSimple = async (reportType: ReportType) => {
    return await db
       .select({ id: gataReport.id, title: gataReport.title, description: gataReport.description })
       .from(gataReport)
@@ -16,7 +17,7 @@ export const getReportsSimple = async (context: AppLoadContext, reportType: Repo
       .limit(50);
 };
 
-export const getReportsWithContent = async (context: AppLoadContext, reportType: ReportType) => {
+export const getReportsWithContent = async (reportType: ReportType) => {
    return await db
       .select({
          id: gataReport.id,
@@ -32,7 +33,7 @@ export const getReportsWithContent = async (context: AppLoadContext, reportType:
       .limit(50);
 };
 
-export const getReportSimple = async (context: AppLoadContext, reportId: string) => {
+export const getReportSimple = async (reportId: string) => {
    const [result] = await db
       .select({
          id: gataReport.id,
@@ -43,13 +44,10 @@ export const getReportSimple = async (context: AppLoadContext, reportId: string)
       .from(gataReport)
       .where(eq(gataReport.id, reportId))
       .limit(1);
-   if (!result) {
-      throw new Error("Finner ikke rapport med id " + reportId);
-   }
    return { ...result, type: ReportType[result.type] };
 };
 
-export const getReport = async (context: AppLoadContext, reportId: string) => {
+export const getReport = async (reportId: string) => {
    const [result] = await db
       .select({
          id: gataReport.id,
@@ -64,14 +62,10 @@ export const getReport = async (context: AppLoadContext, reportId: string) => {
       .from(gataReport)
       .where(eq(gataReport.id, reportId))
       .limit(1);
-
-   if (!result) {
-      throw new Error("Finner ikke rapport med id " + reportId);
-   }
    return { ...result, type: ReportType[result.type] };
 };
 
-export const insertReport = async (context: AppLoadContext, values: ReportSchema, loggedInUser: User) => {
+export const insertReport = async (values: ReportSchema, loggedInUser: User) => {
    const primaryUser = loggedInUser.primaryUser;
    return await db
       .insert(gataReport)
@@ -84,12 +78,7 @@ export const insertReport = async (context: AppLoadContext, values: ReportSchema
       .returning({ reportId: gataReport.id });
 };
 
-export const updateReport = async (
-   context: AppLoadContext,
-   reportId: string,
-   values: ReportSchema,
-   loggedInUser: User
-) => {
+export const updateReport = async (reportId: string, values: ReportSchema, loggedInUser: User) => {
    const primaryUser = loggedInUser.primaryUser;
    await db
       .update(gataReport)
@@ -102,7 +91,7 @@ export const updateReport = async (
       .where(eq(gataReport.id, reportId));
 };
 
-export const deleteReport = async (context: AppLoadContext, reportId: string) => {
+export const deleteReport = async (reportId: string) => {
    await db.transaction(async (tx) => {
       const reportFiles = await tx.select().from(reportFile).where(eq(reportFile.reportId, reportId));
       await Promise.all(
@@ -110,7 +99,7 @@ export const deleteReport = async (context: AppLoadContext, reportId: string) =>
             if (!file.cloudId) {
                throw new Error("No cloud id!");
             }
-            await deleteImage(context, file.cloudId);
+            await deleteImage(file.cloudId);
             await tx.delete(reportFile).where(eq(reportFile.id, file.id));
          })
       );
@@ -118,12 +107,7 @@ export const deleteReport = async (context: AppLoadContext, reportId: string) =>
    });
 };
 
-export const updateReportContent = async (
-   context: AppLoadContext,
-   reportId: string,
-   content: string,
-   loggedInUser: User
-) => {
+export const updateReportContent = async (reportId: string, content: string, loggedInUser: User) => {
    const primaryUser = loggedInUser.primaryUser;
    await db
       .update(gataReport)

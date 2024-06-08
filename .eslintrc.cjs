@@ -42,38 +42,43 @@ module.exports = {
       },
    },
    plugins: ["react", "@typescript-eslint", "prettier", "jsx-a11y", "import"],
-   rules: {
-      "@typescript-eslint/no-unused-vars": [
-         "warn",
-         {
-            ignoreRestSiblings: true,
+   overrides: [
+      {
+         files: ["*.ts", "*.tsx", ".server/**/*.js", ".server/**/*.jsx", ".server/**/*.ts", ".server/**/*.tsx"],
+         rules: {
+            "@typescript-eslint/no-unused-vars": [
+               "warn",
+               {
+                  ignoreRestSiblings: true,
+               },
+            ],
+            "prettier/prettier": [
+               "warn",
+               {
+                  endOfLine: "auto",
+               },
+            ],
+            "react/prop-types": "off",
+            "require-await": "warn",
+            "@typescript-eslint/no-floating-promises": ["warn"],
+            "@typescript-eslint/await-thenable": ["warn"],
+            "@typescript-eslint/ban-ts-comment": "off",
+            "@typescript-eslint/consistent-type-imports": "error",
+            "react/display-name": "off",
+            "import/no-cycle": "warn",
+            "@typescript-eslint/no-unnecessary-condition": "warn",
+            "import/order": [
+               "warn",
+               {
+                  groups: ["builtin", "external", "internal"],
+                  "newlines-between": "always",
+                  alphabetize: {
+                     order: "asc",
+                     caseInsensitive: true,
+                  },
+               },
+            ],
          },
-      ],
-      "prettier/prettier": [
-         "warn",
-         {
-            endOfLine: "auto",
-         },
-      ],
-      "react/prop-types": "off",
-      "require-await": "warn",
-      "@typescript-eslint/no-floating-promises": ["warn"],
-      "@typescript-eslint/await-thenable": ["warn"],
-      "@typescript-eslint/ban-ts-comment": "off",
-      "@typescript-eslint/consistent-type-imports": "error",
-      "react/display-name": "off",
-      "import/no-cycle": "warn",
-      "@typescript-eslint/no-unnecessary-condition": "warn",
-      "import/order": [
-         "warn",
-         {
-            groups: ["builtin", "external", "internal"],
-            "newlines-between": "always",
-            alphabetize: {
-               order: "asc",
-               caseInsensitive: true,
-            },
-         },
-      ],
-   },
+      },
+   ],
 };
