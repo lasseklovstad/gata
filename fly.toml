@@ -13,7 +13,6 @@ destination = "/data"
 [build]
 
 [env]
-  APP_DATABASE_URL="./data/sqlite.db"
   DEFAULT_CONTINGENT_SIZE= "600"
 
 [http_service]

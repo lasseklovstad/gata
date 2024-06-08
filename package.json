@@ -7,7 +7,7 @@
    "scripts": {
       "build": "remix vite:build",
       "dev": "node ./server.mjs",
-      "start": "cross-env NODE_ENV=production node ./server.mjs",
+      "start": "node ./server.mjs",
       "lint": "eslint .",
       "lint:fix": "npm run lint -- --fix",
       "lint:ci": "npm run lint -- --max-warnings 0",

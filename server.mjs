@@ -42,5 +42,4 @@ app.use(morgan("tiny"));
 // handle SSR requests
 app.all("*", remixHandler);
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Express server listening at http://localhost:${port}`));
+app.listen(3000, "0.0.0.0", () => console.log(`Express server listening at http://localhost:3000`));
