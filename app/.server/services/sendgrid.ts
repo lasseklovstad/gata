@@ -1,4 +1,4 @@
-import { AppLoadContext } from "@remix-run/cloudflare";
+import { env } from "~/utils/env.server";
 
 type MailData = {
    to: { email: string }[];
@@ -11,8 +11,8 @@ const from = {
    name: "Hesten Blå",
 };
 
-export const sendMail = async (context: AppLoadContext, mailData: MailData) => {
-   const apiKey = context.cloudflare.env.SENDGRID_API_KEY;
+export const sendMail = async (mailData: MailData) => {
+   const apiKey = env.SENDGRID_API_KEY;
    const url = "https://api.sendgrid.com/v3/mail/send";
 
    const emailData = {

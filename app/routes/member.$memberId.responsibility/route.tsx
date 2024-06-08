@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { redirect } from "@remix-run/cloudflare";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Plus } from "lucide-react";
 
@@ -13,26 +13,23 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { newResponsibilityYearSchema } from "~/utils/formSchema";
 import { isAdmin, isMember } from "~/utils/roleUtils";
 
-export const loader = async ({ request, params: { memberId }, context }: LoaderFunctionArgs) => {
-   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
+   const loggedInUser = await createAuthenticator().getRequiredUser(request);
 
    if (!memberId) throw new Error("Member id required");
 
-   const [member, responsibilityYears] = await Promise.all([
-      getUser(context, memberId),
-      getResponsibilityYears(context, memberId),
-   ]);
+   const [member, responsibilityYears] = await Promise.all([getUser(memberId), getResponsibilityYears(memberId)]);
    return { loggedInUser, responsibilityYears, member };
 };
 
-export const action = async ({ request, params, context }: ActionFunctionArgs) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    if (!params.memberId) {
       throw new Error("Member id required");
    }
-   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+   const loggedInUser = await createAuthenticator().getRequiredUser(request);
    if (request.method === "POST") {
       const form = newResponsibilityYearSchema.parse(await request.formData());
-      await insertResponsibilityYear(context, params.memberId, form.responsibilityId, form.year, loggedInUser);
+      await insertResponsibilityYear(params.memberId, form.responsibilityId, form.year, loggedInUser);
    }
    return redirect(`/member/${params.memberId}/responsibility`);
 };

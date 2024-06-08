@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Mail } from "lucide-react";
 
@@ -13,25 +13,25 @@ import { UserListItem } from "~/routes/members/UserListItem";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isAdmin, isMember } from "~/utils/roleUtils";
 
-export const loader = async ({ request, context }: LoaderFunctionArgs) => {
-   await createAuthenticator(context).getRequiredUser(request);
-   const [users, externalUsers] = await Promise.all([getUsers(context), getNotMemberUsers(context)]);
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+   await createAuthenticator().getRequiredUser(request);
+   const [users, externalUsers] = await Promise.all([getUsers(), getNotMemberUsers()]);
    return { users, externalUsers };
 };
 
-export const action = async ({ request, context }: ActionFunctionArgs) => {
-   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+export const action = async ({ request }: ActionFunctionArgs) => {
+   const loggedInUser = await createAuthenticator().getRequiredUser(request);
    if (!isAdmin(loggedInUser)) {
       throw new Error("Du har ikke tilgang");
    }
    const form = await request.formData();
    const externalUserId = String(form.get("externalUserId"));
    if (request.method === "POST") {
-      await insertUser(context, externalUserId);
+      await insertUser(externalUserId);
       return { ok: true };
    }
    if (request.method === "DELETE") {
-      await deleteExternalUser(context, externalUserId);
+      await deleteExternalUser(externalUserId);
       return { ok: true };
    }
 };

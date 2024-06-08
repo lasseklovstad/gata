@@ -1,4 +1,4 @@
-import type { LinksFunction, LoaderFunctionArgs, MetaFunction, SerializeFrom } from "@remix-run/cloudflare";
+import type { LinksFunction, LoaderFunctionArgs, MetaFunction, SerializeFrom } from "@remix-run/node";
 import {
    Link,
    Links,
@@ -91,10 +91,10 @@ export default function App() {
    );
 }
 
-export const loader = async ({ request, context }: LoaderFunctionArgs) => {
-   const auth0User = await createAuthenticator(context).authenticator.isAuthenticated(request);
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+   const auth0User = await createAuthenticator().authenticator.isAuthenticated(request);
    const loggedInUser = auth0User
-      ? (await getOptionalUserFromExternalUserId(context, auth0User.profile.id ?? "")) || undefined
+      ? (await getOptionalUserFromExternalUserId(auth0User.profile.id ?? "")) || undefined
       : undefined;
    return { auth0User, loggedInUser };
 };

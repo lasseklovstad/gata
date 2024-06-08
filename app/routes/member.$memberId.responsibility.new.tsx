@@ -1,5 +1,5 @@
-import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { json } from "@remix-run/cloudflare";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { Save } from "lucide-react";
 
@@ -11,9 +11,9 @@ import { NativeSelect } from "~/components/ui/native-select";
 import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
-export const loader = async ({ request, context }: LoaderFunctionArgs) => {
-   await createAuthenticator(context).getRequiredUser(request);
-   const responsibilities = await getResponsibilities(context);
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+   await createAuthenticator().getRequiredUser(request);
+   const responsibilities = await getResponsibilities();
    return json({ responsibilities });
 };
 

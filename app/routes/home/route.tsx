@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 import { getReportsWithContent } from "~/.server/db/report";
@@ -11,12 +11,12 @@ import { ReportType } from "~/types/GataReport.type";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isMember } from "~/utils/roleUtils";
 
-export const loader = async ({ request, context }: LoaderFunctionArgs) => {
-   const auth = await createAuthenticator(context).authenticator.isAuthenticated(request);
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+   const auth = await createAuthenticator().authenticator.isAuthenticated(request);
    const loggedInUser = auth?.profile.id
-      ? (await getOptionalUserFromExternalUserId(context, auth.profile.id)) ?? undefined
+      ? (await getOptionalUserFromExternalUserId(auth.profile.id)) ?? undefined
       : undefined;
-   return { reports: isMember(loggedInUser) ? await getReportsWithContent(context, ReportType.NEWS) : undefined };
+   return { reports: isMember(loggedInUser) ? await getReportsWithContent(ReportType.NEWS) : undefined };
 };
 
 export default function Home() {

@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { json } from "@remix-run/cloudflare";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 
 import { getReport } from "~/.server/db/report";
@@ -10,22 +10,22 @@ import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
-export const loader = async ({ request, context }: LoaderFunctionArgs) => {
-   await createAuthenticator(context).getRequiredUser(request);
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+   await createAuthenticator().getRequiredUser(request);
 
-   const reportEmails = await getSubscribedUsers(context);
+   const reportEmails = await getSubscribedUsers();
    return { reportEmails };
 };
 
-export const action = async ({ request, params, context }: ActionFunctionArgs) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    if (!params.reportId) {
       throw new Error("Report id is required");
    }
-   await createAuthenticator(context).getRequiredUser(request);
-   const reportEmails = await getSubscribedUsers(context);
-   const report = await getReport(context, params.reportId);
+   await createAuthenticator().getRequiredUser(request);
+   const reportEmails = await getSubscribedUsers();
+   const report = await getReport(params.reportId);
    const url = new URL(request.url);
-   await sendMail(context, {
+   await sendMail({
       html: `
       <h1>Nytt fra Gata</h1>
       <p>Det har kommet en oppdatering på ${url.origin}!</p>

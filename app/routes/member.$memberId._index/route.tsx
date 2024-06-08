@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { redirect } from "@remix-run/cloudflare";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { CircleUser, Trash } from "lucide-react";
 
@@ -27,25 +27,25 @@ import { isAdmin, requireAdminRole } from "~/utils/roleUtils";
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
 
-export const loader = async ({ request, params: { memberId }, context }: LoaderFunctionArgs) => {
-   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
+   const loggedInUser = await createAuthenticator().getRequiredUser(request);
 
    if (!memberId) throw new Error("Member id required");
 
    const [member, roles, contingentInfo, notMemberUsers] = await Promise.all([
-      getUser(context, memberId),
-      getRoles(context),
-      getContingentInfo(context),
-      getNotMemberUsers(context),
+      getUser(memberId),
+      getRoles(),
+      getContingentInfo(),
+      getNotMemberUsers(),
    ]);
    return { member, contingentInfo, roles, notMemberUsers, loggedInUser };
 };
 
-export const action = async ({ request, params: { memberId }, context }: ActionFunctionArgs) => {
+export const action = async ({ request, params: { memberId } }: ActionFunctionArgs) => {
    if (!memberId) {
       throw badRequest("Member id required");
    }
-   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+   const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const formData = await request.formData();
    const intent = String(formData.get("intent"));
 
@@ -55,16 +55,16 @@ export const action = async ({ request, params: { memberId }, context }: ActionF
          if (loggedInUser.id === memberId) {
             throw badRequest("Du kan ikke slette deg selv!");
          }
-         await deleteUser(context, memberId);
+         await deleteUser(memberId);
          return redirect("/members");
       }
       case memberIntent.updateRole: {
          requireAdminRole(loggedInUser);
          const roleId = String(formData.get("roleId"));
          if (request.method === "DELETE") {
-            await deleteRole(context, roleId, memberId);
+            await deleteRole(roleId, memberId);
          } else if (request.method === "POST") {
-            await insertRole(context, roleId, memberId);
+            await insertRole(roleId, memberId);
          }
          return { ok: true };
       }
@@ -72,22 +72,22 @@ export const action = async ({ request, params: { memberId }, context }: ActionF
          const year = Number(formData.get("year"));
          const hasPaid = String(formData.get("hasPaid"));
          const isPaid = !(hasPaid === "true");
-         await updateContingent(context, memberId, year, isPaid);
+         await updateContingent(memberId, year, isPaid);
 
          return { ok: true };
       }
       case memberIntent.updateLinkedUsers: {
          const externalUserIds = formData.getAll("externalUserId").map(String);
-         await updateLinkedExternalUsers(context, memberId, externalUserIds);
+         await updateLinkedExternalUsers(memberId, externalUserIds);
          return { ok: true };
       }
       case memberIntent.updatePrimaryUserEmail: {
          const primaryUserEmail = String(formData.get("primaryUserEmail"));
-         await updatePrimaryEmail(context, memberId, primaryUserEmail);
+         await updatePrimaryEmail(memberId, primaryUserEmail);
          return { ok: true };
       }
       case memberIntent.updateSubscribe: {
-         await updateUserSubscribe(context, memberId);
+         await updateUserSubscribe(memberId);
          return { ok: true };
       }
       default: {

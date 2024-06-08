@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { json } from "@remix-run/cloudflare";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { Edit, Mail, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -19,15 +19,15 @@ import { isAdmin } from "~/utils/roleUtils";
 
 import { reportInfoIntent } from "./intent";
 
-export const loader = async ({ request, params: { reportId }, context }: LoaderFunctionArgs) => {
-   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+export const loader = async ({ request, params: { reportId } }: LoaderFunctionArgs) => {
+   const loggedInUser = await createAuthenticator().getRequiredUser(request);
    if (!reportId) throw new Error("ReportId id required");
-   const [report] = await Promise.all([getReport(context, reportId)]);
+   const [report] = await Promise.all([getReport(reportId)]);
    return { report, loggedInUser };
 };
 
-export const action = async ({ request, params, context }: ActionFunctionArgs) => {
-   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+export const action = async ({ request, params }: ActionFunctionArgs) => {
+   const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const formData = await request.formData();
    const intent = String(formData.get("intent"));
 
@@ -37,13 +37,13 @@ export const action = async ({ request, params, context }: ActionFunctionArgs) =
 
    switch (intent) {
       case reportInfoIntent.updateContentIntent: {
-         await updateReportContent(context, params.reportId, String(formData.get("content")), loggedInUser);
+         await updateReportContent(params.reportId, String(formData.get("content")), loggedInUser);
          return json({ ok: true, close: formData.get("close"), intent: reportInfoIntent.updateContentIntent } as const);
       }
       case reportInfoIntent.postFileIntent: {
          const data = String(formData.get("data"));
-         const { public_id, secure_url } = await uploadImage(context, data);
-         const [file] = await insertReportFile(context, {
+         const { public_id, secure_url } = await uploadImage(data);
+         const [file] = await insertReportFile({
             reportId: params.reportId,
             cloudId: public_id,
             cloudUrl: secure_url,

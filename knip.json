@@ -1,6 +1,4 @@
 {
    "$schema": "https://unpkg.com/knip@5/schema.json",
-   "ignore": ["functions/**", "load-context.ts"],
-   "ignoreDependencies": ["@remix-run/cloudflare-pages", "miniflare", "isbot"],
-   "exclude": ["enumMembers"]
+   "ignoreDependencies": ["isbot"]
 }

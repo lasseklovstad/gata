@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs } from "@remix-run/cloudflare";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 
 import { getContingentInfo } from "~/.server/db/contigent";
@@ -10,22 +10,26 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 import { isAdmin } from "~/utils/roleUtils";
 
-export const loader = async ({ context }: ActionFunctionArgs) => {
-   const today = new Date();
-   // Todo: Hent ut brukere som ikke har betalt kontingent
-   return { usersNotPaid: await getUsersThatHasNotPaidContingent(context, today.getFullYear()) };
-};
-
-export const action = async ({ request, context }: ActionFunctionArgs) => {
-   const loggedInUser = await createAuthenticator(context).getRequiredUser(request);
+export const loader = async ({ request }: ActionFunctionArgs) => {
+   const loggedInUser = await createAuthenticator().getRequiredUser(request);
    if (!isAdmin(loggedInUser)) {
-      throw new Error("DU har ikke tilgang her");
+      throw new Error("Du har ikke tilgang her");
    }
    const today = new Date();
-   const { size, bank } = getContingentInfo(context);
-   const usersNotPaid = await getUsersThatHasNotPaidContingent(context, today.getFullYear());
+   // Todo: Hent ut brukere som ikke har betalt kontingent
+   return { usersNotPaid: await getUsersThatHasNotPaidContingent(today.getFullYear()) };
+};
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+   if (!isAdmin(loggedInUser)) {
+      throw new Error("Du har ikke tilgang her");
+   }
+   const today = new Date();
+   const { size, bank } = getContingentInfo();
+   const usersNotPaid = await getUsersThatHasNotPaidContingent(today.getFullYear());
    const url = new URL(request.url);
-   await sendMail(context, {
+   await sendMail({
       html: `
       <h1>Betal kontigent</h1>
       <p>Du har ikke betalt kontigenten på ${size}kr til ${bank}!</p>

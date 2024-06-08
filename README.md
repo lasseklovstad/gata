@@ -3,6 +3,9 @@
 Run local db:
 `docker run --name gata-db-postgres -e POSTGRES_PASSWORD=password -d -p 5433:5432 postgres:14.2`
 
+`docker build --tag 'gata-app' .`
+`docker run --env-file ./.env -d -p 127.0.0.1:3000:3000 gata-app`
+
 legg til env for java: AUTH0_CLIENT_ID=xxx;AUTH0_CLIENT_SECRET=xxx
 
 ```bash
@@ -89,6 +92,48 @@ docker exec "dokku.postgres.gatadatabase" su - postgres -c "createdb -E utf8  ga
 
 # Recent logs
 dokku logs gata
+```
+
+## Fly 
+### Config
+[See config at](https://fly.io/docs/reference/configuration/)
+## Setup
+````bash
+fly login
+fly status
+## Create volume where sqlite db is persisted
+fly volumes create data
+## Configure fly app
+fly launch --no-deploy
+## Deploy fly app
+fly deploy
+
+# https://fly.io/docs/networking/custom-domain/
+## Add domains
+fly certs add gataersamla.no
+fly certs add www.gataersamla.no
+```
+
+
+### Fly columes and database
+```bash
+# Get database file from production
+fly sftp get /data/sqlite.db
+# Connect to sftp shell and upload dump file
+fly sftp shell
+cd tmp
+put dump.sql
+# Connect via ssh to run sql
+apt update
+apt upgrade
+apt install sqlite3
+sqlite3 /data/sqlite.db < dump.sql
+CTRL+D to quit ssh
+```
+
+### Secrets
+```bash
+fly secrets set NAME="VALUE" NAME="VALUE"
 ```
 
 ## Connect to db and creating backup

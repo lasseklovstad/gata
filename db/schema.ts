@@ -1,104 +1,121 @@
-import { relations } from "drizzle-orm";
-import type { AnyPgColumn } from "drizzle-orm/pg-core";
-import { boolean, integer, pgTable, primaryKey, smallint, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
+import { sqliteTable, text, integer, primaryKey } from "drizzle-orm/sqlite-core";
 
-export const user = pgTable("gata_user", {
-   id: uuid("id").primaryKey().defaultRandom(),
-   subscribe: boolean("subscribe").default(false).notNull(),
-   primaryExternalUserId: varchar("primary_external_user_id", { length: 255 })
-      .notNull()
-      .unique()
-      .references((): AnyPgColumn => externalUser.id),
+export const user = sqliteTable("gata_user", {
+   id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+   subscribe: integer("subscribe", { mode: "boolean" }).default(false).notNull(),
+   primaryExternalUserId: text("primary_external_user_id").notNull().unique(),
+   //.references((): AnySQLiteColumn => externalUser.id),
 });
 
-export const externalUser = pgTable("external_user", {
-   id: varchar("id", { length: 255 }).primaryKey(),
-   name: varchar("name", { length: 255 }).notNull(),
-   email: varchar("email", { length: 255 }).notNull(),
-   picture: varchar("picture", { length: 500 }),
+export const externalUser = sqliteTable("external_user", {
+   id: text("id").primaryKey(),
+   name: text("name").notNull(),
+   email: text("email").notNull(),
+   picture: text("picture"),
    lastLogin: text("last_login").notNull(),
-   userId: uuid("user_id").references(() => user.id, { onDelete: "set null" }),
+   userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
 });
 
 export type ExternalUser = typeof externalUser.$inferSelect;
 
-export const role = pgTable("gata_role", {
-   id: uuid("id").primaryKey().notNull(),
-   name: varchar("name", { length: 255 }).notNull(),
-   roleName: smallint("role_name").default(0).notNull().unique(),
+export const role = sqliteTable("gata_role", {
+   id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+   name: text("name").notNull(),
+   roleName: integer("role_name").default(0).notNull().unique(),
 });
 
 export type Role = typeof role.$inferSelect;
 
-export const userRoles = pgTable("gata_user_roles", {
-   usersId: uuid("users_id")
+export const userRoles = sqliteTable("gata_user_roles", {
+   usersId: text("users_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-   roleId: uuid("roles_id")
+   roleId: text("roles_id")
       .notNull()
       .references(() => role.id),
 });
 
-export const responsibilityNote = pgTable("responsibility_note", {
-   id: uuid("id").primaryKey().defaultRandom(),
-   lastModifiedBy: varchar("last_modified_by", { length: 255 }).notNull(),
-   lastModifiedDate: timestamp("last_modified_date", { mode: "string" }).defaultNow().notNull(),
+export const responsibilityNote = sqliteTable("responsibility_note", {
+   id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+   lastModifiedBy: text("last_modified_by").notNull(),
+   lastModifiedDate: text("last_modified_date")
+      .default(sql`(CURRENT_TIMESTAMP)`)
+      .notNull(),
    text: text("text").notNull().default(""),
-   responsibilityYearId: uuid("resonsibility_year_id")
+   responsibilityYearId: text("resonsibility_year_id")
       .references(() => responsibilityYear.id, { onDelete: "cascade" })
       .unique()
       .notNull(),
 });
 
-export const responsibility = pgTable("responsibility", {
-   id: uuid("id").primaryKey().defaultRandom(),
-   description: varchar("description", { length: 255 }).notNull(),
-   name: varchar("name", { length: 255 }).notNull(),
+export const responsibility = sqliteTable("responsibility", {
+   id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+   description: text("description").notNull(),
+   name: text("name", { length: 255 }).notNull(),
 });
 
-export const reportFile = pgTable("gata_report_file", {
-   id: uuid("id").primaryKey().defaultRandom(),
+export const reportFile = sqliteTable("gata_report_file", {
+   id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
    data: text("data"),
-   reportId: uuid("report_id")
+   reportId: text("report_id")
       .references(() => gataReport.id)
       .notNull(),
-   cloudUrl: varchar("cloud_url", { length: 255 }),
-   cloudId: varchar("cloud_id", { length: 255 }),
+   cloudUrl: text("cloud_url"),
+   cloudId: text("cloud_id"),
 });
 
-export const contingent = pgTable(
+export const contingent = sqliteTable(
    "gata_contingent",
    {
-      userId: uuid("gata_user_id")
+      userId: text("gata_user_id")
          .references(() => user.id, { onDelete: "cascade" })
          .notNull(),
-      isPaid: boolean("is_paid").notNull(),
-      year: smallint("year").notNull(),
+      isPaid: integer("is_paid", { mode: "boolean" }).notNull(),
+      year: integer("year").notNull(),
    },
    (table) => ({ pk: primaryKey({ columns: [table.year, table.userId] }) })
 );
 
-export const responsibilityYear = pgTable("responsibility_year", {
-   id: uuid("id").primaryKey().defaultRandom(),
-   responsibilityId: uuid("responsibility_id")
+export const responsibilityYear = sqliteTable("responsibility_year", {
+   id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+   responsibilityId: text("responsibility_id")
       .references(() => responsibility.id)
       .notNull(),
-   userId: uuid("user_id")
+   userId: text("user_id")
       .references(() => user.id, { onDelete: "cascade" })
       .notNull(),
-   year: smallint("year").notNull(),
+   year: integer("year").notNull(),
 });
 
-export const gataReport = pgTable("gata_report", {
-   id: uuid("id").primaryKey().defaultRandom(),
+export const gataReport = sqliteTable("gata_report", {
+   id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
    content: text("content"),
-   createdDate: timestamp("created_date", { mode: "string" }).defaultNow().notNull(),
-   description: varchar("description", { length: 255 }).default("").notNull(),
-   lastModifiedBy: varchar("last_modified_by", { length: 255 }).notNull(),
-   lastModifiedDate: timestamp("last_modified_date", { mode: "string" }).defaultNow().notNull(),
-   title: varchar("title", { length: 255 }).notNull(),
+   createdDate: text("created_date")
+      .default(sql`(CURRENT_TIMESTAMP)`)
+      .notNull(),
+   description: text("description").default("").notNull(),
+   lastModifiedBy: text("last_modified_by").notNull(),
+   lastModifiedDate: text("last_modified_date")
+      .default(sql`(CURRENT_TIMESTAMP)`)
+      .notNull(),
+   title: text("title").notNull(),
    type: integer("type").notNull(),
-   createdBy: uuid("created_by").references(() => user.id, { onDelete: "set null" }),
+   createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
 });
 
 export type GataReport = typeof gataReport.$inferSelect;

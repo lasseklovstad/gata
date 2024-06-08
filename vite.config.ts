@@ -1,11 +1,9 @@
-import { cloudflareDevProxyVitePlugin, vitePlugin as remix } from "@remix-run/dev";
+import { vitePlugin as remix } from "@remix-run/dev";
 import { remixDevTools } from "remix-development-tools";
 import { defineConfig } from "vite";
 // eslint-disable-next-line import/no-named-as-default
 import checker from "vite-plugin-checker";
 import tsconfigPaths from "vite-tsconfig-paths";
-
-import { getLoadContext } from "./load-context";
 
 export default defineConfig({
    server: {
@@ -13,7 +11,6 @@ export default defineConfig({
    },
    plugins: [
       remixDevTools(),
-      cloudflareDevProxyVitePlugin({ getLoadContext }),
       remix({
          future: {
             v3_fetcherPersist: true,

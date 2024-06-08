@@ -1,13 +1,14 @@
-import { AppLoadContext } from "@remix-run/cloudflare";
+import { and, count, desc, eq, inArray, isNull, notInArray, or, sql } from "drizzle-orm";
+
+import { db } from "db/config.server";
 import { contingent, externalUser, responsibilityYear, role, user, userRoles } from "db/schema";
-import { and, count, desc, eq, inArray, isNull, ne, notInArray, or, sql } from "drizzle-orm";
-import { Auth0User } from "~/types/Auth0User";
+import type { Auth0User } from "~/types/Auth0User";
 import { RoleName } from "~/utils/roleUtils";
 
 export type User = Awaited<ReturnType<typeof getUser>>;
 
-export const getUser = async (context: AppLoadContext, userId: string) => {
-   const userResult = await context.db.query.user.findFirst({
+export const getUser = async (userId: string) => {
+   const userResult = await db.query.user.findFirst({
       where: eq(user.id, userId),
       with: {
          externalUsers: true,
@@ -22,8 +23,8 @@ export const getUser = async (context: AppLoadContext, userId: string) => {
    return userResult;
 };
 
-export const getOptionalUserFromExternalUserId = async (context: AppLoadContext, externalUserId: string) => {
-   const userResult = await context.db.query.externalUser.findFirst({
+export const getOptionalUserFromExternalUserId = async (externalUserId: string) => {
+   const userResult = await db.query.externalUser.findFirst({
       columns: {},
       where: eq(externalUser.id, externalUserId),
       with: {
@@ -40,8 +41,8 @@ export const getOptionalUserFromExternalUserId = async (context: AppLoadContext,
    return userResult?.user;
 };
 
-export const getUsers = (context: AppLoadContext) => {
-   return context.db.query.user.findMany({
+export const getUsers = () => {
+   return db.query.user.findMany({
       with: {
          externalUsers: true,
          roles: { with: { role: true }, columns: { roleId: true } },
@@ -51,18 +52,18 @@ export const getUsers = (context: AppLoadContext) => {
    });
 };
 
-export const getNotMemberUsers = (context: AppLoadContext) => {
-   return context.db.query.externalUser.findMany({ where: isNull(externalUser.userId) });
+export const getNotMemberUsers = () => {
+   return db.query.externalUser.findMany({ where: isNull(externalUser.userId) });
 };
 
-export const deleteUser = async (context: AppLoadContext, userId: string) => {
-   await context.db.delete(user).where(eq(user.id, userId));
+export const deleteUser = async (userId: string) => {
+   await db.delete(user).where(eq(user.id, userId));
 };
 
 export type ResponsibilityYear = Awaited<ReturnType<typeof getResponsibilityYears>>[number];
 
-export const getResponsibilityYears = (context: AppLoadContext, userId: string) => {
-   return context.db.query.responsibilityYear.findMany({
+export const getResponsibilityYears = (userId: string) => {
+   return db.query.responsibilityYear.findMany({
       where: eq(responsibilityYear.userId, userId),
       with: {
          responsibility: true,
@@ -72,7 +73,7 @@ export const getResponsibilityYears = (context: AppLoadContext, userId: string) 
    });
 };
 
-export const insertOrUpdateExternalUser = async (context: AppLoadContext, auth0User: Auth0User) => {
+export const insertOrUpdateExternalUser = async (auth0User: Auth0User) => {
    const email = auth0User.profile.emails && auth0User.profile.emails[0];
    const photo = auth0User.profile.photos && auth0User.profile.photos[0];
    const id = auth0User.profile.id;
@@ -84,11 +85,11 @@ export const insertOrUpdateExternalUser = async (context: AppLoadContext, auth0U
    }
    const values = {
       email: email.value,
-      lastLogin: sql`now()`,
+      lastLogin: sql`(CURRENT_TIMESTAMP)`,
       name: auth0User.profile.displayName ?? email.value,
       picture: photo?.value,
    };
-   return await context.db
+   return await db
       .insert(externalUser)
       .values({
          id,
@@ -98,8 +99,8 @@ export const insertOrUpdateExternalUser = async (context: AppLoadContext, auth0U
       .returning({ id: externalUser.id });
 };
 
-export const getNumberOfAdmins = async (context: AppLoadContext) => {
-   return await context.db
+export const getNumberOfAdmins = async () => {
+   return await db
       .select({ count: count() })
       .from(user)
       .leftJoin(userRoles, eq(user.id, userRoles.usersId))
@@ -107,8 +108,8 @@ export const getNumberOfAdmins = async (context: AppLoadContext) => {
       .where(eq(role.roleName, RoleName.Admin));
 };
 
-export const insertUser = async (context: AppLoadContext, auth0UserId: string, roleName?: RoleName) => {
-   await context.db.transaction(async (tx) => {
+export const insertUser = async (auth0UserId: string, roleName?: RoleName) => {
+   await db.transaction(async (tx) => {
       const [createdUser] = await tx
          .insert(user)
          .values({ primaryExternalUserId: auth0UserId })
@@ -121,15 +122,15 @@ export const insertUser = async (context: AppLoadContext, auth0UserId: string, r
    });
 };
 
-export const updateUserSubscribe = async (context: AppLoadContext, userId: string) => {
-   await context.db
+export const updateUserSubscribe = async (userId: string) => {
+   await db
       .update(user)
       .set({ subscribe: sql`not ${user.subscribe}` })
       .where(eq(user.id, userId));
 };
 
-export const updateLinkedExternalUsers = async (context: AppLoadContext, userId: string, externalUserIds: string[]) => {
-   await context.db.transaction(async (tx) => {
+export const updateLinkedExternalUsers = async (userId: string, externalUserIds: string[]) => {
+   await db.transaction(async (tx) => {
       await tx
          .update(externalUser)
          .set({ userId: null })
@@ -138,16 +139,16 @@ export const updateLinkedExternalUsers = async (context: AppLoadContext, userId:
    });
 };
 
-export const updatePrimaryEmail = async (context: AppLoadContext, userId: string, primaryExternalUserId: string) => {
-   await context.db.update(user).set({ primaryExternalUserId }).where(eq(user.id, userId));
+export const updatePrimaryEmail = async (userId: string, primaryExternalUserId: string) => {
+   await db.update(user).set({ primaryExternalUserId }).where(eq(user.id, userId));
 };
 
-export const deleteExternalUser = async (context: AppLoadContext, externalUserId: string) => {
-   await context.db.delete(externalUser).where(eq(externalUser.id, externalUserId));
+export const deleteExternalUser = async (externalUserId: string) => {
+   await db.delete(externalUser).where(eq(externalUser.id, externalUserId));
 };
 
-export const getSubscribedUsers = async (context: AppLoadContext) => {
-   return await context.db
+export const getSubscribedUsers = async () => {
+   return await db
       .select({ id: user.id, name: externalUser.name, email: externalUser.email })
       .from(user)
       .innerJoin(externalUser, eq(externalUser.id, user.primaryExternalUserId))
@@ -156,8 +157,8 @@ export const getSubscribedUsers = async (context: AppLoadContext) => {
       .where(and(eq(user.subscribe, true), eq(role.roleName, RoleName.Member)));
 };
 
-export const getUsersThatHasNotPaidContingent = async (context: AppLoadContext, year: number) => {
-   return await context.db
+export const getUsersThatHasNotPaidContingent = async (year: number) => {
+   return await db
       .select({ id: user.id, name: externalUser.name, email: externalUser.email })
       .from(user)
       .leftJoin(contingent, and(eq(contingent.userId, user.id), eq(contingent.year, year)))
