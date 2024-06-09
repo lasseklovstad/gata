@@ -15,6 +15,6 @@ export const isAdmin = (user?: User) => {
 
 export const requireAdminRole = (user: User) => {
    if (!isAdmin(user)) {
-      throw new Error("Du har ikke tilgang til denne ressursen");
+      throw new Response("Du har ikke tilgang til denne ressursen", { status: 403 });
    }
 };

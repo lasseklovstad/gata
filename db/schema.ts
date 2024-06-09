@@ -1,6 +1,8 @@
 import { relations, sql } from "drizzle-orm";
 import { sqliteTable, text, integer, primaryKey } from "drizzle-orm/sqlite-core";
 
+import { env } from "~/utils/env.server";
+
 export const user = sqliteTable("gata_user", {
    id: text("id")
       .primaryKey()
@@ -83,6 +85,10 @@ export const contingent = sqliteTable(
          .notNull(),
       isPaid: integer("is_paid", { mode: "boolean" }).notNull(),
       year: integer("year").notNull(),
+      amount: integer("amount")
+         .notNull()
+         .default(600)
+         .$defaultFn(() => Number(env.DEFAULT_CONTINGENT_SIZE)),
    },
    (table) => ({ pk: primaryKey({ columns: [table.year, table.userId] }) })
 );

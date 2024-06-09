@@ -159,7 +159,7 @@ export const getSubscribedUsers = async () => {
 
 export const getUsersThatHasNotPaidContingent = async (year: number) => {
    return await db
-      .select({ id: user.id, name: externalUser.name, email: externalUser.email })
+      .select({ id: user.id, name: externalUser.name, email: externalUser.email, amount: contingent.amount })
       .from(user)
       .leftJoin(contingent, and(eq(contingent.userId, user.id), eq(contingent.year, year)))
       .innerJoin(externalUser, eq(externalUser.id, user.primaryExternalUserId))

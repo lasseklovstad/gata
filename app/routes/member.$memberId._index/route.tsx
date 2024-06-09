@@ -21,6 +21,7 @@ import { LinkExternalUserToGataUserSelect } from "~/routes/member.$memberId._ind
 import { UserInfo } from "~/routes/member.$memberId._index/components/UserInfo";
 import { UserSubscribe } from "~/routes/member.$memberId._index/components/UserSubscribe";
 import { createAuthenticator } from "~/utils/auth.server";
+import { updateContingentSchema } from "~/utils/formSchema";
 import { badRequest } from "~/utils/responseUtils";
 import { isAdmin, requireAdminRole } from "~/utils/roleUtils";
 
@@ -69,14 +70,14 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
          return { ok: true };
       }
       case memberIntent.updateContingent: {
-         const year = Number(formData.get("year"));
-         const hasPaid = String(formData.get("hasPaid"));
-         const isPaid = !(hasPaid === "true");
-         await updateContingent(memberId, year, isPaid);
+         requireAdminRole(loggedInUser);
+         const { amount, hasPaid, year } = updateContingentSchema.parse(formData);
+         await updateContingent(memberId, year, hasPaid, amount);
 
          return { ok: true };
       }
       case memberIntent.updateLinkedUsers: {
+         requireAdminRole(loggedInUser);
          const externalUserIds = formData.getAll("externalUserId").map(String);
          await updateLinkedExternalUsers(memberId, externalUserIds);
          return { ok: true };

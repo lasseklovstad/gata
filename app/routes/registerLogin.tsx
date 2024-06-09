@@ -7,7 +7,8 @@ import { env } from "~/utils/env.server";
 import { RoleName } from "~/utils/roleUtils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-   const user = await createAuthenticator().authenticator.isAuthenticated(request);
+   const { authenticator, getSessionLoginPath } = createAuthenticator();
+   const user = await authenticator.isAuthenticated(request);
    if (user) {
       const [externalUser] = await insertOrUpdateExternalUser(user);
       if (env.MAKE_FIRST_USER_ADMIN === "true") {
@@ -16,7 +17,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
             await insertUser(externalUser.id, RoleName.Admin);
          }
       }
-      return redirect("/home");
+      const redirectPath = await getSessionLoginPath(request);
+      return redirect(redirectPath ?? "/home");
    }
    return redirect("/login");
 };

@@ -42,10 +42,6 @@ const Alert = React.forwardRef<
 ));
 Alert.displayName = "Alert";
 
-export const AlertAction = ({ className, ...props }: React.ComponentProps<"div">) => {
-   return <div className={cn("flex my-2", className)} {...props} />;
-};
-
 const AlertTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
    ({ className, ...props }, ref) => (
       <Typography variant="h5" ref={ref} className={cn("mb-1 font-medium text-base", className)} {...props} />

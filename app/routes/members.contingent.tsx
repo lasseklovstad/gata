@@ -17,7 +17,10 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
    }
    const today = new Date();
    // Todo: Hent ut brukere som ikke har betalt kontingent
-   return { usersNotPaid: await getUsersThatHasNotPaidContingent(today.getFullYear()) };
+   return {
+      usersNotPaid: await getUsersThatHasNotPaidContingent(today.getFullYear()),
+      contingentInfo: getContingentInfo(),
+   };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -29,21 +32,25 @@ export const action = async ({ request }: ActionFunctionArgs) => {
    const { size, bank } = getContingentInfo();
    const usersNotPaid = await getUsersThatHasNotPaidContingent(today.getFullYear());
    const url = new URL(request.url);
-   await sendMail({
-      html: `
+   await Promise.all(
+      usersNotPaid.map((user) =>
+         sendMail({
+            html: `
       <h1>Betal kontigent</h1>
-      <p>Du har ikke betalt kontigenten på ${size}kr til ${bank}!</p>
+      <p>Du har ikke betalt kontigenten på ${user.amount ?? size}kr til ${bank}!</p>
       <p>Se det på ${url.origin}</p>
       `,
-      to: usersNotPaid.map((user) => ({ email: user.email })),
-      subject: `Du har ikke betalt Gata kontigenten for ${today.getFullYear()}!`,
-   });
+            to: [{ email: user.email }],
+            subject: `Du har ikke betalt Gata-kontigenten for ${today.getFullYear()}!`,
+         })
+      )
+   );
    return { ok: true, emails: usersNotPaid.map((user) => user.email) };
 };
 
 export default function ConfirmDelete() {
    const { dialogRef } = useDialog({ defaultOpen: true });
-   const { usersNotPaid } = useLoaderData<typeof loader>();
+   const { usersNotPaid, contingentInfo } = useLoaderData<typeof loader>();
    const fetcher = useFetcher<typeof action>();
    const navigate = useNavigate();
    const onClose = () => navigate("..");
@@ -67,9 +74,11 @@ export default function ConfirmDelete() {
          <fetcher.Form method="POST">
             <DialogHeading>Er du sikker?</DialogHeading>
             Er du sikker du vil sende e-post til alle brukere som ikke har betalt?
-            <ul className="list-disc">
+            <ul className="list-disc ml-6">
                {usersNotPaid.map((user) => (
-                  <li key={user.id}>{user.email}</li>
+                  <li key={user.id}>
+                     {user.name} ({user.amount ?? contingentInfo.size})
+                  </li>
                ))}
             </ul>
             <DialogFooter>
