@@ -11,7 +11,7 @@ import { useRootLoader } from "~/root";
 import { ExternalUsersWithNoGataUser } from "~/routes/members/ExternalUsersWithNoGataUser";
 import { UserListItem } from "~/routes/members/UserListItem";
 import { createAuthenticator } from "~/utils/auth.server";
-import { isAdmin, isMember } from "~/utils/roleUtils";
+import { isAdmin, isMember, requireAdminRole } from "~/utils/roleUtils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    await createAuthenticator().getRequiredUser(request);
@@ -21,9 +21,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
-   if (!isAdmin(loggedInUser)) {
-      throw new Error("Du har ikke tilgang");
-   }
+   requireAdminRole(loggedInUser);
    const form = await request.formData();
    const externalUserId = String(form.get("externalUserId"));
    if (request.method === "POST") {

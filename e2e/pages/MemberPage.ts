@@ -79,17 +79,10 @@ export class MemberPage {
 
    async markContingentAsPaid(year: number, isPaid: boolean) {
       await this.page.getByRole("combobox", { name: "Velg år" }).selectOption(year.toString());
+      const hasPaidCheckbox = this.page.getByRole("checkbox", { name: "Betalt" });
 
-      const paidContingentStatusText = this.page.getByText(/Status: (Ikke betalt|Betalt)/);
-      await expect(paidContingentStatusText).toBeVisible();
-      const isPaidCurrentYear = !(await paidContingentStatusText.innerText()).includes("Ikke betalt");
-
-      if (isPaid && !isPaidCurrentYear) {
-         await this.page.getByRole("button", { name: "Marker som betalt" }).click();
-      }
-      if (!isPaid && isPaidCurrentYear) {
-         await this.page.getByRole("button", { name: "Marker som ikke betalt" }).click();
-      }
+      await (isPaid ? hasPaidCheckbox.check() : hasPaidCheckbox.uncheck());
+      await this.page.getByRole("button", { name: "Lagre" }).click();
    }
 
    async changePrimaryUser(name: string) {

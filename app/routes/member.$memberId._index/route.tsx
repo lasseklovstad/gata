@@ -26,6 +26,7 @@ import { isAdmin, requireAdminRole } from "~/utils/roleUtils";
 
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
+import { updateContingentSchema } from "~/utils/formSchema";
 
 export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
@@ -69,14 +70,14 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
          return { ok: true };
       }
       case memberIntent.updateContingent: {
-         const year = Number(formData.get("year"));
-         const hasPaid = String(formData.get("hasPaid"));
-         const isPaid = !(hasPaid === "true");
-         await updateContingent(memberId, year, isPaid);
+         requireAdminRole(loggedInUser);
+         const { amount, hasPaid, year } = updateContingentSchema.parse(formData);
+         await updateContingent(memberId, year, hasPaid, amount);
 
          return { ok: true };
       }
       case memberIntent.updateLinkedUsers: {
+         requireAdminRole(loggedInUser);
          const externalUserIds = formData.getAll("externalUserId").map(String);
          await updateLinkedExternalUsers(memberId, externalUserIds);
          return { ok: true };

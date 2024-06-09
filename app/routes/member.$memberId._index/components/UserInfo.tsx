@@ -12,6 +12,7 @@ import { SelectPrimaryEmail } from "./SelectPrimaryEmail";
 import type { IContingentInfo } from "../../../types/ContingentInfo.type";
 import { isAdmin, isMember } from "../../../utils/roleUtils";
 import { memberIntent } from "../intent";
+import { Input } from "~/components/ui/input";
 
 type UserInfoProps = {
    user: User;
@@ -31,33 +32,10 @@ export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) 
       .filter((y) => y <= todaysYear)
       .filter((y) => !user.contingents.find((c) => c.year === y)?.isPaid);
 
-   const getContingent = () => {
-      const hasPaid = !!user.contingents.find((c) => c.year.toString(10) === selectedYear)?.isPaid;
-      return (
-         <Alert variant={hasPaid ? "success" : "warning"} className="my-2">
-            <AlertTitle>Status: {hasPaid ? "Betalt" : "Ikke betalt"}</AlertTitle>
-            {!hasPaid && (
-               <AlertDescription>
-                  {contingentInfo.size}kr til {contingentInfo.bank}
-               </AlertDescription>
-            )}
-            <AlertAction>
-               <input readOnly hidden value={hasPaid ? "true" : "false"} name="hasPaid" />
-               {isAdmin(loggedInUser) && (
-                  <Button
-                     isLoading={fetcher.state !== "idle"}
-                     variant="outline"
-                     type="submit"
-                     name="intent"
-                     value={memberIntent.updateContingent}
-                  >
-                     {hasPaid ? "Marker som ikke betalt" : "Marker som betalt"}
-                  </Button>
-               )}
-            </AlertAction>
-         </Alert>
-      );
-   };
+   const currentContingent = user.contingents.find((c) => c.year.toString(10) === selectedYear);
+   const hasPaid = !!currentContingent?.isPaid;
+   const amount = currentContingent?.amount ?? contingentInfo.size;
+
    return (
       <>
          <div className="my-4">
@@ -77,30 +55,82 @@ export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) 
                <Typography variant="h2" className="mb-2">
                   Kontingent
                </Typography>
-               <fetcher.Form method="POST">
+               <fetcher.Form method="POST" key={selectedYear}>
                   <div className="shadow bg-background rounded p-2 mb-4">
-                     <FormItem name="year">
-                        <FormLabel>Velg år</FormLabel>
-                        <FormControl
-                           render={(props) => (
-                              <NativeSelect
-                                 {...props}
-                                 onChange={(ev) => setSelectedYear(ev.target.value.toString())}
-                                 value={selectedYear}
-                                 className="max-w-[90px]"
+                     <div className="flex gap-4 items-end flex-wrap">
+                        <FormItem name="year">
+                           <FormLabel>Velg år</FormLabel>
+                           <FormControl
+                              render={(props) => (
+                                 <NativeSelect
+                                    {...props}
+                                    onChange={(ev) => setSelectedYear(ev.target.value.toString())}
+                                    value={selectedYear}
+                                    className="w-[90px]"
+                                 >
+                                    {years.map((year) => {
+                                       return (
+                                          <option value={year} key={year}>
+                                             {year}
+                                          </option>
+                                       );
+                                    })}
+                                 </NativeSelect>
+                              )}
+                           />
+                        </FormItem>
+                        {isAdmin(loggedInUser) && (
+                           <>
+                              <FormItem name="amount">
+                                 <FormLabel>Beløp</FormLabel>
+                                 <FormControl
+                                    render={(props) => (
+                                       <Input
+                                          {...props}
+                                          className="w-[90px]"
+                                          autoComplete="off"
+                                          type="number"
+                                          pattern="\d+"
+                                          defaultValue={amount}
+                                       />
+                                    )}
+                                 />
+                              </FormItem>
+                              <FormItem name="hasPaid">
+                                 <div className="flex gap-2 py-3 cursor-pointer">
+                                    <FormControl
+                                       render={(props) => (
+                                          <input
+                                             {...props}
+                                             className="cursor-pointer"
+                                             type="checkbox"
+                                             defaultChecked={hasPaid}
+                                          />
+                                       )}
+                                    />
+                                    <FormLabel className="cursor-pointer">Betalt</FormLabel>
+                                 </div>
+                              </FormItem>
+                              <Button
+                                 isLoading={fetcher.state !== "idle"}
+                                 variant="outline"
+                                 type="submit"
+                                 name="intent"
+                                 value={memberIntent.updateContingent}
                               >
-                                 {years.map((year) => {
-                                    return (
-                                       <option value={year} key={year}>
-                                          {year}
-                                       </option>
-                                    );
-                                 })}
-                              </NativeSelect>
-                           )}
-                        />
-                     </FormItem>
-                     {getContingent()}
+                                 Lagre
+                              </Button>
+                           </>
+                        )}
+                     </div>
+                     <Alert variant={hasPaid ? "success" : "warning"} className="my-2">
+                        <AlertTitle>Status: {hasPaid ? "Betalt" : "Ikke betalt"}</AlertTitle>
+                        {!hasPaid && (
+                           <AlertDescription>
+                              {amount}kr til {contingentInfo.bank}
+                           </AlertDescription>
+                        )}
+                     </Alert>
                      {notPaidYears.length > 0 ? (
                         <Alert variant="destructive">
                            <AlertTitle>

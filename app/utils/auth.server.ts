@@ -1,4 +1,4 @@
-import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import { createCookie, createCookieSessionStorage, redirect } from "@remix-run/node";
 import { Authenticator } from "remix-auth";
 import { Auth0Strategy } from "remix-auth-auth0";
 
@@ -6,6 +6,8 @@ import { getOptionalUserFromExternalUserId } from "~/.server/db/user";
 import type { Auth0User } from "~/types/Auth0User";
 
 import { env } from "./env.server";
+
+const userPreferences = createCookie("user_pref");
 
 export const createAuthenticator = () => {
    const sessionStorage = createCookieSessionStorage({
@@ -39,34 +41,38 @@ export const createAuthenticator = () => {
 
    const { getSession, destroySession } = sessionStorage;
 
-   const getRequiredAuthToken = async (request: Request) => {
-      const auth = await authenticator.isAuthenticated(request, { failureRedirect: "/home" });
-      return auth.accessToken;
-   };
-
-   const getRequiredAuth = async (request: Request) => {
-      const auth = await authenticator.isAuthenticated(request);
-      if (!auth) {
-         throw redirect("/home");
-      }
-      return auth;
-   };
-
    const getRequiredUser = async (request: Request) => {
       const auth = await authenticator.isAuthenticated(request);
+      const url = new URL(request.url);
+      const headers = {
+         "Set-Cookie": await userPreferences.serialize({ loginPath: url.pathname }),
+      };
+
       if (!auth) {
-         throw redirect("/home");
+         throw redirect("/login", { headers });
       }
       const user = auth.profile.id
          ? (await getOptionalUserFromExternalUserId(auth.profile.id)) ?? undefined
          : undefined;
 
       if (!user) {
-         throw redirect("/home");
+         throw redirect("/login", { headers });
       }
 
       return user;
    };
 
-   return { getSession, destroySession, getRequiredAuthToken, authenticator, getRequiredAuth, getRequiredUser };
+   const getSessionLoginPath = async (request: Request) => {
+      const cookieHeader = request.headers.get("Cookie");
+      const path = (await userPreferences.parse(cookieHeader))?.loginPath ?? "/home";
+      return path;
+   };
+
+   return {
+      getSession,
+      destroySession,
+      authenticator,
+      getRequiredUser,
+      getSessionLoginPath,
+   };
 };

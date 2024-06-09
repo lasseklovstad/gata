@@ -1,3 +1,4 @@
+import { year } from "drizzle-orm/mysql-core";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 
@@ -23,4 +24,10 @@ export const newResponsibilityYearSchema = zfd.formData({
 
 export const updateResponsibilityYearSchema = zfd.formData({
    text: zfd.text(z.string()),
+});
+
+export const updateContingentSchema = zfd.formData({
+   hasPaid: zfd.checkbox({ trueValue: "on" }),
+   year: zfd.text(z.coerce.number()),
+   amount: zfd.text(z.coerce.number().default(0)),
 });

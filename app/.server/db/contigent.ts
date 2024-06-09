@@ -9,9 +9,9 @@ export const getContingentInfo = () => {
    };
 };
 
-export const updateContingent = async (userId: string, year: number, isPaid: boolean) => {
+export const updateContingent = async (userId: string, year: number, isPaid: boolean, amount: number) => {
    await db
       .insert(contingent)
-      .values({ isPaid, year, userId })
-      .onConflictDoUpdate({ target: [contingent.userId, contingent.year], set: { isPaid, year } });
+      .values({ isPaid, year, userId, amount })
+      .onConflictDoUpdate({ target: [contingent.userId, contingent.year], set: { isPaid, year, amount } });
 };
