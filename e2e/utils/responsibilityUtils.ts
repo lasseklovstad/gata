@@ -47,7 +47,7 @@ export const addResponsibilityToMember = async (
    await assignResponsibilityToMember(page, username, responsibilitName, type);
 };
 
-export const assignResponsibilityToMember = async (
+const assignResponsibilityToMember = async (
    page: Page,
    username: string,
    responsibilityName: string,
