@@ -21,12 +21,12 @@ import { LinkExternalUserToGataUserSelect } from "~/routes/member.$memberId._ind
 import { UserInfo } from "~/routes/member.$memberId._index/components/UserInfo";
 import { UserSubscribe } from "~/routes/member.$memberId._index/components/UserSubscribe";
 import { createAuthenticator } from "~/utils/auth.server";
+import { updateContingentSchema } from "~/utils/formSchema";
 import { badRequest } from "~/utils/responseUtils";
 import { isAdmin, requireAdminRole } from "~/utils/roleUtils";
 
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
-import { updateContingentSchema } from "~/utils/formSchema";
 
 export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
