@@ -3,6 +3,13 @@
 `docker build --tag 'gata-app' .`
 `docker run --env-file ./.env -d -p 127.0.0.1:3000:3000 gata-app`
 
+# Run e2e tests local
+1. Delete sqlite.db file
+3. Ensure `NODE_ENV` set to production in `.env` file and all other variables are set
+2. run `npm run db:migrate`
+3. Start app `npm run dev`
+4. Start tests `npx playwright test`
+
 # Autentisering med Auth0
 
 Google app er registrert her: https://console.cloud.google.com/

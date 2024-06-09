@@ -10,7 +10,7 @@ export default defineConfig({
       port: 3000,
    },
    plugins: [
-      remixDevTools(),
+      process.env.SHOW_REMIX_DEVTOOLS === "true" ? remixDevTools() : undefined,
       remix({
          future: {
             v3_fetcherPersist: true,
