@@ -64,7 +64,7 @@ export const createAuthenticator = () => {
 
    const getSessionLoginPath = async (request: Request) => {
       const cookieHeader = request.headers.get("Cookie");
-      const path = (await userPreferences.parse(cookieHeader))?.loginPath ?? "/home";
+      const path = (await userPreferences.parse(cookieHeader))?.loginPath;
       return path;
    };
 
