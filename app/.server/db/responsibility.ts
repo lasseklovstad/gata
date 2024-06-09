@@ -40,7 +40,7 @@ export const getResponsibilitiesWithCurrentlyResponsibleUsername = async () => {
                current.currentlyResponsibleUsername,
             ],
          };
-         return [...all, newResp];
+         return all.map((r) => (r.id === newResp.id ? newResp : r));
       } else {
          const newResp = { ...current, currentlyResponsibleUsername: [current.currentlyResponsibleUsername] };
          return [...all, newResp];

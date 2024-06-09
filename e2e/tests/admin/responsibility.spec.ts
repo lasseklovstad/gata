@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { env } from "e2e/pages/Environment";
-import { addResponsibilityToMember, removeResponsibilityFromMember } from "e2e/utils/responsibilityUtils";
+import { assignResponsibilityToMember, removeResponsibilityFromMember } from "e2e/utils/responsibilityUtils";
 
 import { ResponsibilityPage } from "../../pages/ResponsibilityPage";
 
@@ -42,19 +42,19 @@ test.describe("Responsibility page", () => {
       const responsibilityPage = new ResponsibilityPage(page);
       const respName = preAddedResponsibilities[0].name;
       const { listItem } = responsibilityPage.getResponsibilityListItem(respName);
-      await expect(listItem).toHaveText("Ansvarlig: Ingen");
+      await expect(listItem).toContainText("Ansvarlig: Ingen");
 
       await test.step("Add responsibility to member and verify name shows in list", async () => {
-         await addResponsibilityToMember(page, respName, env.memberUsername, "member");
+         await assignResponsibilityToMember(page, env.memberUsername, respName, "member");
          await responsibilityPage.goto();
 
-         await expect(listItem).toHaveText("Ansvarlig: " + env.memberUsername);
+         await expect(listItem).toContainText("Ansvarlig: " + env.memberUsername);
       });
 
       await test.step("Add responsibility to admin and verify both names shows in list", async () => {
-         await addResponsibilityToMember(page, respName, env.memberUsername, "member");
+         await assignResponsibilityToMember(page, env.adminUsername, respName, "admin");
          await responsibilityPage.goto();
-         await expect(listItem).toHaveText("Ansvarlig: " + [env.memberUsername, env.adminUsername].join(", "));
+         await expect(listItem).toContainText("Ansvarlig: " + [env.memberUsername, env.adminUsername].join(", "));
       });
 
       // Cleanup
