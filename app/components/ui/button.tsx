@@ -60,3 +60,23 @@ export const Button: ButtonComponent = forwardRef(
       );
    }
 );
+
+type ButtonResponsiveProps = {
+   label: string;
+   icon: ReactNode;
+} & Omit<ComponentProps<ButtonComponent>, "children" | "size">;
+
+export const ButtonResponsive = ({ label, icon, ...buttonProps }: ButtonResponsiveProps) => {
+   return (
+      <>
+         <Button className="hidden md:flex gap-2" {...buttonProps}>
+            {icon}
+            {label}
+         </Button>
+         <Button size="icon" className="md:hidden" {...buttonProps}>
+            {icon}
+            <span className="sr-only">{label}</span>
+         </Button>
+      </>
+   );
+};

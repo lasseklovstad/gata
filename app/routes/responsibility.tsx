@@ -3,16 +3,16 @@ import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Pencil, Plus, Trash } from "lucide-react";
 
-import { getResponsibilities } from "~/.server/db/responsibility";
+import { getResponsibilitiesWithCurrentlyResponsibleUsername } from "~/.server/db/responsibility";
 import { PageLayout } from "~/components/PageLayout";
-import { Button } from "~/components/ui/button";
+import { Button, ButtonResponsive } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isAdmin } from "~/utils/roleUtils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
-   const [responsibilities] = await Promise.all([getResponsibilities()]);
+   const [responsibilities] = await Promise.all([getResponsibilitiesWithCurrentlyResponsibleUsername()]);
 
    return json({ responsibilities, loggedInUser });
 };
@@ -24,21 +24,20 @@ export default function ResponsibilityPage() {
       <PageLayout>
          <div className="flex justify-between items-center">
             <Typography variant="h1">Ansvarsposter</Typography>
-            {isAdmin(loggedInUser) && (
-               <Button as={Link} to="new">
-                  <Plus className="mr-1" />
-                  Legg til
-               </Button>
-            )}
+            {isAdmin(loggedInUser) && <ButtonResponsive as={Link} to="new" icon={<Plus />} label="Legg til" />}
          </div>
          <ul className="divide-y my-4">
             {responsibilities.map((resp) => {
-               const { name, id, description } = resp;
+               const { name, id, description, currentlyResponsibleUsername } = resp;
+               const usernames = currentlyResponsibleUsername.filter(Boolean);
                return (
                   <li key={id} className="p-2">
                      <div className="flex">
-                        <div className="flex-grow">
+                        <div className="flex-grow flex flex-col">
                            <Typography variant="largeText">{name}</Typography>
+                           <Typography variant="smallText" className="mb-2">
+                              Ansvarlig: {usernames.length ? usernames.join(", ") : "Ingen"}
+                           </Typography>
                            <Typography variant="smallText" className="text-gray-500">
                               {description}
                            </Typography>

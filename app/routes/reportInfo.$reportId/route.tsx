@@ -12,7 +12,7 @@ import { ClientOnly } from "~/components/ClientOnly";
 import { PageLayout } from "~/components/PageLayout";
 import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
 import { RichTextPreview } from "~/components/RichTextEditor/RichTextPreview";
-import { Button } from "~/components/ui/button";
+import { ButtonResponsive } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isAdmin } from "~/utils/roleUtils";
@@ -103,24 +103,15 @@ export default function ReportInfoPage() {
                </Typography>
                {canEdit && (
                   <div className="flex gap-2">
-                     <Button variant="ghost" as={Link} to={`${report.type}/delete`} className="md:flex hidden">
-                        <Trash className="mr-2" />
-                        Slett
-                     </Button>
-                     <Button variant="ghost" as={Link} to={"publish"}>
-                        <Mail className="mr-2" />
-                        Publiser
-                     </Button>
-                     <Button variant="ghost" as={Link} to="edit" className="md:flex hidden">
-                        <Edit className="mr-2" />
-                        Rediger info
-                     </Button>
-                     <Button variant="ghost" size="icon" as={Link} to="delete" className="md:hidden" aria-label="Slett">
-                        <Trash />
-                     </Button>
-                     <Button variant="ghost" size="icon" as={Link} to="edit" className="md:hidden" aria-label="Rediger">
-                        <Edit />
-                     </Button>
+                     <ButtonResponsive variant="ghost" as={Link} to="publish" label="Publiser" icon={<Mail />} />
+                     <ButtonResponsive
+                        variant="ghost"
+                        as={Link}
+                        to={`${report.type}/delete`}
+                        label="Slett"
+                        icon={<Trash />}
+                     />
+                     <ButtonResponsive variant="ghost" as={Link} to="edit" label="Rediger" icon={<Edit />} />
                   </div>
                )}
             </div>
@@ -129,17 +120,11 @@ export default function ReportInfoPage() {
                <>
                   {canEdit && (
                      <div className="flex justify-end">
-                        <Button onClick={() => setEditing(true)} className="md:flex hidden">
-                           <Edit className="mr-2" />
-                           Rediger innhold
-                        </Button>
-                        <Button size="icon" onClick={() => setEditing(true)} className="md:hidden" aria-label="Rediger">
-                           <Edit />
-                        </Button>
+                        <ButtonResponsive onClick={() => setEditing(true)} label="Rediger innhold" icon={<Edit />} />
                      </div>
                   )}
                   <div
-                     className="shadow border rounded bg-background p-1 md:p-2"
+                     className="border rounded bg-background p-1 md:p-2"
                      onDoubleClick={() => {
                         if (canEdit) {
                            setEditing(true);

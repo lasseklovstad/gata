@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { sqliteTable, text, integer, primaryKey } from "drizzle-orm/sqlite-core";
+import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { env } from "~/utils/env.server";
 

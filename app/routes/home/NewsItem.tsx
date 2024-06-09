@@ -1,8 +1,9 @@
 import { Link } from "@remix-run/react";
+import { Edit } from "lucide-react";
 
 import type { GataReport } from "db/schema";
 import type { User } from "~/.server/db/user";
-import { Button } from "~/components/ui/button";
+import { ButtonResponsive } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 
 import { ClientOnly } from "../../components/ClientOnly";
@@ -21,12 +22,16 @@ export const NewsItem = ({ report, loggedInUser }: NewsItemProps) => {
          <div className="flex items-center justify-between w-full">
             <Typography variant="h2">{report.title}</Typography>
             {canEdit && (
-               <Button variant="ghost" as={Link} to={`/reportInfo/${report.id}`}>
-                  Rediger
-               </Button>
+               <ButtonResponsive
+                  variant="ghost"
+                  as={Link}
+                  to={`/reportInfo/${report.id}`}
+                  label="Rediger"
+                  icon={<Edit />}
+               />
             )}
          </div>
-         <div className="border-[1.7px] shadow-md rounded-md w-full p-4 ">
+         <div className="border rounded-md w-full p-4 ">
             {report.content && (
                <ClientOnly>
                   <RichTextPreview content={report.content} />
