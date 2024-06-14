@@ -6,14 +6,14 @@ import { Typography } from "./ui/typography";
 
 type ConfirmDialogProps = {
    onClose: () => void;
-   onConfirm: () => Promise<void>;
+   onConfirm: () => Promise<void> | void;
    title?: string;
    text: string;
    open: boolean;
    showOnlyOk?: boolean;
 };
 
-const ConfirmDialog = ({ text, onClose, onConfirm, open, title, showOnlyOk }: ConfirmDialogProps) => {
+export const ConfirmDialog = ({ text, onClose, onConfirm, open, title, showOnlyOk }: ConfirmDialogProps) => {
    const ref = useRef<HTMLDialogElement>(null);
 
    useEffect(() => {

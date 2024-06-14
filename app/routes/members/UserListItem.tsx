@@ -2,10 +2,10 @@ import { Link } from "@remix-run/react";
 import { Check, X, User as UserIcon } from "lucide-react";
 
 import type { User } from "~/.server/db/user";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Typography } from "~/components/ui/typography";
 
 import { isMember } from "../../utils/roleUtils";
+import { AvatarUser } from "~/components/AvatarUser";
 
 type UserListItemProps = {
    user: User;
@@ -18,12 +18,7 @@ export const UserListItem = ({ user, isLoggedInUserAdmin }: UserListItemProps) =
       <li className="hover:bg-blue-50">
          <Link to={`/member/${user.id}`}>
             <div className="flex gap-4 p-2 items-center">
-               <Avatar>
-                  <AvatarImage src={user.primaryUser.picture || undefined} alt={user.primaryUser.name} />
-                  <AvatarFallback>
-                     <UserIcon />
-                  </AvatarFallback>
-               </Avatar>
+               <AvatarUser user={user} />
                <div>
                   <Typography variant="largeText">{user.primaryUser.name}</Typography>
                   <Typography variant="smallText" className="text-gray-500">

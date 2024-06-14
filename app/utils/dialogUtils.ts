@@ -14,5 +14,13 @@ export const useDialog = ({ defaultOpen }: UseDialogProps) => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
 
-   return { dialogRef };
+   const open = () => {
+      dialogRef.current?.showModal();
+   };
+
+   const close = () => {
+      dialogRef.current?.close();
+   };
+
+   return { dialogRef, open, close };
 };

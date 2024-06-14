@@ -23,6 +23,10 @@ export const News = ({ reports, loggedInUser }: NewsProps) => {
             <Typography variant="h1" id={titleId}>
                Nyheter
             </Typography>
+            <Button as={Link} to="new-event">
+               <Plus className="mr-1" />
+               Opprett arrangement
+            </Button>
             <Button as={Link} to="new">
                <Plus className="mr-1" />
                Opprett

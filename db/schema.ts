@@ -1,4 +1,5 @@
 import { relations, sql } from "drizzle-orm";
+import { unique } from "drizzle-orm/mysql-core";
 import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { env } from "~/utils/env.server";
@@ -126,6 +127,70 @@ export const gataReport = sqliteTable("gata_report", {
 
 export type GataReport = typeof gataReport.$inferSelect;
 
+export const gataEvent = sqliteTable("gata_event", {
+   id: integer("id").primaryKey(),
+   title: text("title").notNull(),
+   description: text("description").notNull(),
+   startDate: integer("start_date", { mode: "timestamp_ms" }),
+   createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
+});
+
+export const eventOrganizer = sqliteTable(
+   "event_organizer",
+   {
+      eventId: integer("event_id")
+         .notNull()
+         .references(() => gataEvent.id, { onDelete: "cascade" }),
+      userId: text("user_id")
+         .notNull()
+         .references(() => user.id, { onDelete: "cascade" }),
+   },
+   (table) => ({ pk: primaryKey({ columns: [table.eventId, table.userId] }) })
+);
+
+export const eventPolls = sqliteTable("event_polls", {
+   eventId: integer("event_id")
+      .references(() => gataEvent.id, { onDelete: "cascade" })
+      .notNull(),
+   pollId: integer("poll_id")
+      .references(() => poll.id, { onDelete: "cascade" })
+      .notNull(),
+});
+
+export const poll = sqliteTable("poll", {
+   id: integer("id").primaryKey(),
+   name: text("name").notNull(),
+   type: text("type", { enum: ["date", "text"] }).notNull(),
+   canSelectMultiple: integer("can_select_multiple", { mode: "boolean" }).notNull(),
+   canAddSuggestions: integer("can_add_suggestions", { mode: "boolean" }).notNull(),
+   isAnonymous: integer("is_anonymous", { mode: "boolean" }).notNull(),
+   isActive: integer("is_active", { mode: "boolean" }).default(true).notNull(),
+});
+
+export const pollOption = sqliteTable("poll_option", {
+   id: integer("id").primaryKey(),
+   dateOption: integer("date_option", { mode: "timestamp" }),
+   textOption: text("text_option"),
+   pollId: integer("poll_id")
+      .notNull()
+      .references(() => poll.id, { onDelete: "cascade" }),
+});
+
+export const pollVote = sqliteTable("poll_vote", {
+   id: integer("id").primaryKey(),
+   pollId: integer("poll_id")
+      .notNull()
+      .references(() => poll.id, { onDelete: "cascade" }),
+   pollOptionId: integer("poll_option_id")
+      .notNull()
+      .references(() => pollOption.id, { onDelete: "cascade" }),
+   userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+});
+
+// Relations
+
 export const externalUserRelations = relations(externalUser, ({ one }) => ({
    user: one(user, {
       fields: [externalUser.userId],
@@ -203,4 +268,27 @@ export const contingentRelations = relations(contingent, ({ one }) => ({
 
 export const responsibilityRelations = relations(responsibility, ({ many }) => ({
    responsibilityYears: many(responsibilityYear),
+}));
+
+export const gataEventRelations = relations(gataEvent, ({ one, many }) => ({
+   createdByUser: one(user, { fields: [gataEvent.createdBy], references: [user.id] }),
+   polls: many(eventPolls),
+}));
+
+export const eventPollsRelations = relations(eventPolls, ({ one }) => ({
+   event: one(gataEvent, { fields: [eventPolls.eventId], references: [gataEvent.id] }),
+   poll: one(poll, { fields: [eventPolls.pollId], references: [poll.id] }),
+}));
+
+export const pollRelations = relations(poll, ({ many }) => ({
+   pollOptions: many(pollOption),
+   pollVotes: many(pollVote),
+}));
+
+export const pollOptionRelations = relations(pollOption, ({ one }) => ({
+   poll: one(poll, { fields: [pollOption.pollId], references: [poll.id] }),
+}));
+
+export const pollVoteRelations = relations(pollVote, ({ one }) => ({
+   poll: one(poll, { fields: [pollVote.pollId], references: [poll.id] }),
 }));
