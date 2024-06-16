@@ -1,5 +1,4 @@
 import { relations, sql } from "drizzle-orm";
-import { unique } from "drizzle-orm/mysql-core";
 import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { env } from "~/utils/env.server";
@@ -131,7 +130,8 @@ export const gataEvent = sqliteTable("gata_event", {
    id: integer("id").primaryKey(),
    title: text("title").notNull(),
    description: text("description").notNull(),
-   startDate: integer("start_date", { mode: "timestamp_ms" }),
+   startDate: text("start_date"), // yyyy-MM-dd
+   startTime: text("start_time"), // kk.mm
    createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
 });
 
@@ -169,11 +169,29 @@ export const poll = sqliteTable("poll", {
 
 export const pollOption = sqliteTable("poll_option", {
    id: integer("id").primaryKey(),
-   dateOption: integer("date_option", { mode: "timestamp" }),
-   textOption: text("text_option"),
+   textOption: text("text_option").notNull(),
    pollId: integer("poll_id")
       .notNull()
       .references(() => poll.id, { onDelete: "cascade" }),
+});
+
+export const cloudinaryImage = sqliteTable("cloudinary_image", {
+   cloudUrl: text("cloud_url").notNull(),
+   cloudId: text("cloud_id").primaryKey(),
+   width: integer("width").notNull(),
+   height: integer("height").notNull(),
+});
+
+export type CloudinaryImage = typeof cloudinaryImage.$inferSelect;
+
+export const eventCloudinaryImages = sqliteTable("event_cloudinary_images", {
+   // Ikke slett bilde hvis event slettes
+   eventId: integer("event_id")
+      .references(() => gataEvent.id)
+      .notNull(),
+   cloudId: text("cloudinary_cloud_id")
+      .references(() => cloudinaryImage.cloudId, { onDelete: "cascade" })
+      .notNull(),
 });
 
 export const pollVote = sqliteTable("poll_vote", {
@@ -273,6 +291,7 @@ export const responsibilityRelations = relations(responsibility, ({ many }) => (
 export const gataEventRelations = relations(gataEvent, ({ one, many }) => ({
    createdByUser: one(user, { fields: [gataEvent.createdBy], references: [user.id] }),
    polls: many(eventPolls),
+   organizers: many(eventOrganizer),
 }));
 
 export const eventPollsRelations = relations(eventPolls, ({ one }) => ({
@@ -291,4 +310,9 @@ export const pollOptionRelations = relations(pollOption, ({ one }) => ({
 
 export const pollVoteRelations = relations(pollVote, ({ one }) => ({
    poll: one(poll, { fields: [pollVote.pollId], references: [poll.id] }),
+}));
+
+export const eventOrganizersRelations = relations(eventOrganizer, ({ one }) => ({
+   event: one(gataEvent, { fields: [eventOrganizer.eventId], references: [gataEvent.id] }),
+   user: one(user, { fields: [eventOrganizer.userId], references: [user.id] }),
 }));

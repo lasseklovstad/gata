@@ -1,6 +1,7 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
+import { getUpCommingEvents } from "~/.server/db/gataEvent";
 import { getReportsWithContent } from "~/.server/db/report";
 import { getOptionalUserFromExternalUserId } from "~/.server/db/user";
 import { PageLayout } from "~/components/PageLayout";
@@ -16,15 +17,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
    const loggedInUser = auth?.profile.id
       ? (await getOptionalUserFromExternalUserId(auth.profile.id)) ?? undefined
       : undefined;
-   return { reports: isMember(loggedInUser) ? await getReportsWithContent(ReportType.NEWS) : undefined };
+   return {
+      reports: isMember(loggedInUser) ? await getReportsWithContent(ReportType.NEWS) : undefined,
+      events: isMember(loggedInUser) ? await getUpCommingEvents() : undefined,
+   };
 };
 
 export default function Home() {
    const { auth0User, loggedInUser } = useRootLoader();
-   const { reports } = useLoaderData<typeof loader>();
+   const { reports, events } = useLoaderData<typeof loader>();
    if (auth0User) {
-      if (loggedInUser && isMember(loggedInUser) && reports) {
-         return <News reports={reports} loggedInUser={loggedInUser} />;
+      if (loggedInUser && isMember(loggedInUser) && reports && events) {
+         return <News reports={reports} loggedInUser={loggedInUser} events={events} />;
       } else {
          return (
             <PageLayout>

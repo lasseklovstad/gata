@@ -1,7 +1,7 @@
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { UserIcon } from "lucide-react";
 
 import type { User } from "~/.server/db/user";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 type Props = {
    user: User;

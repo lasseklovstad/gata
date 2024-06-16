@@ -1,11 +1,11 @@
 import { Link } from "@remix-run/react";
-import { Check, X, User as UserIcon } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 import type { User } from "~/.server/db/user";
+import { AvatarUser } from "~/components/AvatarUser";
 import { Typography } from "~/components/ui/typography";
 
 import { isMember } from "../../utils/roleUtils";
-import { AvatarUser } from "~/components/AvatarUser";
 
 type UserListItemProps = {
    user: User;

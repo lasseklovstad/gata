@@ -1,5 +1,5 @@
 import { Link, Outlet } from "@remix-run/react";
-import { Plus } from "lucide-react";
+import { Plus, Calendar } from "lucide-react";
 import { useId } from "react";
 
 import type { GataReport } from "db/schema";
@@ -13,25 +13,39 @@ import { PageLayout } from "../../components/PageLayout";
 type NewsProps = {
    reports: Pick<GataReport, "id" | "title" | "content" | "createdBy" | "lastModifiedDate">[];
    loggedInUser: User;
+   events: { id: number; title: string }[];
 };
 
-export const News = ({ reports, loggedInUser }: NewsProps) => {
+export const News = ({ reports, loggedInUser, events }: NewsProps) => {
    const titleId = useId();
    return (
       <PageLayout>
-         <div className="flex items-center justify-between flex-wrap mb-4">
+         <div className="flex items-center justify-between flex-wrap mb-4 gap-2">
             <Typography variant="h1" id={titleId}>
                Nyheter
             </Typography>
-            <Button as={Link} to="new-event">
-               <Plus className="mr-1" />
-               Opprett arrangement
-            </Button>
+
             <Button as={Link} to="new">
                <Plus className="mr-1" />
                Opprett
             </Button>
          </div>
+         <ul className="flex gap-2 flex-wrap mb-2">
+            {events.map((event) => (
+               <li key={event.id} className="bg-orange-100 rounded py-2 px-4 shadow flex">
+                  <Link to={`/event/${event.id}`} className="w-full text-base flex">
+                     <Calendar className="mr-2" />
+                     {event.title}
+                  </Link>
+               </li>
+            ))}
+            <li>
+               <Button as={Link} to="new-event" variant="ghost">
+                  <Plus className="mr-1" />
+                  Nytt arrangement
+               </Button>
+            </li>
+         </ul>
          <ul aria-labelledby={titleId}>
             {reports.map((report) => {
                return (

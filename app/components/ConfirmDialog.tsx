@@ -11,9 +11,20 @@ type ConfirmDialogProps = {
    text: string;
    open: boolean;
    showOnlyOk?: boolean;
+   disabled?: boolean;
+   isLoading?: boolean;
 };
 
-export const ConfirmDialog = ({ text, onClose, onConfirm, open, title, showOnlyOk }: ConfirmDialogProps) => {
+export const ConfirmDialog = ({
+   text,
+   onClose,
+   onConfirm,
+   open,
+   title,
+   showOnlyOk,
+   isLoading,
+   disabled,
+}: ConfirmDialogProps) => {
    const ref = useRef<HTMLDialogElement>(null);
 
    useEffect(() => {
@@ -31,10 +42,14 @@ export const ConfirmDialog = ({ text, onClose, onConfirm, open, title, showOnlyO
          <Typography>{text}</Typography>
          <DialogFooter>
             {showOnlyOk ? (
-               <Button onClick={onClose}>Ok</Button>
+               <Button onClick={onClose} isLoading={isLoading} disabled={disabled}>
+                  Ok
+               </Button>
             ) : (
                <>
-                  <Button onClick={onConfirm}>Jeg er sikker</Button>
+                  <Button onClick={onConfirm} isLoading={isLoading} disabled={disabled}>
+                     Jeg er sikker
+                  </Button>
                   <Button onClick={onClose} variant="ghost">
                      Avbryt
                   </Button>

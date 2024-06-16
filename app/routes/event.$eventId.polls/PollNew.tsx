@@ -26,11 +26,17 @@ export const PollNew = () => {
       }
    };
 
+   const handleReset = () => {
+      setType("");
+      setTextOptions([crypto.randomUUID()]);
+      setSelectedDates([]);
+   };
+
    useEffect(() => {
-      if (fetcher.data?.ok) {
+      if (fetcher.data?.ok && fetcher.state === "idle") {
          newPollDialog.close();
       }
-   }, [fetcher.data?.ok, newPollDialog]);
+   }, [fetcher.data, fetcher.state, newPollDialog]);
 
    return (
       <>
@@ -41,7 +47,7 @@ export const PollNew = () => {
             label="Ny avstemningen"
          />
          <Dialog ref={newPollDialog.dialogRef}>
-            <fetcher.Form method="POST">
+            <fetcher.Form method="POST" onReset={handleReset}>
                <FormProvider
                   errors={
                      fetcher.data && fetcher.data.ok === false && "fieldErrors" in fetcher.data
@@ -56,31 +62,34 @@ export const PollNew = () => {
                         <FormControl render={(props) => <Input {...props} autoComplete="off" />} />
                         <FormMessage />
                      </FormItem>
-                     <fieldset>
-                        <legend className="mb-2">Velg type</legend>
-                        <div className="flex gap-2">
-                           <Label className="flex items-center gap-2 cursor-pointer">
-                              <input
-                                 onChange={handleTypeChange}
-                                 className="size-4"
-                                 type="radio"
-                                 name="type"
-                                 value="text"
-                              />
-                              Tekst
-                           </Label>
-                           <Label className="flex items-center gap-2 cursor-pointer">
-                              <input
-                                 onChange={handleTypeChange}
-                                 className="size-4"
-                                 type="radio"
-                                 name="type"
-                                 value="date"
-                              />
-                              Dato
-                           </Label>
-                        </div>
-                     </fieldset>
+                     <FormItem name="type">
+                        <fieldset>
+                           <legend className="mb-2">Velg type</legend>
+                           <div className="flex gap-2">
+                              <Label className="flex items-center gap-2 cursor-pointer">
+                                 <input
+                                    onChange={handleTypeChange}
+                                    className="size-4"
+                                    type="radio"
+                                    name="type"
+                                    value="text"
+                                 />
+                                 Tekst
+                              </Label>
+                              <Label className="flex items-center gap-2 cursor-pointer">
+                                 <input
+                                    onChange={handleTypeChange}
+                                    className="size-4"
+                                    type="radio"
+                                    name="type"
+                                    value="date"
+                                 />
+                                 Dato
+                              </Label>
+                           </div>
+                        </fieldset>
+                        <FormMessage />
+                     </FormItem>
                      {type ? (
                         <>
                            {type === "date" ? (
@@ -183,7 +192,7 @@ export const PollNew = () => {
                      <Button type="submit" name="intent" value="newPoll" isLoading={fetcher.state !== "idle"}>
                         Opprett
                      </Button>
-                     <Button type="button" variant="ghost" onClick={() => newPollDialog.close()}>
+                     <Button type="reset" variant="ghost" onClick={() => newPollDialog.close()}>
                         Avbryt
                      </Button>
                   </DialogFooter>

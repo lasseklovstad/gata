@@ -7,8 +7,8 @@ import { useState } from "react";
 import { DayPicker } from "react-day-picker";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
-import { insertEvent } from "~/.server/db/gataEvent";
 
+import { insertEvent } from "~/.server/db/gataEvent";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { FormControl, FormItem, FormLabel, FormMessage, FormProvider } from "~/components/ui/form";
@@ -21,8 +21,8 @@ import { useDialog } from "~/utils/dialogUtils";
 const eventSchema = zfd.formData({
    title: zfd.text(z.string()),
    description: zfd.text(z.string().optional().default("")),
-   // format: YYYY-MM-DD
-   dateOption: zfd.repeatable(z.array(z.coerce.date())),
+   // format: yyyy-MM-mm
+   dateOption: zfd.repeatable(z.array(z.string().date())),
    isAnonymous: zfd.checkbox(),
    canAddSuggestions: zfd.checkbox(),
 });

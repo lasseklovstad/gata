@@ -47,7 +47,12 @@ export const Button: ButtonComponent = forwardRef(
    ) => {
       const Comp = as ?? "button";
       return (
-         <Comp className={cn(buttonVariants({ variant, size, className }))} {...props} ref={ref}>
+         <Comp
+            className={cn(buttonVariants({ variant, size, className }))}
+            {...props}
+            disabled={props.disabled || isLoading}
+            ref={ref}
+         >
             {size === "icon" ? (
                <>{isLoading ? <Loader2 className=" h-6 w-6 animate-spin" /> : children}</>
             ) : (
