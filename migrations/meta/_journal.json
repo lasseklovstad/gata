@@ -15,6 +15,13 @@
       "when": 1717922605312,
       "tag": "0001_sticky_carmella_unuscione",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1718571594041,
+      "tag": "0002_futuristic_bug",
+      "breakpoints": true
     }
   ]
 }
