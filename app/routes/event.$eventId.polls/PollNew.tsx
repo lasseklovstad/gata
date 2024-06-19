@@ -2,7 +2,7 @@ import { useFetcher } from "@remix-run/react";
 import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Plus, Trash } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DayPicker } from "react-day-picker";
 
 import { Button, ButtonResponsive } from "~/components/ui/button";
@@ -17,6 +17,7 @@ import type { action } from "./route";
 export const PollNew = () => {
    const fetcher = useFetcher<typeof action>();
    const newPollDialog = useDialog({ defaultOpen: false });
+   const formRef = useRef<HTMLFormElement>(null);
    const [type, setType] = useState("");
    const [selectedDates, setSelectedDates] = useState<Date[]>();
    const [textOptions, setTextOptions] = useState([crypto.randomUUID()]);
@@ -32,11 +33,13 @@ export const PollNew = () => {
       setSelectedDates([]);
    };
 
+   const closeDialog = newPollDialog.close;
    useEffect(() => {
       if (fetcher.data?.ok && fetcher.state === "idle") {
-         newPollDialog.close();
+         formRef.current?.reset();
+         closeDialog();
       }
-   }, [fetcher.data, fetcher.state, newPollDialog]);
+   }, [closeDialog, fetcher.data, fetcher.state]);
 
    return (
       <>
@@ -47,14 +50,8 @@ export const PollNew = () => {
             label="Ny avstemningen"
          />
          <Dialog ref={newPollDialog.dialogRef}>
-            <fetcher.Form method="POST" onReset={handleReset}>
-               <FormProvider
-                  errors={
-                     fetcher.data && fetcher.data.ok === false && "fieldErrors" in fetcher.data
-                        ? fetcher.data.fieldErrors
-                        : undefined
-                  }
-               >
+            <fetcher.Form method="POST" onReset={handleReset} ref={formRef}>
+               <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
                   <DialogHeading>Ny avstemning</DialogHeading>
                   <div className="space-y-4">
                      <FormItem name="name">
@@ -73,6 +70,7 @@ export const PollNew = () => {
                                     type="radio"
                                     name="type"
                                     value="text"
+                                    checked={type === "text"}
                                  />
                                  Tekst
                               </Label>
@@ -83,6 +81,7 @@ export const PollNew = () => {
                                     type="radio"
                                     name="type"
                                     value="date"
+                                    checked={type === "date"}
                                  />
                                  Dato
                               </Label>
@@ -121,26 +120,28 @@ export const PollNew = () => {
                                  <ul className="flex flex-col gap-2">
                                     {textOptions.map((id, index) => {
                                        return (
-                                          <li key={id} className="flex gap-4 items-end">
-                                             <FormItem name="textOption" className="flex-1">
+                                          <li key={id} className="flex gap-4">
+                                             <FormItem name={`textOption[${index}]`} className="flex-1">
                                                 <FormLabel>Alternativ {index + 1}</FormLabel>
-                                                <FormControl
-                                                   render={(props) => <Input {...props} autoComplete="off" />}
-                                                />
+                                                <div className="flex gap-2">
+                                                   <FormControl
+                                                      render={(props) => <Input {...props} autoComplete="off" />}
+                                                   />
+                                                   <Button
+                                                      type="button"
+                                                      onClick={() =>
+                                                         setTextOptions(textOptions.filter((option) => option !== id))
+                                                      }
+                                                      size="icon"
+                                                      variant="ghost"
+                                                      disabled={textOptions.length === 1}
+                                                   >
+                                                      <Trash />
+                                                      <span className="sr-only">Fjern alternativ {index + 1}</span>
+                                                   </Button>
+                                                </div>
                                                 <FormMessage />
                                              </FormItem>
-                                             <Button
-                                                type="button"
-                                                onClick={() =>
-                                                   setTextOptions(textOptions.filter((option) => option !== id))
-                                                }
-                                                size="icon"
-                                                variant="ghost"
-                                                disabled={textOptions.length === 1}
-                                             >
-                                                <Trash />
-                                                <span className="sr-only">Fjern alternativ {index + 1}</span>
-                                             </Button>
                                           </li>
                                        );
                                     })}

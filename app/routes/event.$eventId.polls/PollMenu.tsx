@@ -65,13 +65,7 @@ export const PollMenu = ({ poll }: Props) => {
          <Dialog ref={editDialog.dialogRef}>
             <DialogHeading>Rediger avstemning</DialogHeading>
             <fetcher.Form method="PUT">
-               <FormProvider
-                  errors={
-                     fetcher.data && fetcher.data.ok === false && "fieldErrors" in fetcher.data
-                        ? fetcher.data.fieldErrors
-                        : undefined
-                  }
-               >
+               <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
                   <input hidden readOnly value={poll.id} name="pollId" />
                   <FormItem name="name">
                      <FormLabel>Navn</FormLabel>

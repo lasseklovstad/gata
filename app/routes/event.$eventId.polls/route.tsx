@@ -18,6 +18,7 @@ import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
 import { badRequest } from "~/utils/responseUtils";
+import { transformErrorResponse } from "~/utils/validateUtils";
 
 import { Poll } from "./Poll";
 import { PollNew } from "./PollNew";
@@ -60,16 +61,25 @@ const pollDeleteSchema = zfd.formData({
    pollId: zfd.numeric(),
 });
 
-const newPollSchema = zfd.formData({
-   name: zfd.text(z.string()),
-   // format: yyyy-MM-dd
-   dateOption: zfd.repeatable(z.array(z.string().date())),
-   textOption: zfd.repeatable(z.array(z.string())),
-   isAnonymous: zfd.checkbox(),
-   canAddSuggestions: zfd.checkbox(),
-   canSelectMultiple: zfd.checkbox(),
-   type: zfd.text(z.enum(["text", "date"])),
-});
+const newPollSchema = zfd
+   .formData({
+      name: zfd.text(z.string()),
+      // format: yyyy-MM-dd
+      dateOption: zfd.repeatable(z.array(z.string().date())),
+      textOption: zfd.repeatable(z.array(z.string().min(1))),
+      isAnonymous: zfd.checkbox(),
+      canAddSuggestions: zfd.checkbox(),
+      canSelectMultiple: zfd.checkbox(),
+      type: zfd.text(z.enum(["text", "date"])),
+   })
+   .refine((data) => (data.type === "text" ? data.textOption.length > 1 : true), {
+      message: "Det må være mer enn ett alternativ",
+      path: ["textOption"], // path of error
+   })
+   .refine((data) => (data.type === "date" ? data.dateOption.length > 1 : true), {
+      message: "Det må være mer enn ett alternativ",
+      path: ["dateOption"], // path of error
+   });
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
    const paramsParsed = paramSchema.safeParse(params);
@@ -100,7 +110,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    if (intent === "updatePoll") {
       const updatePollForm = pollUpdateSchema.safeParse(formdata);
       if (!updatePollForm.success) {
-         return { ...updatePollForm.error.formErrors, ok: false };
+         return transformErrorResponse(updatePollForm.error);
       }
       const { pollId, isFinished, ...pollValues } = updatePollForm.data;
       await updatePoll(pollId, { ...pollValues, isActive: !isFinished });
@@ -115,7 +125,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    if (intent === "newPoll") {
       const newPollForm = newPollSchema.safeParse(formdata);
       if (!newPollForm.success) {
-         return { ...newPollForm.error.formErrors, ok: false };
+         return transformErrorResponse(newPollForm.error);
       }
       const { dateOption, textOption, ...poll } = newPollForm.data;
       await insertNewTextPoll(eventId, poll, poll.type === "text" ? textOption : dateOption);

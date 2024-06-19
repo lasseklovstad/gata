@@ -3,9 +3,11 @@ import { createContext, forwardRef, useContext, useId } from "react";
 
 import { Label } from "~/components/ui/label";
 import { cn } from "~/utils";
+import type { TransformedError } from "~/utils/validateUtils";
+import { isTransformErrors } from "~/utils/validateUtils";
 
 type FormContextValue = {
-   errors?: Record<string, string[]>;
+   errors?: Record<string, string[]> | TransformedError[];
 };
 
 const FormContext = createContext<FormContextValue | undefined>(undefined);
@@ -49,7 +51,26 @@ const FormItem = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>
    ({ className, name, ...props }, ref) => {
       const id = useId();
       const formContext = useContext(FormContext);
-      const error = formContext?.errors ? formContext.errors[name] : undefined;
+      const getError = () => {
+         if (!formContext?.errors) return undefined;
+         if (isTransformErrors(formContext.errors)) {
+            const arrayFormNameRegex = /^(.*)\[(\d+)\]/i;
+            const match = arrayFormNameRegex.exec(name);
+            const nameField = match && match[1];
+            const indexField = match && match[2];
+            let errors: string[] = [];
+            if (nameField && indexField) {
+               errors = formContext.errors
+                  .filter((error) => error.path[0] === nameField && error.path[1] === Number(indexField))
+                  .map((error) => error.message);
+            } else {
+               errors = formContext.errors.filter((error) => error.path[0] === name).map((error) => error.message);
+            }
+            return errors.length > 0 ? errors : undefined;
+         }
+         return formContext.errors[name];
+      };
+      const error = getError();
 
       return (
          <FormItemContext.Provider value={{ id, error, name }}>
@@ -100,7 +121,7 @@ FormDescription.displayName = "FormDescription";
 const FormMessage = forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
    ({ className, children, ...props }, ref) => {
       const { error, formMessageId } = useFormField();
-      const body = error ? error : children;
+      const body = error ? error.join(", ") : children;
 
       if (!body) {
          return null;
