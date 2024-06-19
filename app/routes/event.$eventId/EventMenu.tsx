@@ -1,10 +1,7 @@
 import type { SerializeFrom } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
-import { formatDate, parseISO } from "date-fns";
-import { nb } from "date-fns/locale";
-import { Calendar, Edit, EllipsisVertical, Trash, X } from "lucide-react";
+import { Edit, EllipsisVertical, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
-import { DayPicker } from "react-day-picker";
 
 import type { GataEvent } from "~/.server/db/gataEvent";
 import { ConfirmDialog } from "~/components/ConfirmDialog";
@@ -16,14 +13,11 @@ import {
    DropdownMenuItem,
    DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { FormControl, FormItem, FormLabel, FormMessage, FormProvider } from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Typography } from "~/components/ui/typography";
+import { FormProvider } from "~/components/ui/form";
 import { useDialog } from "~/utils/dialogUtils";
 
-import type { action } from "./route";
 import { EventForm } from "./EventForm";
+import type { action } from "./route";
 
 type Props = {
    event: SerializeFrom<GataEvent>;

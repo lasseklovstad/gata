@@ -51,32 +51,32 @@ test("linked member should be able to edit news", async ({ adminPage, memberPage
 
 const deleteNews = async (page: Page) => {
    await page.goto("/");
-   const homePage = new HomePage(page);
+   const homePage = HomePage(page);
    await homePage.deleteAllNews();
 };
 
 const assertEditNewsAsMember = async (page: Page, title: string, content: string) => {
    await page.goto("/");
-   const homePage = new HomePage(page);
+   const homePage = HomePage(page);
    await homePage.assertNewsHasContent(title, content);
 };
 
 const addNewsAsMember = async (page: Page, title: string, description: string) => {
    await page.goto("/");
-   const homePage = new HomePage(page);
+   const homePage = HomePage(page);
    await homePage.addNews(title, description);
 };
 
 const editNewsAsNonMember = async (page: Page, title: string, newContent: string) => {
    await page.goto("/");
-   const homePage = new HomePage(page);
+   const homePage = HomePage(page);
    const documentPage = new DocumentPage(page);
    await homePage.clickEditNewsItem(title);
    await documentPage.editContent(newContent);
 };
 
 const assertThatNonMemberIsNotMember = async (page: Page) => {
-   const homePage = new HomePage(page);
+   const homePage = HomePage(page);
 
    await page.goto("/");
    await expect(homePage.nonMemberInformationText).toBeVisible();

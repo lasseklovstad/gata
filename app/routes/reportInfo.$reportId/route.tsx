@@ -15,10 +15,10 @@ import { RichTextPreview } from "~/components/RichTextEditor/RichTextPreview";
 import { ButtonResponsive } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
+import { getCloudinaryUploadFolder } from "~/utils/cloudinaryUtils";
 import { isAdmin } from "~/utils/roleUtils";
 
 import { reportInfoIntent } from "./intent";
-import { getCloudinaryUploadFolder } from "~/utils/cloudinaryUtils";
 
 export const loader = async ({ request, params: { reportId } }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);

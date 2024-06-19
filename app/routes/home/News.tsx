@@ -30,7 +30,7 @@ export const News = ({ reports, loggedInUser, events }: NewsProps) => {
                Opprett
             </Button>
          </div>
-         <ul className="flex gap-2 flex-wrap mb-2">
+         <ul className="flex gap-2 flex-wrap mb-2" aria-label="Arrangement">
             {events.map((event) => (
                <li key={event.id} className="bg-orange-100 rounded py-2 px-4 shadow flex">
                   <Link to={`/event/${event.id}`} className="w-full text-base flex">

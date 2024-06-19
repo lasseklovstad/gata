@@ -2,6 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Outlet, redirect, useLoaderData } from "@remix-run/react";
 import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
+import { useId } from "react";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 
@@ -108,7 +109,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 
 export default function EventPage() {
    const { event, loggedInUser, users, numberOfImages, eventParticipants } = useLoaderData<typeof loader>();
-
+   const descriptionTitleId = useId();
    const organizers = users.filter((user) => event.organizers.find((organizer) => organizer.userId === user.id));
 
    const isOrganizer = isUserOrganizer(event, loggedInUser);
@@ -121,13 +122,17 @@ export default function EventPage() {
          </div>
          {isOrganizer ? <EventOrganizers users={users} organizers={organizers} /> : null}
 
-         <div className="space-y-8">
+         <div className="space-y-4">
             {organizers.length ? (
                <Typography variant="mutedText">
                   Arrangører: {organizers.map((user) => user.primaryUser.name).join(", ")}
                </Typography>
             ) : null}
-            <div className="bg-slate-100 rounded p-2 border">
+
+            <section className="bg-slate-100 rounded p-2 border" aria-labelledby={descriptionTitleId}>
+               <Typography variant="h4" as="h2" id={descriptionTitleId}>
+                  Beskrivelse
+               </Typography>
                <Typography>{event.description || "Ingen beskrivelse fra arrangør"}</Typography>
                {event.startDate ? (
                   <Typography>
@@ -142,7 +147,7 @@ export default function EventPage() {
                      Tidspunkt: <span className="font-semibold">{event.startTime}</span>
                   </Typography>
                ) : null}
-            </div>
+            </section>
             <AttendingSelect eventParticipants={eventParticipants} loggedInUser={loggedInUser} />
          </div>
          <nav className="border-b-2 mt-6">

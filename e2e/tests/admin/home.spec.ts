@@ -8,7 +8,7 @@ test.use({ storageState: "adminStorageState.json" });
 test("Should have welcome title", async ({ page }) => {
    await page.goto("/");
    const gataHeader = new GataHeader(page);
-   const homePage = new HomePage(page);
+   const homePage = HomePage(page);
    await expect(page).toHaveTitle(/Gata/);
 
    await expect(homePage.memberWelcomeTitle).toBeVisible();

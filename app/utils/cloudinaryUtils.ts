@@ -1,5 +1,3 @@
-import { env } from "./env.server";
-
 export const buildImageUrl = (url: string, size: number, direction?: "height" | "width") => {
    // https://res.cloudinary.com/dsiqlprku/image/upload/v1718532608/gata/event-1/uyr8gc2p5ysevbnutyk1.jpg
    // To seperate the image name and cloud url

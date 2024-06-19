@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 
 import type { User } from "~/.server/db/user";
-import { AvatarUser } from "~/components/AvatarUser";
 import { AvatarUserList } from "~/components/AvatarUserList";
 import { Label } from "~/components/ui/label";
 

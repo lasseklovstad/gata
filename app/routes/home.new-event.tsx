@@ -5,13 +5,13 @@ import { Calendar } from "lucide-react";
 import { insertEvent } from "~/.server/db/gataEvent";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
-import { FormDescription, FormProvider } from "~/components/ui/form";
+import { FormProvider } from "~/components/ui/form";
+import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
 import { EventForm } from "./event.$eventId/EventForm";
 import { eventSchema } from "./event.$eventId/eventSchema";
-import { Typography } from "~/components/ui/typography";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);

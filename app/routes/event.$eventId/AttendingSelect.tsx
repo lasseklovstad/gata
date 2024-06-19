@@ -1,5 +1,6 @@
 import { useSubmit } from "@remix-run/react";
 import { useId } from "react";
+
 import type { EventParticipant } from "~/.server/db/gataEvent";
 import type { User } from "~/.server/db/user";
 import { AvatarUserList } from "~/components/AvatarUserList";

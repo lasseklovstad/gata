@@ -11,7 +11,7 @@ cloudinary.v2.config({
 
 import { env } from "~/utils/env.server";
 
-export const uploadImage = async (data: string, folder: string) => {
+export const uploadImage = (data: string, folder: string) => {
    return new Promise<UploadApiResponse>((resolve, reject) => {
       void cloudinary.v2.uploader.upload(data, { folder }, (error, result) => {
          if (error) {
