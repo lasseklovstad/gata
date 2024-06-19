@@ -54,14 +54,25 @@ const FormItem = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>
       const getError = () => {
          if (!formContext?.errors) return undefined;
          if (isTransformErrors(formContext.errors)) {
+            // name[0]
+            // nameField = name
+            // nameIndex = 0
             const arrayFormNameRegex = /^(.*)\[(\d+)\]/i;
             const match = arrayFormNameRegex.exec(name);
             const nameField = match && match[1];
             const indexField = match && match[2];
             let errors: string[] = [];
             if (nameField && indexField) {
+               const index = Number(indexField);
                errors = formContext.errors
-                  .filter((error) => error.path[0] === nameField && error.path[1] === Number(indexField))
+                  .filter((error) => {
+                     // When there are only errors on first field and that is the only field, xod omits the index
+                     if (index === 0 && error.path.length === 1) {
+                        return error.path[0] === nameField;
+                     } else {
+                        return error.path[0] === nameField && error.path[1] === index;
+                     }
+                  })
                   .map((error) => error.message);
             } else {
                errors = formContext.errors.filter((error) => error.path[0] === name).map((error) => error.message);
