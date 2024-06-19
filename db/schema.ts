@@ -207,6 +207,20 @@ export const pollVote = sqliteTable("poll_vote", {
       .references(() => user.id, { onDelete: "cascade" }),
 });
 
+export const eventParticipants = sqliteTable(
+   "event_participants",
+   {
+      eventId: integer("event_id")
+         .notNull()
+         .references(() => gataEvent.id, { onDelete: "cascade" }),
+      userId: text("user_id")
+         .notNull()
+         .references(() => user.id, { onDelete: "cascade" }),
+      isParticipating: integer("is_participating", { mode: "boolean" }).notNull(),
+   },
+   (table) => ({ pk: primaryKey({ columns: [table.eventId, table.userId] }) })
+);
+
 // Relations
 
 export const externalUserRelations = relations(externalUser, ({ one }) => ({
@@ -315,4 +329,9 @@ export const pollVoteRelations = relations(pollVote, ({ one }) => ({
 export const eventOrganizersRelations = relations(eventOrganizer, ({ one }) => ({
    event: one(gataEvent, { fields: [eventOrganizer.eventId], references: [gataEvent.id] }),
    user: one(user, { fields: [eventOrganizer.userId], references: [user.id] }),
+}));
+
+export const eventParticipantsRelations = relations(eventParticipants, ({ one }) => ({
+   event: one(gataEvent, { fields: [eventParticipants.eventId], references: [gataEvent.id] }),
+   user: one(user, { fields: [eventParticipants.userId], references: [user.id] }),
 }));

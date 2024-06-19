@@ -20,6 +20,15 @@ CREATE TABLE `event_organizer` (
 	FOREIGN KEY (`user_id`) REFERENCES `gata_user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE TABLE `event_participants` (
+	`event_id` integer NOT NULL,
+	`user_id` text NOT NULL,
+	`is_participating` integer NOT NULL,
+	PRIMARY KEY(`event_id`, `user_id`),
+	FOREIGN KEY (`event_id`) REFERENCES `gata_event`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`user_id`) REFERENCES `gata_user`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `event_polls` (
 	`event_id` integer NOT NULL,
 	`poll_id` integer NOT NULL,

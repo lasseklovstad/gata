@@ -5,7 +5,15 @@ import { nb } from "date-fns/locale";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 
-import { deleteEvent, getEvent, getNumberOfImages, updateEvent, updateOrganizers } from "~/.server/db/gataEvent";
+import {
+   deleteEvent,
+   getEvent,
+   getEventParticipants,
+   getNumberOfImages,
+   updateEvent,
+   updateIsUserParticipating,
+   updateOrganizers,
+} from "~/.server/db/gataEvent";
 import { getUsers } from "~/.server/db/user";
 import { PageLayout } from "~/components/PageLayout";
 import { TabNavLink } from "~/components/TabNavLink";
@@ -14,8 +22,10 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
 import { badRequest } from "~/utils/responseUtils";
 
+import { AttendingSelect } from "./AttendingSelect";
 import { EventMenu } from "./EventMenu";
 import { EventOrganizers } from "./EventOrganizers";
+import { eventSchema } from "./eventSchema";
 
 const paramSchema = z.object({
    eventId: z.coerce.number(),
@@ -28,27 +38,21 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    }
    const { eventId } = paramsParsed.data;
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
-   const [event, users, numberOfImages] = await Promise.all([
+   const [event, users, numberOfImages, eventParticipants] = await Promise.all([
       getEvent(eventId),
       getUsers(),
       getNumberOfImages(eventId),
+      getEventParticipants(eventId),
    ]);
-   return { event, loggedInUser, users, numberOfImages };
+   return { event, loggedInUser, users, numberOfImages, eventParticipants };
 };
 
-const eventUpdateSchema = zfd.formData({
-   title: zfd.text(z.string()),
-   description: zfd.text(z.string().default("")),
-   startDate: zfd.text(z.string().date().optional()),
-   startTime: zfd.text(
-      z
-         .string()
-         .regex(/\d{2}:\d{2}/)
-         .optional()
-   ),
-});
 const organizersUpdateSchema = zfd.formData({
    organizers: zfd.repeatable(z.array(z.string())),
+});
+
+const updateParticipatingSchema = zfd.formData({
+   status: zfd.text(z.enum(["going", "notGoing"])),
 });
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
@@ -62,6 +66,12 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    const formdata = await request.formData();
    const intent = formdata.get("intent") as string;
 
+   if (intent === "updateParticipating") {
+      const { status } = updateParticipatingSchema.parse(formdata);
+      await updateIsUserParticipating(eventId, loggedInUser.id, status === "going");
+      return { ok: true };
+   }
+
    const event = await getEvent(eventId);
    if (!isUserOrganizer(event, loggedInUser)) {
       throw badRequest("Du har ikke tilgang til å endre denne ressursen");
@@ -73,7 +83,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    }
 
    if (intent === "updateEvent") {
-      const updateEventForm = eventUpdateSchema.safeParse(formdata);
+      const updateEventForm = eventSchema.safeParse(formdata);
       if (!updateEventForm.success) {
          return { ...updateEventForm.error.formErrors, ok: false };
       }
@@ -97,42 +107,45 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 };
 
 export default function EventPage() {
-   const { event, loggedInUser, users, numberOfImages } = useLoaderData<typeof loader>();
+   const { event, loggedInUser, users, numberOfImages, eventParticipants } = useLoaderData<typeof loader>();
 
    const organizers = users.filter((user) => event.organizers.find((organizer) => organizer.userId === user.id));
 
    const isOrganizer = isUserOrganizer(event, loggedInUser);
+
    return (
       <PageLayout>
          <div className="flex justify-between items-center mb-4">
             <Typography variant="h1">{event.title}</Typography>
             {isOrganizer ? <EventMenu event={event} numberOfImages={numberOfImages} /> : null}
          </div>
-         <Typography variant="mutedText">
-            Opprettet av {event.createdByUser?.primaryUser.name ?? "Ukjent bruker"}
-         </Typography>
-         <div className="bg-slate-100 rounded my-2 p-2 border">
-            <Typography>{event.description || "Ingen beskrivelse fra arrangør"}</Typography>
-            {event.startDate ? (
-               <Typography>
-                  Start dato:{" "}
-                  <span className="font-semibold">
-                     {formatDate(event.startDate, "iiii dd.MM.yyyy", { locale: nb })}
-                  </span>
-               </Typography>
-            ) : null}
-            {event.startTime ? (
-               <Typography>
-                  Tidspunkt: <span className="font-semibold">{event.startTime}</span>
-               </Typography>
-            ) : null}
-         </div>
-
          {isOrganizer ? <EventOrganizers users={users} organizers={organizers} /> : null}
-         {organizers.length ? (
-            <Typography>Arrangører: {organizers.map((user) => user.primaryUser.name).join(", ")}</Typography>
-         ) : null}
-         <nav className="border-b-2 mt-4">
+
+         <div className="space-y-8">
+            {organizers.length ? (
+               <Typography variant="mutedText">
+                  Arrangører: {organizers.map((user) => user.primaryUser.name).join(", ")}
+               </Typography>
+            ) : null}
+            <div className="bg-slate-100 rounded p-2 border">
+               <Typography>{event.description || "Ingen beskrivelse fra arrangør"}</Typography>
+               {event.startDate ? (
+                  <Typography>
+                     Start dato:{" "}
+                     <span className="font-semibold">
+                        {formatDate(event.startDate, "iiii dd.MM.yyyy", { locale: nb })}
+                     </span>
+                  </Typography>
+               ) : null}
+               {event.startTime ? (
+                  <Typography>
+                     Tidspunkt: <span className="font-semibold">{event.startTime}</span>
+                  </Typography>
+               ) : null}
+            </div>
+            <AttendingSelect eventParticipants={eventParticipants} loggedInUser={loggedInUser} />
+         </div>
+         <nav className="border-b-2 mt-6">
             <ul className="flex">
                <li>
                   <TabNavLink to={""}>Aktivitet</TabNavLink>

@@ -1,3 +1,5 @@
+import { env } from "./env.server";
+
 export const buildImageUrl = (url: string, size: number, direction?: "height" | "width") => {
    // https://res.cloudinary.com/dsiqlprku/image/upload/v1718532608/gata/event-1/uyr8gc2p5ysevbnutyk1.jpg
    // To seperate the image name and cloud url
@@ -9,4 +11,8 @@ export const buildImageUrl = (url: string, size: number, direction?: "height" | 
       throw new Error("Could not parse image url " + url);
    }
    return `${rootUrl}${["q_auto", "f_auto", (direction === "height" ? "h_" : "w_") + size].join(",")}/${nameUrl}`;
+};
+
+export const getCloudinaryUploadFolder = () => {
+   return process.env.NODE_ENV === "production" ? "gata" : "gata-local";
 };

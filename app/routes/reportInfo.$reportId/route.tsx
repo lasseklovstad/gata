@@ -18,6 +18,7 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { isAdmin } from "~/utils/roleUtils";
 
 import { reportInfoIntent } from "./intent";
+import { getCloudinaryUploadFolder } from "~/utils/cloudinaryUtils";
 
 export const loader = async ({ request, params: { reportId } }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
@@ -42,7 +43,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       }
       case reportInfoIntent.postFileIntent: {
          const data = String(formData.get("data"));
-         const { public_id, secure_url } = await uploadImage(data);
+         const folder = `${getCloudinaryUploadFolder()}/report-${params.reportId}`;
+         const { public_id, secure_url } = await uploadImage(data, folder);
          const [file] = await insertReportFile({
             reportId: params.reportId,
             cloudId: public_id,

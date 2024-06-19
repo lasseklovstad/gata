@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import type { User } from "~/.server/db/user";
 import { AvatarUser } from "~/components/AvatarUser";
+import { AvatarUserList } from "~/components/AvatarUserList";
 import { Label } from "~/components/ui/label";
 
 type Props<OptionType> = {
@@ -56,13 +57,9 @@ export const PollFormList = <OptionType extends { id: number; numberOfVotes: num
                         <div className="flex justify-between items-center mb-1">
                            {renderOptionHeader(option)}
                            <div className="flex items-center gap-1">
-                              <div className="flex flex-row-reverse h-6">
-                                 {!isAnonymous
-                                    ? usersSelectedThisOption.map((user) => (
-                                         <AvatarUser key={user.id} user={user} className="size-6 shadow -ml-3" />
-                                      ))
-                                    : null}
-                              </div>
+                              {!isAnonymous ? (
+                                 <AvatarUserList aria-label="Brukere som har stemt" users={usersSelectedThisOption} />
+                              ) : null}
                               <span className="text-xs">{option.numberOfVotes}</span>
                            </div>
                         </div>

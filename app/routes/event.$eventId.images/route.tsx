@@ -25,6 +25,7 @@ import { Toggle } from "~/components/ui/toggle";
 import { Typography } from "~/components/ui/typography";
 import { UploadImages } from "~/components/UploadImages";
 import { createAuthenticator } from "~/utils/auth.server";
+import { getCloudinaryUploadFolder } from "~/utils/cloudinaryUtils";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
 import { badRequest } from "~/utils/responseUtils";
 
@@ -63,11 +64,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
             if (name !== "image") {
                return undefined;
             }
-
-            const { secure_url, public_id, width, height } = await uploadImageToCloudinary(
-               data,
-               "gata/event-" + eventId
-            );
+            const folder = `${getCloudinaryUploadFolder()}/event-${eventId}`;
+            const { secure_url, public_id, width, height } = await uploadImageToCloudinary(data, folder);
             await insertCloudinaryImage(eventId, { cloudId: public_id, cloudUrl: secure_url, width, height });
             return secure_url;
          },

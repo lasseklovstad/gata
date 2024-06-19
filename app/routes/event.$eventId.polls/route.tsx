@@ -163,11 +163,21 @@ export default function EventPage() {
             {isOrganizer ? <PollNew /> : null}
          </div>
          <div className="space-y-8">
-            {polls.map(({ poll }) => {
-               return (
-                  <Poll key={poll.id} poll={poll} loggedInUser={loggedInUser} users={users} isOrganizer={isOrganizer} />
-               );
-            })}
+            {polls.length === 0 ? (
+               <Typography>Ingen avstmeninger lagt til enda...</Typography>
+            ) : (
+               polls.map(({ poll }) => {
+                  return (
+                     <Poll
+                        key={poll.id}
+                        poll={poll}
+                        loggedInUser={loggedInUser}
+                        users={users}
+                        isOrganizer={isOrganizer}
+                     />
+                  );
+               })
+            )}
          </div>
       </div>
    );

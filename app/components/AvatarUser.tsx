@@ -4,7 +4,7 @@ import type { User } from "~/.server/db/user";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 type Props = {
-   user: User;
+   user: Pick<User, "primaryUser">;
    className?: string;
 };
 

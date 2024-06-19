@@ -5,6 +5,7 @@ import {
    cloudinaryImage,
    eventCloudinaryImages,
    eventOrganizer,
+   eventParticipants,
    eventPolls,
    gataEvent,
    poll,
@@ -14,19 +15,10 @@ import {
 
 import type { User } from "./user";
 
-export const insertEvent = async (
-   event: { title: string; description: string; createdBy: string },
-   datePoll: typeof poll.$inferInsert,
-   dateOptions: string[]
-) => {
+export const insertEvent = async (event: Omit<typeof gataEvent.$inferInsert, "createdBy"> & { createdBy: string }) => {
    return await db.transaction(async (tx) => {
       const [{ eventId }] = await tx.insert(gataEvent).values(event).returning({ eventId: gataEvent.id });
       await tx.insert(eventOrganizer).values({ userId: event.createdBy, eventId });
-      if (dateOptions.length > 1) {
-         const [{ pollId }] = await tx.insert(poll).values(datePoll).returning({ pollId: poll.id });
-         await tx.insert(eventPolls).values({ pollId, eventId });
-         await tx.insert(pollOption).values(dateOptions.map((textOption) => ({ textOption, pollId })));
-      }
       return eventId;
    });
 };
@@ -171,4 +163,20 @@ export const getNumberOfImages = async (eventId: number) => {
    return (
       await db.select({ count: count() }).from(eventCloudinaryImages).where(eq(eventCloudinaryImages.eventId, eventId))
    )[0].count;
+};
+
+export type EventParticipant = Awaited<ReturnType<typeof getEventParticipants>>[number];
+
+export const getEventParticipants = async (eventId: number) => {
+   return await db.query.eventParticipants.findMany({
+      where: eq(eventParticipants.eventId, eventId),
+      with: { user: { with: { primaryUser: true } } },
+   });
+};
+
+export const updateIsUserParticipating = async (eventId: number, userId: string, isParticipating: boolean) => {
+   await db
+      .insert(eventParticipants)
+      .values({ eventId, userId, isParticipating })
+      .onConflictDoUpdate({ target: [eventParticipants.eventId, eventParticipants.userId], set: { isParticipating } });
 };

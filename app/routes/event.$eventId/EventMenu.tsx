@@ -23,6 +23,7 @@ import { Typography } from "~/components/ui/typography";
 import { useDialog } from "~/utils/dialogUtils";
 
 import type { action } from "./route";
+import { EventForm } from "./EventForm";
 
 type Props = {
    event: SerializeFrom<GataEvent>;
@@ -33,8 +34,6 @@ export const EventMenu = ({ event, numberOfImages }: Props) => {
    const fetcher = useFetcher<typeof action>();
    const [open, setOpen] = useState(false);
    const editDialog = useDialog({ defaultOpen: false });
-   const dateDialog = useDialog({ defaultOpen: false });
-   const [startDate, setStartDate] = useState(event.startDate ? parseISO(event.startDate) : undefined);
 
    const closeDialog = editDialog.close;
    useEffect(() => {
@@ -82,65 +81,7 @@ export const EventMenu = ({ event, numberOfImages }: Props) => {
                <FormProvider
                   errors={fetcher.data && "fieldErrors" in fetcher.data ? fetcher.data.fieldErrors : undefined}
                >
-                  <FormItem name="title">
-                     <FormLabel>Tittel</FormLabel>
-                     <FormControl
-                        render={(props) => <Input {...props} defaultValue={event.title} autoComplete="off" />}
-                     />
-                     <FormMessage />
-                  </FormItem>
-                  <FormItem name="description">
-                     <FormLabel>Beskrivelse</FormLabel>
-                     <FormControl
-                        render={(props) => <Input {...props} defaultValue={event.description} autoComplete="off" />}
-                     />
-                     <FormMessage />
-                  </FormItem>
-                  <div className="flex gap-8">
-                     <FormItem name="startDate">
-                        <Label>Startdato</Label>
-                        <div className="flex gap-2 items-center relative">
-                           <Input
-                              name="startDate"
-                              type="date"
-                              readOnly
-                              value={startDate ? formatDate(startDate, "yyyy-MM-dd") : ""}
-                           />
-                           <Button size="icon" variant="ghost" type="button" onClick={dateDialog.open}>
-                              <Calendar />
-                              <span className="sr-only">Åpne kalender</span>
-                           </Button>
-                           <dialog ref={dateDialog.dialogRef} className="bg-background shadow-2xl rounded p-4 border">
-                              <div className="flex justify-between items-center">
-                                 <Typography variant="h3">Velg dato</Typography>
-                                 <Button type="button" variant="ghost" size="icon" onClick={dateDialog.close}>
-                                    <X />
-                                    <span className="sr-only">Lukk</span>
-                                 </Button>
-                              </div>
-                              <DayPicker
-                                 className="m-0 mt-2"
-                                 locale={nb}
-                                 mode="single"
-                                 selected={startDate}
-                                 onSelect={(date) => {
-                                    dateDialog.close();
-                                    setStartDate(date);
-                                 }}
-                              />
-                           </dialog>
-                        </div>
-                     </FormItem>
-                     <FormItem name="startTime" className="w-[100px]">
-                        <FormLabel>Starttidspunkt</FormLabel>
-                        <FormControl
-                           render={(props) => (
-                              <Input {...props} defaultValue={event.startTime ?? ""} type="time" autoComplete="off" />
-                           )}
-                        />
-                        <FormMessage />
-                     </FormItem>
-                  </div>
+                  <EventForm event={event} />
                </FormProvider>
 
                <DialogFooter>
