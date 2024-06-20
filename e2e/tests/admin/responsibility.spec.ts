@@ -62,7 +62,7 @@ test.describe("Responsibility page", () => {
       await test.step("Add responsibility to admin and verify both names shows in list", async () => {
          await assignResponsibilityToMember(page, env.adminUsername, respName, "admin");
          await responsibilityPage.goto();
-         await expect(listItem).toContainText("Ansvarlig: " + [env.memberUsername, env.adminUsername].join(", "));
+         await expect(listItem).toContainText("Ansvarlig: " + [env.adminUsername, env.memberUsername].join(", "));
       });
 
       // Cleanup
