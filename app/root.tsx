@@ -1,3 +1,6 @@
+import "react-day-picker/dist/style.css";
+import "./tailwind.css";
+
 import type { LinksFunction, LoaderFunctionArgs, MetaFunction, SerializeFrom } from "@remix-run/node";
 import {
    Link,
@@ -13,8 +16,6 @@ import {
 } from "@remix-run/react";
 import type { ComponentProps } from "react";
 import { useEffect } from "react";
-import "react-day-picker/dist/style.css";
-import "./tailwind.css";
 
 import { getOptionalUserFromExternalUserId } from "./.server/db/user";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";

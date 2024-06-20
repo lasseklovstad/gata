@@ -83,9 +83,8 @@ export const HomePage = (page: Page) => {
       const items = listEvents.getByRole("listitem");
       const count = await items.count();
       const eventPage = EventPage(page);
-      // Iterate backwards and dont click the last item
-      for (let i = 0; i < count - 1; i++) {
-         await items.nth(i).click();
+      for (let i = count - 2; i >= 0; i--) {
+         await items.nth(i).getByRole("link").click();
          await eventPage.deleteEvent();
       }
    }

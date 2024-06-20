@@ -1,7 +1,7 @@
 import { formatDate, parseISO } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Calendar, X } from "lucide-react";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { DayPicker } from "react-day-picker";
 
 import type { GataEvent } from "~/.server/db/gataEvent";
@@ -18,6 +18,7 @@ type Props = {
 
 export const EventForm = ({ event }: Props) => {
    const dateDialog = useDialog({ defaultOpen: false });
+   const dateDialogTitleId = useId();
    const [startDate, setStartDate] = useState(event?.startDate ? parseISO(event.startDate) : undefined);
    return (
       <>
@@ -47,9 +48,15 @@ export const EventForm = ({ event }: Props) => {
                      <Calendar />
                      <span className="sr-only">Åpne kalender</span>
                   </Button>
-                  <dialog ref={dateDialog.dialogRef} className="bg-background shadow-2xl rounded p-4 border">
+                  <dialog
+                     aria-labelledby={dateDialogTitleId}
+                     ref={dateDialog.dialogRef}
+                     className="bg-background shadow-2xl rounded p-4 border"
+                  >
                      <div className="flex justify-between items-center">
-                        <Typography variant="h3">Velg dato</Typography>
+                        <Typography variant="h3" id={dateDialogTitleId}>
+                           Velg dato
+                        </Typography>
                         <Button type="button" variant="ghost" size="icon" onClick={dateDialog.close}>
                            <X />
                            <span className="sr-only">Lukk</span>
@@ -59,11 +66,20 @@ export const EventForm = ({ event }: Props) => {
                         className="m-0 mt-2"
                         locale={nb}
                         mode="single"
+                        labels={{
+                           labelNext: () => "Gå til neste måned",
+                           labelPrevious: () => "Gå til forrige måned",
+                           labelMonthDropdown: () => "Velg måned",
+                           labelYearDropdown: () => "Velg år",
+                        }}
                         selected={startDate}
                         onSelect={(date) => {
                            dateDialog.close();
                            setStartDate(date);
                         }}
+                        captionLayout="dropdown-buttons"
+                        fromYear={new Date().getFullYear()}
+                        toYear={new Date().getFullYear() + 5}
                      />
                   </dialog>
                </div>

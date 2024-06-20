@@ -1,6 +1,9 @@
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 
 import { ConfirmModal } from "./ConfirmModal";
+import { formatDate } from "date-fns";
+import { nb } from "date-fns/locale";
+import { GataEventForm } from "./EventFormPage";
 
 export const EventPage = (page: Page) => {
    const mainHeading = page.getByRole("heading", { level: 1 });
@@ -8,11 +11,27 @@ export const EventPage = (page: Page) => {
    const menuEvent = page.getByRole("button", { name: "Åpne meny for arrangement" });
 
    const deleteEvent = async () => {
-      await menuEvent.click();
-      await page.getByRole("menuitem", { name: "Slett" }).click();
+      await openMenu("Slett");
       const confirmDialog = new ConfirmModal(page);
       await confirmDialog.confirm();
    };
 
-   return { mainHeading, regionDescription, deleteEvent };
+   const openMenu = async (menuItemName: "Slett" | "Rediger") => {
+      await menuEvent.click();
+      await page.getByRole("menuitem", { name: menuItemName }).click();
+   };
+
+   const verifyDescription = async ({ title, description, startDate, startTime }: GataEventForm) => {
+      await expect(mainHeading).toHaveText(title);
+      await expect(regionDescription).toContainText(description);
+      if (startDate) {
+         const startDateFormated = formatDate(startDate, "iiii dd.MMMM.yyyy", { locale: nb });
+         await expect(regionDescription).toContainText(`Startdato: ${startDateFormated}`);
+      }
+      if (startTime) {
+         await expect(regionDescription).toContainText(`Tidspunkt: ${startTime}`);
+      }
+   };
+
+   return { mainHeading, regionDescription, deleteEvent, openMenu, verifyDescription };
 };

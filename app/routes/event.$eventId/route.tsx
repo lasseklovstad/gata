@@ -136,9 +136,9 @@ export default function EventPage() {
                <Typography>{event.description || "Ingen beskrivelse fra arrangør"}</Typography>
                {event.startDate ? (
                   <Typography>
-                     Start dato:{" "}
+                     Startdato:{" "}
                      <span className="font-semibold">
-                        {formatDate(event.startDate, "iiii dd.MM.yyyy", { locale: nb })}
+                        {formatDate(event.startDate, "iiii dd.MMMM.yyyy", { locale: nb })}
                      </span>
                   </Typography>
                ) : null}
