@@ -7,7 +7,7 @@ import { HomePage } from "../../pages/HomePage";
 
 test.use({ storageState: "memberStorageState.json" });
 
-test.describe.only("Gata event", () => {
+test.describe("Gata event", () => {
    test.afterEach(async ({ page }) => {
       const homePage = HomePage(page);
       await homePage.goto();
