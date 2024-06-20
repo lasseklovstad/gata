@@ -1,9 +1,9 @@
 import { expect, type Page } from "@playwright/test";
-
-import { ConfirmModal } from "./ConfirmModal";
 import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
-import { GataEventForm } from "./EventFormPage";
+
+import { ConfirmModal } from "./ConfirmModal";
+import type { GataEventForm } from "./EventFormPage";
 
 export const EventPage = (page: Page) => {
    const mainHeading = page.getByRole("heading", { level: 1 });
