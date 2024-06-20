@@ -8,9 +8,17 @@ import { ResponsibilityPage } from "../../pages/ResponsibilityPage";
 test.use({ storageState: "adminStorageState.json" });
 
 const preAddedResponsibilities = [
-   { name: "Aktivitetsansvarlig", description: "Planlegg aktiviteter" },
-   { name: "Kultur", description: "Vedlikeholder gatas kultur og historie" },
-   { name: "Musikk", description: "Ordner musikk til arangement" },
+   {
+      name: "Aktivitetsansvarlig",
+      description:
+         "Tar ansvar for leker og andre aktiviteter som innebærer å ikke sitte stille i en sofa. Innebærer ikke å ta ansvar for organisering av større utflukter. Da skal det heller opprettes en reisekomité.",
+   },
+   {
+      name: "Kulturansvarlig",
+      description:
+         "Tar ansvar for bevaring av Gatas kulturminner, for eksempel Lekeplassen, filmer og bilder, sitater og særegne uttrykk i Gata.",
+   },
+   { name: "Musikkansvarlig", description: "Tar ansvar for at det alltid er god musikk på Gata-arrangementer." },
 ];
 
 test.describe("Responsibility page", () => {
