@@ -72,7 +72,7 @@ test.describe("Event polls", () => {
          await eventPollPage.verifyPollListIsDisabled(name, true);
       });
    });
-   test.only("Should create poll with multiselect date and verify list on mobile", async ({ memberPage }) => {
+   test("Should create poll with multiselect date and verify list on mobile", async ({ memberPage }) => {
       const eventPage = EventPage(memberPage);
       const eventPollPage = EventPollPage(memberPage);
       await eventPage.linkPolls.click();
