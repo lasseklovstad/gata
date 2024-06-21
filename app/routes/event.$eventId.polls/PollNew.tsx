@@ -7,7 +7,15 @@ import { DayPicker } from "react-day-picker";
 
 import { Button, ButtonResponsive } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
-import { FormControl, FormItem, FormLabel, FormMessage, FormProvider } from "~/components/ui/form";
+import {
+   FormControl,
+   FormFieldset,
+   FormItem,
+   FormLabel,
+   FormLegend,
+   FormMessage,
+   FormProvider,
+} from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useDialog } from "~/utils/dialogUtils";
@@ -60,8 +68,8 @@ export const PollNew = () => {
                         <FormMessage />
                      </FormItem>
                      <FormItem name="type">
-                        <fieldset>
-                           <legend className="mb-2">Velg type</legend>
+                        <FormFieldset>
+                           <FormLegend className="mb-2">Velg type</FormLegend>
                            <div className="flex gap-2">
                               <Label className="flex items-center gap-2 cursor-pointer">
                                  <input
@@ -86,7 +94,7 @@ export const PollNew = () => {
                                  Dato
                               </Label>
                            </div>
-                        </fieldset>
+                        </FormFieldset>
                         <FormMessage />
                      </FormItem>
                      {type ? (
@@ -108,8 +116,17 @@ export const PollNew = () => {
                                        className="m-0 mt-2"
                                        locale={nb}
                                        mode="multiple"
+                                       labels={{
+                                          labelNext: () => "Gå til neste måned",
+                                          labelPrevious: () => "Gå til forrige måned",
+                                          labelMonthDropdown: () => "Velg måned",
+                                          labelYearDropdown: () => "Velg år",
+                                       }}
                                        selected={selectedDates}
                                        onSelect={setSelectedDates}
+                                       captionLayout="dropdown-buttons"
+                                       fromYear={new Date().getFullYear()}
+                                       toYear={new Date().getFullYear() + 5}
                                     />
                                     <FormMessage />
                                  </FormItem>
@@ -117,7 +134,7 @@ export const PollNew = () => {
                            ) : null}
                            {type === "text" ? (
                               <>
-                                 <ul className="flex flex-col gap-2">
+                                 <ul className="flex flex-col gap-2" aria-label="Alternativer">
                                     {textOptions.map((id, index) => {
                                        return (
                                           <li key={id} className="flex gap-4">

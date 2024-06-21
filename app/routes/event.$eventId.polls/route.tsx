@@ -8,9 +8,8 @@ import {
    getEvent,
    getEventPolls,
    getIsPollActive,
-   insertDatePollVote,
+   insertPollVote,
    insertNewTextPoll,
-   updateDatePollVote,
    updatePoll,
 } from "~/.server/db/gataEvent";
 import { getUsers } from "~/.server/db/user";
@@ -66,7 +65,7 @@ const newPollSchema = zfd
       name: zfd.text(z.string()),
       // format: yyyy-MM-dd
       dateOption: zfd.repeatable(z.array(z.string().date())),
-      textOption: zfd.repeatable(z.array(z.string().min(1))),
+      textOption: zfd.repeatable(z.array(z.string().min(1, { message: "Alternativ kan ikke være tomt" }))),
       isAnonymous: zfd.checkbox(),
       canAddSuggestions: zfd.checkbox(),
       canSelectMultiple: zfd.checkbox(),
@@ -98,7 +97,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       if (!isPollActive) {
          throw badRequest("Avstemning er ikke aktiv lenger");
       }
-      request.method === "POST" ? await insertDatePollVote(pollVoteForm) : await updateDatePollVote(pollVoteForm);
+      await insertPollVote(pollVoteForm);
       return { ok: true };
    }
 

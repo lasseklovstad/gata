@@ -194,18 +194,21 @@ export const eventCloudinaryImages = sqliteTable("event_cloudinary_images", {
       .notNull(),
 });
 
-export const pollVote = sqliteTable("poll_vote", {
-   id: integer("id").primaryKey(),
-   pollId: integer("poll_id")
-      .notNull()
-      .references(() => poll.id, { onDelete: "cascade" }),
-   pollOptionId: integer("poll_option_id")
-      .notNull()
-      .references(() => pollOption.id, { onDelete: "cascade" }),
-   userId: text("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-});
+export const pollVote = sqliteTable(
+   "poll_vote",
+   {
+      pollId: integer("poll_id")
+         .notNull()
+         .references(() => poll.id, { onDelete: "cascade" }),
+      pollOptionId: integer("poll_option_id")
+         .notNull()
+         .references(() => pollOption.id, { onDelete: "cascade" }),
+      userId: text("user_id")
+         .notNull()
+         .references(() => user.id, { onDelete: "cascade" }),
+   },
+   (table) => ({ pk: primaryKey({ columns: [table.pollId, table.pollOptionId, table.userId] }) })
+);
 
 export const eventParticipants = sqliteTable(
    "event_participants",

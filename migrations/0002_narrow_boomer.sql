@@ -64,10 +64,10 @@ CREATE TABLE `poll_option` (
 );
 --> statement-breakpoint
 CREATE TABLE `poll_vote` (
-	`id` integer PRIMARY KEY NOT NULL,
 	`poll_id` integer NOT NULL,
 	`poll_option_id` integer NOT NULL,
 	`user_id` text NOT NULL,
+	PRIMARY KEY(`poll_id`, `poll_option_id`, `user_id`),
 	FOREIGN KEY (`poll_id`) REFERENCES `poll`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`poll_option_id`) REFERENCES `poll_option`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`user_id`) REFERENCES `gata_user`(`id`) ON UPDATE no action ON DELETE cascade

@@ -92,18 +92,13 @@ export const getIsPollActive = async (pollId: number) => {
    return !!result?.isActive;
 };
 
-type InsertPollDateVote = {
+type InsertPollVote = {
    userId: string;
    pollId: number;
    options: number[];
 };
 
-export const insertDatePollVote = async ({ userId, pollId, options }: InsertPollDateVote) => {
-   if (!options.length) return;
-   await db.insert(pollVote).values(options.map((pollOptionId) => ({ pollId, pollOptionId, userId })));
-};
-
-export const updateDatePollVote = async ({ userId, pollId, options }: InsertPollDateVote) => {
+export const insertPollVote = async ({ userId, pollId, options }: InsertPollVote) => {
    await db.transaction(async (tx) => {
       await tx.delete(pollVote).where(and(eq(pollVote.userId, userId), eq(pollVote.pollId, pollId)));
       if (!options.length) return;

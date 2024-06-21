@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "b21a0e38-8922-47da-8f42-044e10cbd660",
+  "id": "6047734f-5c0d-4a94-9669-0e54c802fcba",
   "prevId": "85033ffb-1e0a-490e-9ef2-31bfb7ec092f",
   "tables": {
     "cloudinary_image": {
@@ -649,13 +649,6 @@
     "poll_vote": {
       "name": "poll_vote",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
         "poll_id": {
           "name": "poll_id",
           "type": "integer",
@@ -720,7 +713,16 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "poll_vote_poll_id_poll_option_id_user_id_pk": {
+          "columns": [
+            "poll_id",
+            "poll_option_id",
+            "user_id"
+          ],
+          "name": "poll_vote_poll_id_poll_option_id_user_id_pk"
+        }
+      },
       "uniqueConstraints": {}
     },
     "gata_report_file": {

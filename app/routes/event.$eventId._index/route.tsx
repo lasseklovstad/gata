@@ -42,7 +42,7 @@ export default function EventActivities() {
                <Typography variant="h3" className="mb-2" id={activePollsTitleId}>
                   Aktive avstemninger
                </Typography>
-               <ul className="space-y-2 max-w-fit" aria-labelledby={activePollsTitleId}>
+               <ul className="flex gap-2 flex-wrap" aria-labelledby={activePollsTitleId}>
                   {activePolls.map(({ poll }) => {
                      return (
                         <li key={poll.id} className="bg-orange-100 rounded py-2 px-4 shadow flex">

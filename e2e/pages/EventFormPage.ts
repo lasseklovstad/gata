@@ -1,7 +1,10 @@
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import { formatDate } from "date-fns";
-import { nb } from "date-fns/locale";
+
+import { selectDate } from "e2e/utils/eventUtils";
+
+import { HomePage } from "./HomePage";
 
 export type GataEventForm = {
    title: string;
@@ -29,12 +32,7 @@ export const EventFormPage = (page: Page) => {
          await buttonOpenDatePicker.click();
          const dateDialog = page.getByRole("dialog", { name: "Velg dato" });
          await expect(dateDialog).toBeVisible();
-         const year = formatDate(startDate, "yyyy", { locale: nb });
-         const month = formatDate(startDate, "MMMM", { locale: nb });
-         const day = formatDate(startDate, "d", { locale: nb });
-         await dateDialog.getByLabel("Velg år").selectOption(year);
-         await dateDialog.getByLabel("Velg måned").selectOption(month);
-         await dateDialog.getByRole("grid").getByRole("gridcell", { name: day, exact: true }).click();
+         await selectDate(startDate, dateDialog);
       }
    };
 
@@ -53,5 +51,14 @@ export const EventFormPage = (page: Page) => {
       await page.getByRole("button", { name: "Avbryt" }).click();
    };
 
-   return { fillForm, submit, cancel, inputTitle, inputDescription, verifyForm };
+   const createEvent = async (event: GataEventForm) => {
+      const homePage = HomePage(page);
+      const eventFormPage = EventFormPage(page);
+      await homePage.goto();
+      await homePage.buttonCreateEvent.click();
+      await eventFormPage.fillForm(event);
+      await eventFormPage.submit();
+   };
+
+   return { fillForm, submit, cancel, inputTitle, inputDescription, verifyForm, createEvent };
 };

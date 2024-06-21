@@ -9,6 +9,7 @@ export const EventPage = (page: Page) => {
    const mainHeading = page.getByRole("heading", { level: 1 });
    const regionDescription = page.getByRole("region", { name: "Beskrivelse" });
    const menuEvent = page.getByRole("button", { name: "Åpne meny for arrangement" });
+   const linkPolls = page.getByRole("link", { name: "Avstemninger" });
 
    const deleteEvent = async () => {
       await openMenu("Slett");
@@ -33,5 +34,5 @@ export const EventPage = (page: Page) => {
       }
    };
 
-   return { mainHeading, regionDescription, deleteEvent, openMenu, verifyDescription };
+   return { mainHeading, regionDescription, deleteEvent, openMenu, verifyDescription, linkPolls };
 };

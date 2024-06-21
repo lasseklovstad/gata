@@ -103,6 +103,26 @@ const FormLabel = forwardRef<React.ElementRef<typeof Label>, React.ComponentProp
 );
 FormLabel.displayName = "FormLabel";
 
+export const FormFieldset = forwardRef<React.ElementRef<"fieldset">, React.ComponentPropsWithoutRef<"fieldset">>(
+   ({ className, ...props }, ref) => {
+      const { error, formMessageId } = useFormField();
+
+      return <fieldset ref={ref} aria-invalid={error ? "true" : "false"} aria-describedby={formMessageId} {...props} />;
+   }
+);
+FormFieldset.displayName = "FormFieldset";
+
+export const FormLegend = forwardRef<React.ElementRef<"legend">, React.ComponentPropsWithoutRef<"legend">>(
+   ({ className, ...props }, ref) => {
+      const { error } = useFormField();
+
+      return (
+         <legend ref={ref} className={cn("text-sm font-medium", !!error && "text-destructive", className)} {...props} />
+      );
+   }
+);
+FormLabel.displayName = "FormLegend";
+
 type FormControlProps = {
    render: (props: { name: string; id: string; "aria-describedby": string; "aria-invalid": boolean }) => ReactNode;
 };

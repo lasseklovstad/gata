@@ -43,6 +43,11 @@ export const HomePage = (page: Page) => {
       await page.goto("");
    }
 
+   async function gotoEvent(name: string) {
+      await page.goto("");
+      await listEvents.getByRole("link", { name }).click();
+   }
+
    async function addNews(title: string, description: string) {
       await addNewsButton.click();
       await addNewsModal.fillForm(title, description);
@@ -121,5 +126,6 @@ export const HomePage = (page: Page) => {
       deleteNewsItem,
       deleteNews,
       deleteAllEvents,
+      gotoEvent,
    };
 };

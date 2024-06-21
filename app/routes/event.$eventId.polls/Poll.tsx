@@ -22,26 +22,34 @@ type Props = {
 
 export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
    const fetcher = useFetcher();
-   const tableId = useId();
+   const titleId = useId();
+   const isActiveMessageId = useId();
+   const anonymousMessageId = useId();
    const hasVoted = poll.pollVotes.find((vote) => vote.userId === loggedInUser.id);
    const type = poll.canSelectMultiple ? "checkbox" : "radio";
 
    return (
       <div>
          <div className="flex justify-between">
-            <Typography variant="h3" className="mb-2" id={`${tableId}-title`}>
+            <Typography variant="h3" className="mb-2" id={titleId}>
                {poll.name}
             </Typography>
             {isOrganizer ? <PollMenu poll={poll} /> : null}
          </div>
-         {poll.isAnonymous ? <Typography variant="mutedText">Denne avstemningen er anonym</Typography> : null}
+         {poll.isAnonymous ? (
+            <Typography variant="mutedText" id={anonymousMessageId}>
+               Denne avstemningen er anonym
+            </Typography>
+         ) : null}
 
-         <fetcher.Form method={hasVoted ? "PUT" : "POST"}>
+         <fetcher.Form method="POST">
             <input hidden value={poll.id} name="pollId" readOnly />
             <input hidden value={loggedInUser.id} name="userId" readOnly />
             <input hidden value="pollVote" name="intent" readOnly />
             <div className="hidden md:block">
                <PollFormTable
+                  id={titleId}
+                  describedBy={`${isActiveMessageId} ${anonymousMessageId}`}
                   isAnonymous={poll.isAnonymous}
                   disabled={!poll.isActive}
                   loggedInUser={loggedInUser}
@@ -76,6 +84,8 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
             <input hidden value="pollVote" name="intent" readOnly />
             <div className="block md:hidden">
                <PollFormList
+                  id={titleId}
+                  describedBy={`${isActiveMessageId} ${anonymousMessageId}`}
                   isAnonymous={poll.isAnonymous}
                   disabled={!poll.isActive}
                   loggedInUser={loggedInUser}
@@ -97,7 +107,7 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
                />
             </div>
          </fetcher.Form>
-         <PollActiveStatus isActive={poll.isActive} />
+         <PollActiveStatus id={isActiveMessageId} isActive={poll.isActive} />
       </div>
    );
 };

@@ -15,6 +15,8 @@ type Props<OptionType> = {
    isAnonymous: boolean;
    numberOfVotes: number;
    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+   id: string;
+   describedBy?: string;
 };
 
 export const PollFormList = <OptionType extends { id: number; numberOfVotes: number }>({
@@ -28,10 +30,12 @@ export const PollFormList = <OptionType extends { id: number; numberOfVotes: num
    isAnonymous,
    numberOfVotes,
    onChange,
+   id,
+   describedBy,
 }: Props<OptionType>) => {
    const usersThatHasVoted = users.filter((u) => !!pollVotes.find((vote) => vote.userId === u.id));
    return (
-      <ul className="space-y-2">
+      <ul className="space-y-2" aria-labelledby={id} aria-describedby={describedBy}>
          {options.map((option) => {
             const checked = !!pollVotes.find(
                (vote) => vote.pollOptionId === option.id && loggedInUser.id === vote.userId
