@@ -11,7 +11,7 @@ import { testWithRoles as test } from "../../utils/fixtures";
 
 const eventName = "Gata Pils";
 
-test.describe.only("Event polls", () => {
+test.describe("Event polls", () => {
    test.afterEach(async ({ adminPage }) => {
       const homePage = HomePage(adminPage);
       await homePage.goto();

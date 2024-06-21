@@ -10,7 +10,7 @@ import { testWithRoles as test } from "../../utils/fixtures";
 
 const eventName = "Gata Pils";
 test.use(devices["iPhone SE"]);
-test.describe.only("Event polls", () => {
+test.describe("Event polls", () => {
    test.afterEach(async ({ adminPage }) => {
       const homePage = HomePage(adminPage);
       await homePage.goto();
@@ -20,7 +20,7 @@ test.describe.only("Event polls", () => {
    test.beforeEach(async ({ memberPage }) => {
       await EventFormPage(memberPage).createEvent({ title: eventName, description: "" });
    });
-   test.only("Should create poll with multiselect and verify list on mobile", async ({ memberPage, adminPage }) => {
+   test("Should create poll with multiselect and verify list on mobile", async ({ memberPage, adminPage }) => {
       const eventPage = EventPage(memberPage);
       const eventPollPage = EventPollPage(memberPage);
       await eventPage.linkPolls.click();
