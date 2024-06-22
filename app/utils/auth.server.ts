@@ -7,7 +7,7 @@ import type { Auth0User } from "~/types/Auth0User";
 
 import { env } from "./env.server";
 
-const userPreferences = createCookie("user_pref", { maxAge: 60_000 });
+const userPreferences = createCookie("user_pref", { maxAge: 60 });
 
 export const createAuthenticator = () => {
    const sessionStorage = createCookieSessionStorage({
