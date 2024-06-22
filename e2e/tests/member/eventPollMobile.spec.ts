@@ -11,7 +11,9 @@ import { PollActivityPage } from "e2e/pages/PollActivityPage";
 import { testWithRoles as test } from "../../utils/fixtures";
 
 const eventName = "Gata Pils";
-test.use(devices["iPhone SE"]);
+
+test.use(devices["Galaxy S5"]);
+
 test.describe("Event polls", () => {
    test.afterEach(async ({ adminPage }) => {
       const homePage = HomePage(adminPage);

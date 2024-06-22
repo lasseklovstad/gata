@@ -13,4 +13,4 @@ test-results
 playwright-report
 playwright/.cache/
 *StorageState.json
-sqlite.db
+sqlite*.db
