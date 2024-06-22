@@ -107,7 +107,7 @@ test.describe("Event polls", () => {
       });
 
       await test.step("Delete poll name", async () => {
-         await eventPollPage.deletePoll(name);
+         await eventPollPage.deletePoll(newName);
          await expect(memberPage.getByRole("list", { name: newName })).toBeHidden();
       });
    });
