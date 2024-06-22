@@ -14,6 +14,7 @@ import {
    useRouteError,
    useRouteLoaderData,
 } from "@remix-run/react";
+import PullToRefresh from "pulltorefreshjs";
 import type { ComponentProps } from "react";
 import { useEffect } from "react";
 
@@ -71,11 +72,32 @@ const Document = ({ children }: DocumentProps) => {
 };
 
 export function Layout({ children }: ComponentProps<never>) {
+   useEffect(() => {
+      const standalone = window.matchMedia("(display-mode: standalone)").matches;
+      if (!standalone) {
+         return; // not standalone; no pull to refresh needed
+      }
+      // eslint-disable-next-line import/no-named-as-default-member
+      PullToRefresh.init({
+         mainElement: "body",
+         instructionsRefreshing: "Laster inn siden på nytt",
+         instructionsReleaseToRefresh: "Slipp for å laste inn på nytt",
+         instructionsPullToRefresh: "Dra for å laste inn på nytt",
+         onRefresh() {
+            window.location.reload();
+         },
+      });
+      return () => {
+         // eslint-disable-next-line import/no-named-as-default-member
+         PullToRefresh.destroyAll();
+      };
+   }, []);
    return <Document>{children}</Document>;
 }
 
 export default function App() {
    const { auth0User, loggedInUser, version } = useLoaderData<typeof loader>();
+
    return (
       <div className="flex flex-col min-h-lvh">
          <ResponsiveAppBar auth0User={auth0User} loggedInUser={loggedInUser} />

@@ -2,6 +2,8 @@ import { expect, type Page } from "@playwright/test";
 
 import { selectDate } from "e2e/utils/eventUtils";
 
+import { ConfirmModal } from "./ConfirmModal";
+
 export const EventPollPage = (page: Page) => {
    const mainHeading = page.getByRole("heading", { name: "Avstemninger" });
    const buttonCreatePoll = page.getByRole("button", { name: "Ny avstemning" });
@@ -124,6 +126,13 @@ export const EventPollPage = (page: Page) => {
       await dialog.getByRole("button", { name: "Lagre" }).click();
    };
 
+   const deletePoll = async (pollName: string) => {
+      await page.getByRole("button", { name: `Åpne meny for avstemning ${pollName}` }).click();
+      await page.getByRole("menuitem", { name: "Slett" }).click();
+      const confirmDialog = new ConfirmModal(page);
+      await confirmDialog.confirm();
+   };
+
    const verifyPollTableRowDisabled = async (tableName: string, canSelectMultiple: boolean, username: string) => {
       const table = getPollTableForm(tableName);
       const row = table.getByRole("row", { name: username });
@@ -201,5 +210,6 @@ export const EventPollPage = (page: Page) => {
       verifyPollList,
       checkListPollOption,
       verifyPollListIsDisabled,
+      deletePoll,
    };
 };

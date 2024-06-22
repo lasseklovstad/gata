@@ -9,7 +9,8 @@ type Props = {
 export const CloudImageCheckbox = ({ cloudImage }: Props) => {
    return (
       <>
-         <label className="relative cursor-pointer">
+         {/* Need flex for iphone and firefox */}
+         <label className="relative cursor-pointer flex">
             <CloudImage cloudImage={cloudImage} />
             <span className="sr-only">Velg bilde</span>
             <input
