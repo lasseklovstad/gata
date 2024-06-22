@@ -1,6 +1,7 @@
 import { expect, type Page } from "@playwright/test";
 
 import { selectDate } from "e2e/utils/eventUtils";
+
 import { ConfirmModal } from "./ConfirmModal";
 
 export const EventPollPage = (page: Page) => {
