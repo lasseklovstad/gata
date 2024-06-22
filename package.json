@@ -59,6 +59,7 @@
       "@playwright/test": "^1.44.1",
       "@remix-run/dev": "2.9.2",
       "@types/better-sqlite3": "^7.6.10",
+      "@types/pulltorefreshjs": "^0.1.7",
       "@types/react": "18.3.3",
       "@types/react-dom": "18.3.0",
       "@typescript-eslint/eslint-plugin": "7.13.0",

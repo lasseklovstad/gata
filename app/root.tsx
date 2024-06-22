@@ -73,6 +73,11 @@ const Document = ({ children }: DocumentProps) => {
 
 export function Layout({ children }: ComponentProps<never>) {
    useEffect(() => {
+      const standalone = window.matchMedia("(display-mode: standalone)").matches;
+      if (!standalone) {
+         return; // not standalone; no pull to refresh needed
+      }
+      // eslint-disable-next-line import/no-named-as-default-member
       PullToRefresh.init({
          mainElement: "body",
          instructionsRefreshing: "Laster inn siden på nytt",
@@ -83,6 +88,7 @@ export function Layout({ children }: ComponentProps<never>) {
          },
       });
       return () => {
+         // eslint-disable-next-line import/no-named-as-default-member
          PullToRefresh.destroyAll();
       };
    }, []);
