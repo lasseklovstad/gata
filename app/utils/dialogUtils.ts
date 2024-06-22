@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 
 type UseDialogProps = {
    defaultOpen: boolean;
@@ -14,5 +14,13 @@ export const useDialog = ({ defaultOpen }: UseDialogProps) => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, []);
 
-   return { dialogRef };
+   const open = () => {
+      dialogRef.current?.showModal();
+   };
+
+   const close = useCallback(() => {
+      dialogRef.current?.close();
+   }, []);
+
+   return { dialogRef, open, close };
 };

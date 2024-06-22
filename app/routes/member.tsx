@@ -1,5 +1,6 @@
-import { NavLink, Outlet, useParams } from "@remix-run/react";
-import type { ComponentProps } from "react";
+import { Outlet, useParams } from "@remix-run/react";
+
+import { TabNavLink } from "~/components/TabNavLink";
 
 export default function MemberLayout() {
    const { memberId } = useParams();
@@ -25,14 +26,3 @@ export default function MemberLayout() {
       </>
    );
 }
-
-const TabNavLink = (props: ComponentProps<typeof NavLink>) => {
-   return (
-      <NavLink
-         {...props}
-         end
-         unstable_viewTransition
-         className="-mb-[2px] block p-2 aria-current:text-primary aria-current:border-b-2 border-primary"
-      />
-   );
-};

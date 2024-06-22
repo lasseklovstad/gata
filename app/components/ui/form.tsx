@@ -3,9 +3,11 @@ import { createContext, forwardRef, useContext, useId } from "react";
 
 import { Label } from "~/components/ui/label";
 import { cn } from "~/utils";
+import type { TransformedError } from "~/utils/validateUtils";
+import { isTransformErrors } from "~/utils/validateUtils";
 
 type FormContextValue = {
-   errors?: Record<string, string[]>;
+   errors?: Record<string, string[]> | TransformedError[];
 };
 
 const FormContext = createContext<FormContextValue | undefined>(undefined);
@@ -49,7 +51,37 @@ const FormItem = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>
    ({ className, name, ...props }, ref) => {
       const id = useId();
       const formContext = useContext(FormContext);
-      const error = formContext?.errors ? formContext.errors[name] : undefined;
+      const getError = () => {
+         if (!formContext?.errors) return undefined;
+         if (isTransformErrors(formContext.errors)) {
+            // name[0]
+            // nameField = name
+            // nameIndex = 0
+            const arrayFormNameRegex = /^(.*)\[(\d+)\]/i;
+            const match = arrayFormNameRegex.exec(name);
+            const nameField = match && match[1];
+            const indexField = match && match[2];
+            let errors: string[] = [];
+            if (nameField && indexField) {
+               const index = Number(indexField);
+               errors = formContext.errors
+                  .filter((error) => {
+                     // When there are only errors on first field and that is the only field, xod omits the index
+                     if (index === 0 && error.path.length === 1) {
+                        return error.path[0] === nameField;
+                     } else {
+                        return error.path[0] === nameField && error.path[1] === index;
+                     }
+                  })
+                  .map((error) => error.message);
+            } else {
+               errors = formContext.errors.filter((error) => error.path[0] === name).map((error) => error.message);
+            }
+            return errors.length > 0 ? errors : undefined;
+         }
+         return formContext.errors[name];
+      };
+      const error = getError();
 
       return (
          <FormItemContext.Provider value={{ id, error, name }}>
@@ -70,6 +102,26 @@ const FormLabel = forwardRef<React.ElementRef<typeof Label>, React.ComponentProp
    }
 );
 FormLabel.displayName = "FormLabel";
+
+export const FormFieldset = forwardRef<React.ElementRef<"fieldset">, React.ComponentPropsWithoutRef<"fieldset">>(
+   ({ className, ...props }, ref) => {
+      const { error, formMessageId } = useFormField();
+
+      return <fieldset ref={ref} aria-invalid={error ? "true" : "false"} aria-describedby={formMessageId} {...props} />;
+   }
+);
+FormFieldset.displayName = "FormFieldset";
+
+export const FormLegend = forwardRef<React.ElementRef<"legend">, React.ComponentPropsWithoutRef<"legend">>(
+   ({ className, ...props }, ref) => {
+      const { error } = useFormField();
+
+      return (
+         <legend ref={ref} className={cn("text-sm font-medium", !!error && "text-destructive", className)} {...props} />
+      );
+   }
+);
+FormLabel.displayName = "FormLegend";
 
 type FormControlProps = {
    render: (props: { name: string; id: string; "aria-describedby": string; "aria-invalid": boolean }) => ReactNode;
@@ -100,7 +152,7 @@ FormDescription.displayName = "FormDescription";
 const FormMessage = forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
    ({ className, children, ...props }, ref) => {
       const { error, formMessageId } = useFormField();
-      const body = error ? error : children;
+      const body = error ? error.join(", ") : children;
 
       if (!body) {
          return null;

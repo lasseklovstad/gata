@@ -2,6 +2,7 @@ import type { Locator, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 import { DocumentPage } from "./DocumentPage";
+import { EventPage } from "./EventPage";
 
 class DocumentModal {
    modal: Locator;
@@ -27,77 +28,104 @@ class DocumentModal {
    }
 }
 
-export class HomePage {
-   page: Page;
-   welcomeTitle: Locator;
-   nonMemberInformationText: Locator;
-   memberWelcomeTitle: Locator;
-   addNewsButton: Locator;
-   addNewsModal: DocumentModal;
-   documentPage: DocumentPage;
-   newsList: Locator;
+export const HomePage = (page: Page) => {
+   const welcomeTitle = page.getByRole("heading", { name: "Velkommen" });
+   const memberWelcomeTitle = page.getByRole("heading", { name: "Nyheter" });
+   const newsList = page.getByRole("list", { name: "Nyheter" });
+   const listEvents = page.getByRole("list", { name: "Arrangement" });
+   const addNewsButton = page.getByRole("link", { name: "Opprett" });
+   const buttonCreateEvent = page.getByRole("link", { name: "Nytt Arrangement" });
+   const nonMemberInformationText = page.getByText("Du må være medlem for å se nyheter");
+   const addNewsModal = new DocumentModal(page);
+   const documentPage = new DocumentPage(page);
 
-   constructor(page: Page) {
-      this.page = page;
-      this.welcomeTitle = page.getByRole("heading", { name: "Velkommen" });
-      this.memberWelcomeTitle = page.getByRole("heading", { name: "Nyheter" });
-      this.newsList = page.getByRole("list", { name: "Nyheter" });
-      this.addNewsButton = page.getByRole("link", { name: "Opprett" });
-      this.nonMemberInformationText = page.getByText("Du må være medlem for å se nyheter");
-      this.addNewsModal = new DocumentModal(page);
-      this.documentPage = new DocumentPage(page);
+   async function goto() {
+      await page.goto("");
    }
 
-   async goto() {
-      await this.page.goto("");
+   async function gotoEvent(name: string) {
+      await page.goto("");
+      await listEvents.getByRole("link", { name }).click();
    }
 
-   async addNews(title: string, description: string) {
-      await this.addNewsButton.click();
-      await this.addNewsModal.fillForm(title, description);
-      await this.documentPage.validateTitleAndDescription(title, description);
+   async function addNews(title: string, description: string) {
+      await addNewsButton.click();
+      await addNewsModal.fillForm(title, description);
+      await documentPage.validateTitleAndDescription(title, description);
    }
 
-   getListItemButtons(listItem: Locator) {
+   function getListItemButtons(listItem: Locator) {
       const editButton = listItem.getByRole("link", { name: "Rediger" });
       return { editButton };
    }
 
-   getNewsListItem(title: string) {
-      return this.page.getByRole("listitem").filter({ hasText: title });
+   function getNewsListItem(title: string) {
+      return page.getByRole("listitem").filter({ hasText: title });
    }
 
-   async assertNewsHasContent(title: string, content: string) {
-      const item = this.getNewsListItem(title);
+   async function assertNewsHasContent(title: string, content: string) {
+      const item = getNewsListItem(title);
       await expect(item).toContainText(content);
    }
 
-   async clickEditNewsItem(title: string) {
-      const item = this.getNewsListItem(title);
-      const { editButton } = this.getListItemButtons(item);
+   async function clickEditNewsItem(title: string) {
+      const item = getNewsListItem(title);
+      const { editButton } = getListItemButtons(item);
       await editButton.click();
-      await this.documentPage.validateTitle(title);
+      await documentPage.validateTitle(title);
    }
 
-   async deleteAllNews() {
-      const items = this.newsList.getByRole("listitem");
+   async function deleteAllNews() {
+      const items = newsList.getByRole("listitem");
       const count = await items.count();
       // Iterate backwards
       for (let i = count - 1; i >= 0; i--) {
-         await this.deleteNewsItem(items.nth(i));
+         await deleteNewsItem(items.nth(i));
       }
    }
 
-   private async deleteNewsItem(item: Locator) {
-      await expect(item).toBeVisible();
-      const { editButton } = this.getListItemButtons(item);
-      await editButton.click();
-      await this.documentPage.deleteDocument();
-      await expect(this.memberWelcomeTitle).toBeVisible();
+   async function deleteAllEvents() {
+      const items = listEvents.getByRole("listitem");
+      const count = await items.count();
+      const eventPage = EventPage(page);
+      for (let i = count - 2; i >= 0; i--) {
+         await items.nth(i).getByRole("link").click();
+         await eventPage.deleteEvent();
+      }
    }
 
-   async deleteNews(title: string) {
-      const item = this.newsList.getByRole("listitem").filter({ has: this.page.getByRole("heading", { name: title }) });
-      await this.deleteNewsItem(item);
+   async function deleteNewsItem(item: Locator) {
+      await expect(item).toBeVisible();
+      const { editButton } = getListItemButtons(item);
+      await editButton.click();
+      await documentPage.deleteDocument();
+      await expect(memberWelcomeTitle).toBeVisible();
    }
-}
+
+   async function deleteNews(title: string) {
+      const item = newsList.getByRole("listitem").filter({ has: page.getByRole("heading", { name: title }) });
+      await deleteNewsItem(item);
+   }
+
+   return {
+      welcomeTitle,
+      memberWelcomeTitle,
+      newsList,
+      addNewsButton,
+      buttonCreateEvent,
+      nonMemberInformationText,
+      addNewsModal,
+      documentPage,
+      goto,
+      addNews,
+      getListItemButtons,
+      getNewsListItem,
+      assertNewsHasContent,
+      clickEditNewsItem,
+      deleteAllNews,
+      deleteNewsItem,
+      deleteNews,
+      deleteAllEvents,
+      gotoEvent,
+   };
+};

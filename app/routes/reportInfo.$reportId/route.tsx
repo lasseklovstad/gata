@@ -15,6 +15,7 @@ import { RichTextPreview } from "~/components/RichTextEditor/RichTextPreview";
 import { ButtonResponsive } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
+import { getCloudinaryUploadFolder } from "~/utils/cloudinaryUtils";
 import { isAdmin } from "~/utils/roleUtils";
 
 import { reportInfoIntent } from "./intent";
@@ -42,7 +43,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       }
       case reportInfoIntent.postFileIntent: {
          const data = String(formData.get("data"));
-         const { public_id, secure_url } = await uploadImage(data);
+         const folder = `${getCloudinaryUploadFolder()}/report-${params.reportId}`;
+         const { public_id, secure_url } = await uploadImage(data, folder);
          const [file] = await insertReportFile({
             reportId: params.reportId,
             cloudId: public_id,

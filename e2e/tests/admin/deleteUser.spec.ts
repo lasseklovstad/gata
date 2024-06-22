@@ -19,7 +19,7 @@ test.describe("Delete user", () => {
    });
    test("Should delete member that has added news", async ({ adminPage, memberPage }) => {
       await test.step("Member should add news", async () => {
-         const homePage = new HomePage(memberPage);
+         const homePage = HomePage(memberPage);
          const documentPage = new DocumentPage(memberPage);
          await homePage.goto();
          await homePage.addNews("Automatisk test", "Kake er godt");
@@ -29,7 +29,7 @@ test.describe("Delete user", () => {
       await deleteUser(adminPage);
 
       await test.step("Check that news item is still there", async () => {
-         const homePage = new HomePage(adminPage);
+         const homePage = HomePage(adminPage);
          await homePage.goto();
          await homePage.assertNewsHasContent("Automatisk test", "Jeg kommer til å bli slette");
          await homePage.deleteNews("Automatisk test");

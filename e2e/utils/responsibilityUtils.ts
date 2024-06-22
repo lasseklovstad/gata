@@ -37,14 +37,14 @@ export const removeResponsibilityFromMember = async (
 
 export const addResponsibilityToMember = async (
    page: Page,
-   responsibilitName: string,
+   responsibility: { name: string; description: string },
    username: string,
    type: "member" | "admin"
 ) => {
    const respPage = new ResponsibilityPage(page);
    await respPage.goto();
-   await respPage.createNewResponsibility(responsibilitName, "Han er kul");
-   await assignResponsibilityToMember(page, username, responsibilitName, type);
+   await respPage.createNewResponsibility(responsibility.name, responsibility.description);
+   await assignResponsibilityToMember(page, username, responsibility.name, type);
 };
 
 export const assignResponsibilityToMember = async (
