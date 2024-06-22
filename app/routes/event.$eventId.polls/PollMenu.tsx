@@ -25,15 +25,16 @@ type Props = {
 
 export const PollMenu = ({ poll }: Props) => {
    const fetcher = useFetcher<typeof action>();
-   const [open, setOpen] = useState(false);
+   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
    const editDialog = useDialog({ defaultOpen: false });
 
+   const closeEditDialog = editDialog.close;
    useEffect(() => {
       if (fetcher.data?.ok && fetcher.state === "idle") {
-         setOpen(false);
-         editDialog.close();
+         setDeleteDialogOpen(false);
+         closeEditDialog();
       }
-   }, [editDialog, fetcher.data, fetcher.state]);
+   }, [closeEditDialog, fetcher.data, fetcher.state]);
 
    return (
       <>
@@ -48,14 +49,14 @@ export const PollMenu = ({ poll }: Props) => {
                <DropdownMenuItem className="w-full" onClick={editDialog.open}>
                   <Edit className="mr-2" /> Rediger avstemningen
                </DropdownMenuItem>
-               <DropdownMenuItem className="w-full" onClick={() => setOpen(true)}>
+               <DropdownMenuItem className="w-full" onClick={() => setDeleteDialogOpen(true)}>
                   <Trash className="mr-2" /> Slett avstemningen
                </DropdownMenuItem>
             </DropdownMenuContent>
          </DropdownMenu>
          <ConfirmDialog
-            onClose={() => setOpen(false)}
-            open={open}
+            onClose={() => setDeleteDialogOpen(false)}
+            open={deleteDialogOpen}
             text="Er du sikker på at du vil slette avstemningen?"
             onConfirm={() => {
                fetcher.submit({ intent: "deletePoll", pollId: poll.id }, { method: "DELETE" });

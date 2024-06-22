@@ -9,6 +9,7 @@ import { Button } from "~/components/ui/button";
 import { FormControl, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { Textarea } from "~/components/ui/textarea";
 import { Typography } from "~/components/ui/typography";
 import { useDialog } from "~/utils/dialogUtils";
 
@@ -30,7 +31,7 @@ export const EventForm = ({ event }: Props) => {
          <FormItem name="description">
             <FormLabel>Beskrivelse</FormLabel>
             <FormControl
-               render={(props) => <Input {...props} defaultValue={event?.description} autoComplete="off" />}
+               render={(props) => <Textarea {...props} defaultValue={event?.description} autoComplete="off" />}
             />
             <FormMessage />
          </FormItem>

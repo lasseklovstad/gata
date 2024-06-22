@@ -42,6 +42,8 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
             </Typography>
          ) : null}
 
+         <PollActiveStatus id={isActiveMessageId} isActive={poll.isActive} />
+
          <fetcher.Form method="POST">
             <input hidden value={poll.id} name="pollId" readOnly />
             <input hidden value={loggedInUser.id} name="userId" readOnly />
@@ -107,7 +109,6 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
                />
             </div>
          </fetcher.Form>
-         <PollActiveStatus id={isActiveMessageId} isActive={poll.isActive} />
       </div>
    );
 };

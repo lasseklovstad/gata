@@ -16,11 +16,11 @@ export const UploadImages = ({ eventId }: Props) => {
    const encType = "multipart/form-data";
    return (
       <>
-         <Typography variant="h3" className="flex gap-2 items-center">
+         <Typography variant="h3" className="flex gap-2 items-center flex-wrap">
             <Image />
             Last opp bilder
          </Typography>
-         <fetcher.Form action={action} method={method} className="flex gap-2 items-center" encType={encType}>
+         <fetcher.Form action={action} method={method} className="flex gap-2 items-center flex-wrap" encType={encType}>
             <Input
                onChange={(e) => fetcher.submit(e.target.form, { method, encType, action })}
                className="w-fit"
