@@ -16,6 +16,7 @@ import {
 } from "@remix-run/react";
 import type { ComponentProps } from "react";
 import { useEffect } from "react";
+import PullToRefresh from "pulltorefreshjs";
 
 import { getOptionalUserFromExternalUserId } from "./.server/db/user";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
@@ -71,11 +72,27 @@ const Document = ({ children }: DocumentProps) => {
 };
 
 export function Layout({ children }: ComponentProps<never>) {
+   useEffect(() => {
+      const standalone = window.matchMedia("(display-mode: standalone)").matches;
+      if (!standalone) {
+         return; // not standalone; no pull to refresh needed
+      }
+      PullToRefresh.init({
+         mainElement: "body",
+         onRefresh() {
+            window.location.reload();
+         },
+      });
+      return () => {
+         PullToRefresh.destroyAll();
+      };
+   }, []);
    return <Document>{children}</Document>;
 }
 
 export default function App() {
    const { auth0User, loggedInUser, version } = useLoaderData<typeof loader>();
+
    return (
       <div className="flex flex-col min-h-lvh">
          <ResponsiveAppBar auth0User={auth0User} loggedInUser={loggedInUser} />

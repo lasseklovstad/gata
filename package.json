@@ -78,6 +78,7 @@
       "knip": "5.18.2",
       "postcss": "^8.4.38",
       "prettier": "3.3.2",
+      "pulltorefreshjs": "^0.1.22",
       "remix-development-tools": "^4.1.6",
       "tailwindcss": "^3.4.3",
       "typescript": "5.4.5",

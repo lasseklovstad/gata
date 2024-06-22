@@ -100,10 +100,15 @@ test.describe("Event polls", () => {
          await eventPollPage.verifyPollList(name, true, optionTexts, ["0", "1", "1"], [false, true, true]);
       });
 
+      const newName = "Når skal vi spise kake?";
       await test.step("Edit poll name", async () => {
-         const newName = "Når skal vi spise kake?";
          await eventPollPage.editPoll(name, { isActive: true, name: newName });
          await expect(memberPage.getByRole("list", { name: newName })).toBeVisible();
+      });
+
+      await test.step("Delete poll name", async () => {
+         await eventPollPage.deletePoll(name);
+         await expect(memberPage.getByRole("list", { name: newName })).toBeHidden();
       });
    });
 });
