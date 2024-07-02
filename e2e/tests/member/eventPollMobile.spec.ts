@@ -14,7 +14,7 @@ const eventName = "Gata Pils";
 
 test.use(devices["Galaxy S5"]);
 
-test.describe("Event polls", () => {
+test.describe("Event polls mobile", () => {
    test.afterEach(async ({ adminPage }) => {
       const homePage = HomePage(adminPage);
       await homePage.goto();
@@ -24,7 +24,7 @@ test.describe("Event polls", () => {
    test.beforeEach(async ({ memberPage }) => {
       await EventFormPage(memberPage).createEvent({ title: eventName, description: "" });
    });
-   test("Should create poll with multiselect and verify list on mobile", async ({ memberPage, adminPage }) => {
+   test("Should create poll with multiselect and verify list", async ({ memberPage, adminPage }) => {
       const eventPage = EventPage(memberPage);
       const eventPollPage = EventPollPage(memberPage);
       await eventPage.linkPolls.click();
@@ -74,7 +74,7 @@ test.describe("Event polls", () => {
          await eventPollPage.verifyPollListIsDisabled(name, true);
       });
    });
-   test("Should create poll with multiselect date and verify list on mobile", async ({ memberPage }) => {
+   test("Should create poll with multiselect date and verify list", async ({ memberPage }) => {
       const eventPage = EventPage(memberPage);
       const eventPollPage = EventPollPage(memberPage);
       await eventPage.linkPolls.click();
@@ -109,6 +109,51 @@ test.describe("Event polls", () => {
       await test.step("Delete poll name", async () => {
          await eventPollPage.deletePoll(newName);
          await expect(memberPage.getByRole("list", { name: newName })).toBeHidden();
+      });
+   });
+   test("Should create poll with can suggest options", async ({ memberPage }) => {
+      const eventPage = EventPage(memberPage);
+      const eventPollPage = EventPollPage(memberPage);
+      await eventPage.linkPolls.click();
+      await expect(eventPollPage.mainHeading).toBeVisible();
+
+      const name = "Når skal det skje?";
+      const options = [new Date(), addDays(new Date(), 1), addDays(new Date(), 2)];
+      const optionTexts = options.map((date) => formatDate(date, "dd.MMMM yyyy", { locale: nb }));
+
+      await test.step("Create poll and verify", async () => {
+         await eventPollPage.buttonCreatePoll.click();
+         await eventPollPage.fillForm({
+            name,
+            type: "Dato",
+            options,
+            canSelectMultiple: true,
+            canAddSuggestions: true,
+         });
+         await eventPollPage.buttonSubmit.click();
+         await eventPollPage.verifyPollList(name, true, optionTexts, ["0", "0", "0"], [false, false, false]);
+      });
+
+      await test.step("Select option", async () => {
+         await eventPollPage.checkListPollOption(name, true, optionTexts[1], true);
+         await eventPollPage.verifyPollList(name, true, optionTexts, ["0", "1", "0"], [false, true, false]);
+         await eventPollPage.checkListPollOption(name, true, optionTexts[2], true);
+         await eventPollPage.verifyPollList(name, true, optionTexts, ["0", "1", "1"], [false, true, true]);
+      });
+
+      await test.step("Add poll options", async () => {
+         const newPollOptions = [addDays(new Date(), 3), addDays(new Date(), 6)];
+         await eventPollPage.addPollOptions(name, { type: "Dato", options: newPollOptions });
+         const newPollOptionTexts = [...options, ...newPollOptions].map((date) =>
+            formatDate(date, "dd.MMMM yyyy", { locale: nb })
+         );
+         await eventPollPage.verifyPollList(
+            name,
+            true,
+            newPollOptionTexts,
+            ["0", "1", "1", "0", "0"],
+            [false, true, true, false, false]
+         );
       });
    });
 });

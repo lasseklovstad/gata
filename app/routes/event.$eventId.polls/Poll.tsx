@@ -30,7 +30,7 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
    const type = poll.canSelectMultiple ? "checkbox" : "radio";
 
    return (
-      <div>
+      <section aria-labelledby={titleId}>
          <div className="flex justify-between">
             <Typography variant="h3" className="mb-2" id={titleId}>
                {poll.name}
@@ -111,6 +111,6 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
             </div>
          </fetcher.Form>
          {isOrganizer || poll.canAddSuggestions ? <PollAddOption poll={poll} /> : null}
-      </div>
+      </section>
    );
 };
