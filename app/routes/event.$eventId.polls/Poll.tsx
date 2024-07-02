@@ -9,10 +9,10 @@ import type { User } from "~/.server/db/user";
 import { Typography } from "~/components/ui/typography";
 
 import { PollActiveStatus } from "./PollActiveStatus";
+import { PollAddOption } from "./PollAddOption";
 import { PollFormList } from "./PollFormList";
 import { PollFormTable } from "./PollFormTable";
 import { PollMenu } from "./PollMenu";
-import { PollAddOption } from "./PollAddOption";
 
 type Props = {
    poll: SerializeFrom<PollType["poll"]>;
@@ -110,7 +110,7 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
                />
             </div>
          </fetcher.Form>
-         <PollAddOption poll={poll} />
+         {isOrganizer || poll.canAddSuggestions ? <PollAddOption poll={poll} /> : null}
       </div>
    );
 };

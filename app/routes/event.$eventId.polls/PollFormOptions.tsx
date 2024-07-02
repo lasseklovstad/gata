@@ -14,9 +14,17 @@ type Props = {
    setSelectedDates: (date: Date[]) => void;
    textOptions: string[];
    setTextOptions: (options: string[]) => void;
+   existingOptions?: string[];
 };
 
-export const PollFormOptions = ({ type, selectedDates, setSelectedDates, setTextOptions, textOptions }: Props) => {
+export const PollFormOptions = ({
+   type,
+   selectedDates,
+   setSelectedDates,
+   setTextOptions,
+   textOptions,
+   existingOptions = [],
+}: Props) => {
    return (
       <>
          {type === "date" ? (
@@ -42,6 +50,7 @@ export const PollFormOptions = ({ type, selectedDates, setSelectedDates, setText
                         labelMonthDropdown: () => "Velg måned",
                         labelYearDropdown: () => "Velg år",
                      }}
+                     disabled={existingOptions.map((option) => new Date(option))}
                      selected={selectedDates}
                      onSelect={(dates) => setSelectedDates(dates ?? [])}
                      captionLayout="dropdown-buttons"

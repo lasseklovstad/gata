@@ -35,6 +35,7 @@ export const PollAddOption = ({ poll }: Props) => {
          closeDialog();
       }
    }, [closeDialog, fetcher.data, fetcher.state]);
+
    return (
       <>
          <Button variant="outline" onClick={dialog.open}>
@@ -53,6 +54,7 @@ export const PollAddOption = ({ poll }: Props) => {
                      setSelectedDates={setSelectedDates}
                      setTextOptions={setTextOptions}
                      textOptions={textOptions}
+                     existingOptions={poll.pollOptions.map((option) => option.textOption)}
                   />
                   <DialogFooter>
                      <Button type="submit" name="intent" value="addPollOptions" isLoading={fetcher.state !== "idle"}>
