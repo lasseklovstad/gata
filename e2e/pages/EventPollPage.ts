@@ -1,4 +1,5 @@
-import { expect, type Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 import { selectDate } from "e2e/utils/eventUtils";
 
@@ -8,6 +9,7 @@ export const EventPollPage = (page: Page) => {
    const mainHeading = page.getByRole("heading", { name: "Avstemninger" });
    const buttonCreatePoll = page.getByRole("button", { name: "Ny avstemning" });
    const dialogPoll = page.getByRole("dialog", { name: "Ny Avstemning" });
+   const dialogAddPollOptions = page.getByRole("dialog", { name: "Legg til alternativer" });
    const inputName = dialogPoll.getByLabel("Navn");
    const radioGroupType = dialogPoll.getByRole("group", { name: "Velg type" });
    const checkboxCanSelectMultiple = dialogPoll.getByRole("checkbox", {
@@ -27,23 +29,33 @@ export const EventPollPage = (page: Page) => {
       isAnonymous?: boolean;
       canSelectMultiple?: boolean;
       canAddSuggestions?: boolean;
-   } & ({ type: "Tekst"; options: string[] } | { type: "Dato"; options: Date[] });
+   } & PollFormOptions;
+
+   type PollFormOptions = { type: "Tekst"; options: string[] } | { type: "Dato"; options: Date[] };
+
+   const addDateOptions = async (options: Date[], container: Locator) => {
+      for (let index = 0; index < options.length; index++) {
+         await selectDate(options[index], container);
+      }
+   };
+
+   const addTextOptions = async (options: string[], container: Locator) => {
+      for (let index = 0; index < options.length; index++) {
+         if (index > 0) {
+            await container.getByRole("button", { name: "Legg til alternativ" }).click();
+         }
+         await getInputTextOption(index, container).fill(options[index]);
+      }
+   };
 
    const fillForm = async ({ name, type, canAddSuggestions, isAnonymous, canSelectMultiple, options }: PollForm) => {
       await inputName.fill(name);
       await getRadioType(type).click();
       if (type === "Tekst") {
-         for (let index = 0; index < options.length; index++) {
-            if (index > 0) {
-               await dialogPoll.getByRole("button", { name: "Legg til alternativ" }).click();
-            }
-            await getInputTextOption(index).fill(options[index]);
-         }
+         await addTextOptions(options, dialogPoll);
       }
       if (type === "Dato") {
-         for (let index = 0; index < options.length; index++) {
-            await selectDate(options[index], dialogPoll);
-         }
+         await addDateOptions(options, dialogPoll);
       }
       canAddSuggestions && (await checkboxCanAddSuggestions.check());
       isAnonymous && (await checkboxIsAnonymous.check());
@@ -51,7 +63,7 @@ export const EventPollPage = (page: Page) => {
    };
 
    const getRadioType = (type: "Tekst" | "Dato") => radioGroupType.getByRole("radio", { name: type });
-   const getInputTextOption = (index = 0) => dialogPoll.getByLabel(`Alternativ ${index + 1}`);
+   const getInputTextOption = (index: number, container: Locator) => container.getByLabel(`Alternativ ${index + 1}`);
    const getOptionListItems = () => dialogPoll.getByRole("list", { name: "Alternativer" }).getByRole("listitem");
    const deleteInputTextOption = async (index = 0) => {
       await dialogPoll.getByRole("button", { name: `Fjern Alternativ ${index + 1}` }).click();
@@ -187,11 +199,23 @@ export const EventPollPage = (page: Page) => {
       check ? await option.check() : await option.uncheck();
    };
 
+   const addPollOptions = async (pollName: string, { type, options }: PollFormOptions) => {
+      await page.getByRole("region", { name: pollName }).getByRole("button", { name: "Legg til alternativer" }).click();
+      if (type === "Tekst") {
+         await addTextOptions(options, dialogAddPollOptions);
+      }
+      if (type === "Dato") {
+         await addDateOptions(options, dialogAddPollOptions);
+      }
+      await dialogAddPollOptions.getByRole("button", { name: "Legg til" }).click();
+   };
+
    return {
       mainHeading,
       buttonCreatePoll,
       buttonCancel,
       buttonSubmit,
+      dialogPoll,
       fillForm,
       inputName,
       radioGroupType,
@@ -211,5 +235,6 @@ export const EventPollPage = (page: Page) => {
       checkListPollOption,
       verifyPollListIsDisabled,
       deletePoll,
+      addPollOptions,
    };
 };

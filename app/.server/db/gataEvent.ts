@@ -114,12 +114,16 @@ export const deletePoll = async (pollId: number) => {
    await db.delete(poll).where(eq(poll.id, pollId));
 };
 
-export const insertNewTextPoll = async (eventId: number, datePoll: typeof poll.$inferInsert, textOptions: string[]) => {
+export const insertNewPoll = async (eventId: number, pollValues: typeof poll.$inferInsert, options: string[]) => {
    await db.transaction(async (tx) => {
-      const [{ pollId }] = await tx.insert(poll).values(datePoll).returning({ pollId: poll.id });
+      const [{ pollId }] = await tx.insert(poll).values(pollValues).returning({ pollId: poll.id });
       await tx.insert(eventPolls).values({ pollId, eventId });
-      await tx.insert(pollOption).values(textOptions.map((textOption) => ({ textOption, pollId })));
+      await tx.insert(pollOption).values(options.map((textOption) => ({ textOption, pollId })));
    });
+};
+
+export const insertPollOptions = async (pollId: number, options: string[]) => {
+   await db.insert(pollOption).values(options.map((textOption) => ({ textOption, pollId })));
 };
 
 export const updateOrganizers = async (eventId: number, organizers: string[]) => {

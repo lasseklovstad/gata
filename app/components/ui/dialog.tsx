@@ -1,6 +1,8 @@
 import type { ComponentProps, Ref } from "react";
 import { createContext, forwardRef, useContext, useId } from "react";
 
+import { cn } from "~/utils";
+
 import { Typography } from "./typography";
 
 type DialogContext = {
@@ -28,6 +30,6 @@ export const DialogHeading = (props: ComponentProps<typeof Typography>) => {
    const context = useContext(DialogContext);
    return <Typography id={context?.titleId} variant="h2" {...props} />;
 };
-export const DialogFooter = (props: ComponentProps<"div">) => (
-   <div className="mt-4 flex justify-end gap-2" {...props} />
+export const DialogFooter = ({ className, ...props }: ComponentProps<"div">) => (
+   <div className={cn("mt-4 flex justify-end gap-2", className)} {...props} />
 );
