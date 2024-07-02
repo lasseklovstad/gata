@@ -131,9 +131,9 @@ export default function EventImages() {
             <>
                <fetcher.Form method="DELETE" id={formId}>
                   <input name="intent" value="deleteImages" hidden readOnly />
-                  <ul className="flex gap-2 flex-wrap">
+                  <ul className="sm:flex gap-2 flex-wrap grid">
                      {cloudinaryImages.map((image) => (
-                        <li key={image.cloudId}>
+                        <li key={image.cloudId} className="h-full sm:h-[160px]">
                            <CloudImageCheckbox cloudImage={image} />
                         </li>
                      ))}

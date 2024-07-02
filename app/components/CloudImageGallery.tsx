@@ -14,9 +14,9 @@ export const CloudImageGallery = ({ cloudImages }: Props) => {
    const selectedImage = selectedIndex !== -1 ? cloudImages[selectedIndex] : undefined;
    return (
       <>
-         <ul className="flex gap-2 flex-wrap">
+         <ul className="sm:flex gap-2 flex-wrap grid">
             {cloudImages.map((image, index) => (
-               <li key={image.cloudId}>
+               <li key={image.cloudId} className="h-full sm:h-[160px]">
                   <CloudImageButton cloudImage={image} onClick={() => setSelectedIndex(index)} />
                </li>
             ))}
