@@ -60,3 +60,6 @@ CTRL+D to quit ssh
 ```bash
 fly secrets set NAME="VALUE" NAME="VALUE"
 ```
+
+## Test in webkit browser locally on windows
+`npm run launch:webkit` launches a webkit browser for testing locally safari issues.

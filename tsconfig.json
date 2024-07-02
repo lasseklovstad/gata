@@ -8,7 +8,8 @@
     "**/.client/**/*.tsx",
     ".eslintrc.cjs",
     "postcss.config.cjs",
-    "server.mjs"
+    "server.mjs",
+    "launch-webkit.js"
   ],
   "exclude": ["node_modules"],
   "compilerOptions": {

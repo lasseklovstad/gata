@@ -9,8 +9,8 @@ export const CloudImage = ({ cloudImage }: Props) => {
    return (
       <img
          loading="lazy"
-         className="rounded shadow h-[160px]"
-         src={buildImageUrl(cloudImage.cloudUrl, 300, "height")}
+         className="rounded shadow h-full w-full"
+         src={buildImageUrl(cloudImage.cloudUrl, 400, "height")}
          alt=""
       />
    );
