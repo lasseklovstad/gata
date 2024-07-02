@@ -9,8 +9,9 @@ import {
    getEventPolls,
    getIsPollActive,
    insertPollVote,
-   insertNewTextPoll,
+   insertNewPoll,
    updatePoll,
+   insertPollOptions,
 } from "~/.server/db/gataEvent";
 import { getUsers } from "~/.server/db/user";
 import { Typography } from "~/components/ui/typography";
@@ -80,6 +81,23 @@ const newPollSchema = zfd
       path: ["dateOption"], // path of error
    });
 
+const addPollOptionsSchema = zfd
+   .formData({
+      dateOption: zfd.repeatable(z.array(z.string().date())),
+      textOption: zfd.repeatable(z.array(z.string().min(1, { message: "Alternativ kan ikke være tomt" }))),
+      pollId: zfd.numeric(),
+      // Only for validations
+      type: zfd.text(z.enum(["text", "date"])),
+   })
+   .refine((data) => (data.type === "text" ? data.textOption.length > 0 : true), {
+      message: "Det må være minst ett alternativ",
+      path: ["textOption"], // path of error
+   })
+   .refine((data) => (data.type === "date" ? data.dateOption.length > 0 : true), {
+      message: "Det må være minst ett alternativ",
+      path: ["dateOption"], // path of error
+   });
+
 export const action = async ({ request, params }: ActionFunctionArgs) => {
    const paramsParsed = paramSchema.safeParse(params);
    if (!paramsParsed.success) {
@@ -98,6 +116,20 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
          throw badRequest("Avstemning er ikke aktiv lenger");
       }
       await insertPollVote(pollVoteForm);
+      return { ok: true };
+   }
+
+   if (intent === "addPollOptions") {
+      const formParsed = addPollOptionsSchema.safeParse(formdata);
+      if (!formParsed.success) {
+         return transformErrorResponse(formParsed.error);
+      }
+      const { pollId, dateOption, textOption, type } = formParsed.data;
+      const isPollActive = await getIsPollActive(pollId);
+      if (!isPollActive) {
+         throw badRequest("Avstemning er ikke aktiv lenger");
+      }
+      await insertPollOptions(pollId, type === "date" ? dateOption : textOption);
       return { ok: true };
    }
 
@@ -127,7 +159,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
          return transformErrorResponse(newPollForm.error);
       }
       const { dateOption, textOption, ...poll } = newPollForm.data;
-      await insertNewTextPoll(eventId, poll, poll.type === "text" ? textOption : dateOption);
+      await insertNewPoll(eventId, poll, poll.type === "text" ? textOption : dateOption);
       return { ok: true };
    }
    throw badRequest("Intent not found " + intent);
