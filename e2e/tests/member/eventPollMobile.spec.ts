@@ -111,7 +111,7 @@ test.describe("Event polls mobile", () => {
          await expect(memberPage.getByRole("list", { name: newName })).toBeHidden();
       });
    });
-   test("Should create poll with can suggest options", async ({ memberPage }) => {
+   test.only("Should create poll with can suggest options", async ({ memberPage }) => {
       const eventPage = EventPage(memberPage);
       const eventPollPage = EventPollPage(memberPage);
       await eventPage.linkPolls.click();

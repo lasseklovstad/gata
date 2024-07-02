@@ -42,7 +42,7 @@ test.describe("Event polls", () => {
       await expect(eventPollPage.getRadioType("Tekst")).not.toBeChecked();
 
       // Should hide rest of form after reset
-      await expect(eventPollPage.getInputTextOption()).toBeHidden();
+      await expect(eventPollPage.getInputTextOption(0, eventPollPage.dialogPoll)).toBeHidden();
       await expect(eventPollPage.checkboxCanAddSuggestions).toBeHidden();
       await expect(eventPollPage.checkboxCanSelectMultiple).toBeHidden();
       await expect(eventPollPage.checkboxIsAnonymous).toBeHidden();
@@ -51,19 +51,19 @@ test.describe("Event polls", () => {
       // Verify middle one to be deleted
       await eventPollPage.deleteInputTextOption(1);
       await expect(eventPollPage.getOptionListItems()).toHaveCount(2);
-      await expect(eventPollPage.getInputTextOption(0)).toHaveValue("Øl");
-      await expect(eventPollPage.getInputTextOption(1)).toHaveValue("Brus");
+      await expect(eventPollPage.getInputTextOption(0, eventPollPage.dialogPoll)).toHaveValue("Øl");
+      await expect(eventPollPage.getInputTextOption(1, eventPollPage.dialogPoll)).toHaveValue("Brus");
 
       // Verify at least one option
       await eventPollPage.deleteInputTextOption(1);
-      await eventPollPage.getInputTextOption(0).fill("");
+      await eventPollPage.getInputTextOption(0, eventPollPage.dialogPoll).fill("");
       await eventPollPage.buttonSubmit.click();
-      await expect(eventPollPage.getInputTextOption(0)).toHaveAccessibleDescription(
+      await expect(eventPollPage.getInputTextOption(0, eventPollPage.dialogPoll)).toHaveAccessibleDescription(
          "Alternativ kan ikke være tomt, Det må være mer enn ett alternativ"
       );
-      await eventPollPage.getInputTextOption(0).fill("Øl");
+      await eventPollPage.getInputTextOption(0, eventPollPage.dialogPoll).fill("Øl");
       await eventPollPage.buttonSubmit.click();
-      await expect(eventPollPage.getInputTextOption(0)).toHaveAccessibleDescription(
+      await expect(eventPollPage.getInputTextOption(0, eventPollPage.dialogPoll)).toHaveAccessibleDescription(
          "Det må være mer enn ett alternativ"
       );
    });

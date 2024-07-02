@@ -1,4 +1,5 @@
-import { Locator, expect, type Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 import { selectDate } from "e2e/utils/eventUtils";
 
@@ -43,7 +44,7 @@ export const EventPollPage = (page: Page) => {
          if (index > 0) {
             await container.getByRole("button", { name: "Legg til alternativ" }).click();
          }
-         await getInputTextOption(index).fill(options[index]);
+         await getInputTextOption(index, container).fill(options[index]);
       }
    };
 
@@ -62,7 +63,7 @@ export const EventPollPage = (page: Page) => {
    };
 
    const getRadioType = (type: "Tekst" | "Dato") => radioGroupType.getByRole("radio", { name: type });
-   const getInputTextOption = (index = 0, container: Locator) => container.getByLabel(`Alternativ ${index + 1}`);
+   const getInputTextOption = (index: number, container: Locator) => container.getByLabel(`Alternativ ${index + 1}`);
    const getOptionListItems = () => dialogPoll.getByRole("list", { name: "Alternativer" }).getByRole("listitem");
    const deleteInputTextOption = async (index = 0) => {
       await dialogPoll.getByRole("button", { name: `Fjern Alternativ ${index + 1}` }).click();
@@ -214,6 +215,7 @@ export const EventPollPage = (page: Page) => {
       buttonCreatePoll,
       buttonCancel,
       buttonSubmit,
+      dialogPoll,
       fillForm,
       inputName,
       radioGroupType,

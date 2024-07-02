@@ -40,12 +40,12 @@ export const PollAddOption = ({ poll }: Props) => {
       <>
          <Button variant="outline" onClick={dialog.open}>
             <Plus className="mr-2" />
-            Legg til alternativ
+            Legg til alternativer
          </Button>
          <Dialog ref={dialog.dialogRef}>
             <fetcher.Form method="POST" onReset={handleReset} ref={formRef}>
                <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
-                  <DialogHeading>Legg til alternativ</DialogHeading>
+                  <DialogHeading>Legg til alternativer</DialogHeading>
                   <input hidden readOnly value={poll.id} name="pollId" />
                   <input hidden readOnly value={poll.type} name="type" />
                   <PollFormOptions
