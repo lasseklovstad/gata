@@ -133,34 +133,6 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    throw badRequest("Intent not found " + intent);
 };
 
-/**
- * DONE -- Lag PollText ferdig
- * Legg til mulig for bilder
- * DONE --Rediger poll
- * Rediger event
- * Slett event
- * Legg til event arrangører
- * Legg til om man kan komme
- * Legg til notificasjon i appen?
- * Legg til kommentarer
- * Legg til at brukere kan legge til alternativer
- * DONE --Anonym avstemning bør skjule hvilke brukere som har stemt.
- * DONE --mobilvisning
- * Opplasting av bilder bør kunne velg cloud eller lagre i db.
- * Vise liste over arrangementer på forsiden
- * Bør vise notifikasjon hvis en bruker ikke har sett på et arrangement
- * Lag e2e tester
- * Det kan være tabs med avstemninger/bilder/meldinger
- * en oversikt finnes på forside som linker til avstemningene.
- * DU får notifikasjon på de hvis du ikke ha sett en avstemning. Notifikasjonen forsvinner når du har stemt. Når avstemningen er ferdig forsvinner den.
- * Når du sier du deltar får du notifaksjon når noe skjer. Legger til bilder, ny avstemning, ny melding osv...
- * Hvis du har huket av på deltat men ikke har vært inne på en uke får du ny  notifikasjon og itilleg en mail om at det har skjedd noe.
- * Når du går inn resettes denne.
- * Alle notifikasjonene kan lagres på brukern og vises. slik som facebook.
- * Det blei mye greier men notifkasjonsgreine kan man avvente da.
- * Innlogging kan vare en måned.
- */
-
 export default function EventPage() {
    const { event, polls, loggedInUser, users } = useLoaderData<typeof loader>();
 
