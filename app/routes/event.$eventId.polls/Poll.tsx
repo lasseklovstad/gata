@@ -110,7 +110,7 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
                />
             </div>
          </fetcher.Form>
-         {isOrganizer || poll.canAddSuggestions ? <PollAddOption poll={poll} /> : null}
+         {poll.isActive && (isOrganizer || poll.canAddSuggestions) ? <PollAddOption poll={poll} /> : null}
       </section>
    );
 };
