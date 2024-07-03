@@ -50,6 +50,8 @@ export const pushSubscriptions = sqliteTable("push_subscriptions", {
    subscription: blob("subscription", { mode: "json" }).notNull(),
 });
 
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+
 export const responsibilityNote = sqliteTable("responsibility_note", {
    id: text("id")
       .primaryKey()

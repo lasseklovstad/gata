@@ -10,3 +10,7 @@ export const insertPushSubscription = async (userId: string, endpoint: string, s
 export const deletePushSubscription = async (endpoint: string) => {
    await db.delete(pushSubscriptions).where(eq(pushSubscriptions.endpoint, endpoint));
 };
+
+export const getSubscriptions = async () => {
+   return await db.select().from(pushSubscriptions);
+};

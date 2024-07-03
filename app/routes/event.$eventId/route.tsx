@@ -27,6 +27,9 @@ import { AttendingSelect } from "./AttendingSelect";
 import { EventMenu } from "./EventMenu";
 import { EventOrganizers } from "./EventOrganizers";
 import { eventSchema } from "./eventSchema";
+import { getSubscriptions } from "~/.server/db/pushSubscriptions";
+import { sendPushNotification } from "~/.server/services/pushNoticiationService";
+import { PushSubscription } from "web-push";
 
 const paramSchema = z.object({
    eventId: z.coerce.number(),
@@ -70,6 +73,11 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    if (intent === "updateParticipating") {
       const { status } = updateParticipatingSchema.parse(formdata);
       await updateIsUserParticipating(eventId, loggedInUser.id, status === "going");
+      const subscriptions = await getSubscriptions();
+      await sendPushNotification(
+         subscriptions.map((s) => s.subscription as PushSubscription),
+         "Event er oppdatert"
+      );
       return { ok: true };
    }
 
