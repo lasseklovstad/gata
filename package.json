@@ -54,6 +54,7 @@
       "slate-react": "0.106.0",
       "tailwind-merge": "^2.2.2",
       "tailwindcss-animate": "^1.0.7",
+      "web-push": "^3.6.7",
       "zod": "^3.23.8",
       "zod-form-data": "^2.0.2"
    },
