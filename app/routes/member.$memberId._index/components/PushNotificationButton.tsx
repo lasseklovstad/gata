@@ -18,7 +18,6 @@ export const PushNotificationButton = ({ publicKey }: Props) => {
       if ("serviceWorker" in navigator && "PushManager" in window) {
          void navigator.serviceWorker.ready.then(async (registration) => {
             await registration.pushManager.getSubscription().then((sub) => {
-               console.log(sub);
                setSubscription(sub);
             });
          });
@@ -34,7 +33,6 @@ export const PushNotificationButton = ({ publicKey }: Props) => {
             })
             .then((subscription) => {
                setSubscription(subscription);
-               console.log("User is subscribed:", subscription);
 
                fetcher.submit(JSON.stringify(subscription), {
                   action: "/subscribe",
