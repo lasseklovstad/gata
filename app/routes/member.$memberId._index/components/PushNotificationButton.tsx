@@ -1,8 +1,8 @@
 import { useFetcher } from "@remix-run/react";
 import { Bell, BellOff } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 
 type Props = {

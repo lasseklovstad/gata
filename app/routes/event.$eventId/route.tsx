@@ -12,7 +12,6 @@ import {
    getEvent,
    getEventParticipants,
    getNumberOfImages,
-   updateEvent,
    updateOrganizers,
 } from "~/.server/db/gataEvent";
 import { getUsers } from "~/.server/db/user";
@@ -23,10 +22,10 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
 import { badRequest } from "~/utils/responseUtils";
 
+import { eventSchema } from "../../utils/schemas/eventSchema";
 import { AttendingSelect } from "./AttendingSelect";
 import { EventMenu } from "./EventMenu";
 import { EventOrganizers } from "./EventOrganizers";
-import { eventSchema } from "../../utils/schemas/eventSchema";
 
 const paramSchema = z.object({
    eventId: z.coerce.number(),

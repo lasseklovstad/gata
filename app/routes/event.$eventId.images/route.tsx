@@ -10,8 +10,8 @@ import { Trash } from "lucide-react";
 import { useId, useState } from "react";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
-import { notifyParticipantsImagesIsUploaded } from "~/.server/data-layer/gataEvent";
 
+import { notifyParticipantsImagesIsUploaded } from "~/.server/data-layer/gataEvent";
 import {
    deleteEventCloudinaryImage,
    getEvent,

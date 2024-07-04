@@ -2,7 +2,7 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import { Link, json, redirect, useFetcher } from "@remix-run/react";
 import { Calendar } from "lucide-react";
 
-import { insertEvent } from "~/.server/db/gataEvent";
+import { createEventAndNotify } from "~/.server/data-layer/gataEvent";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { FormProvider } from "~/components/ui/form";
@@ -19,14 +19,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
    if (!event.success) {
       return json({ ...event.error.formErrors }, { status: 400 });
    }
-   const { startDate, startTime, description, title } = event.data;
-   const eventId = await insertEvent({
-      title,
-      description,
-      startTime: startTime ?? null,
-      startDate: startDate ?? null,
-      createdBy: loggedInUser.id,
-   });
+   const eventId = await createEventAndNotify(loggedInUser, event.data);
    return redirect(`/event/${eventId}`);
 };
 
