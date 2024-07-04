@@ -11,7 +11,7 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
 import { EventForm } from "./event.$eventId/EventForm";
-import { eventSchema } from "./event.$eventId/eventSchema";
+import { eventSchema } from "../utils/schemas/eventSchema";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);

@@ -10,6 +10,7 @@ import { Trash } from "lucide-react";
 import { useId, useState } from "react";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
+import { notifyParticipantsImagesIsUploaded } from "~/.server/data-layer/gataEvent";
 
 import {
    deleteEventCloudinaryImage,
@@ -74,6 +75,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       );
 
       await unstable_parseMultipartFormData(request, uploadHandler);
+      await notifyParticipantsImagesIsUploaded(loggedInUser, eventId);
 
       return { ok: true };
    }

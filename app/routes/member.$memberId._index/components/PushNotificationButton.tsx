@@ -42,14 +42,6 @@ export const PushNotificationButton = ({ publicKey }: Props) => {
                   preventScrollReset: true,
                   method: "POST",
                });
-               // Send subscription to your server
-               // fetch('/subscribe', {
-               //   method: 'POST',
-               //   body: JSON.stringify(subscription),
-               //   headers: {
-               //     'Content-Type': 'application/json'
-               //   }
-               // });
             })
             .catch((error) => {
                setError(String(error));

@@ -6,13 +6,13 @@ import { useId } from "react";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 
+import { updateEventAndNotify, updateParticipatingAndNotify } from "~/.server/data-layer/gataEvent";
 import {
    deleteEvent,
    getEvent,
    getEventParticipants,
    getNumberOfImages,
    updateEvent,
-   updateIsUserParticipating,
    updateOrganizers,
 } from "~/.server/db/gataEvent";
 import { getUsers } from "~/.server/db/user";
@@ -26,10 +26,7 @@ import { badRequest } from "~/utils/responseUtils";
 import { AttendingSelect } from "./AttendingSelect";
 import { EventMenu } from "./EventMenu";
 import { EventOrganizers } from "./EventOrganizers";
-import { eventSchema } from "./eventSchema";
-import { getSubscriptions } from "~/.server/db/pushSubscriptions";
-import { sendPushNotification } from "~/.server/services/pushNoticiationService";
-import { PushSubscription } from "web-push";
+import { eventSchema } from "../../utils/schemas/eventSchema";
 
 const paramSchema = z.object({
    eventId: z.coerce.number(),
@@ -69,19 +66,13 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const formdata = await request.formData();
    const intent = formdata.get("intent") as string;
-
+   const event = await getEvent(eventId);
    if (intent === "updateParticipating") {
       const { status } = updateParticipatingSchema.parse(formdata);
-      await updateIsUserParticipating(eventId, loggedInUser.id, status === "going");
-      const subscriptions = await getSubscriptions();
-      await sendPushNotification(
-         subscriptions.map((s) => s.subscription as PushSubscription),
-         "Event er oppdatert"
-      );
+      await updateParticipatingAndNotify(loggedInUser, eventId, status);
       return { ok: true };
    }
 
-   const event = await getEvent(eventId);
    if (!isUserOrganizer(event, loggedInUser)) {
       throw badRequest("Du har ikke tilgang til å endre denne ressursen");
    }
@@ -96,8 +87,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       if (!updateEventForm.success) {
          return { ...updateEventForm.error.formErrors, ok: false };
       }
-      const { startDate, startTime, description, title } = updateEventForm.data;
-      await updateEvent(eventId, { title, description, startTime: startTime ?? null, startDate: startDate ?? null });
+      await updateEventAndNotify(loggedInUser, eventId, updateEventForm.data);
       return { ok: true };
    }
    if (intent === "updateOrganizers") {

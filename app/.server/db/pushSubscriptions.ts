@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 
 import { db } from "db/config.server";
-import { pushSubscriptions } from "db/schema";
+import { eventParticipants, pushSubscriptions } from "db/schema";
 
 export const insertPushSubscription = async (userId: string, endpoint: string, subscription: PushSubscriptionJSON) => {
    await db.insert(pushSubscriptions).values({ userId, subscription, endpoint });
@@ -11,6 +11,20 @@ export const deletePushSubscription = async (endpoint: string) => {
    await db.delete(pushSubscriptions).where(eq(pushSubscriptions.endpoint, endpoint));
 };
 
-export const getSubscriptions = async () => {
-   return await db.select().from(pushSubscriptions);
+export const getAllSubscriptions = async (notIncludedUser: string) => {
+   return await db.select().from(pushSubscriptions).where(ne(pushSubscriptions.userId, notIncludedUser));
+};
+
+export const getAllSubscriptionsGoingToEvent = async (eventId: number, notIncludedUser: string) => {
+   return await db
+      .select({ subscription: pushSubscriptions.subscription })
+      .from(pushSubscriptions)
+      .innerJoin(eventParticipants, eq(eventParticipants.userId, pushSubscriptions.userId))
+      .where(
+         and(
+            eq(eventParticipants.eventId, eventId),
+            eq(eventParticipants.isParticipating, true),
+            ne(pushSubscriptions.userId, notIncludedUser)
+         )
+      );
 };
