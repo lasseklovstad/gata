@@ -21,10 +21,12 @@ import { LinkExternalUserToGataUserSelect } from "~/routes/member.$memberId._ind
 import { UserInfo } from "~/routes/member.$memberId._index/components/UserInfo";
 import { UserSubscribe } from "~/routes/member.$memberId._index/components/UserSubscribe";
 import { createAuthenticator } from "~/utils/auth.server";
+import { env } from "~/utils/env.server";
 import { updateContingentSchema } from "~/utils/formSchema";
 import { badRequest } from "~/utils/responseUtils";
 import { isAdmin, requireAdminRole } from "~/utils/roleUtils";
 
+import { PushNotificationButton } from "./components/PushNotificationButton";
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
 
@@ -39,7 +41,7 @@ export const loader = async ({ request, params: { memberId } }: LoaderFunctionAr
       getContingentInfo(),
       getNotMemberUsers(),
    ]);
-   return { member, contingentInfo, roles, notMemberUsers, loggedInUser };
+   return { member, contingentInfo, roles, notMemberUsers, loggedInUser, pwaPublicKey: env.PWA_PUBLIC_KEY };
 };
 
 export const action = async ({ request, params: { memberId } }: ActionFunctionArgs) => {
@@ -98,7 +100,7 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
 };
 
 export default function MemberInfoPage() {
-   const { member, contingentInfo, roles, notMemberUsers, loggedInUser } = useLoaderData<typeof loader>();
+   const { member, contingentInfo, roles, notMemberUsers, loggedInUser, pwaPublicKey } = useLoaderData<typeof loader>();
    const fetcher = useFetcher();
    const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog({
       text: "Ved å slette mister vi all informasjon knyttet til brukeren",
@@ -129,7 +131,10 @@ export default function MemberInfoPage() {
                </>
             )}
          </div>
-         {loggedInUser.id === member.id && <UserSubscribe user={member} />}
+         <div className="space-y-2">
+            {loggedInUser.id === member.id && <UserSubscribe user={member} />}
+            {loggedInUser.id === member.id && <PushNotificationButton publicKey={pwaPublicKey} />}
+         </div>
          <UserInfo user={member} loggedInUser={loggedInUser} contingentInfo={contingentInfo} />
 
          {isUserAdmin && (

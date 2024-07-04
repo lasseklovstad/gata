@@ -9,7 +9,8 @@
     ".eslintrc.cjs",
     "postcss.config.cjs",
     "server.mjs",
-    "launch-webkit.js"
+    "launch-webkit.js",
+    "public/sw.js"
   ],
   "exclude": ["node_modules"],
   "compilerOptions": {

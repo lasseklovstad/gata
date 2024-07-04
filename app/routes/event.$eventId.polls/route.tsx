@@ -1,23 +1,21 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { z } from "zod";
-import { zfd } from "zod-form-data";
 
-import {
-   deletePoll,
-   getEvent,
-   getEventPolls,
-   getIsPollActive,
-   insertPollVote,
-   insertNewPoll,
-   updatePoll,
-   insertPollOptions,
-} from "~/.server/db/gataEvent";
+import { addPollVoteAndNotify, createNewPoll, updatePollAndNotify } from "~/.server/data-layer/eventPoll";
+import { deletePoll, getEvent, getEventPolls, getIsPollActive, insertPollOptions } from "~/.server/db/gataEvent";
 import { getUsers } from "~/.server/db/user";
 import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
 import { badRequest } from "~/utils/responseUtils";
+import {
+   addPollOptionsSchema,
+   newPollSchema,
+   pollDeleteSchema,
+   pollUpdateSchema,
+   pollVoteSchema,
+} from "~/utils/schemas/eventPollSchema";
 import { transformErrorResponse } from "~/utils/validateUtils";
 
 import { Poll } from "./Poll";
@@ -44,60 +42,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    return { event, polls: filteredPolls, loggedInUser, users };
 };
 
-const pollVoteSchema = zfd.formData({
-   pollId: zfd.numeric(),
-   userId: zfd.text(),
-   options: zfd.repeatable(z.array(z.coerce.number())),
-});
-
-const pollUpdateSchema = zfd.formData({
-   pollId: zfd.numeric(),
-   name: zfd.text(z.string()),
-   canAddSuggestions: zfd.checkbox(),
-   isFinished: zfd.checkbox(),
-});
-
-const pollDeleteSchema = zfd.formData({
-   pollId: zfd.numeric(),
-});
-
-const newPollSchema = zfd
-   .formData({
-      name: zfd.text(z.string()),
-      // format: yyyy-MM-dd
-      dateOption: zfd.repeatable(z.array(z.string().date())),
-      textOption: zfd.repeatable(z.array(z.string().min(1, { message: "Alternativ kan ikke være tomt" }))),
-      isAnonymous: zfd.checkbox(),
-      canAddSuggestions: zfd.checkbox(),
-      canSelectMultiple: zfd.checkbox(),
-      type: zfd.text(z.enum(["text", "date"])),
-   })
-   .refine((data) => (data.type === "text" ? data.textOption.length > 1 : true), {
-      message: "Det må være mer enn ett alternativ",
-      path: ["textOption"], // path of error
-   })
-   .refine((data) => (data.type === "date" ? data.dateOption.length > 1 : true), {
-      message: "Det må være mer enn ett alternativ",
-      path: ["dateOption"], // path of error
-   });
-
-const addPollOptionsSchema = zfd
-   .formData({
-      dateOption: zfd.repeatable(z.array(z.string().date())),
-      textOption: zfd.repeatable(z.array(z.string().min(1, { message: "Alternativ kan ikke være tomt" }))),
-      pollId: zfd.numeric(),
-      // Only for validations
-      type: zfd.text(z.enum(["text", "date"])),
-   })
-   .refine((data) => (data.type === "text" ? data.textOption.length > 0 : true), {
-      message: "Det må være minst ett alternativ",
-      path: ["textOption"], // path of error
-   })
-   .refine((data) => (data.type === "date" ? data.dateOption.length > 0 : true), {
-      message: "Det må være minst ett alternativ",
-      path: ["dateOption"], // path of error
-   });
-
 export const action = async ({ request, params }: ActionFunctionArgs) => {
    const paramsParsed = paramSchema.safeParse(params);
    if (!paramsParsed.success) {
@@ -115,7 +59,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       if (!isPollActive) {
          throw badRequest("Avstemning er ikke aktiv lenger");
       }
-      await insertPollVote(pollVoteForm);
+      await addPollVoteAndNotify(loggedInUser, eventId, pollVoteForm);
       return { ok: true };
    }
 
@@ -143,8 +87,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       if (!updatePollForm.success) {
          return transformErrorResponse(updatePollForm.error);
       }
-      const { pollId, isFinished, ...pollValues } = updatePollForm.data;
-      await updatePoll(pollId, { ...pollValues, isActive: !isFinished });
+      await updatePollAndNotify(loggedInUser, eventId, updatePollForm.data);
       return { ok: true };
    }
 
@@ -158,8 +101,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       if (!newPollForm.success) {
          return transformErrorResponse(newPollForm.error);
       }
-      const { dateOption, textOption, ...poll } = newPollForm.data;
-      await insertNewPoll(eventId, poll, poll.type === "text" ? textOption : dateOption);
+      await createNewPoll(loggedInUser, eventId, newPollForm.data);
       return { ok: true };
    }
    throw badRequest("Intent not found " + intent);

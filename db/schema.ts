@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { blob, integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { env } from "~/utils/env.server";
 
@@ -41,6 +41,16 @@ export const userRoles = sqliteTable("gata_user_roles", {
       .notNull()
       .references(() => role.id),
 });
+
+export const pushSubscriptions = sqliteTable("push_subscriptions", {
+   userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+   endpoint: text("endpoint").primaryKey(),
+   subscription: blob("subscription", { mode: "json" }).notNull(),
+});
+
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
 
 export const responsibilityNote = sqliteTable("responsibility_note", {
    id: text("id")

@@ -12,3 +12,5 @@ export const eventSchema = zfd.formData({
          .optional()
    ),
 });
+
+export type EventSchema = z.infer<typeof eventSchema>;
