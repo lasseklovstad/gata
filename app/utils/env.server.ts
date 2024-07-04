@@ -15,5 +15,4 @@ export const env = {
    VERSION: process.env.npm_package_version!,
    PWA_PUBLIC_KEY: process.env.PWA_PUBLIC_KEY!,
    PWA_PRIVATE_KEY: process.env.PWA_PRIVATE_KEY!,
-   GCM_API_KEY: process.env.GCM_API_KEY!,
 };
