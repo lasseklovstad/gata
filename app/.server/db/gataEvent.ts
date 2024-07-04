@@ -57,6 +57,10 @@ export const getEventPollsSimple = async (eventId: number) => {
    });
 };
 
+export const getPoll = async (pollId: number) => {
+   return await db.select().from(poll).where(eq(poll.id, pollId));
+};
+
 export type Poll = Awaited<ReturnType<typeof getEventPolls>>[number];
 
 export const getEventPolls = async (eventId: number, loggedInUser: User) => {

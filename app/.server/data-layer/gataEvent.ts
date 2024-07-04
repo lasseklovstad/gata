@@ -18,7 +18,7 @@ export const updateParticipatingAndNotify = async (
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),
       {
-         body: `${loggedInUser.primaryUser.name} ${status === "going" ? "skal delta på" : "kan ikke delta på"} arrangement ${event.title}`,
+         body: `${status === "going" ? "✔️" : "❌"} ${loggedInUser.primaryUser.name} ${status === "going" ? "skal delta på" : "kan ikke delta på"} arrangement ${event.title}`,
          data: { url: "" },
          icon: "/logo192.png",
       }
@@ -36,7 +36,7 @@ export const updateEventAndNotify = async (
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),
       {
-         body: `Arrangement ${event.title} er oppdatert`,
+         body: `📅 Arrangement ${event.title} er oppdatert`,
          data: { url: "" },
          icon: "/logo192.png",
       }
@@ -59,7 +59,7 @@ export const createEventAndNotify = async (
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),
       {
-         body: `Nytt arrangement ${title} opprettet. Si i fra om du kommer!`,
+         body: `📅 Nytt arrangement ${title} opprettet. Si i fra om du kommer 🎉`,
          data: { url: "" },
          icon: "/logo192.png",
       }
@@ -74,7 +74,7 @@ export const notifyParticipantsImagesIsUploaded = async (loggedInUser: User, eve
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),
       {
-         body: `Arrangement ${event.title} er oppdatert med nye bilder`,
+         body: `Arrangement ${event.title} er oppdatert med nye bilder 📷`,
          data: { url: "" },
          icon: "/logo192.png",
       }
