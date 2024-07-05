@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-import { Link, useNavigation } from "@remix-run/react";
+import { Link, NavLink, useNavigation } from "@remix-run/react";
 import { Menu } from "lucide-react";
 import { useEffect, useRef } from "react";
 
@@ -57,9 +57,12 @@ export const SideBar = ({ items }: Props) => {
                                     {item.name}
                                  </a>
                               ) : (
-                                 <Link to={item.url} className="w-full">
+                                 <NavLink
+                                    to={item.url}
+                                    className={({ isActive }) => `w-full ${isActive ? "font-semibold" : ""}`}
+                                 >
                                     {item.name}
-                                 </Link>
+                                 </NavLink>
                               )
                            ) : (
                               item.name
