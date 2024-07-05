@@ -13,7 +13,7 @@ export class GataHeader {
 
    constructor(page: Page) {
       this.responsibilityLink = page.getByRole("link", { name: "Ansvarsposter" });
-      this.homeLink = page.getByRole("link", { name: "Hjem" });
+      this.homeLink = page.getByRole("link", { name: "Hjem", exact: true });
       this.myPageLink = page.getByRole("link", { name: "Min side" });
       this.memberLink = page.getByRole("link", { name: "Medlemmer" });
       this.documentsLink = page.getByRole("link", {
