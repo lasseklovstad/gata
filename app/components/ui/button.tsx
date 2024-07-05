@@ -74,11 +74,11 @@ type ButtonResponsiveProps = {
 export const ButtonResponsive = ({ label, icon, ...buttonProps }: ButtonResponsiveProps) => {
    return (
       <>
-         <Button className="hidden md:flex gap-2" {...buttonProps}>
+         <Button className="hidden md:flex gap-2 flex-shrink-0" {...buttonProps}>
             {icon}
             {label}
          </Button>
-         <Button size="icon" className="md:hidden" {...buttonProps}>
+         <Button size="icon" className="md:hidden  flex-shrink-0" {...buttonProps}>
             {icon}
             <span className="sr-only">{label}</span>
          </Button>

@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 
 import { getReportsSimple } from "~/.server/db/report";
 import { PageLayout } from "~/components/PageLayout";
-import { Button } from "~/components/ui/button";
+import { ButtonResponsive } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { ReportType } from "~/types/GataReport.type";
 import { createAuthenticator } from "~/utils/auth.server";
@@ -26,12 +26,7 @@ export default function ReportPage() {
             <Typography variant="h1" id="report-page-title">
                Aktuelle dokumenter
             </Typography>
-            {isAdmin(loggedInUser) && (
-               <Button as={Link} to="new">
-                  <Plus className="mr-2" />
-                  Opprett
-               </Button>
-            )}
+            {isAdmin(loggedInUser) && <ButtonResponsive as={Link} to="new" label="Opprett" icon={<Plus />} />}
          </div>
          <ul aria-labelledby="report-page-title" className="divide-y my-4">
             {reports.map((report) => {
