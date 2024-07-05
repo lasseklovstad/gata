@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 
 import { getReportsSimple } from "~/.server/db/report";
 import { PageLayout } from "~/components/PageLayout";
-import { Button, ButtonResponsive } from "~/components/ui/button";
+import { ButtonResponsive } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { ReportType } from "~/types/GataReport.type";
 import { createAuthenticator } from "~/utils/auth.server";

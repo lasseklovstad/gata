@@ -1,21 +1,12 @@
 import { Link } from "@remix-run/react";
-import { Menu } from "lucide-react";
 
 import type { User } from "~/.server/db/user";
 import type { Auth0User } from "~/types/Auth0User";
 
+import { SideBar } from "./Sidebar";
 import { UserMenu } from "./UserMenu";
 import { isAdmin, isMember } from "../../utils/roleUtils";
 import { Button } from "../ui/button";
-import {
-   DropdownMenu,
-   DropdownMenuContent,
-   DropdownMenuItem,
-   DropdownMenuLabel,
-   DropdownMenuSeparator,
-   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { SideBar } from "./Sidebar";
 
 type ResponsiveAppBarProps = {
    auth0User: Auth0User | null;
