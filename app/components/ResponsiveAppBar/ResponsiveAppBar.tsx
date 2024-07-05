@@ -15,6 +15,7 @@ import {
    DropdownMenuSeparator,
    DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { SideBar } from "./Sidebar";
 
 type ResponsiveAppBarProps = {
    auth0User: Auth0User | null;
@@ -26,7 +27,7 @@ export const ResponsiveAppBar = ({ auth0User, loggedInUser }: ResponsiveAppBarPr
    const isUserAdmin = isAdmin(loggedInUser);
 
    const filteredPages = [
-      { name: "Hjem", url: "" },
+      { name: "Hjem", url: "/home" },
       { name: "Min side", url: `member/${loggedInUser?.id}`, isMember: true },
       { name: "Medlemmer", url: "members", isMember: true },
       { name: "Ansvarsposter", url: "responsibility", isMember: true },
@@ -51,40 +52,18 @@ export const ResponsiveAppBar = ({ auth0User, loggedInUser }: ResponsiveAppBarPr
       <header className="bg-primary shadow-xl">
          <div className="py-2 px-4 max-w-[1000px] w-full me-auto ms-auto">
             <div className="flex items-center">
-               <img src="/logo192.png" alt="Hesten blå" className="h-[48px] mr-2 hidden md:block" />
+               <Link to="/home" className="mr-2 hidden md:block">
+                  <span className="sr-only">Gå hjem</span>
+                  <img src="/logo192.png" alt="Hesten blå" className="h-[48px]" />
+               </Link>
 
                <div className="flex grow md:hidden">
-                  <DropdownMenu>
-                     <DropdownMenuTrigger asChild>
-                        <Button aria-label="Åpne meny">
-                           <Menu />
-                        </Button>
-                     </DropdownMenuTrigger>
-                     <DropdownMenuContent>
-                        {filteredPages.map((page) => {
-                           if (page.url.startsWith("https")) {
-                              return (
-                                 <DropdownMenuItem key={page.url} asChild>
-                                    <a href={page.url} target="_blank" rel="noreferrer">
-                                       {page.name}
-                                    </a>
-                                 </DropdownMenuItem>
-                              );
-                           }
-                           return (
-                              <DropdownMenuItem key={page.url} asChild>
-                                 <Link to={page.url}>{page.name}</Link>
-                              </DropdownMenuItem>
-                           );
-                        })}
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel>Rolle: {getRole()}</DropdownMenuLabel>
-                     </DropdownMenuContent>
-                  </DropdownMenu>
+                  <SideBar items={filteredPages} />
                </div>
-               <div className="grow md:hidden">
+               <Link to="/home" className="grow md:hidden">
+                  <span className="sr-only">Gå hjem</span>
                   <img src="/logo192.png" className="h-[40px]" alt="Hesten blå" />
-               </div>
+               </Link>
 
                <div className="grow flex-wrap hidden md:flex gap-1">
                   {filteredPages.map((page) => {
