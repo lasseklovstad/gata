@@ -134,7 +134,7 @@ export default function EventPage() {
                               await navigator.clipboard.writeText(`${location.origin}/event/${event.id}/public`);
                            }}
                         >
-                           <span className="sr-only">Lagre del link</span>
+                           <span className="sr-only">Kopier link for å dele</span>
                            <Copy />
                         </Button>
                      </TooltipTrigger>
