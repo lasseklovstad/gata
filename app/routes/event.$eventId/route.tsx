@@ -1,7 +1,9 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/react";
 import { Outlet, redirect, useLoaderData } from "@remix-run/react";
 import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
+import { Copy } from "lucide-react";
 import { useId } from "react";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
@@ -17,6 +19,8 @@ import {
 import { getUsers } from "~/.server/db/user";
 import { PageLayout } from "~/components/PageLayout";
 import { TabNavLink } from "~/components/TabNavLink";
+import { Button } from "~/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
 import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
@@ -26,6 +30,10 @@ import { AttendingSelect } from "./AttendingSelect";
 import { EventMenu } from "./EventMenu";
 import { EventOrganizers } from "./EventOrganizers";
 import { eventSchema } from "../../utils/schemas/eventSchema";
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+   return [{ title: `Gata - ${data?.event.title}` }];
+};
 
 const paramSchema = z.object({
    eventId: z.coerce.number(),
@@ -114,7 +122,28 @@ export default function EventPage() {
    return (
       <PageLayout>
          <div className="flex justify-between items-center mb-4">
-            <Typography variant="h1">{event.title}</Typography>
+            <div className="flex">
+               <Typography variant="h1">{event.title}</Typography>
+               <TooltipProvider>
+                  <Tooltip>
+                     <TooltipTrigger asChild>
+                        <Button
+                           size="icon"
+                           variant="ghost"
+                           onClick={async () => {
+                              await navigator.clipboard.writeText(`${location.origin}/event/${event.id}/public`);
+                           }}
+                        >
+                           <span className="sr-only">Kopier link for å dele</span>
+                           <Copy />
+                        </Button>
+                     </TooltipTrigger>
+                     <TooltipContent>
+                        <Typography>Kopier link for å dele</Typography>
+                     </TooltipContent>
+                  </Tooltip>
+               </TooltipProvider>
+            </div>
             {isOrganizer ? <EventMenu event={event} numberOfImages={numberOfImages} /> : null}
          </div>
          {isOrganizer ? <EventOrganizers users={users} organizers={organizers} /> : null}
