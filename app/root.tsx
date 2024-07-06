@@ -11,6 +11,7 @@ import {
    ScrollRestoration,
    isRouteErrorResponse,
    useLoaderData,
+   useNavigate,
    useRouteError,
    useRouteLoaderData,
 } from "@remix-run/react";
@@ -97,6 +98,19 @@ export function Layout({ children }: ComponentProps<never>) {
 
 export default function App() {
    const { auth0User, loggedInUser, version } = useLoaderData<typeof loader>();
+   const navigate = useNavigate();
+
+   useEffect(() => {
+      function navigateOnMessage(event: MessageEvent) {
+         if ("url" in event.data) {
+            navigate(event.data.url);
+         }
+      }
+      navigator.serviceWorker.addEventListener("message", navigateOnMessage);
+      return () => {
+         navigator.serviceWorker.removeEventListener("message", navigateOnMessage);
+      };
+   }, [navigate]);
 
    return (
       <div className="flex flex-col min-h-lvh">

@@ -19,7 +19,7 @@ export const createNewPoll = async (
       subscriptions.map((s) => s.subscription as PushSubscription),
       {
          body: `📝 Ny avstemning ${poll.name} i arrangement ${event.title}`,
-         data: { url: "" },
+         data: { url: `/event/${eventId}` },
          icon: "/logo192.png",
       }
    );
@@ -37,7 +37,7 @@ export const updatePollAndNotify = async (
       subscriptions.map((s) => s.subscription as PushSubscription),
       {
          body: `📝 Avstemning ${pollValues.name} er endret i arrangement ${event.title}`,
-         data: { url: "" },
+         data: { url: `/event/${eventId}` },
          icon: "/logo192.png",
       }
    );
@@ -52,7 +52,7 @@ export const addPollVoteAndNotify = async (loggedInUser: User, eventId: number, 
       subscriptions.map((s) => s.subscription as PushSubscription),
       {
          body: `📝 Ny avstemning registrert ${poll.name} er endret i arrangement ${event.title}`,
-         data: { url: "" },
+         data: { url: `/event/${eventId}` },
          icon: "/logo192.png",
       }
    );
