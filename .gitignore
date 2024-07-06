@@ -14,3 +14,4 @@ playwright-report
 playwright/.cache/
 *StorageState.json
 sqlite*.db
+/data

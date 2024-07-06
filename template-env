@@ -31,3 +31,4 @@ PLAYWRIGHT_BASE_URL=http://localhost:8080
 
 SKIP_SETUP=false
 SHOW_REMIX_DEVTOOLS=false
+IMAGE_DIR="./data"

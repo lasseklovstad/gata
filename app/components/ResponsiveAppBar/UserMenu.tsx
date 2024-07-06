@@ -1,32 +1,42 @@
-import { Form, Link } from "@remix-run/react";
-import type { Auth0Profile } from "remix-auth-auth0";
+import { Form, Link, useFetcher } from "@remix-run/react";
+import { useEffect, useRef } from "react";
 
 import type { User } from "~/.server/db/user";
+import type { action } from "~/root";
 import { useDialog } from "~/utils/dialogUtils";
 
+import { UserForm } from "./UserForm";
 import { Button } from "../ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "../ui/dialog";
 import {
    DropdownMenu,
    DropdownMenuContent,
    DropdownMenuItem,
-   DropdownMenuTrigger,
    DropdownMenuLabel,
+   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { FormControl, FormDescription, FormItem, FormLabel, FormMessage, FormProvider } from "../ui/form";
-import { Input } from "../ui/input";
-import { Switch } from "../ui/switch";
+import { FormProvider } from "../ui/form";
+import { AvatarUser } from "../AvatarUser";
 
 type UserMenuProps = {
    roleText: string;
    isAuthenticated: boolean;
-   user: Auth0Profile | undefined;
    loggedInUser: User | undefined;
+   pwaPublicKey: string;
 };
 
-export const UserMenu = ({ roleText, user, isAuthenticated, loggedInUser }: UserMenuProps) => {
+export const UserMenu = ({ roleText, isAuthenticated, loggedInUser, pwaPublicKey }: UserMenuProps) => {
    const editProfileDialog = useDialog({ defaultOpen: false });
-   const photo = user && user.photos && user.photos[0] ? user.photos[0].value : "";
+   const fetcher = useFetcher<typeof action>();
+   const formRef = useRef<HTMLFormElement>(null);
+
+   const closeEditDialog = editProfileDialog.close;
+   useEffect(() => {
+      if (fetcher.data?.ok && fetcher.state === "idle") {
+         closeEditDialog();
+         formRef.current?.reset();
+      }
+   }, [closeEditDialog, fetcher.data, fetcher.state]);
    return (
       <>
          {isAuthenticated && (
@@ -34,7 +44,7 @@ export const UserMenu = ({ roleText, user, isAuthenticated, loggedInUser }: User
                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                      <Button aria-label="Åpne meny" size="icon">
-                        <img alt="" src={photo} className="rounded-full w-[35px]" />
+                        <AvatarUser className="size-10" user={loggedInUser} />
                      </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -59,52 +69,21 @@ export const UserMenu = ({ roleText, user, isAuthenticated, loggedInUser }: User
          )}
          {loggedInUser ? (
             <Dialog ref={editProfileDialog.dialogRef}>
-               <DialogHeading>Rediger profil</DialogHeading>
-               <FormProvider>
-                  <FormItem name="name">
-                     <FormLabel>Navn</FormLabel>
-                     <FormControl
-                        render={(props) => <Input {...props} defaultValue={loggedInUser.name} autoComplete="off" />}
-                     />
-                     <FormMessage />
-                  </FormItem>
-                  <FormItem name="picture">
-                     <FormLabel>Bilde</FormLabel>
-                     <FormControl
-                        render={(props) => (
-                           <Input {...props} className="w-fit" type="file" name="image" accept="image/*" />
-                        )}
-                     />
-                     <FormMessage />
-                  </FormItem>
-                  <FormItem name="emailSubscription" className="border p-2 flex justify-between items-center rounded">
-                     <div>
-                        <FormLabel>E-post</FormLabel>
-                        <FormDescription>
-                           Få tilsendt e-post hvis en bruker velger å publisere en nyhet eller nytt dokument
-                        </FormDescription>
-                     </div>
-                     <FormControl render={(props) => <Switch {...props} />} />
-                  </FormItem>
-                  <FormItem name="pushSubscription" className="border p-2 flex justify-between items-center rounded">
-                     <div>
-                        <FormLabel>Push notifikasjoner</FormLabel>
-                        <FormDescription>
-                           Få tilsendt push notifikasjoner på enheten ved feks. endringer i et arrangement du deltar på
-                        </FormDescription>
-                     </div>
-                     <FormControl render={(props) => <Switch {...props} />} />
-                  </FormItem>
-               </FormProvider>
+               <fetcher.Form ref={formRef} encType="multipart/form-data" method="PUT" onReset={editProfileDialog.close}>
+                  <DialogHeading>Rediger profil</DialogHeading>
+                  <FormProvider>
+                     <UserForm user={loggedInUser} pwaPublicKey={pwaPublicKey} />
+                  </FormProvider>
 
-               <DialogFooter>
-                  <Button type="submit" name="intent" value="updateProfile">
-                     Lagre
-                  </Button>
-                  <Button type="button" variant="ghost" onClick={editProfileDialog.close}>
-                     Avbryt
-                  </Button>
-               </DialogFooter>
+                  <DialogFooter>
+                     <Button type="submit" name="intent" value="updateProfile">
+                        Lagre
+                     </Button>
+                     <Button type="reset" variant="ghost" onClick={editProfileDialog.close}>
+                        Avbryt
+                     </Button>
+                  </DialogFooter>
+               </fetcher.Form>
             </Dialog>
          ) : null}
       </>

@@ -1,5 +1,6 @@
 ALTER TABLE `gata_user` ADD `name` text NOT NULL DEFAULT '';--> statement-breakpoint
 ALTER TABLE `gata_user` ADD `picture` text NOT NULL DEFAULT '';--> statement-breakpoint
+ALTER TABLE `gata_user` ADD `original_picture` text;--> statement-breakpoint
 
 UPDATE gata_user
 SET name = (

@@ -4,7 +4,7 @@ import { cn } from "~/utils";
 import { AvatarUser } from "./AvatarUser";
 
 type Props = {
-   users: Pick<User, "primaryUser" | "id">[];
+   users: Pick<User, "picture" | "id">[];
    className?: string;
    "aria-label": string;
 };

@@ -6,6 +6,9 @@ import checker from "vite-plugin-checker";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
+   ssr: {
+      noExternal: ["react-easy-crop", "tslib"],
+   },
    server: {
       port: 3000,
    },

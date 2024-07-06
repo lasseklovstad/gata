@@ -47,28 +47,28 @@ export const PushNotificationButton = ({ publicKey }: Props) => {
       });
    };
 
+   const unsubscribe = async () => {
+      if (!subscription) return;
+      await subscription
+         .unsubscribe()
+         .then(() => {
+            setSubscription(null);
+            fetcher.submit(JSON.stringify(subscription), {
+               action: "/subscribe",
+               encType: "application/json",
+               preventScrollReset: true,
+               method: "DELETE",
+            });
+         })
+         .catch((error) => {
+            console.error("Failed to unsubscribe the user: ", error);
+         });
+   };
+
    return (
       <div className="space-y-4">
          {subscription !== null ? (
-            <Button
-               onClick={async () => {
-                  await subscription
-                     .unsubscribe()
-                     .then(() => {
-                        setSubscription(null);
-                        fetcher.submit(JSON.stringify(subscription), {
-                           action: "/subscribe",
-                           encType: "application/json",
-                           preventScrollReset: true,
-                           method: "DELETE",
-                        });
-                     })
-                     .catch((error) => {
-                        console.error("Failed to unsubscribe the user: ", error);
-                     });
-               }}
-               isLoading={fetcher.state !== "idle"}
-            >
+            <Button onClick={unsubscribe} isLoading={fetcher.state !== "idle"}>
                <BellOff className="mr-2" /> Skru av sidenotifikasjoner
             </Button>
          ) : (

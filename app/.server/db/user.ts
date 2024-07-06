@@ -110,9 +110,14 @@ export const getNumberOfAdmins = async () => {
 
 export const insertUser = async (auth0UserId: string, roleName?: RoleName) => {
    await db.transaction(async (tx) => {
+      const [externalUserResult] = await tx.select().from(externalUser).where(eq(externalUser.id, auth0UserId));
       const [createdUser] = await tx
          .insert(user)
-         .values({ primaryExternalUserId: auth0UserId })
+         .values({
+            primaryExternalUserId: auth0UserId,
+            name: externalUserResult.name,
+            picture: externalUserResult.picture ?? "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+         })
          .returning({ id: user.id });
       await tx.update(externalUser).set({ userId: createdUser.id }).where(eq(externalUser.id, auth0UserId));
       if (roleName !== undefined) {
@@ -120,6 +125,13 @@ export const insertUser = async (auth0UserId: string, roleName?: RoleName) => {
          await tx.insert(userRoles).values({ usersId: createdUser.id, roleId: userRole.id });
       }
    });
+};
+
+export const updateUser = async (
+   userId: string,
+   values: Omit<typeof user.$inferSelect, "id" | "primaryExternalUserId">
+) => {
+   await db.update(user).set(values).where(eq(user.id, userId));
 };
 
 export const updateUserSubscribe = async (userId: string) => {
