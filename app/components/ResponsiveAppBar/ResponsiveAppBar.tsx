@@ -73,7 +73,12 @@ export const ResponsiveAppBar = ({ auth0User, loggedInUser }: ResponsiveAppBarPr
                   })}
                </div>
 
-               <UserMenu roleText={getRole()} user={auth0User?.profile} isAuthenticated={!!auth0User} />
+               <UserMenu
+                  roleText={getRole()}
+                  user={auth0User?.profile}
+                  isAuthenticated={!!auth0User}
+                  loggedInUser={loggedInUser}
+               />
             </div>
          </div>
       </header>

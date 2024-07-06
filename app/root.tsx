@@ -101,6 +101,7 @@ export default function App() {
    const navigate = useNavigate();
 
    useEffect(() => {
+      if (!("serviceWorker" in navigator)) return;
       function navigateOnMessage(event: MessageEvent) {
          if ("url" in event.data) {
             navigate(event.data.url);
