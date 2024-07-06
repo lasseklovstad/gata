@@ -122,8 +122,8 @@ export default function EventPage() {
    return (
       <PageLayout>
          <div className="flex justify-between items-center mb-4">
-            <Typography variant="h1">
-               {event.title}
+            <div className="flex">
+               <Typography variant="h1">{event.title}</Typography>
                <TooltipProvider>
                   <Tooltip>
                      <TooltipTrigger asChild>
@@ -143,7 +143,7 @@ export default function EventPage() {
                      </TooltipContent>
                   </Tooltip>
                </TooltipProvider>
-            </Typography>
+            </div>
             {isOrganizer ? <EventMenu event={event} numberOfImages={numberOfImages} /> : null}
          </div>
          {isOrganizer ? <EventOrganizers users={users} organizers={organizers} /> : null}
