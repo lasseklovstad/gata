@@ -150,9 +150,7 @@ export default function EventPage() {
 
          <div className="space-y-4">
             {organizers.length ? (
-               <Typography variant="mutedText">
-                  Arrangører: {organizers.map((user) => user.primaryUser.name).join(", ")}
-               </Typography>
+               <Typography variant="mutedText">Arrangører: {organizers.map((user) => user.name).join(", ")}</Typography>
             ) : null}
 
             <section className="bg-slate-100 rounded p-2 border" aria-labelledby={descriptionTitleId}>

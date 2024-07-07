@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e5f71b6e-311d-426e-bbc6-a401dc095c4b",
+  "id": "0d132c27-f036-41de-beab-4e316abcefa0",
   "prevId": "8394faef-a2e6-4818-a375-d221c6561327",
   "tables": {
     "cloudinary_image": {
@@ -1065,13 +1065,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "original_picture": {
-          "name": "original_picture",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
           "autoincrement": false
         }
       },

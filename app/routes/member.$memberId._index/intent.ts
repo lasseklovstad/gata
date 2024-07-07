@@ -4,5 +4,4 @@ export const memberIntent = {
    updateContingent: "update-contingent",
    updateLinkedUsers: "update-linked-users",
    updatePrimaryUserEmail: "update-primary-user-email",
-   updateSubscribe: "update-subscribe",
 };

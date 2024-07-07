@@ -1,9 +1,6 @@
 import "react-day-picker/dist/style.css";
 import "./tailwind.css";
 
-import { resolve } from "node:path";
-import sharp from "sharp";
-
 import type {
    ActionFunctionArgs,
    LinksFunction,
@@ -12,6 +9,7 @@ import type {
    SerializeFrom,
 } from "@remix-run/node";
 import {
+   NodeOnDiskFile,
    unstable_composeUploadHandlers,
    unstable_createFileUploadHandler,
    unstable_createMemoryUploadHandler,
@@ -30,12 +28,12 @@ import {
    useRouteError,
    useRouteLoaderData,
 } from "@remix-run/react";
-import mime from "mime/lite";
 import PullToRefresh from "pulltorefreshjs";
 import type { ComponentProps } from "react";
 import { useEffect } from "react";
 
 import { getOptionalUserFromExternalUserId, updateUser } from "./.server/db/user";
+import { cropProfileImage } from "./.server/services/localImageService";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
 import { Button } from "./components/ui/button";
 import { Typography } from "./components/ui/typography";
@@ -165,7 +163,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
    const uploadHandler = unstable_composeUploadHandlers(
       unstable_createFileUploadHandler({
          maxPartSize: 5_000_000,
-         directory: env.IMAGE_DIR,
          file: ({ filename }) => filename,
       }),
       // parse everything else into memory
@@ -178,26 +175,24 @@ export const action = async ({ request }: ActionFunctionArgs) => {
    if (intent === "updateProfile") {
       const form = profileSchema.parse(formData);
       console.log(form);
-      const imagePath = resolve(`${env.IMAGE_DIR}/${form.image.name}`);
-
-      const image = sharp(imagePath);
-      const imageMetadata = await image.metadata();
-      const newName = `${crypto.randomUUID()}.${imageMetadata.format}`;
-      const newImagePath = resolve(`${env.IMAGE_DIR}/${newName}`);
-      await image
-         .extract({
+      if (form.picture instanceof NodeOnDiskFile) {
+         const newName = await cropProfileImage(form.picture.getFilePath(), {
+            height: form.pictureCropHeight,
+            width: form.pictureCropWidth,
             left: form.pictureCropX,
             top: form.pictureCropY,
-            width: form.pictureCropWidth,
-            height: form.pictureCropHeight,
-         })
-         .toFile(newImagePath);
-      await updateUser(loggedInUser.id, {
-         name: form.name,
-         picture: `/picture/${newName}`,
-         originalPicture: `/picture/${form.image.name}`,
-         subscribe: form.emailSubscription,
-      });
+         });
+         await updateUser(loggedInUser.id, {
+            name: form.name,
+            picture: newName,
+            subscribe: form.emailSubscription,
+         });
+      } else {
+         await updateUser(loggedInUser.id, {
+            name: form.name,
+            subscribe: form.emailSubscription,
+         });
+      }
       return { ok: true };
    }
 

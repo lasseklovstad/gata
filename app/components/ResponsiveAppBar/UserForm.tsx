@@ -1,7 +1,8 @@
 import { useFetcher } from "@remix-run/react";
 import { Bell, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
-import Cropper, { Area } from "react-easy-crop";
+import type { Area, Point } from "react-easy-crop";
+import Cropper from "react-easy-crop";
 
 import type { User } from "~/.server/db/user";
 
@@ -13,16 +14,31 @@ import { Switch } from "../ui/switch";
 type Props = {
    user: User;
    pwaPublicKey: string;
+   crop: Point;
+   setCrop: (crop: Point) => void;
+   zoom: number;
+   setZoom: (zoom: number) => void;
+   area: Area | undefined;
+   setArea: (area: Area) => void;
+   picture: string | undefined;
+   setPicture: (value: string | undefined) => void;
 };
 
-export const UserForm = ({ user, pwaPublicKey }: Props) => {
+export const UserForm = ({
+   user,
+   pwaPublicKey,
+   area,
+   crop,
+   picture,
+   setCrop,
+   setPicture,
+   setZoom,
+   zoom,
+   setArea,
+}: Props) => {
    const [subscription, setSubscription] = useState<PushSubscription | null>(null);
    const [error, setError] = useState("");
    const fetcher = useFetcher();
-   const [picture, setPicture] = useState<string>();
-   const [crop, setCrop] = useState({ x: 0, y: 0 });
-   const [zoom, setZoom] = useState(1);
-   const [area, setArea] = useState<Area>();
 
    useEffect(() => {
       if ("serviceWorker" in navigator && "PushManager" in window) {
@@ -82,14 +98,14 @@ export const UserForm = ({ user, pwaPublicKey }: Props) => {
             <FormMessage />
          </FormItem>
          <FormItem name="picture">
-            <FormLabel>Bilde</FormLabel>
+            <FormLabel>Last opp nytt bilde</FormLabel>
             <FormControl
                render={(props) => (
                   <Input
                      {...props}
                      className="w-fit"
                      type="file"
-                     name="image"
+                     name="picture"
                      accept="image/*"
                      onChange={(e) => {
                         if (e.target.files?.length) {
@@ -103,41 +119,28 @@ export const UserForm = ({ user, pwaPublicKey }: Props) => {
             />
             <FormMessage />
          </FormItem>
-         <div className="relative w-[200px] h-[200px]">
-            <Cropper
-               image={picture ?? user.originalPicture ?? user.picture}
-               crop={crop}
-               zoom={zoom}
-               aspect={1}
-               onCropChange={setCrop}
-               onZoomChange={setZoom}
-               cropShape="round"
-               maxZoom={10}
-               onCropAreaChange={(area, areaPx) => setArea(areaPx)}
-            />
-         </div>
+
+         {picture ? (
+            <div className="relative w-[200px] h-[200px]">
+               <Cropper
+                  image={picture}
+                  crop={crop}
+                  zoom={zoom}
+                  aspect={1}
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  cropShape="round"
+                  maxZoom={10}
+                  onCropAreaChange={(area, areaPx) => setArea(areaPx)}
+               />
+            </div>
+         ) : null}
+
          <input hidden readOnly value={area?.x ?? 0} name="pictureCropX" />
          <input hidden readOnly value={area?.y ?? 0} name="pictureCropY" />
          <input hidden readOnly value={area?.width ?? 0} name="pictureCropWidth" />
          <input hidden readOnly value={area?.height ?? 0} name="pictureCropHeight" />
-         <FormItem name="pictureZoom" className="space-y-0">
-            <FormLabel>Zoom</FormLabel>
-            <FormControl
-               render={(props) => (
-                  <Input
-                     {...props}
-                     type="range"
-                     defaultValue={0}
-                     min={1}
-                     max={10}
-                     className="p-0"
-                     step={0.1}
-                     onChange={({ target: { value } }) => setZoom(Number(value))}
-                  />
-               )}
-            />
-            <FormMessage />
-         </FormItem>
+
          <FormItem name="emailSubscription" className="border p-2 flex justify-between items-center rounded">
             <div>
                <FormLabel className="flex gap-2 items-center">

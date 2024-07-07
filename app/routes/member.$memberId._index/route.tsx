@@ -11,7 +11,6 @@ import {
    getUser,
    updateLinkedExternalUsers,
    updatePrimaryEmail,
-   updateUserSubscribe,
 } from "~/.server/db/user";
 import { useConfirmDialog } from "~/components/ConfirmDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -19,14 +18,11 @@ import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { LinkExternalUserToGataUserSelect } from "~/routes/member.$memberId._index/components/LinkExternalUserToGataUserSelect";
 import { UserInfo } from "~/routes/member.$memberId._index/components/UserInfo";
-import { UserSubscribe } from "~/routes/member.$memberId._index/components/UserSubscribe";
 import { createAuthenticator } from "~/utils/auth.server";
-import { env } from "~/utils/env.server";
 import { updateContingentSchema } from "~/utils/formSchema";
 import { badRequest } from "~/utils/responseUtils";
 import { isAdmin, requireAdminRole } from "~/utils/roleUtils";
 
-import { PushNotificationButton } from "./components/PushNotificationButton";
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
 
@@ -41,7 +37,7 @@ export const loader = async ({ request, params: { memberId } }: LoaderFunctionAr
       getContingentInfo(),
       getNotMemberUsers(),
    ]);
-   return { member, contingentInfo, roles, notMemberUsers, loggedInUser, pwaPublicKey: env.PWA_PUBLIC_KEY };
+   return { member, contingentInfo, roles, notMemberUsers, loggedInUser };
 };
 
 export const action = async ({ request, params: { memberId } }: ActionFunctionArgs) => {
@@ -89,10 +85,6 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
          await updatePrimaryEmail(memberId, primaryUserEmail);
          return { ok: true };
       }
-      case memberIntent.updateSubscribe: {
-         await updateUserSubscribe(memberId);
-         return { ok: true };
-      }
       default: {
          throw new Response(`Invalid intent "${intent}"`, { status: 400 });
       }
@@ -100,7 +92,7 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
 };
 
 export default function MemberInfoPage() {
-   const { member, contingentInfo, roles, notMemberUsers, loggedInUser, pwaPublicKey } = useLoaderData<typeof loader>();
+   const { member, contingentInfo, roles, notMemberUsers, loggedInUser } = useLoaderData<typeof loader>();
    const fetcher = useFetcher();
    const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog({
       text: "Ved å slette mister vi all informasjon knyttet til brukeren",
@@ -114,7 +106,7 @@ export default function MemberInfoPage() {
       <>
          <div className="flex items-center mb-2 gap-2">
             <Avatar>
-               <AvatarImage src={member.primaryUser.picture || undefined} />
+               <AvatarImage src={member.picture} />
                <AvatarFallback>
                   <CircleUser />
                </AvatarFallback>
@@ -130,10 +122,6 @@ export default function MemberInfoPage() {
                   {ConfirmDialogComponent}
                </>
             )}
-         </div>
-         <div className="space-y-2">
-            {loggedInUser.id === member.id && <UserSubscribe user={member} />}
-            {loggedInUser.id === member.id && <PushNotificationButton publicKey={pwaPublicKey} />}
          </div>
          <UserInfo user={member} loggedInUser={loggedInUser} contingentInfo={contingentInfo} />
 

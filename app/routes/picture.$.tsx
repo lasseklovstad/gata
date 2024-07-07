@@ -4,10 +4,13 @@ import { resolve } from "node:path";
 import { type LoaderFunctionArgs } from "@remix-run/node";
 import mime from "mime/lite";
 
+import { createAuthenticator } from "~/utils/auth.server";
 import { env } from "~/utils/env.server";
 
-export const loader = async ({ params: { pictureId } }: LoaderFunctionArgs) => {
-   const imagePath = resolve(`${env.IMAGE_DIR}/${pictureId}`);
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+   await createAuthenticator().getRequiredUser(request);
+   console.log("PictureId", params["*"]);
+   const imagePath = resolve(`${env.IMAGE_DIR}/${params["*"]}`);
    if (!existsSync(imagePath)) {
       throw new Response("Not Found", {
          status: 404,

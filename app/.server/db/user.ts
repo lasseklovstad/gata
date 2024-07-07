@@ -129,16 +129,9 @@ export const insertUser = async (auth0UserId: string, roleName?: RoleName) => {
 
 export const updateUser = async (
    userId: string,
-   values: Omit<typeof user.$inferSelect, "id" | "primaryExternalUserId">
+   values: Partial<Omit<typeof user.$inferSelect, "id" | "primaryExternalUserId">>
 ) => {
    await db.update(user).set(values).where(eq(user.id, userId));
-};
-
-export const updateUserSubscribe = async (userId: string) => {
-   await db
-      .update(user)
-      .set({ subscribe: sql`not ${user.subscribe}` })
-      .where(eq(user.id, userId));
 };
 
 export const updateLinkedExternalUsers = async (userId: string, externalUserIds: string[]) => {
