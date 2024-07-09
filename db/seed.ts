@@ -10,11 +10,6 @@ const seed = async () => {
          .select()
          .from(externalUser)
          .where(eq(externalUser.email, "admin@gataersamla.no"));
-
-      if (!externalUserResult) {
-         const allExternalUsers = await tx.select().from(externalUser);
-         throw new Error("Can't find admin, users available: " + allExternalUsers.map((user) => user.email).join(", "));
-      }
       const [createdUser] = await tx
          .insert(user)
          .values({
