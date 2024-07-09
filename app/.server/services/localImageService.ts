@@ -15,7 +15,7 @@ export const cropProfileImage = async (filepath: string, region: sharp.Region) =
 
    const profileImagePath = resolve(env.IMAGE_DIR, "profile");
    if (!existsSync(profileImagePath)) {
-      mkdirSync(profileImagePath);
+      mkdirSync(profileImagePath, { recursive: true });
    }
 
    await image.extract(region).toFile(newImagePath);
