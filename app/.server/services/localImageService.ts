@@ -17,8 +17,7 @@ export const cropProfileImage = async (filepath: string, region: sharp.Region) =
    if (!existsSync(profileImagePath)) {
       mkdirSync(profileImagePath);
    }
-
-   await image.extract(region).toFile(newImagePath);
-   console.log("newImagePath", newImagePath);
+   // Rotate based on Exif
+   await image.rotate().extract(region).toFile(newImagePath);
    return `${PRIVATE_PICTURE_ENDPOINT_URL}/${newName}`;
 };
