@@ -18,7 +18,7 @@ export const updateParticipatingAndNotify = async (
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),
       {
-         body: `${status === "going" ? "✔️" : "❌"} ${loggedInUser.primaryUser.name} ${status === "going" ? "skal delta på" : "kan ikke delta på"} arrangement ${event.title}`,
+         body: `${status === "going" ? "✔️" : "❌"} ${loggedInUser.name} ${status === "going" ? "skal delta på" : "kan ikke delta på"} arrangement ${event.title}`,
          data: { url: `/event/${eventId}` },
          icon: "/logo192.png",
       }

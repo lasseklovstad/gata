@@ -66,26 +66,24 @@ export const getReport = async (reportId: string) => {
 };
 
 export const insertReport = async (values: ReportSchema, loggedInUser: User) => {
-   const primaryUser = loggedInUser.primaryUser;
    return await db
       .insert(gataReport)
       .values({
          ...values,
          type: ReportType[values.type],
          createdBy: loggedInUser.id,
-         lastModifiedBy: primaryUser.name,
+         lastModifiedBy: loggedInUser.name,
       })
       .returning({ reportId: gataReport.id });
 };
 
 export const updateReport = async (reportId: string, values: ReportSchema, loggedInUser: User) => {
-   const primaryUser = loggedInUser.primaryUser;
    await db
       .update(gataReport)
       .set({
          ...values,
          type: ReportType[values.type],
-         lastModifiedBy: primaryUser.name,
+         lastModifiedBy: loggedInUser.name,
          lastModifiedDate: sql`(CURRENT_TIMESTAMP)`,
       })
       .where(eq(gataReport.id, reportId));
@@ -108,12 +106,11 @@ export const deleteReport = async (reportId: string) => {
 };
 
 export const updateReportContent = async (reportId: string, content: string, loggedInUser: User) => {
-   const primaryUser = loggedInUser.primaryUser;
    await db
       .update(gataReport)
       .set({
          content,
-         lastModifiedBy: primaryUser.name,
+         lastModifiedBy: loggedInUser.name,
          lastModifiedDate: sql`(CURRENT_TIMESTAMP)`,
       })
       .where(eq(gataReport.id, reportId));

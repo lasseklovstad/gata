@@ -1,7 +1,20 @@
 import "react-day-picker/dist/style.css";
 import "./tailwind.css";
 
-import type { LinksFunction, LoaderFunctionArgs, MetaFunction, SerializeFrom } from "@remix-run/node";
+import type {
+   ActionFunctionArgs,
+   LinksFunction,
+   LoaderFunctionArgs,
+   MetaFunction,
+   SerializeFrom,
+} from "@remix-run/node";
+import {
+   NodeOnDiskFile,
+   unstable_composeUploadHandlers,
+   unstable_createFileUploadHandler,
+   unstable_createMemoryUploadHandler,
+   unstable_parseMultipartFormData,
+} from "@remix-run/node";
 import {
    Link,
    Links,
@@ -19,12 +32,16 @@ import PullToRefresh from "pulltorefreshjs";
 import type { ComponentProps } from "react";
 import { useEffect } from "react";
 
-import { getOptionalUserFromExternalUserId } from "./.server/db/user";
+import { getOptionalUserFromExternalUserId, updateUser } from "./.server/db/user";
+import { cropProfileImage } from "./.server/services/localImageService";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
 import { Button } from "./components/ui/button";
 import { Typography } from "./components/ui/typography";
 import { createAuthenticator } from "./utils/auth.server";
 import { env } from "./utils/env.server";
+import { badRequest } from "./utils/responseUtils";
+import { profileSchema } from "./utils/schemas/profileSchema";
+import { transformErrorResponse } from "./utils/validateUtils";
 
 export const meta: MetaFunction = () => {
    return [
@@ -97,10 +114,11 @@ export function Layout({ children }: ComponentProps<never>) {
 }
 
 export default function App() {
-   const { auth0User, loggedInUser, version } = useLoaderData<typeof loader>();
+   const { auth0User, loggedInUser, version, pwaPublicKey } = useLoaderData<typeof loader>();
    const navigate = useNavigate();
 
    useEffect(() => {
+      if (!("serviceWorker" in navigator)) return;
       function navigateOnMessage(event: MessageEvent) {
          if ("url" in event.data) {
             navigate(event.data.url);
@@ -114,7 +132,7 @@ export default function App() {
 
    return (
       <div className="flex flex-col min-h-lvh">
-         <ResponsiveAppBar auth0User={auth0User} loggedInUser={loggedInUser} />
+         <ResponsiveAppBar auth0User={auth0User} loggedInUser={loggedInUser} pwaPublicKey={pwaPublicKey} />
          <main className="mb-8 max-w-[1000px] w-full me-auto ms-auto px-4">
             <Outlet />
          </main>
@@ -137,7 +155,52 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       ? (await getOptionalUserFromExternalUserId(auth0User.profile.id ?? "")) || undefined
       : undefined;
    const version = env.VERSION;
-   return { auth0User, loggedInUser, version };
+   const pwaPublicKey = env.PWA_PUBLIC_KEY;
+   return { auth0User, loggedInUser, version, pwaPublicKey };
+};
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+   const uploadHandler = unstable_composeUploadHandlers(
+      unstable_createFileUploadHandler({
+         maxPartSize: 5_000_000,
+         file: ({ filename }) => filename,
+      }),
+      // parse everything else into memory
+      unstable_createMemoryUploadHandler()
+   );
+   const formData = await unstable_parseMultipartFormData(request, uploadHandler);
+
+   const intent = formData.get("intent");
+
+   if (intent === "updateProfile") {
+      const formResult = profileSchema.safeParse(formData);
+      if (!formResult.success) {
+         return transformErrorResponse(formResult.error);
+      }
+      const form = formResult.data;
+      if (form.picture instanceof NodeOnDiskFile) {
+         const newName = await cropProfileImage(form.picture.getFilePath(), {
+            height: form.pictureCropHeight,
+            width: form.pictureCropWidth,
+            left: form.pictureCropX,
+            top: form.pictureCropY,
+         });
+         await updateUser(loggedInUser.id, {
+            name: form.name,
+            picture: newName,
+            subscribe: form.emailSubscription,
+         });
+      } else {
+         await updateUser(loggedInUser.id, {
+            name: form.name,
+            subscribe: form.emailSubscription,
+         });
+      }
+      return { ok: true };
+   }
+
+   return badRequest("Invalid intent");
 };
 
 export const useRootLoader = () => {

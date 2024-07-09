@@ -20,7 +20,7 @@ export const UserListItem = ({ user, isLoggedInUserAdmin }: UserListItemProps) =
             <div className="flex gap-4 p-2 items-center">
                <AvatarUser user={user} />
                <div>
-                  <Typography variant="largeText">{user.primaryUser.name}</Typography>
+                  <Typography variant="largeText">{user.name}</Typography>
                   <Typography variant="smallText" className="text-gray-500">
                      Sist innlogget: {new Date(user.primaryUser.lastLogin).toLocaleDateString("no")}
                   </Typography>

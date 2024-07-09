@@ -36,7 +36,7 @@ export const EventOrganizers = ({ users, organizers }: Props) => {
                      disabled={organizers.length === 1 && isSelected}
                      className="cursor-default data-[selected]:bg-blue-200 data-[focus]:bg-blue-100 py-1 px-2 flex gap-2"
                   >
-                     {isSelected ? <Check /> : null} {user.primaryUser.name}
+                     {isSelected ? <Check /> : null} {user.name}
                   </ListboxOption>
                );
             })}

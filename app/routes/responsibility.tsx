@@ -28,8 +28,8 @@ export default function ResponsibilityPage() {
          </div>
          <ul className="divide-y my-4">
             {responsibilities.map((resp) => {
-               const { name, id, description, currentlyResponsibleUsername } = resp;
-               const usernames = currentlyResponsibleUsername.filter(Boolean);
+               const { name, id, description, responsibilityYears } = resp;
+               const usernames = responsibilityYears.map((responsibilityYear) => responsibilityYear.user.name);
                return (
                   <li key={id} className="p-2">
                      <div className="flex">

@@ -40,7 +40,7 @@ export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) 
       <>
          <div className="my-4">
             <Typography>
-               <strong>Navn:</strong> {user.primaryUser.name}
+               <strong>Navn:</strong> {user.name}
             </Typography>
             {isAdmin(loggedInUser) ? (
                <SelectPrimaryEmail user={user} />

@@ -1,19 +1,17 @@
-import { UserIcon } from "lucide-react";
-
 import type { User } from "~/.server/db/user";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 type Props = {
-   user: Pick<User, "primaryUser">;
+   user?: Pick<User, "picture" | "name">;
    className?: string;
 };
 
 export const AvatarUser = ({ user, className }: Props) => {
    return (
       <Avatar className={className}>
-         <AvatarImage src={user.primaryUser.picture || undefined} alt={user.primaryUser.name} />
+         <AvatarImage src={user?.picture || undefined} alt={user?.name || ""} />
          <AvatarFallback>
-            <UserIcon />
+            <img src="/no-profile.jpg" alt="" />
          </AvatarFallback>
       </Avatar>
    );

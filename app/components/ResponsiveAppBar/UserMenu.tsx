@@ -1,23 +1,56 @@
-import { Form, Link } from "@remix-run/react";
-import type { Auth0Profile } from "remix-auth-auth0";
+import { Form, Link, useFetcher } from "@remix-run/react";
+import { useEffect, useRef, useState } from "react";
+import type { Area } from "react-easy-crop";
 
+import type { User } from "~/.server/db/user";
+import type { action } from "~/root";
+import { useDialog } from "~/utils/dialogUtils";
+
+import { UserForm } from "./UserForm";
+import { AvatarUser } from "../AvatarUser";
 import { Button } from "../ui/button";
+import { Dialog, DialogFooter, DialogHeading } from "../ui/dialog";
 import {
    DropdownMenu,
    DropdownMenuContent,
    DropdownMenuItem,
-   DropdownMenuTrigger,
    DropdownMenuLabel,
+   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { FormProvider } from "../ui/form";
 
 type UserMenuProps = {
    roleText: string;
    isAuthenticated: boolean;
-   user: Auth0Profile | undefined;
+   loggedInUser: User | undefined;
+   pwaPublicKey: string;
 };
 
-export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => {
-   const photo = user && user.photos && user.photos[0] ? user.photos[0].value : "";
+export const UserMenu = ({ roleText, isAuthenticated, loggedInUser, pwaPublicKey }: UserMenuProps) => {
+   const editProfileDialog = useDialog({ defaultOpen: false });
+   const fetcher = useFetcher<typeof action>();
+   const formRef = useRef<HTMLFormElement>(null);
+   const [picture, setPicture] = useState<string>();
+   const [crop, setCrop] = useState({ x: 0, y: 0 });
+   const [zoom, setZoom] = useState(1);
+   const [area, setArea] = useState<Area>();
+
+   const closeEditDialog = editProfileDialog.close;
+   useEffect(() => {
+      if (fetcher.data?.ok && fetcher.state === "idle") {
+         closeEditDialog();
+         formRef.current?.reset();
+      }
+   }, [closeEditDialog, fetcher.data, fetcher.state]);
+
+   const handleReset = () => {
+      editProfileDialog.close();
+      setPicture(undefined);
+      setArea(undefined);
+      setZoom(1);
+      setCrop({ x: 0, y: 0 });
+   };
+
    return (
       <>
          {isAuthenticated && (
@@ -25,10 +58,13 @@ export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => 
                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                      <Button aria-label="Åpne meny" size="icon">
-                        <img alt="" src={photo} className="rounded-full w-[35px]" />
+                        <AvatarUser className="size-10" user={loggedInUser} />
                      </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
+                     {loggedInUser ? (
+                        <DropdownMenuItem onClick={editProfileDialog.open}>Rediger profil</DropdownMenuItem>
+                     ) : null}
                      <DropdownMenuItem asChild>
                         <Link to="/logout">Logg ut</Link>
                      </DropdownMenuItem>
@@ -45,6 +81,36 @@ export const UserMenu = ({ roleText, user, isAuthenticated }: UserMenuProps) => 
                <Button type="submit">Logg inn</Button>
             </Form>
          )}
+         {loggedInUser ? (
+            <Dialog ref={editProfileDialog.dialogRef}>
+               <fetcher.Form ref={formRef} encType="multipart/form-data" method="PUT" onReset={handleReset}>
+                  <DialogHeading>Rediger profil</DialogHeading>
+                  <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
+                     <UserForm
+                        user={loggedInUser}
+                        pwaPublicKey={pwaPublicKey}
+                        area={area}
+                        crop={crop}
+                        picture={picture}
+                        setCrop={setCrop}
+                        setPicture={setPicture}
+                        setZoom={setZoom}
+                        zoom={zoom}
+                        setArea={setArea}
+                     />
+                  </FormProvider>
+
+                  <DialogFooter>
+                     <Button type="submit" name="intent" value="updateProfile">
+                        Lagre
+                     </Button>
+                     <Button type="reset" variant="ghost" onClick={editProfileDialog.close}>
+                        Avbryt
+                     </Button>
+                  </DialogFooter>
+               </fetcher.Form>
+            </Dialog>
+         ) : null}
       </>
    );
 };

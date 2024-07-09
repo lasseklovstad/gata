@@ -110,9 +110,14 @@ export const getNumberOfAdmins = async () => {
 
 export const insertUser = async (auth0UserId: string, roleName?: RoleName) => {
    await db.transaction(async (tx) => {
+      const [externalUserResult] = await tx.select().from(externalUser).where(eq(externalUser.id, auth0UserId));
       const [createdUser] = await tx
          .insert(user)
-         .values({ primaryExternalUserId: auth0UserId })
+         .values({
+            primaryExternalUserId: auth0UserId,
+            name: externalUserResult.name,
+            picture: externalUserResult.picture ?? "/no-profile.jpg",
+         })
          .returning({ id: user.id });
       await tx.update(externalUser).set({ userId: createdUser.id }).where(eq(externalUser.id, auth0UserId));
       if (roleName !== undefined) {
@@ -122,11 +127,11 @@ export const insertUser = async (auth0UserId: string, roleName?: RoleName) => {
    });
 };
 
-export const updateUserSubscribe = async (userId: string) => {
-   await db
-      .update(user)
-      .set({ subscribe: sql`not ${user.subscribe}` })
-      .where(eq(user.id, userId));
+export const updateUser = async (
+   userId: string,
+   values: Partial<Omit<typeof user.$inferSelect, "id" | "primaryExternalUserId">>
+) => {
+   await db.update(user).set(values).where(eq(user.id, userId));
 };
 
 export const updateLinkedExternalUsers = async (userId: string, externalUserIds: string[]) => {
