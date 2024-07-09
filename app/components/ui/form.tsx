@@ -14,7 +14,7 @@ const FormContext = createContext<FormContextValue | undefined>(undefined);
 
 const FormProvider = ({ children, errors }: { children: ReactNode } & FormContextValue) => {
    return (
-      <div className="space-y-2">
+      <div className="space-y-4">
          <FormContext.Provider value={{ errors }}>{children}</FormContext.Provider>
       </div>
    );

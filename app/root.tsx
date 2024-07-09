@@ -41,6 +41,7 @@ import { createAuthenticator } from "./utils/auth.server";
 import { env } from "./utils/env.server";
 import { badRequest } from "./utils/responseUtils";
 import { profileSchema } from "./utils/schemas/profileSchema";
+import { transformErrorResponse } from "./utils/validateUtils";
 
 export const meta: MetaFunction = () => {
    return [
@@ -173,8 +174,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
    const intent = formData.get("intent");
 
    if (intent === "updateProfile") {
-      const form = profileSchema.parse(formData);
-      console.log(form);
+      const formResult = profileSchema.safeParse(formData);
+      if (!formResult.success) {
+         return transformErrorResponse(formResult.error);
+      }
+      const form = formResult.data;
       if (form.picture instanceof NodeOnDiskFile) {
          const newName = await cropProfileImage(form.picture.getFilePath(), {
             height: form.pictureCropHeight,

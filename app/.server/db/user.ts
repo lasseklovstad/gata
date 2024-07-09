@@ -116,7 +116,7 @@ export const insertUser = async (auth0UserId: string, roleName?: RoleName) => {
          .values({
             primaryExternalUserId: auth0UserId,
             name: externalUserResult.name,
-            picture: externalUserResult.picture ?? "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+            picture: externalUserResult.picture ?? "/no-profile.jpg",
          })
          .returning({ id: user.id });
       await tx.update(externalUser).set({ userId: createdUser.id }).where(eq(externalUser.id, auth0UserId));

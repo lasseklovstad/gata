@@ -15,3 +15,4 @@ playwright/.cache/
 *StorageState.json
 sqlite*.db
 /data
+/db-backups

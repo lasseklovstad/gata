@@ -43,7 +43,7 @@ fly certs add www.gataersamla.no
 ### Fly columes and database
 ```bash
 # Get database file from production
-fly sftp get /data/sqlite.db
+fly sftp get /data/sqlite.db db-backups/sqlite_09_07_2024_prod.db
 # Connect to sftp shell and upload dump file
 fly sftp shell
 cd tmp

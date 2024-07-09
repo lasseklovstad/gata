@@ -118,6 +118,7 @@ export const UserForm = ({
                )}
             />
             <FormMessage />
+            <FormDescription>Bilder som lastes her er kun synlig for oss i Gata</FormDescription>
          </FormItem>
 
          {picture ? (

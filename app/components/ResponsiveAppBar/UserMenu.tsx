@@ -85,7 +85,7 @@ export const UserMenu = ({ roleText, isAuthenticated, loggedInUser, pwaPublicKey
             <Dialog ref={editProfileDialog.dialogRef}>
                <fetcher.Form ref={formRef} encType="multipart/form-data" method="PUT" onReset={handleReset}>
                   <DialogHeading>Rediger profil</DialogHeading>
-                  <FormProvider>
+                  <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
                      <UserForm
                         user={loggedInUser}
                         pwaPublicKey={pwaPublicKey}
