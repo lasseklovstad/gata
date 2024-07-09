@@ -39,7 +39,6 @@ COPY --from=build /app/server.mjs /app/server.mjs
 COPY --from=build /app/migrations /app/migrations
 
 RUN mkdir /data
-RUN mkdir /data/images
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
 CMD [ "npm", "run", "start" ]
