@@ -27,7 +27,7 @@ test("link non member to member and change primary user", async ({ adminPage, no
    await changePrimaryUser(adminPage, env.memberUsername, env.nonMemberUsername);
    await assertThatNonMemberIsLinked(nonMemberPage, env.nonMemberUsername);
    // Change back
-   await changePrimaryUser(adminPage, env.nonMemberUsername, env.memberUsername);
+   await changePrimaryUser(adminPage, env.memberUsername, env.memberUsername);
 
    await removeLinkedUserWithAdmin(adminPage, env.memberUsername, env.nonMemberUsername);
 

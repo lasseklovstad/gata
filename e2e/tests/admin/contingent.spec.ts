@@ -40,7 +40,7 @@ test.describe.serial("Contingent", () => {
       await verifyUsersNotPaid(page, [env.adminUsername, env.nonMemberUsername]);
 
       // Change back
-      await changePrimaryUser(page, env.nonMemberUsername, env.memberUsername);
+      await changePrimaryUser(page, env.memberUsername, env.memberUsername);
       await memberPage.markContingentAsPaid(today.getFullYear() - 1, false);
       await verifyUsersNotPaid(page, [env.adminUsername, env.memberUsername]);
       await removeLinkedUserWithAdmin(page, env.memberUsername, env.nonMemberUsername);

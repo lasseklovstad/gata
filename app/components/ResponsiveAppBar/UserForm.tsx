@@ -131,6 +131,7 @@ export const UserForm = ({
                   onZoomChange={setZoom}
                   cropShape="round"
                   maxZoom={10}
+                  zoomSpeed={0.3}
                   onCropAreaChange={(area, areaPx) => setArea(areaPx)}
                />
             </div>

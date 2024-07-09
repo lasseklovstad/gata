@@ -88,7 +88,7 @@ export class MemberPage {
    async changePrimaryUser(name: string) {
       await this.primaryUserSelect.click();
       await this.page.getByRole("option", { name: "Auth0 " + name, exact: true }).click();
-      await expect(this.page.getByText(`Navn: ${name}`)).toBeVisible();
+      await expect(this.getRemoveLinkedUserButton(name)).toBeHidden();
    }
 
    async removeLinkedUser(name: string) {
