@@ -1,26 +1,39 @@
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Image } from "@unpic/react";
+import { ChevronLeft, ChevronRight, Loader2, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
+import type { CloudinaryImage } from "db/schema";
 import { Button } from "~/components/ui/button";
-import { buildImageUrl } from "~/utils/cloudinaryUtils";
+import { cn } from "~/utils";
 import { useDialog } from "~/utils/dialogUtils";
 
 import { Typography } from "./ui/typography";
 
 type Props = {
-   url: string;
+   cloudImage: CloudinaryImage;
    onNext: () => void;
    onPrevious: () => void;
    onClose: () => void;
 };
 
-export const CloudImageFullscreen = ({ url, onNext, onPrevious, onClose }: Props) => {
+export const CloudImageFullscreen = ({
+   cloudImage: { cloudUrl, width, height },
+   onNext,
+   onPrevious,
+   onClose,
+}: Props) => {
    const dialog = useDialog({ defaultOpen: true });
+   const [isLoaded, setIsLoaded] = useState(false);
+
+   useEffect(() => {
+      setIsLoaded(false);
+   }, [cloudUrl]);
 
    return (
       <>
          <dialog
             ref={dialog.dialogRef}
-            className="backdrop:bg-black/80 rounded fixed top-[50%] left-[50%] m-0 p-0 -translate-x-[50%] -translate-y-[50%] w-[90vw]"
+            className="backdrop:bg-black/80 w-full h-screen flex justify-center items-center fixed top-0 left-0 m-0 p-0 max-w-full max-h-screen bg-black"
             onClose={onClose}
             onKeyDown={(e) => {
                if (e.key === "ArrowRight") {
@@ -31,49 +44,55 @@ export const CloudImageFullscreen = ({ url, onNext, onPrevious, onClose }: Props
                }
             }}
          >
-            <div className="flex justify-center bg-black min-w-[200px] min-h-[200px]">
-               <Button
-                  type="button"
-                  onClick={dialog.close}
-                  size="icon"
-                  variant="secondary"
-                  className="m-2 absolute right-0 z-50"
-               >
-                  <X />
-                  <span className="sr-only">Lukk</span>
-               </Button>
-               <Button
-                  type="button"
-                  onClick={onPrevious}
-                  size="icon"
-                  variant="secondary"
-                  className="m-2 absolute left-0 top-[50%] z-50"
-               >
-                  <ChevronLeft />
-                  <span className="sr-only">Forrige bilde</span>
-               </Button>
-               <Button
-                  type="button"
-                  onClick={onNext}
-                  size="icon"
-                  variant="secondary"
-                  className="m-2 absolute top-[50%] right-0 z-50"
-               >
-                  <ChevronRight />
-                  <span className="sr-only">Neste bilde</span>
-               </Button>
-               <Typography className="absolute top-[50%] text-white z-0 p-2">Henter bilde...</Typography>
-               <img
-                  loading="lazy"
-                  className="max-h-[90vh] z-40 relative"
-                  src={buildImageUrl(url, 1100)}
-                  srcSet={[240, 560, 840, 1100, 1650, 2100, 2600, 3100]
-                     .map((width) => `${buildImageUrl(url, width)} ${width}w`)
-                     .join(", ")}
-                  alt=""
-                  sizes="100vw"
-               />
-            </div>
+            <Button
+               type="button"
+               onClick={dialog.close}
+               size="icon"
+               variant="secondary"
+               className="m-1 fixed right-0 top-0 z-50"
+            >
+               <X />
+               <span className="sr-only">Lukk</span>
+            </Button>
+            <Button
+               type="button"
+               onClick={onPrevious}
+               size="icon"
+               variant="link"
+               className="m-1 fixed left-0 bottom-[45%] z-50"
+            >
+               <ChevronLeft className="size-8" />
+               <span className="sr-only">Forrige bilde</span>
+            </Button>
+            <Button
+               type="button"
+               onClick={onNext}
+               size="icon"
+               variant="link"
+               className="m-1 fixed bottom-[45%] right-0 z-50"
+            >
+               <ChevronRight className="size-8" />
+               <span className="sr-only">Neste bilde</span>
+            </Button>
+            <Typography
+               variant="h2"
+               as="div"
+               className={cn("z-50 fixed text-primary flex gap-2 items-center bottom-[45%]", isLoaded && "hidden")}
+            >
+               <Loader2 className="animate-spin size-12" />
+            </Typography>
+            <Image
+               loading="eager"
+               unstyled
+               className={cn("max-h-screen object-contain", isLoaded ? "opacity-100" : "opacity-30")}
+               fetchPriority="high"
+               src={cloudUrl}
+               background="auto"
+               alt=""
+               width={width}
+               height={height}
+               onLoad={() => setIsLoaded(true)}
+            />
          </dialog>
       </>
    );

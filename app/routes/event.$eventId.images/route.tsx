@@ -107,7 +107,7 @@ export default function EventImages() {
    const formId = useId();
    const isOrganizer = isUserOrganizer(event, loggedInUser);
    return (
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
          <UploadImages eventId={event.id} />
          {cloudinaryImages.length === 0 ? (
             <Typography>Ingen bilder lastet opp enda...</Typography>
@@ -133,9 +133,9 @@ export default function EventImages() {
             <>
                <fetcher.Form method="DELETE" id={formId}>
                   <input name="intent" value="deleteImages" hidden readOnly />
-                  <ul className="sm:flex gap-2 flex-wrap grid">
+                  <ul className="flex gap-2 flex-wrap">
                      {cloudinaryImages.map((image) => (
-                        <li key={image.cloudId} className="h-full sm:h-[160px]">
+                        <li key={image.cloudId} className="h-[160px]">
                            <CloudImageCheckbox cloudImage={image} />
                         </li>
                      ))}

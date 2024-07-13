@@ -36,7 +36,7 @@ export default function EventActivities() {
    const activePollsTitleId = useId();
    const activePolls = polls.filter((p) => p.poll.isActive);
    return (
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4 items-start">
          {activePolls.length > 0 ? (
             <>
                <Typography variant="h3" className="mb-2" id={activePollsTitleId}>
@@ -57,7 +57,7 @@ export default function EventActivities() {
             </>
          ) : null}
          <UploadImages eventId={eventId} />
-         <CloudImageGallery cloudImages={cloudinaryImages.slice(0, 10)} />
+         <CloudImageGallery cloudImages={cloudinaryImages.slice(0, 8)} />
          {cloudinaryImages.length ? (
             <Button variant="outline" as={Link} to="images">
                Se alle bilder
