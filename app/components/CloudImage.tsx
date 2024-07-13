@@ -1,5 +1,6 @@
+import { Image } from "@unpic/react";
+
 import type { CloudinaryImage } from "db/schema";
-import { buildImageUrl } from "~/utils/cloudinaryUtils";
 
 type Props = {
    cloudImage: CloudinaryImage;
@@ -7,11 +8,13 @@ type Props = {
 
 export const CloudImage = ({ cloudImage }: Props) => {
    return (
-      <img
-         loading="lazy"
+      <Image
          className="rounded shadow h-full w-full"
-         src={buildImageUrl(cloudImage.cloudUrl, 400, "height")}
+         src={cloudImage.cloudUrl}
          alt=""
+         height={300}
+         background="auto"
+         width={200}
       />
    );
 };
