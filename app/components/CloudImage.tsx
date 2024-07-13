@@ -1,4 +1,4 @@
-import { Image, Source } from "@unpic/react";
+import { Image } from "@unpic/react";
 
 import type { CloudinaryImage } from "db/schema";
 
