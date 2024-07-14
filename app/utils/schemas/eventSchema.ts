@@ -19,6 +19,11 @@ export const createEventMessageSchema = zfd.formData({
    message: zfd.text(z.string()),
 });
 
+export const newEventMessageReplySchema = zfd.formData({
+   messageId: zfd.text(z.coerce.number()),
+   reply: zfd.text(z.string()),
+});
+
 export const likeMessageSchema = zfd.formData({
    messageId: zfd.text(z.coerce.number()),
    type: zfd.text(z.string()),

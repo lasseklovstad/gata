@@ -8,7 +8,11 @@ import { Label } from "~/components/ui/label";
 
 import type { action } from "./route";
 
-export const ReplyMessageForm = () => {
+type Props = {
+   messageId: number;
+};
+
+export const ReplyMessageForm = ({ messageId }: Props) => {
    const fetcher = useFetcher<typeof action>();
    const formRef = useRef<HTMLFormElement>(null);
    const id = useId();
@@ -26,13 +30,8 @@ export const ReplyMessageForm = () => {
                Ny kommentar
             </Label>
             <div className="flex gap-2 w-full">
-               <Input
-                  autoComplete="off"
-                  name="message"
-                  className="w-full"
-                  id={id}
-                  placeholder="Legg til en kommentar"
-               />
+               <Input autoComplete="off" name="reply" className="w-full" id={id} placeholder="Legg til en kommentar" />
+               <input hidden readOnly value={messageId} name="messageId" />
                <Button type="submit" variant="ghost" size="icon" name="intent" value="replyMessage">
                   <Send />
                   <span className="sr-only">Send melding</span>

@@ -273,7 +273,7 @@ export const messages = sqliteTable("messages", {
 
 export const messagesRelations = relations(messages, ({ one, many }) => ({
    likes: many(messageLikes),
-   replies: many(messageReplies),
+   replies: many(messageReplies, { relationName: "message" }),
    user: one(user, {
       fields: [messages.userId],
       references: [user.id],
@@ -322,10 +322,12 @@ export const messageRepliesRelations = relations(messageReplies, ({ one }) => ({
    message: one(messages, {
       fields: [messageReplies.messageId],
       references: [messages.id],
+      relationName: "message",
    }),
    reply: one(messages, {
-      fields: [messageReplies.messageId],
+      fields: [messageReplies.replyId],
       references: [messages.id],
+      relationName: "reply",
    }),
 }));
 

@@ -177,7 +177,7 @@ export default function EventPage() {
          <nav className="border-b-2 mt-6">
             <ul className="flex">
                <li>
-                  <TabNavLink to={""}>Aktivitet</TabNavLink>
+                  <TabNavLink to="">Aktivitet</TabNavLink>
                </li>
                <li>
                   <TabNavLink to="polls">Avstemninger</TabNavLink>

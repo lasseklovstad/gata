@@ -1,5 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import { formatDate, intervalToDuration } from "date-fns";
 import { Vote } from "lucide-react";
 import { useId } from "react";
 import { z } from "zod";
@@ -10,6 +11,7 @@ import {
    getEventMessages,
    getEventPollsSimple,
    insertEventMessage,
+   insertEventMessageReply,
    insertMessageLike,
 } from "~/.server/db/gataEvent";
 import { AvatarUser } from "~/components/AvatarUser";
@@ -18,16 +20,13 @@ import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { badRequest } from "~/utils/responseUtils";
-import { createEventMessageSchema, likeMessageSchema } from "~/utils/schemas/eventSchema";
+import { createEventMessageSchema, likeMessageSchema, newEventMessageReplySchema } from "~/utils/schemas/eventSchema";
 
 import { LikeButton } from "./LikeButton";
-import { LikeIconMapping } from "./LikeIconMapping";
-import { NewMessageForm } from "./NewMessageForm";
-import { UploadImages } from "../../components/UploadImages";
-import { formatDate, parse } from "date-fns";
-import { ReplyMessageForm } from "./ReplyMessageForm";
-import { nb } from "date-fns/locale";
 import { Likes } from "./Likes";
+import { NewMessageForm } from "./NewMessageForm";
+import { ReplyMessageForm } from "./ReplyMessageForm";
+import { UploadImages } from "../../components/UploadImages";
 
 const paramSchema = z.object({
    eventId: z.coerce.number(),
@@ -62,6 +61,11 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       await insertEventMessage(eventId, loggendInUser.id, message);
       return { ok: true };
    }
+   if (intent === "replyMessage") {
+      const { reply, messageId } = newEventMessageReplySchema.parse(formData);
+      await insertEventMessageReply(loggendInUser.id, messageId, reply);
+      return { ok: true };
+   }
    if (intent === "likeMessage") {
       const { messageId, type } = likeMessageSchema.parse(formData);
       request.method === "POST"
@@ -75,7 +79,7 @@ export default function EventActivities() {
    const { polls, cloudinaryImages, eventId, messages, loggedInUser } = useLoaderData<typeof loader>();
    const activePollsTitleId = useId();
    const activePolls = polls.filter((p) => p.poll.isActive);
-   console.log(messages);
+
    return (
       <div className="flex flex-col gap-4 items-start">
          {activePolls.length > 0 ? (
@@ -107,7 +111,10 @@ export default function EventActivities() {
          <NewMessageForm />
          <ul className="flex flex-col gap-2 w-full">
             {messages.map(({ message }) => (
-               <li key={message.id} className="flex flex-col p-4 w-full whitespace-pre-line border rounded shadow-sm">
+               <li
+                  key={message.id}
+                  className="flex flex-col gap-2 p-4 w-full whitespace-pre-line border rounded shadow-sm"
+               >
                   <div className="flex gap-2 items-center">
                      <AvatarUser className="size-10" user={message.user} />
                      <div>
@@ -116,16 +123,69 @@ export default function EventActivities() {
                      </div>
                   </div>
                   <div className="p-1">{message.message}</div>
+                  <div className="border-b-2 py-2">
+                     <Likes likes={message.likes} size="normal" />
+                  </div>
                   <div>
-                     <Likes likes={message.likes} />
+                     <LikeButton
+                        messageId={message.id}
+                        loggInUserId={loggedInUser.id}
+                        likes={message.likes}
+                        size="normal"
+                     />
                   </div>
-                  <div className="my-4">
-                     <LikeButton messageId={message.id} loggInUserId={loggedInUser.id} likes={message.likes} />
-                  </div>
-                  <ReplyMessageForm />
+                  <ul className="flex flex-col gap-2">
+                     {message.replies.map(({ reply }) => {
+                        const timeSince = getTimeDifference(reply.dateTime);
+                        return (
+                           <li key={reply.id}>
+                              <div className="flex gap-2">
+                                 <AvatarUser className="size-8" user={message.user} />
+                                 <div>
+                                    <div className="p-2 bg-gray-200 rounded-xl">
+                                       <Typography variant="mutedText">{reply.user.name}</Typography>
+                                       {reply.message}
+
+                                       <Likes likes={reply.likes} size="small" />
+                                    </div>
+
+                                    <div className="flex">
+                                       <Typography variant="mutedText">{timeSince}</Typography>
+                                       <LikeButton
+                                          messageId={reply.id}
+                                          loggInUserId={loggedInUser.id}
+                                          likes={reply.likes}
+                                          size="small"
+                                          className="-mt-2"
+                                       />
+                                    </div>
+                                 </div>
+                              </div>
+                           </li>
+                        );
+                     })}
+                  </ul>
+                  <ReplyMessageForm messageId={message.id} />
                </li>
             ))}
          </ul>
       </div>
    );
+}
+
+function getTimeDifference(dateString: string) {
+   const targetDate = new Date(dateString);
+   const now = new Date();
+
+   const duration = intervalToDuration({ start: targetDate, end: now });
+
+   if (duration.days && duration.days > 0) {
+      return `${duration.days} dager siden`;
+   } else if (duration.hours && duration.hours > 0) {
+      return `${duration.hours} timer siden`;
+   } else if (duration.minutes && duration.minutes > 0) {
+      return `${duration.minutes} minutter siden`;
+   } else if (duration.seconds && duration.seconds > 0) {
+      return `${duration.seconds} sekunder siden`;
+   }
 }

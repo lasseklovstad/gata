@@ -10,6 +10,7 @@ import {
    eventPolls,
    gataEvent,
    messageLikes,
+   messageReplies,
    messages,
    poll,
    pollOption,
@@ -195,6 +196,17 @@ export const getEventMessages = async (eventId: number) => {
             with: {
                user: { columns: { name: true, picture: true } },
                likes: { with: { user: { columns: { name: true, picture: true } } } },
+               replies: {
+                  with: {
+                     reply: {
+                        with: {
+                           user: { columns: { name: true, picture: true } },
+                           likes: { with: { user: { columns: { name: true, picture: true } } } },
+                        },
+                     },
+                  },
+                  orderBy: desc(messageReplies.replyId),
+               },
             },
          },
       },
@@ -209,6 +221,16 @@ export const insertEventMessage = async (eventId: number, userId: string, messag
          .values({ userId, message })
          .returning({ messageId: messages.id });
       await tx.insert(eventMessages).values({ messageId, eventId });
+   });
+};
+
+export const insertEventMessageReply = async (userId: string, messageId: number, reply: string) => {
+   await db.transaction(async (tx) => {
+      const [{ replyId }] = await tx
+         .insert(messages)
+         .values({ userId, message: reply })
+         .returning({ replyId: messages.id });
+      await tx.insert(messageReplies).values({ messageId, replyId });
    });
 };
 

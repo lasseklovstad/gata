@@ -22,12 +22,12 @@ export const NewMessageForm = () => {
    return (
       <fetcher.Form className="w-full" method="POST" ref={formRef}>
          <div className="flex flex-col gap-2 w-full">
-            <Label htmlFor={id}>Ny Melding</Label>
+            <Label htmlFor={id}>Nytt innlegg</Label>
             <div className="flex gap-2 w-full">
-               <Textarea autoComplete="off" name="message" className="w-full" id={id} placeholder="Ny melding" />
+               <Textarea autoComplete="off" name="message" className="w-full" id={id} placeholder="Skriv noe..." />
                <Button type="submit" size="icon" name="intent" value="createMessage">
                   <Send />
-                  <span className="sr-only">Send melding</span>
+                  <span className="sr-only">Opprett innlegg</span>
                </Button>
             </div>
          </div>

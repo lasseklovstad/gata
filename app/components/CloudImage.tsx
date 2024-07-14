@@ -9,10 +9,11 @@ type Props = {
 export const CloudImage = ({ cloudImage }: Props) => {
    return (
       <Image
-         className="rounded shadow h-full w-full"
+         className="rounded shadow h-full object-cover"
          src={cloudImage.cloudUrl}
          alt=""
          height={300}
+         unstyled
          background="auto"
          width={200}
       />

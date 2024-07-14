@@ -4,6 +4,7 @@ import { ThumbsUp } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import { cn } from "~/utils";
 
 import { LikeIconMapping } from "./LikeIconMapping";
 
@@ -11,17 +12,25 @@ type Props = {
    messageId: number;
    likes: { type: string; userId: string }[];
    loggInUserId: string;
+   size: "normal" | "small";
+   className?: string;
 };
 
-export const LikeButton = ({ messageId, loggInUserId, likes }: Props) => {
+export const LikeButton = ({ messageId, loggInUserId, likes, size, className }: Props) => {
    const fetcher = useFetcher();
    const selectedLikeType = likes.find((like) => like.userId === loggInUserId)?.type;
    return (
       <>
-         <Popover className="relative">
-            <PopoverButton as={Button} variant="outline" className="flex gap-1" isLoading={fetcher.state !== "idle"}>
-               <ThumbsUp />
-               <span>Liker</span>
+         <Popover className={cn("relative", className)}>
+            <PopoverButton
+               as={Button}
+               variant={size === "normal" ? "outline" : "ghost"}
+               size={size === "normal" ? "default" : "icon"}
+               className="flex gap-1"
+               isLoading={fetcher.state !== "idle"}
+            >
+               <ThumbsUp className={size === "normal" ? "size-6" : "size-4"} />
+               <span className={size === "normal" ? "" : "sr-only"}>Liker</span>
             </PopoverButton>
             <PopoverPanel anchor="top" className="flex gap-2 p-2 bg-white rounded shadow-lg border [--anchor-gap:8px]">
                {({ close }) => (
@@ -42,7 +51,7 @@ export const LikeButton = ({ messageId, loggInUserId, likes }: Props) => {
                      {(["thumbsUp", "thumbsDown", "heart", "party", "cry", "angry"] as const).map((type) => {
                         const Icon = LikeIconMapping[type];
                         return (
-                           <ToggleGroupItem key={type} value={type}>
+                           <ToggleGroupItem key={type} value={type} className="text-xl">
                               {Icon}
                            </ToggleGroupItem>
                         );

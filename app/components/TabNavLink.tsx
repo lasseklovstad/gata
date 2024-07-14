@@ -6,7 +6,7 @@ export const TabNavLink = (props: ComponentProps<typeof NavLink>) => {
       <NavLink
          {...props}
          end
-         unstable_viewTransition
+         preventScrollReset
          className="-mb-[2px] block p-2 aria-current:text-primary aria-current:border-b-2 border-primary"
       />
    );
