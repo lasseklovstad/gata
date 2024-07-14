@@ -20,7 +20,13 @@ export const UploadImages = ({ eventId }: Props) => {
             <Image />
             Last opp bilder
          </Typography>
-         <fetcher.Form action={action} method={method} className="flex gap-2 items-center flex-wrap" encType={encType}>
+         {/* Important with max-w-full for iphone not extending out of screen */}
+         <fetcher.Form
+            action={action}
+            method={method}
+            className="flex gap-2 items-center flex-wrap max-w-full"
+            encType={encType}
+         >
             <Input
                onChange={(e) => fetcher.submit(e.target.form, { method, encType, action })}
                className="w-fit"

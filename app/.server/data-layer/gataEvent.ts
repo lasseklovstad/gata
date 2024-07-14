@@ -3,7 +3,12 @@ import type { PushSubscription } from "web-push";
 import type { EventSchema } from "~/utils/schemas/eventSchema";
 
 import { getEvent, insertEvent, updateEvent, updateIsUserParticipating } from "../db/gataEvent";
-import { getAllSubscriptions, getAllSubscriptionsGoingToEvent } from "../db/pushSubscriptions";
+import {
+   getAllSubscriptions,
+   getAllSubscriptionsGoingToEvent,
+   getAllSubscriptionsInvolvedInMessage,
+   getSubscriptionForMessage,
+} from "../db/pushSubscriptions";
 import type { User } from "../db/user";
 import { sendPushNotification } from "../services/pushNoticiationService";
 
@@ -77,6 +82,57 @@ export const notifyParticipantsImagesIsUploaded = async (loggedInUser: User, eve
          body: `Arrangement ${event.title} er oppdatert med nye bilder 📷`,
          data: { url: `/event/${eventId}` },
          icon: "/logo192.png",
+      }
+   );
+};
+
+export const notifyParticipantsNewPostCreated = async (
+   userThatCreatedPost: User,
+   eventId: number,
+   messageId: number
+) => {
+   const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, userThatCreatedPost.id);
+   const event = await getEvent(eventId);
+   await sendPushNotification(
+      subscriptions.map((s) => s.subscription as PushSubscription),
+      {
+         body: `${userThatCreatedPost.name} publiserte et nytt innlegg`,
+         data: { url: `/event/${eventId}?messageId=${messageId}` },
+         icon: "/logo192.png",
+         title: event.title,
+      }
+   );
+};
+
+export const notifyParticipantsReplyToPost = async (
+   loggedInUser: User,
+   eventId: number,
+   messageId: number,
+   replyId: number
+) => {
+   const subscriptions = await getAllSubscriptionsInvolvedInMessage(messageId, loggedInUser.id);
+   const event = await getEvent(eventId);
+   await sendPushNotification(
+      subscriptions.map((s) => s.subscription as PushSubscription),
+      {
+         body: `${loggedInUser.name} kommenterte på et innlegg`,
+         data: { url: `/event/${eventId}?messageId=${replyId}` },
+         icon: "/logo192.png",
+         title: event.title,
+      }
+   );
+};
+
+export const notifyParticipantLikeOnPost = async (loggedInUser: User, eventId: number, messageId: number) => {
+   const subscriptions = await getSubscriptionForMessage(messageId, loggedInUser.id);
+   const event = await getEvent(eventId);
+   await sendPushNotification(
+      subscriptions.map((s) => s.subscription as PushSubscription),
+      {
+         body: `${loggedInUser.name} reagerte på ditt innlegg`,
+         data: { url: `/event/${eventId}?messageId=${messageId}` },
+         icon: "/logo192.png",
+         title: event.title,
       }
    );
 };

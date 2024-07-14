@@ -1,10 +1,15 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import { formatDate, intervalToDuration } from "date-fns";
 import { Vote } from "lucide-react";
-import { useId } from "react";
+import { useEffect, useId } from "react";
 import { z } from "zod";
 
+import {
+   notifyParticipantLikeOnPost,
+   notifyParticipantsNewPostCreated,
+   notifyParticipantsReplyToPost,
+} from "~/.server/data-layer/gataEvent";
 import {
    deleteMessageLike,
    getEventCloudinaryImages,
@@ -18,6 +23,7 @@ import { AvatarUser } from "~/components/AvatarUser";
 import { CloudImageGallery } from "~/components/CloudImageGallery";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
+import { cn } from "~/utils";
 import { createAuthenticator } from "~/utils/auth.server";
 import { badRequest } from "~/utils/responseUtils";
 import { createEventMessageSchema, likeMessageSchema, newEventMessageReplySchema } from "~/utils/schemas/eventSchema";
@@ -63,7 +69,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
          return transformErrorResponse(parsedForm.error);
       }
       const { message } = parsedForm.data;
-      await insertEventMessage(eventId, loggendInUser.id, message);
+      const messageId = await insertEventMessage(eventId, loggendInUser.id, message);
+      await notifyParticipantsNewPostCreated(loggendInUser, eventId, messageId);
       return { ok: true } as const;
    }
    if (intent === "replyMessage") {
@@ -72,22 +79,35 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
          return transformErrorResponse(parsedForm.error);
       }
       const { reply, messageId } = parsedForm.data;
-      await insertEventMessageReply(loggendInUser.id, messageId, reply);
+      const replyId = await insertEventMessageReply(loggendInUser.id, messageId, reply);
+      await notifyParticipantsReplyToPost(loggendInUser, eventId, messageId, replyId);
       return { ok: true } as const;
    }
    if (intent === "likeMessage") {
       const { messageId, type } = likeMessageSchema.parse(formData);
-      request.method === "POST"
-         ? await insertMessageLike(loggendInUser.id, messageId, type)
-         : await deleteMessageLike(loggendInUser.id, messageId);
+      if (request.method === "POST") {
+         await insertMessageLike(loggendInUser.id, messageId, type);
+         await notifyParticipantLikeOnPost(loggendInUser, eventId, messageId);
+      } else {
+         await deleteMessageLike(loggendInUser.id, messageId);
+      }
       return { ok: true } as const;
    }
 };
 
 export default function EventActivities() {
    const { polls, cloudinaryImages, eventId, messages, loggedInUser } = useLoaderData<typeof loader>();
+   const [searchParams] = useSearchParams();
    const activePollsTitleId = useId();
    const activePolls = polls.filter((p) => p.poll.isActive);
+
+   const messageId = searchParams.get("messageId");
+   useEffect(() => {
+      // Focus message when a user has clicked notification
+      if (messageId) {
+         document.getElementById(`message-${messageId}`)?.scrollIntoView();
+      }
+   }, [messageId]);
 
    return (
       <div className="flex flex-col gap-4 items-start">
@@ -122,7 +142,11 @@ export default function EventActivities() {
             {messages.map(({ message }) => (
                <li
                   key={message.id}
-                  className="flex flex-col gap-2 p-4 w-full whitespace-pre-line border rounded shadow-sm"
+                  id={`message-${message.id}`}
+                  className={cn(
+                     "flex flex-col gap-2 p-4 w-full whitespace-pre-line border rounded shadow-sm",
+                     message.id.toString() === messageId && "outline outline-primary outline-offset-2"
+                  )}
                >
                   <div className="flex gap-2 items-center">
                      <AvatarUser className="size-10" user={message.user} />
@@ -147,9 +171,15 @@ export default function EventActivities() {
                      {message.replies.map(({ reply }) => {
                         const timeSince = getTimeDifference(reply.dateTime);
                         return (
-                           <li key={reply.id}>
+                           <li
+                              key={reply.id}
+                              id={`message-${reply.id}`}
+                              className={cn(
+                                 reply.id.toString() === messageId && "outline outline-primary outline-offset-4 rounded"
+                              )}
+                           >
                               <div className="flex gap-2">
-                                 <AvatarUser className="size-8" user={message.user} />
+                                 <AvatarUser className="size-8" user={reply.user} />
                                  <div>
                                     <div className="p-2 bg-gray-200 rounded-xl">
                                        <Typography variant="mutedText">{reply.user.name}</Typography>
