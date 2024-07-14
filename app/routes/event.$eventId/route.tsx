@@ -25,6 +25,7 @@ import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
 import { badRequest } from "~/utils/responseUtils";
+import { transformErrorResponse } from "~/utils/validateUtils";
 
 import { AttendingSelect } from "./AttendingSelect";
 import { EventMenu } from "./EventMenu";
@@ -92,7 +93,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    if (intent === "updateEvent") {
       const updateEventForm = eventSchema.safeParse(formdata);
       if (!updateEventForm.success) {
-         return { ...updateEventForm.error.formErrors, ok: false };
+         return transformErrorResponse(updateEventForm.error);
       }
       await updateEventAndNotify(loggedInUser, eventId, updateEventForm.data);
       return { ok: true };
@@ -177,7 +178,7 @@ export default function EventPage() {
          <nav className="border-b-2 mt-6">
             <ul className="flex">
                <li>
-                  <TabNavLink to={""}>Aktivitet</TabNavLink>
+                  <TabNavLink to="">Aktivitet</TabNavLink>
                </li>
                <li>
                   <TabNavLink to="polls">Avstemninger</TabNavLink>

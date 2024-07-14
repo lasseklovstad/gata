@@ -2,11 +2,11 @@ import { devices, expect } from "@playwright/test";
 import { addDays, formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
 
+import { EventActivityPage } from "e2e/pages/EventActivityPage";
 import { EventFormPage } from "e2e/pages/EventFormPage";
 import { EventPage } from "e2e/pages/EventPage";
 import { EventPollPage } from "e2e/pages/EventPollPage";
 import { HomePage } from "e2e/pages/HomePage";
-import { PollActivityPage } from "e2e/pages/PollActivityPage";
 
 import { testWithRoles as test } from "../../utils/fixtures";
 
@@ -51,7 +51,7 @@ test.describe("Event polls mobile", () => {
 
       await test.step("Select as admin and verify result", async () => {
          const homePage = HomePage(adminPage);
-         const pollActivityPage = PollActivityPage(adminPage);
+         const pollActivityPage = EventActivityPage(adminPage);
          const eventPollPage = EventPollPage(adminPage);
 
          // Goto poll

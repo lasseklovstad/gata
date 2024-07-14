@@ -236,6 +236,101 @@ export const eventParticipants = sqliteTable(
    (table) => ({ pk: primaryKey({ columns: [table.eventId, table.userId] }) })
 );
 
+export const eventMessages = sqliteTable(
+   "event_messages",
+   {
+      eventId: integer("event_id")
+         .notNull()
+         .references(() => gataEvent.id, { onDelete: "cascade" }),
+      messageId: integer("message_id")
+         .notNull()
+         .references(() => messages.id, { onDelete: "cascade" }),
+   },
+   (table) => ({ pk: primaryKey({ columns: [table.eventId, table.messageId] }) })
+);
+
+export const eventMessagesRelations = relations(eventMessages, ({ one }) => ({
+   event: one(gataEvent, {
+      fields: [eventMessages.eventId],
+      references: [gataEvent.id],
+   }),
+   message: one(messages, {
+      fields: [eventMessages.messageId],
+      references: [messages.id],
+   }),
+}));
+
+export const messages = sqliteTable("messages", {
+   id: integer("id").primaryKey(),
+   userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+   message: text("message").notNull(),
+   dateTime: text("date_time")
+      .notNull()
+      .default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+export const messagesRelations = relations(messages, ({ one, many }) => ({
+   likes: many(messageLikes),
+   replies: many(messageReplies, { relationName: "message" }),
+   user: one(user, {
+      fields: [messages.userId],
+      references: [user.id],
+   }),
+}));
+
+export const messageLikes = sqliteTable(
+   "message_likes",
+   {
+      messageId: integer("message_id")
+         .notNull()
+         .references(() => messages.id, { onDelete: "cascade" }),
+      userId: text("user_id")
+         .notNull()
+         .references(() => user.id, { onDelete: "cascade" }),
+      type: text("type").notNull(),
+   },
+   (table) => ({ pk: primaryKey({ columns: [table.messageId, table.userId] }) })
+);
+
+export const messageLikesRelations = relations(messageLikes, ({ one }) => ({
+   message: one(messages, {
+      fields: [messageLikes.messageId],
+      references: [messages.id],
+   }),
+   user: one(user, {
+      fields: [messageLikes.userId],
+      references: [user.id],
+   }),
+}));
+
+export const messageReplies = sqliteTable(
+   "message_replies",
+   {
+      messageId: integer("message_id")
+         .notNull()
+         .references(() => messages.id, { onDelete: "cascade" }),
+      replyId: integer("reply_id")
+         .notNull()
+         .references(() => messages.id, { onDelete: "cascade" }),
+   },
+   (table) => ({ pk: primaryKey({ columns: [table.messageId, table.replyId] }) })
+);
+
+export const messageRepliesRelations = relations(messageReplies, ({ one }) => ({
+   message: one(messages, {
+      fields: [messageReplies.messageId],
+      references: [messages.id],
+      relationName: "message",
+   }),
+   reply: one(messages, {
+      fields: [messageReplies.replyId],
+      references: [messages.id],
+      relationName: "reply",
+   }),
+}));
+
 // Relations
 
 export const externalUserRelations = relations(externalUser, ({ one }) => ({
@@ -321,6 +416,7 @@ export const gataEventRelations = relations(gataEvent, ({ one, many }) => ({
    createdByUser: one(user, { fields: [gataEvent.createdBy], references: [user.id] }),
    polls: many(eventPolls),
    organizers: many(eventOrganizer),
+   messages: many(eventMessages),
 }));
 
 export const eventPollsRelations = relations(eventPolls, ({ one }) => ({
