@@ -21,6 +21,7 @@ import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { badRequest } from "~/utils/responseUtils";
 import { createEventMessageSchema, likeMessageSchema, newEventMessageReplySchema } from "~/utils/schemas/eventSchema";
+import { transformErrorResponse } from "~/utils/validateUtils";
 
 import { LikeButton } from "./LikeButton";
 import { Likes } from "./Likes";
@@ -57,21 +58,29 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    const formData = await request.formData();
    const intent = formData.get("intent");
    if (intent === "createMessage") {
-      const { message } = createEventMessageSchema.parse(formData);
+      const parsedForm = createEventMessageSchema.safeParse(formData);
+      if (!parsedForm.success) {
+         return transformErrorResponse(parsedForm.error);
+      }
+      const { message } = parsedForm.data;
       await insertEventMessage(eventId, loggendInUser.id, message);
-      return { ok: true };
+      return { ok: true } as const;
    }
    if (intent === "replyMessage") {
-      const { reply, messageId } = newEventMessageReplySchema.parse(formData);
+      const parsedForm = newEventMessageReplySchema.safeParse(formData);
+      if (!parsedForm.success) {
+         return transformErrorResponse(parsedForm.error);
+      }
+      const { reply, messageId } = parsedForm.data;
       await insertEventMessageReply(loggendInUser.id, messageId, reply);
-      return { ok: true };
+      return { ok: true } as const;
    }
    if (intent === "likeMessage") {
       const { messageId, type } = likeMessageSchema.parse(formData);
       request.method === "POST"
          ? await insertMessageLike(loggendInUser.id, messageId, type)
          : await deleteMessageLike(loggendInUser.id, messageId);
-      return { ok: true };
+      return { ok: true } as const;
    }
 };
 
@@ -109,7 +118,7 @@ export default function EventActivities() {
             </Button>
          ) : null}
          <NewMessageForm />
-         <ul className="flex flex-col gap-2 w-full">
+         <ul className="flex flex-col gap-2 w-full" aria-label="Innlegg">
             {messages.map(({ message }) => (
                <li
                   key={message.id}
@@ -134,7 +143,7 @@ export default function EventActivities() {
                         size="normal"
                      />
                   </div>
-                  <ul className="flex flex-col gap-2">
+                  <ul className="flex flex-col gap-2" aria-label="Kommentarer">
                      {message.replies.map(({ reply }) => {
                         const timeSince = getTimeDifference(reply.dateTime);
                         return (

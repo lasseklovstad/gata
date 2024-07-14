@@ -29,4 +29,9 @@ export const LikeIconMapping = {
          😠
       </span>
    ),
+   haha: (
+      <span role="img" aria-label="Haha">
+         😂
+      </span>
+   ),
 };

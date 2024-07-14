@@ -25,7 +25,7 @@ export const LikeButton = ({ messageId, loggInUserId, likes, size, className }: 
             <PopoverButton
                as={Button}
                variant={size === "normal" ? "outline" : "ghost"}
-               size={size === "normal" ? "default" : "icon"}
+               size={size === "normal" ? "sm" : "icon"}
                className="flex gap-1"
                isLoading={fetcher.state !== "idle"}
             >
@@ -48,7 +48,7 @@ export const LikeButton = ({ messageId, loggInUserId, likes, size, className }: 
                         close();
                      }}
                   >
-                     {(["thumbsUp", "thumbsDown", "heart", "party", "cry", "angry"] as const).map((type) => {
+                     {(["thumbsUp", "thumbsDown", "heart", "party", "cry", "angry", "haha"] as const).map((type) => {
                         const Icon = LikeIconMapping[type];
                         return (
                            <ToggleGroupItem key={type} value={type} className="text-xl">

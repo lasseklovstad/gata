@@ -72,9 +72,7 @@ export const EventMenu = ({ event, numberOfImages }: Props) => {
          <Dialog ref={editDialog.dialogRef}>
             <DialogHeading>Rediger arrangement</DialogHeading>
             <fetcher.Form method="PUT">
-               <FormProvider
-                  errors={fetcher.data && "fieldErrors" in fetcher.data ? fetcher.data.fieldErrors : undefined}
-               >
+               <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
                   <EventForm event={event} />
                </FormProvider>
 

@@ -8,8 +8,9 @@ self.addEventListener('activate', function(event) {
 
 self.addEventListener('push', function(event){
     const options = event.data.json()
+    const title = options.title || "Oppdatering"
     event.waitUntil(
-      self.registration.showNotification("Gata", options)
+      self.registration.showNotification(title, options)
     );
   });
 // https://github.com/mdn/serviceworker-cookbook/tree/master

@@ -25,6 +25,7 @@ import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
 import { badRequest } from "~/utils/responseUtils";
+import { transformErrorResponse } from "~/utils/validateUtils";
 
 import { AttendingSelect } from "./AttendingSelect";
 import { EventMenu } from "./EventMenu";
@@ -92,7 +93,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    if (intent === "updateEvent") {
       const updateEventForm = eventSchema.safeParse(formdata);
       if (!updateEventForm.success) {
-         return { ...updateEventForm.error.formErrors, ok: false };
+         return transformErrorResponse(updateEventForm.error);
       }
       await updateEventAndNotify(loggedInUser, eventId, updateEventForm.data);
       return { ok: true };
