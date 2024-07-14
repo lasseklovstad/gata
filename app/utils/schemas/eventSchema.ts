@@ -14,3 +14,12 @@ export const eventSchema = zfd.formData({
 });
 
 export type EventSchema = z.infer<typeof eventSchema>;
+
+export const createEventMessageSchema = zfd.formData({
+   message: zfd.text(z.string()),
+});
+
+export const likeMessageSchema = zfd.formData({
+   messageId: zfd.text(z.coerce.number()),
+   type: zfd.text(z.string()),
+});

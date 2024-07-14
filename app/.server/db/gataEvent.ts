@@ -4,10 +4,13 @@ import { db } from "db/config.server";
 import {
    cloudinaryImage,
    eventCloudinaryImages,
+   eventMessages,
    eventOrganizer,
    eventParticipants,
    eventPolls,
    gataEvent,
+   messageLikes,
+   messages,
    poll,
    pollOption,
    pollVote,
@@ -182,4 +185,43 @@ export const updateIsUserParticipating = async (eventId: number, userId: string,
       .insert(eventParticipants)
       .values({ eventId, userId, isParticipating })
       .onConflictDoUpdate({ target: [eventParticipants.eventId, eventParticipants.userId], set: { isParticipating } });
+};
+
+export const getEventMessages = async (eventId: number) => {
+   return await db.query.eventMessages.findMany({
+      where: eq(eventMessages.eventId, eventId),
+      with: {
+         message: {
+            with: {
+               user: { columns: { name: true, picture: true } },
+               likes: { with: { user: { columns: { name: true, picture: true } } } },
+            },
+         },
+      },
+      orderBy: desc(eventMessages.messageId),
+   });
+};
+
+export const insertEventMessage = async (eventId: number, userId: string, message: string) => {
+   await db.transaction(async (tx) => {
+      const [{ messageId }] = await tx
+         .insert(messages)
+         .values({ userId, message })
+         .returning({ messageId: messages.id });
+      await tx.insert(eventMessages).values({ messageId, eventId });
+   });
+};
+
+export const insertMessageLike = async (userId: string, messageId: number, type: string) => {
+   await db
+      .insert(messageLikes)
+      .values({ userId, messageId, type })
+      .onConflictDoUpdate({
+         target: [messageLikes.messageId, messageLikes.userId],
+         set: { userId, messageId, type },
+      });
+};
+
+export const deleteMessageLike = async (userId: string, messageId: number) => {
+   await db.delete(messageLikes).where(and(eq(messageLikes.messageId, messageId), eq(messageLikes.userId, userId)));
 };
