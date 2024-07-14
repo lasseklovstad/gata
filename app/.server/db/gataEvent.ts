@@ -1,4 +1,4 @@
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, sql } from "drizzle-orm";
 
 import { db } from "db/config.server";
 import {
@@ -205,7 +205,7 @@ export const getEventMessages = async (eventId: number) => {
                         },
                      },
                   },
-                  orderBy: desc(messageReplies.replyId),
+                  orderBy: asc(messageReplies.replyId),
                },
             },
          },
@@ -215,22 +215,24 @@ export const getEventMessages = async (eventId: number) => {
 };
 
 export const insertEventMessage = async (eventId: number, userId: string, message: string) => {
-   await db.transaction(async (tx) => {
+   return await db.transaction(async (tx) => {
       const [{ messageId }] = await tx
          .insert(messages)
          .values({ userId, message })
          .returning({ messageId: messages.id });
       await tx.insert(eventMessages).values({ messageId, eventId });
+      return messageId;
    });
 };
 
 export const insertEventMessageReply = async (userId: string, messageId: number, reply: string) => {
-   await db.transaction(async (tx) => {
+   return await db.transaction(async (tx) => {
       const [{ replyId }] = await tx
          .insert(messages)
          .values({ userId, message: reply })
          .returning({ replyId: messages.id });
       await tx.insert(messageReplies).values({ messageId, replyId });
+      return replyId;
    });
 };
 

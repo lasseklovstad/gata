@@ -5,7 +5,10 @@ import { env } from "~/utils/env.server";
 
 import { deletePushSubscription } from "../db/pushSubscriptions";
 
-export const sendPushNotification = async (subscriptions: PushSubscription[], notification: NotificationOptions) => {
+export const sendPushNotification = async (
+   subscriptions: PushSubscription[],
+   notification: NotificationOptions & { title?: string }
+) => {
    await Promise.all(
       subscriptions.map((subscription) =>
          // eslint-disable-next-line import/no-named-as-default-member
