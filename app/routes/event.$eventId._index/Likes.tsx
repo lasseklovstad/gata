@@ -9,7 +9,7 @@ type Props = {
 
 export const Likes = ({ likes, size }: Props) => {
    return (
-      <ul className="flex gap-2">
+      <ul className="flex gap-2" aria-label="Reaksjoner">
          {[...new Set(likes.map((l) => l.type))].map((like) => {
             const Icon = LikeIconMapping[like as keyof typeof LikeIconMapping];
             return (
