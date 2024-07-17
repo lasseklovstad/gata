@@ -25,6 +25,8 @@ import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { cn } from "~/utils";
 import { createAuthenticator } from "~/utils/auth.server";
+import { emitter } from "~/utils/events/emitter.server";
+import { useLiveLoader } from "~/utils/events/use-live-loader";
 import { badRequest } from "~/utils/responseUtils";
 import { createEventMessageSchema, likeMessageSchema, newEventMessageReplySchema } from "~/utils/schemas/eventSchema";
 import { transformErrorResponse } from "~/utils/validateUtils";
@@ -63,6 +65,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    const { eventId } = paramsParsed.data;
    const formData = await request.formData();
    const intent = formData.get("intent");
+   emitter.emit(`event-${eventId}-activities`);
    if (intent === "createMessage") {
       const parsedForm = createEventMessageSchema.safeParse(formData);
       if (!parsedForm.success) {
@@ -96,7 +99,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 };
 
 export default function EventActivities() {
-   const { polls, cloudinaryImages, eventId, messages, loggedInUser } = useLoaderData<typeof loader>();
+   const { polls, cloudinaryImages, eventId, messages, loggedInUser } = useLiveLoader<typeof loader>();
    const [searchParams] = useSearchParams();
    const activePollsTitleId = useId();
    const activePolls = polls.filter((p) => p.poll.isActive);
