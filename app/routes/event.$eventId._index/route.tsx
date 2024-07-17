@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { Link, useSearchParams } from "@remix-run/react";
 import { formatDate, intervalToDuration } from "date-fns";
 import { Vote } from "lucide-react";
 import { useEffect, useId } from "react";
@@ -25,6 +25,8 @@ import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { cn } from "~/utils";
 import { createAuthenticator } from "~/utils/auth.server";
+import { emitter } from "~/utils/events/emitter.server";
+import { useLiveLoader } from "~/utils/events/use-live-loader";
 import { badRequest } from "~/utils/responseUtils";
 import { createEventMessageSchema, likeMessageSchema, newEventMessageReplySchema } from "~/utils/schemas/eventSchema";
 import { transformErrorResponse } from "~/utils/validateUtils";
@@ -63,6 +65,9 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    const { eventId } = paramsParsed.data;
    const formData = await request.formData();
    const intent = formData.get("intent");
+
+   const startEmit = () => emitter.emit(`event-${eventId}-activities`);
+
    if (intent === "createMessage") {
       const parsedForm = createEventMessageSchema.safeParse(formData);
       if (!parsedForm.success) {
@@ -71,6 +76,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       const { message } = parsedForm.data;
       const messageId = await insertEventMessage(eventId, loggendInUser.id, message);
       await notifyParticipantsNewPostCreated(loggendInUser, eventId, messageId);
+      startEmit();
       return { ok: true } as const;
    }
    if (intent === "replyMessage") {
@@ -81,6 +87,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       const { reply, messageId } = parsedForm.data;
       const replyId = await insertEventMessageReply(loggendInUser.id, messageId, reply);
       await notifyParticipantsReplyToPost(loggendInUser, eventId, messageId, replyId);
+      startEmit();
       return { ok: true } as const;
    }
    if (intent === "likeMessage") {
@@ -91,12 +98,13 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       } else {
          await deleteMessageLike(loggendInUser.id, messageId);
       }
+      startEmit();
       return { ok: true } as const;
    }
 };
 
 export default function EventActivities() {
-   const { polls, cloudinaryImages, eventId, messages, loggedInUser } = useLoaderData<typeof loader>();
+   const { polls, cloudinaryImages, eventId, messages, loggedInUser } = useLiveLoader<typeof loader>();
    const [searchParams] = useSearchParams();
    const activePollsTitleId = useId();
    const activePolls = polls.filter((p) => p.poll.isActive);

@@ -1,5 +1,4 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
 import { z } from "zod";
 
 import { addPollVoteAndNotify, createNewPoll, updatePollAndNotify } from "~/.server/data-layer/eventPoll";
@@ -7,6 +6,8 @@ import { deletePoll, getEvent, getEventPolls, getIsPollActive, insertPollOptions
 import { getUsers } from "~/.server/db/user";
 import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
+import { emitter } from "~/utils/events/emitter.server";
+import { useLiveLoader } from "~/utils/events/use-live-loader";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
 import { badRequest } from "~/utils/responseUtils";
 import {
@@ -53,6 +54,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    const formdata = await request.formData();
    const intent = formdata.get("intent") as string;
 
+   const startEmit = () => emitter.emit(`event-${eventId}-polls`);
+
    if (intent === "pollVote") {
       const pollVoteForm = pollVoteSchema.parse(formdata);
       const isPollActive = await getIsPollActive(pollVoteForm.pollId);
@@ -60,6 +63,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
          throw badRequest("Avstemning er ikke aktiv lenger");
       }
       await addPollVoteAndNotify(loggedInUser, eventId, pollVoteForm);
+      startEmit();
       return { ok: true };
    }
 
@@ -74,6 +78,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
          throw badRequest("Avstemning er ikke aktiv lenger");
       }
       await insertPollOptions(pollId, type === "date" ? dateOption : textOption);
+      startEmit();
       return { ok: true };
    }
 
@@ -88,12 +93,14 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
          return transformErrorResponse(updatePollForm.error);
       }
       await updatePollAndNotify(loggedInUser, eventId, updatePollForm.data);
+      startEmit();
       return { ok: true };
    }
 
    if (intent === "deletePoll") {
       const { pollId } = pollDeleteSchema.parse(formdata);
       await deletePoll(pollId);
+      startEmit();
       return { ok: true };
    }
    if (intent === "newPoll") {
@@ -102,13 +109,14 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
          return transformErrorResponse(newPollForm.error);
       }
       await createNewPoll(loggedInUser, eventId, newPollForm.data);
+      startEmit();
       return { ok: true };
    }
    throw badRequest("Intent not found " + intent);
 };
 
 export default function EventPage() {
-   const { event, polls, loggedInUser, users } = useLoaderData<typeof loader>();
+   const { event, polls, loggedInUser, users } = useLiveLoader<typeof loader>();
 
    const isOrganizer = isUserOrganizer(event, loggedInUser);
    return (

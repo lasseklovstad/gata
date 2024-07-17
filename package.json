@@ -54,6 +54,7 @@
       "react-easy-crop": "^5.0.7",
       "remix-auth": "3.7.0",
       "remix-auth-auth0": "1.10.0",
+      "remix-utils": "^7.6.0",
       "sharp": "^0.33.4",
       "slate": "0.103.0",
       "slate-history": "0.100.0",
