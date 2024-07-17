@@ -65,7 +65,9 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    const { eventId } = paramsParsed.data;
    const formData = await request.formData();
    const intent = formData.get("intent");
-   emitter.emit(`event-${eventId}-activities`);
+
+   const startEmit = () => emitter.emit(`event-${eventId}-activities`);
+
    if (intent === "createMessage") {
       const parsedForm = createEventMessageSchema.safeParse(formData);
       if (!parsedForm.success) {
@@ -74,6 +76,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       const { message } = parsedForm.data;
       const messageId = await insertEventMessage(eventId, loggendInUser.id, message);
       await notifyParticipantsNewPostCreated(loggendInUser, eventId, messageId);
+      startEmit();
       return { ok: true } as const;
    }
    if (intent === "replyMessage") {
@@ -84,6 +87,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       const { reply, messageId } = parsedForm.data;
       const replyId = await insertEventMessageReply(loggendInUser.id, messageId, reply);
       await notifyParticipantsReplyToPost(loggendInUser, eventId, messageId, replyId);
+      startEmit();
       return { ok: true } as const;
    }
    if (intent === "likeMessage") {
@@ -94,6 +98,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       } else {
          await deleteMessageLike(loggendInUser.id, messageId);
       }
+      startEmit();
       return { ok: true } as const;
    }
 };
