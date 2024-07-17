@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { Link, useSearchParams } from "@remix-run/react";
 import { formatDate, intervalToDuration } from "date-fns";
 import { Vote } from "lucide-react";
 import { useEffect, useId } from "react";

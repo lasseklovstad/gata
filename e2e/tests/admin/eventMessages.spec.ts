@@ -50,8 +50,8 @@ test.describe("Event messages (Admin created)", () => {
          await eventActivityAdminPage.addReply(postMessage, postReply);
          await eventActivityAdminPage.verifyReply(postMessage, postReply);
       });
-      // Todo, can remove when socket is implemented
-      await memberPage.reload();
+
+      // The page will update automatically with events.
       await eventActivityPage.verifyReply(postMessage, postReply);
       await eventActivityPage.verifyLikes(postMessage, [{ type: "Hjerte", count: 1 }]);
    });
