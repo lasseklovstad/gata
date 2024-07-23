@@ -52,7 +52,7 @@ export const createAuthenticator = () => {
          throw redirect("/login", { headers });
       }
       const user = auth.profile.id
-         ? (await getOptionalUserFromExternalUserId(auth.profile.id)) ?? undefined
+         ? ((await getOptionalUserFromExternalUserId(auth.profile.id)) ?? undefined)
          : undefined;
 
       if (!user) {

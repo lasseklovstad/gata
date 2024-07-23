@@ -15,7 +15,7 @@ import { isMember } from "~/utils/roleUtils";
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    const auth = await createAuthenticator().authenticator.isAuthenticated(request);
    const loggedInUser = auth?.profile.id
-      ? (await getOptionalUserFromExternalUserId(auth.profile.id)) ?? undefined
+      ? ((await getOptionalUserFromExternalUserId(auth.profile.id)) ?? undefined)
       : undefined;
    return {
       reports: isMember(loggedInUser) ? await getReportsWithContent(ReportType.NEWS) : undefined,
