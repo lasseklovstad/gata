@@ -1,8 +1,10 @@
+import { X } from "lucide-react";
 import type { ComponentProps, Ref } from "react";
 import { createContext, forwardRef, useContext, useId } from "react";
 
 import { cn } from "~/utils";
 
+import { Button } from "./button";
 import { Typography } from "./typography";
 
 type DialogContext = {
@@ -32,4 +34,11 @@ export const DialogHeading = (props: ComponentProps<typeof Typography>) => {
 };
 export const DialogFooter = ({ className, ...props }: ComponentProps<"div">) => (
    <div className={cn("mt-4 flex justify-end gap-2", className)} {...props} />
+);
+
+export const DialogCloseButton = ({ onClose }: { onClose: () => void }) => (
+   <Button type="button" onClick={onClose} size="icon" variant="secondary" className="m-1 absolute right-0 top-0 z-50">
+      <X />
+      <span className="sr-only">Lukk</span>
+   </Button>
 );

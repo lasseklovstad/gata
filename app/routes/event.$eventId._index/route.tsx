@@ -19,7 +19,7 @@ import {
    insertEventMessageReply,
    insertMessageLike,
 } from "~/.server/db/gataEvent";
-import { AvatarUser } from "~/components/AvatarUser";
+import { AvatarUserButton } from "~/components/AvatarUser";
 import { CloudImageGallery } from "~/components/CloudImageGallery";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
@@ -158,7 +158,7 @@ export default function EventActivities() {
                   )}
                >
                   <div className="flex gap-2 items-center">
-                     <AvatarUser className="size-10" user={message.user} />
+                     <AvatarUserButton className="size-10" user={message.user} />
                      <div>
                         {message.user.name}
                         <Typography variant="mutedText">{formatDateTime(message.dateTime)}</Typography>
@@ -188,7 +188,7 @@ export default function EventActivities() {
                               )}
                            >
                               <div className="flex gap-2">
-                                 <AvatarUser className="size-8" user={reply.user} />
+                                 <AvatarUserButton className="size-8" user={reply.user} />
                                  <div>
                                     <div className="p-2 bg-gray-200 rounded-xl">
                                        <Typography variant="mutedText">{reply.user.name}</Typography>
