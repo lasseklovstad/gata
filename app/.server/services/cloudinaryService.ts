@@ -15,12 +15,12 @@ export const uploadImage = (data: string, folder: string) => {
    return new Promise<UploadApiResponse>((resolve, reject) => {
       void cloudinary.v2.uploader.upload(data, { folder }, (error, result) => {
          if (error) {
+            console.error(error);
             reject(error);
          }
          if (result) {
             resolve(result);
          }
-         throw new Error("Cloudinary upload failed");
       });
    });
 };
