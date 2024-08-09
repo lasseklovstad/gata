@@ -11,6 +11,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { Typography } from "~/components/ui/typography";
+import { dayPickerLabels } from "~/utils/date.utils";
 import { useDialog } from "~/utils/dialogUtils";
 
 type Props = {
@@ -18,6 +19,7 @@ type Props = {
 };
 
 export const EventForm = ({ event }: Props) => {
+   const currentYear = new Date().getFullYear();
    const dateDialog = useDialog({ defaultOpen: false });
    const dateDialogTitleId = useId();
    const [startDate, setStartDate] = useState(event?.startDate ? parseISO(event.startDate) : undefined);
@@ -67,20 +69,15 @@ export const EventForm = ({ event }: Props) => {
                         className="m-0 mt-2"
                         locale={nb}
                         mode="single"
-                        labels={{
-                           labelNext: () => "Gå til neste måned",
-                           labelPrevious: () => "Gå til forrige måned",
-                           labelMonthDropdown: () => "Velg måned",
-                           labelYearDropdown: () => "Velg år",
-                        }}
+                        labels={dayPickerLabels}
                         selected={startDate}
                         onSelect={(date) => {
                            dateDialog.close();
                            setStartDate(date);
                         }}
-                        captionLayout="dropdown-buttons"
-                        fromYear={new Date().getFullYear()}
-                        toYear={new Date().getFullYear() + 5}
+                        captionLayout="dropdown"
+                        startMonth={new Date(currentYear, 0)}
+                        endMonth={new Date(currentYear + 5, 0)}
                      />
                   </dialog>
                </div>
