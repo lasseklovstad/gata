@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
 import { Textarea } from "~/components/ui/textarea";
 import { Typography } from "~/components/ui/typography";
+import { formatDateTime } from "~/utils/date.utils";
 
 import { isAdmin } from "../../utils/roleUtils";
 
@@ -24,7 +25,6 @@ export const ResponsibilityForm = ({
 }: ResponsibilityFormProps) => {
    const fetcher = useFetcher();
    const [text, setText] = useState(note?.text ?? "");
-   const lastModifiedDate = new Date(note?.lastModifiedDate ?? "");
    const canEditNote = loggedInUser.id === user.id || isAdmin(loggedInUser);
 
    return (
@@ -52,10 +52,11 @@ export const ResponsibilityForm = ({
                            />
                         )}
                      />
-                     <FormDescription>
-                        Sist redigert av: {note?.lastModifiedBy}, {lastModifiedDate.toLocaleDateString("no")}{" "}
-                        {lastModifiedDate.toLocaleTimeString("no")}
-                     </FormDescription>
+                     {note ? (
+                        <FormDescription>
+                           Sist redigert av: {note.lastModifiedBy}, {formatDateTime(note.lastModifiedDate)}
+                        </FormDescription>
+                     ) : null}
                   </FormItem>
                   <div className="flex gap-2 mt-4">
                      {isAdmin(loggedInUser) && (
