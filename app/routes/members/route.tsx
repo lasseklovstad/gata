@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Mail } from "lucide-react";
 
@@ -12,6 +12,10 @@ import { ExternalUsersWithNoGataUser } from "~/routes/members/ExternalUsersWithN
 import { UserListItem } from "~/routes/members/UserListItem";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isAdmin, isMember, requireAdminRole } from "~/utils/roleUtils";
+
+export const meta: MetaFunction<typeof loader> = () => {
+   return [{ title: "Medlemmer - Gata" }];
+};
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    await createAuthenticator().getRequiredUser(request);

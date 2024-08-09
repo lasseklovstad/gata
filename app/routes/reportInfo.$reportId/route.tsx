@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { Edit, Mail, Trash } from "lucide-react";
@@ -20,6 +20,10 @@ import { formatDateTime } from "~/utils/date.utils";
 import { isAdmin } from "~/utils/roleUtils";
 
 import { reportInfoIntent } from "./intent";
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+   return [{ title: `${data?.report.title} - Gata` }];
+};
 
 export const loader = async ({ request, params: { reportId } }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);

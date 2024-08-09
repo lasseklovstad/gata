@@ -61,9 +61,9 @@ export const AttendingSelect = ({ eventParticipants, loggedInUser }: Props) => {
                   </Button>
                ) : null}
                <Dialog ref={dialog.dialogRef}>
-                  <DialogHeading>Deltakere som deltar</DialogHeading>
+                  <DialogHeading>Deltakere som deltar ({usersAttending.length})</DialogHeading>
                   <DialogCloseButton onClose={dialog.close} />
-                  <ul>
+                  <ul className="flex flex-col gap-2">
                      {usersAttending.map((user) => {
                         return (
                            <li key={user.id} className="flex gap-2 items-center">

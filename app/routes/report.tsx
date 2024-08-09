@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Plus } from "lucide-react";
@@ -10,6 +10,10 @@ import { Typography } from "~/components/ui/typography";
 import { ReportType } from "~/types/GataReport.type";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isAdmin } from "~/utils/roleUtils";
+
+export const meta: MetaFunction<typeof loader> = () => {
+   return [{ title: "Aktuelle dokumenter - Gata" }];
+};
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
