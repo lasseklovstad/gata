@@ -26,7 +26,7 @@ export const EventPage = (page: Page) => {
       await expect(mainHeading).toHaveText(title);
       await expect(regionDescription).toContainText(description);
       if (startDate) {
-         const startDateFormated = formatDate(startDate, "iiii dd.MMMM.yyyy", { locale: nb });
+         const startDateFormated = formatDate(startDate, "PPPP", { locale: nb });
          await expect(regionDescription).toContainText(`Startdato: ${startDateFormated}`);
       }
       if (startTime) {

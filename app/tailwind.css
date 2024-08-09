@@ -75,6 +75,6 @@
    }
 }
 
-.rdp {
+.rdp-root {
    --rdp-accent-color: hsl(var(--primary));
 }

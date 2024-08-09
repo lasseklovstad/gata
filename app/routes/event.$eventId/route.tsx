@@ -162,9 +162,7 @@ export default function EventPage() {
                {event.startDate ? (
                   <Typography>
                      Startdato:{" "}
-                     <span className="font-semibold">
-                        {formatDate(event.startDate, "iiii dd.MMMM.yyyy", { locale: nb })}
-                     </span>
+                     <span className="font-semibold">{formatDate(event.startDate, "PPPP", { locale: nb })}</span>
                   </Typography>
                ) : null}
                {event.startTime ? (
