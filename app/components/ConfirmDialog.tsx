@@ -70,13 +70,17 @@ export const useConfirmDialog = ({ onConfirm, text, onClose, title, showOnlyOk }
    const openConfirmDialog = () => setOpen(true);
    const closeConfirmDialog = () => {
       setOpen(false);
-      onClose && onClose();
+      if (onClose) {
+         onClose();
+      }
    };
 
    const handleConfirm = async () => {
       if (onConfirm) {
          const close = await onConfirm();
-         close || (close === undefined && closeConfirmDialog());
+         if (close || close === undefined) {
+            closeConfirmDialog();
+         }
       } else {
          closeConfirmDialog();
       }
