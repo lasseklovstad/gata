@@ -1,6 +1,6 @@
 import { useSubmit } from "@remix-run/react";
 import { Loader2, Save } from "lucide-react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { createEditor } from "slate";
 import type { Descendant } from "slate";
 import { withHistory } from "slate-history";
@@ -30,7 +30,7 @@ export const RichTextEditor = ({ onCancel, onSave, isLoading, initialContent }: 
    const renderLeaf = useCallback((props: RenderLeafProps) => {
       return <RichTextLeaf {...props} />;
    }, []);
-   const initialValue = useMemo(() => {
+   const initialValue: Descendant[] = useMemo(() => {
       const contentParsed = (initialContent && JSON.parse(initialContent)) || [];
       return contentParsed.length
          ? contentParsed
@@ -41,11 +41,22 @@ export const RichTextEditor = ({ onCancel, onSave, isLoading, initialContent }: 
               },
            ];
    }, [initialContent]);
-   const content = useRef<Descendant[]>();
+   const content = useRef<Descendant[]>(initialValue);
 
-   const handleSave = (close: boolean) => {
-      onSave(content.current, close);
-   };
+   const handleSave = useCallback(
+      (close: boolean) => {
+         if (JSON.stringify(content.current) === initialContent && !close) return;
+         onSave(content.current, close);
+      },
+      [initialContent, onSave]
+   );
+
+   useEffect(() => {
+      const interval = setInterval(() => {
+         handleSave(false);
+      }, 5000);
+      return () => clearInterval(interval);
+   }, [handleSave]);
 
    return (
       <>
