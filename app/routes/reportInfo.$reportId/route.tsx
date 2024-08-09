@@ -16,6 +16,7 @@ import { ButtonResponsive } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { createAuthenticator } from "~/utils/auth.server";
 import { getCloudinaryUploadFolder } from "~/utils/cloudinaryUtils";
+import { formatDateTime } from "~/utils/date.utils";
 import { isAdmin } from "~/utils/roleUtils";
 
 import { reportInfoIntent } from "./intent";
@@ -94,8 +95,6 @@ export default function ReportInfoPage() {
       }
    }, [fetcher.data, fetcher.state]);
 
-   const lastModifiedDate = new Date(report.lastModifiedDate);
-
    return (
       <>
          <PageLayout className="space-y-2">
@@ -153,8 +152,7 @@ export default function ReportInfoPage() {
                </ClientOnly>
             )}
             <Typography variant="mutedText" className="mt-1 mb-10">
-               Sist redigert av: {report.lastModifiedBy}, {lastModifiedDate.toLocaleDateString("no")}{" "}
-               {lastModifiedDate.toLocaleTimeString("no")}
+               Sist redigert av: {report.lastModifiedBy}, {formatDateTime(report.lastModifiedDate)}
             </Typography>
          </PageLayout>
          <Outlet />

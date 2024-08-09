@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useSearchParams } from "@remix-run/react";
-import { formatDate, intervalToDuration } from "date-fns";
+import { intervalToDuration } from "date-fns";
 import { Vote } from "lucide-react";
 import { useEffect, useId } from "react";
 import { z } from "zod";
@@ -25,6 +25,7 @@ import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { cn } from "~/utils";
 import { createAuthenticator } from "~/utils/auth.server";
+import { formatDateTime, getDateWithTimeZone } from "~/utils/date.utils";
 import { emitter } from "~/utils/events/emitter.server";
 import { useLiveLoader } from "~/utils/events/use-live-loader";
 import { badRequest } from "~/utils/responseUtils";
@@ -160,7 +161,7 @@ export default function EventActivities() {
                      <AvatarUser className="size-10" user={message.user} />
                      <div>
                         {message.user.name}
-                        <Typography variant="mutedText">{formatDate(message.dateTime, "dd.MM.yyyy HH:mm")}</Typography>
+                        <Typography variant="mutedText">{formatDateTime(message.dateTime)}</Typography>
                      </div>
                   </div>
                   <div className="p-1">{message.message}</div>
@@ -197,7 +198,6 @@ export default function EventActivities() {
                                     </div>
 
                                     <div className="flex">
-                                       <Typography variant="mutedText">{timeSince}</Typography>
                                        <LikeButton
                                           messageId={reply.id}
                                           loggInUserId={loggedInUser.id}
@@ -205,6 +205,7 @@ export default function EventActivities() {
                                           size="small"
                                           className="-mt-2"
                                        />
+                                       <Typography variant="mutedText">{timeSince}</Typography>
                                     </div>
                                  </div>
                               </div>
@@ -221,10 +222,9 @@ export default function EventActivities() {
 }
 
 function getTimeDifference(dateString: string) {
-   const targetDate = new Date(dateString);
    const now = new Date();
 
-   const duration = intervalToDuration({ start: targetDate, end: now });
+   const duration = intervalToDuration({ start: getDateWithTimeZone(dateString), end: now });
 
    if (duration.days && duration.days > 0) {
       return `${duration.days} dager siden`;
@@ -232,7 +232,8 @@ function getTimeDifference(dateString: string) {
       return `${duration.hours} timer siden`;
    } else if (duration.minutes && duration.minutes > 0) {
       return `${duration.minutes} minutter siden`;
-   } else if (duration.seconds && duration.seconds > 0) {
+   } else if (duration.seconds && duration.seconds >= 0) {
       return `${duration.seconds} sekunder siden`;
    }
+   return "Nå";
 }
