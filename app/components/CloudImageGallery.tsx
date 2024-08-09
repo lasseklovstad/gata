@@ -33,6 +33,7 @@ export const CloudImageGallery = ({ cloudImages }: Props) => {
                   setSelectedIndex(nextIndex);
                }}
                onClose={() => setSelectedIndex(-1)}
+               showNextAndPreviousButtons={cloudImages.length > 1}
             />
          ) : null}
       </>
