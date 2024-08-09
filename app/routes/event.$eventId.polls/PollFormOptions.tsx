@@ -7,6 +7,7 @@ import { Button } from "~/components/ui/button";
 import { FormControl, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { dayPickerLabels } from "~/utils/date.utils";
 
 type Props = {
    type: "text" | "date";
@@ -45,12 +46,7 @@ export const PollFormOptions = ({
                      className="m-0 mt-2"
                      locale={nb}
                      mode="multiple"
-                     labels={{
-                        labelNext: () => "Gå til neste måned",
-                        labelPrevious: () => "Gå til forrige måned",
-                        labelMonthDropdown: () => "Velg måned",
-                        labelYearDropdown: () => "Velg år",
-                     }}
+                     labels={dayPickerLabels}
                      disabled={existingOptions.map((option) => new Date(option))}
                      selected={selectedDates}
                      onSelect={(dates) => setSelectedDates(dates ?? [])}

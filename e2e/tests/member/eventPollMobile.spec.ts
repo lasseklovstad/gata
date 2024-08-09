@@ -81,7 +81,7 @@ test.describe("Event polls mobile", () => {
       await expect(eventPollPage.mainHeading).toBeVisible();
 
       const name = "Når skal det skje?";
-      const options = [addDays(new Date(), 1), addDays(new Date(), 2), addDays(new Date(), 3)];
+      const options = [new Date(), addDays(new Date(), 1), addDays(new Date(), 2)];
       const optionTexts = options.map((date) => formatDate(date, "dd.MMMM yyyy", { locale: nb }));
 
       await test.step("Create poll and verify", async () => {
@@ -118,7 +118,7 @@ test.describe("Event polls mobile", () => {
       await expect(eventPollPage.mainHeading).toBeVisible();
 
       const name = "Når skal det skje?";
-      const options = [addDays(new Date(), 1), addDays(new Date(), 2), addDays(new Date(), 3)];
+      const options = [new Date(), addDays(new Date(), 1), addDays(new Date(), 2)];
       const optionTexts = options.map((date) => formatDate(date, "dd.MMMM yyyy", { locale: nb }));
 
       await test.step("Create poll and verify", async () => {
