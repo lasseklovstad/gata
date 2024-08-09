@@ -40,7 +40,7 @@ export const AvatarUserButton = ({ user, className }: Props) => {
             </Avatar>
          </Button>
 
-         <Dialog ref={dialogRef} className="backdrop:bg-black/80 relative">
+         <Dialog ref={dialogRef} className="backdrop:bg-black/80 relative w-[400px] h-[400px]">
             <DialogCloseButton onClose={close} />
             <Image
                unstyled

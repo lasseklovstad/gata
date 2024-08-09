@@ -33,7 +33,7 @@ import { EventOrganizers } from "./EventOrganizers";
 import { eventSchema } from "../../utils/schemas/eventSchema";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-   return [{ title: `Gata - ${data?.event.title}` }];
+   return [{ title: `${data?.event.title} - Gata` }];
 };
 
 const paramSchema = z.object({

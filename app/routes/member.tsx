@@ -1,6 +1,23 @@
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/react";
 import { Outlet, useParams } from "@remix-run/react";
 
+import { getUser } from "~/.server/db/user";
 import { TabNavLink } from "~/components/TabNavLink";
+import { createAuthenticator } from "~/utils/auth.server";
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+   return [{ title: `${data?.member.name} - Gata` }];
+};
+
+export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
+   await createAuthenticator().getRequiredUser(request);
+
+   if (!memberId) throw new Error("Member id required");
+
+   const [member] = await Promise.all([getUser(memberId)]);
+   return { member };
+};
 
 export default function MemberLayout() {
    const { memberId } = useParams();
