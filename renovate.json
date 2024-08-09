@@ -1,18 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended", ":automergeMinor"
   ],
   "packageRules": [
-    {
-      "matchManagers": ["maven"],
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ],
-      "groupName": "Maven non-major dependencies",
-      "groupSlug": "maven-minor-patch"
-    },
     {
       "matchManagers": ["npm"],
       "matchUpdateTypes": [
@@ -21,11 +12,6 @@
       ],
       "groupName": "Npm non-major dependencies",
       "groupSlug": "npm-minor-patch"
-    },
-    {
-      "matchPackageNames": ["node"],
-      "matchManagers": ["dockerfile"],
-      "enabled": false
     }
   ]
 }
