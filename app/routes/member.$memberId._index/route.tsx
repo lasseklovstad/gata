@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
-import { CircleUser, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 
 import { getContingentInfo, updateContingent } from "~/.server/db/contigent";
 import { deleteRole, getRoles, insertRole } from "~/.server/db/role";
@@ -12,8 +12,8 @@ import {
    updateLinkedExternalUsers,
    updatePrimaryEmail,
 } from "~/.server/db/user";
+import { AvatarUserButton } from "~/components/AvatarUser";
 import { useConfirmDialog } from "~/components/ConfirmDialog";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { LinkExternalUserToGataUserSelect } from "~/routes/member.$memberId._index/components/LinkExternalUserToGataUserSelect";
@@ -105,12 +105,7 @@ export default function MemberInfoPage() {
    return (
       <>
          <div className="flex items-center mb-2 gap-2">
-            <Avatar>
-               <AvatarImage src={member.picture} />
-               <AvatarFallback>
-                  <CircleUser />
-               </AvatarFallback>
-            </Avatar>
+            <AvatarUserButton user={member} />
             <Typography variant="h2" as="h1" className="flex-1">
                Informasjon
             </Typography>
