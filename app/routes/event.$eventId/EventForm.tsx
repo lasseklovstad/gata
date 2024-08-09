@@ -18,6 +18,7 @@ type Props = {
 };
 
 export const EventForm = ({ event }: Props) => {
+   const currentYear = new Date().getFullYear();
    const dateDialog = useDialog({ defaultOpen: false });
    const dateDialogTitleId = useId();
    const [startDate, setStartDate] = useState(event?.startDate ? parseISO(event.startDate) : undefined);
@@ -78,9 +79,9 @@ export const EventForm = ({ event }: Props) => {
                            dateDialog.close();
                            setStartDate(date);
                         }}
-                        captionLayout="dropdown-buttons"
-                        fromYear={new Date().getFullYear()}
-                        toYear={new Date().getFullYear() + 5}
+                        captionLayout="dropdown"
+                        startMonth={new Date(currentYear, 0)}
+                        endMonth={new Date(currentYear + 5, 0)}
                      />
                   </dialog>
                </div>

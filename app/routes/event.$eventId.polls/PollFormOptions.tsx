@@ -25,6 +25,7 @@ export const PollFormOptions = ({
    textOptions,
    existingOptions = [],
 }: Props) => {
+   const currentYear = new Date().getFullYear();
    return (
       <>
          {type === "date" ? (
@@ -53,9 +54,9 @@ export const PollFormOptions = ({
                      disabled={existingOptions.map((option) => new Date(option))}
                      selected={selectedDates}
                      onSelect={(dates) => setSelectedDates(dates ?? [])}
-                     captionLayout="dropdown-buttons"
-                     fromYear={new Date().getFullYear()}
-                     toYear={new Date().getFullYear() + 5}
+                     captionLayout="dropdown"
+                     startMonth={new Date(currentYear, 0)}
+                     endMonth={new Date(currentYear + 5, 0)}
                   />
                   <FormMessage />
                </FormItem>
