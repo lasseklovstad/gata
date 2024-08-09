@@ -47,6 +47,10 @@ export const UserForm = ({
                setSubscription(sub);
             });
          });
+      } else {
+         setError(
+            "Din nettleser støtter ikke pushnotifikasjoner. Prøv å oppdatere til nyeste versjon av nettleseren. Hvis du bruker Iphone må du legge til nettsiden til Hjem-skjerm for å kunne bruke pushnotifkasjoner og påse at du har nyeste versjon av iOS. Spør Lasse..."
+         );
       }
    }, []);
 

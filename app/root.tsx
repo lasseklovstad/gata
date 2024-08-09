@@ -119,16 +119,29 @@ export default function App() {
 
    useEffect(() => {
       if (!("serviceWorker" in navigator)) return;
+      const sessionStorageKey = "serviceWorkerNavigateUrl";
       function navigateOnMessage(event: MessageEvent) {
          if ("url" in event.data) {
-            navigate(event.data.url);
+            if (loggedInUser) {
+               sessionStorage.removeItem(sessionStorageKey);
+               navigate(event.data.url);
+            } else {
+               sessionStorage.setItem(sessionStorageKey, event.data.url);
+            }
+         }
+      }
+      if (loggedInUser) {
+         const url = sessionStorage.getItem(sessionStorageKey);
+         if (url) {
+            sessionStorage.removeItem(sessionStorageKey);
+            navigate(url);
          }
       }
       navigator.serviceWorker.addEventListener("message", navigateOnMessage);
       return () => {
          navigator.serviceWorker.removeEventListener("message", navigateOnMessage);
       };
-   }, [navigate]);
+   }, [navigate, loggedInUser]);
 
    return (
       <div className="flex flex-col min-h-lvh">
