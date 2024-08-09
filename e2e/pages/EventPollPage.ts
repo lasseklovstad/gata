@@ -57,9 +57,15 @@ export const EventPollPage = (page: Page) => {
       if (type === "Dato") {
          await addDateOptions(options, dialogPoll);
       }
-      canAddSuggestions && (await checkboxCanAddSuggestions.check());
-      isAnonymous && (await checkboxIsAnonymous.check());
-      canSelectMultiple && (await checkboxCanSelectMultiple.check());
+      if (canAddSuggestions) {
+         await checkboxCanAddSuggestions.check();
+      }
+      if (isAnonymous) {
+         await checkboxIsAnonymous.check();
+      }
+      if (canSelectMultiple) {
+         await checkboxCanSelectMultiple.check();
+      }
    };
 
    const getRadioType = (type: "Tekst" | "Dato") => radioGroupType.getByRole("radio", { name: type });
@@ -116,7 +122,11 @@ export const EventPollPage = (page: Page) => {
       const table = getPollTableForm(tableName);
       const row = table.getByRole("row", { name: username });
       const option = row.getByRole("cell").getByRole(canSelectMultiple ? "checkbox" : "radio", { name: optionText });
-      check ? await option.check() : await option.uncheck();
+      if (check) {
+         await option.check();
+      } else {
+         await option.uncheck();
+      }
    };
 
    type EditPollForm = {
@@ -133,7 +143,11 @@ export const EventPollPage = (page: Page) => {
       }
       if (pollForm.isActive !== undefined) {
          const activeCheckbox = dialog.getByLabel("Avslutt avstemning");
-         !pollForm.isActive ? await activeCheckbox.check() : await activeCheckbox.uncheck();
+         if (pollForm.isActive) {
+            await activeCheckbox.uncheck();
+         } else {
+            await activeCheckbox.check();
+         }
       }
       await dialog.getByRole("button", { name: "Lagre" }).click();
    };
@@ -196,7 +210,11 @@ export const EventPollPage = (page: Page) => {
       const option = pollList
          .getByRole("listitem")
          .getByRole(canSelectMultiple ? "checkbox" : "radio", { name: optionText });
-      check ? await option.check() : await option.uncheck();
+      if (check) {
+         await option.check();
+      } else {
+         await option.uncheck();
+      }
    };
 
    const addPollOptions = async (pollName: string, { type, options }: PollFormOptions) => {

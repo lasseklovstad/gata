@@ -80,7 +80,9 @@ export default function ReportInfoPage() {
             { method: "PUT", action: `/reportInfo/${report.id}` }
          );
       } else {
-         close && setEditing(false);
+         if (close) {
+            setEditing(false);
+         }
       }
    };
 
