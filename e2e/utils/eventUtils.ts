@@ -5,8 +5,10 @@ import { nb } from "date-fns/locale";
 export const selectDate = async (date: Date, container: Locator) => {
    const year = formatDate(date, "yyyy", { locale: nb });
    const month = formatDate(date, "MMMM", { locale: nb });
-   const day = formatDate(date, "d", { locale: nb });
    await container.getByLabel("Velg år").selectOption(year);
    await container.getByLabel("Velg måned").selectOption(month);
-   await container.getByRole("grid").getByRole("gridcell", { name: day, exact: true }).click();
+   await container
+      .getByRole("grid")
+      .getByRole("gridcell", { name: formatDate(date, "PPPP", { locale: nb }), exact: true })
+      .click();
 };
