@@ -14,6 +14,7 @@ type Props = {
    onNext: () => void;
    onPrevious: () => void;
    onClose: () => void;
+   showNextAndPreviousButtons: boolean;
 };
 
 export const CloudImageFullscreen = ({
@@ -21,6 +22,7 @@ export const CloudImageFullscreen = ({
    onNext,
    onPrevious,
    onClose,
+   showNextAndPreviousButtons,
 }: Props) => {
    const dialog = useDialog({ defaultOpen: true });
    const [isLoaded, setIsLoaded] = useState(false);
@@ -54,26 +56,30 @@ export const CloudImageFullscreen = ({
                <X />
                <span className="sr-only">Lukk</span>
             </Button>
-            <Button
-               type="button"
-               onClick={onPrevious}
-               size="icon"
-               variant="link"
-               className="m-1 fixed left-0 bottom-[45%] z-50"
-            >
-               <ChevronLeft className="size-8" />
-               <span className="sr-only">Forrige bilde</span>
-            </Button>
-            <Button
-               type="button"
-               onClick={onNext}
-               size="icon"
-               variant="link"
-               className="m-1 fixed bottom-[45%] right-0 z-50"
-            >
-               <ChevronRight className="size-8" />
-               <span className="sr-only">Neste bilde</span>
-            </Button>
+            {showNextAndPreviousButtons ? (
+               <>
+                  <Button
+                     type="button"
+                     onClick={onPrevious}
+                     size="icon"
+                     variant="link"
+                     className="m-1 fixed left-0 bottom-[45%] z-50"
+                  >
+                     <ChevronLeft className="size-8" />
+                     <span className="sr-only">Forrige bilde</span>
+                  </Button>
+                  <Button
+                     type="button"
+                     onClick={onNext}
+                     size="icon"
+                     variant="link"
+                     className="m-1 fixed bottom-[45%] right-0 z-50"
+                  >
+                     <ChevronRight className="size-8" />
+                     <span className="sr-only">Neste bilde</span>
+                  </Button>
+               </>
+            ) : null}
             <Typography
                variant="h2"
                as="div"
