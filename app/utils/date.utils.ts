@@ -1,4 +1,5 @@
 import { formatDate } from "date-fns";
+import type { Labels } from "react-day-picker";
 
 export const getDateWithTimeZone = (dateString: string) => {
    return new Date(dateString + "Z");
@@ -13,6 +14,6 @@ export const dayPickerLabels = {
    labelPrevious: () => "Gå til forrige måned",
    labelMonthDropdown: () => "Velg måned",
    labelYearDropdown: () => "Velg år",
-   labelGridcell: (date: Date) => formatDate(date, "PPPP"),
-   labelDayButton: (date: Date) => formatDate(date, "PPPP"),
-};
+   labelGridcell: (date, modifiers, options) => formatDate(date, "PPPP", options),
+   labelDayButton: (date, modifiers, options) => formatDate(date, "PPPP", options),
+} satisfies Partial<Labels>;
