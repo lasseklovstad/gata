@@ -18,6 +18,7 @@ export const createAuthenticator = () => {
          httpOnly: true,
          secure: process.env.NODE_ENV === "production",
          secrets: [env.AUTH0_COOKIE_SECRET!],
+         maxAge: 60 * 60 * 24 * 400, // 400 days
       },
    });
 
