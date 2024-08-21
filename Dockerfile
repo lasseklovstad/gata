@@ -1,4 +1,4 @@
-FROM node:20.16-alpine3.20 as base
+FROM node:20.17-alpine3.20 as base
 
 LABEL fly_launch_runtime="Remix"
 
