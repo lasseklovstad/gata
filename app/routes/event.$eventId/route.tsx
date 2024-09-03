@@ -182,7 +182,7 @@ export default function EventPage() {
                   <TabNavLink to="polls">Avstemninger</TabNavLink>
                </li>
                <li>
-                  <TabNavLink to="images">Bilder ({numberOfImages})</TabNavLink>
+                  <TabNavLink to="images">Media ({numberOfImages})</TabNavLink>
                </li>
             </ul>
          </nav>
