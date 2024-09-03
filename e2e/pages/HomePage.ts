@@ -33,7 +33,7 @@ export const HomePage = (page: Page) => {
    const memberWelcomeTitle = page.getByRole("heading", { name: "Nyheter" });
    const newsList = page.getByRole("list", { name: "Nyheter" });
    const listEvents = page.getByRole("list", { name: "Arrangement" });
-   const addNewsButton = page.getByRole("link", { name: "Nytt inlegg" });
+   const addNewsButton = page.getByRole("link", { name: "Nytt innlegg" });
    const buttonCreateEvent = page.getByRole("link", { name: "Nytt Arrangement" });
    const nonMemberInformationText = page.getByText("Du må være medlem for å se nyheter");
    const addNewsModal = new DocumentModal(page);
