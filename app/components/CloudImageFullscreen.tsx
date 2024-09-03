@@ -95,6 +95,9 @@ export const CloudImageFullscreen = ({
                   controls
                   style={{ width, height }}
                   src={cloudUrl}
+                  loop
+                  muted
+                  playsInline
                >
                   <track default kind="captions" />
                </video>
