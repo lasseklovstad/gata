@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { redirect, useLoaderData } from "@remix-run/react";
 
 import { getUpCommingEvents } from "~/.server/db/gataEvent";
 import { getReportsWithContent } from "~/.server/db/report";
@@ -14,9 +14,13 @@ import { isMember } from "~/utils/roleUtils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    const auth = await createAuthenticator().authenticator.isAuthenticated(request);
-   const loggedInUser = auth?.profile.id
-      ? ((await getOptionalUserFromExternalUserId(auth.profile.id)) ?? undefined)
-      : undefined;
+
+   if (!auth) {
+      return redirect("/login-totp");
+   }
+
+   const loggedInUser = auth.id ? ((await getOptionalUserFromExternalUserId(auth.id)) ?? undefined) : undefined;
+
    return {
       reports: isMember(loggedInUser) ? await getReportsWithContent(ReportType.NEWS) : undefined,
       events: isMember(loggedInUser) ? await getUpCommingEvents() : undefined,

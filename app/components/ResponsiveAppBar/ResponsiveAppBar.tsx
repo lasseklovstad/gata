@@ -1,7 +1,7 @@
 import { Link } from "@remix-run/react";
 
+import type { ExternalUser } from "db/schema";
 import type { User } from "~/.server/db/user";
-import type { Auth0User } from "~/types/Auth0User";
 
 import { SideBar } from "./Sidebar";
 import { UserMenu } from "./UserMenu";
@@ -9,7 +9,7 @@ import { isAdmin, isMember } from "../../utils/roleUtils";
 import { Button } from "../ui/button";
 
 type ResponsiveAppBarProps = {
-   auth0User: Auth0User | null;
+   auth0User: ExternalUser | null;
    loggedInUser: User | undefined;
    pwaPublicKey: string;
 };

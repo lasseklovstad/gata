@@ -164,9 +164,7 @@ export default function App() {
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    const auth0User = await createAuthenticator().authenticator.isAuthenticated(request);
-   const loggedInUser = auth0User
-      ? (await getOptionalUserFromExternalUserId(auth0User.profile.id ?? "")) || undefined
-      : undefined;
+   const loggedInUser = auth0User ? (await getOptionalUserFromExternalUserId(auth0User.id)) || undefined : undefined;
    const version = env.VERSION;
    const pwaPublicKey = env.PWA_PUBLIC_KEY;
    return { auth0User, loggedInUser, version, pwaPublicKey };
