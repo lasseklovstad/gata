@@ -12,7 +12,7 @@ export const CloudImage = ({ cloudImage }: Props) => {
    if (getIsVideo(cloudImage.cloudUrl)) {
       return (
          <div className="relative rounded shadow h-full object-cover">
-            <video className="h-full" loop muted playsInline>
+            <video className="h-full" loop muted playsInline preload="metadata">
                <source src={cloudImage.cloudUrl} type="video/mp4"></source>
                <track default kind="captions" />
             </video>
