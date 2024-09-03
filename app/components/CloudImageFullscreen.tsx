@@ -101,7 +101,7 @@ export const CloudImageFullscreen = ({
                   preload="metadata"
                   playsInline
                >
-                  <source src={cloudUrl} type="video/mp4"></source>
+                  <source src={cloudUrl + "#t=0.001"} type="video/mp4"></source>
                   <track default kind="captions" />
                </video>
             ) : (
