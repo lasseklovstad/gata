@@ -8,6 +8,7 @@ import { cn } from "~/utils";
 import { useDialog } from "~/utils/dialogUtils";
 
 import { Typography } from "./ui/typography";
+import { getIsVideo } from "~/utils/cloudinaryUtils";
 
 type Props = {
    cloudImage: CloudinaryImage;
@@ -26,9 +27,6 @@ export const CloudImageFullscreen = ({
 }: Props) => {
    const dialog = useDialog({ defaultOpen: true });
    const [isLoaded, setIsLoaded] = useState(false);
-
-   const videoRegexp = /.*\/video\/upload\/.*/;
-   const isVideo = videoRegexp.test(cloudUrl);
 
    useEffect(() => {
       setIsLoaded(false);
@@ -90,7 +88,7 @@ export const CloudImageFullscreen = ({
             >
                <Loader2 className="animate-spin size-12" />
             </Typography>
-            {isVideo ? (
+            {getIsVideo(cloudUrl) ? (
                <video
                   className={cn("max-h-screen object-contain max-w-full", isLoaded ? "opacity-100" : "opacity-30")}
                   onCanPlay={() => setIsLoaded(true)}

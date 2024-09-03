@@ -1,17 +1,19 @@
 import { Image } from "@unpic/react";
 
 import type { CloudinaryImage } from "db/schema";
+import { getIsVideo } from "~/utils/cloudinaryUtils";
 
 type Props = {
    cloudImage: CloudinaryImage;
 };
 
 export const CloudImage = ({ cloudImage }: Props) => {
-   const videoRegexp = /.*\/video\/upload\/.*/;
-   const isVideo = videoRegexp.test(cloudImage.cloudUrl);
-   if (isVideo) {
-      // eslint-disable-next-line jsx-a11y/media-has-caption
-      return <video className="rounded shadow h-full object-cover" src={cloudImage.cloudUrl} />;
+   if (getIsVideo(cloudImage.cloudUrl)) {
+      return (
+         <video className="rounded shadow h-full object-cover" src={cloudImage.cloudUrl}>
+            <track default kind="captions" />
+         </video>
+      );
    }
    return (
       <Image
