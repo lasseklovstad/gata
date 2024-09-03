@@ -36,7 +36,7 @@ import { LikeButton } from "./LikeButton";
 import { Likes } from "./Likes";
 import { NewMessageForm } from "./NewMessageForm";
 import { ReplyMessageForm } from "./ReplyMessageForm";
-import { UploadImages } from "../../components/UploadImages";
+import { UploadMedia } from "../../components/UploadMedia";
 
 const paramSchema = z.object({
    eventId: z.coerce.number(),
@@ -139,7 +139,7 @@ export default function EventActivities() {
                </ul>
             </>
          ) : null}
-         <UploadImages eventId={eventId} />
+         <UploadMedia eventId={eventId} />
          <CloudImageGallery cloudImages={cloudinaryImages.slice(0, 8)} />
          {cloudinaryImages.length ? (
             <Button variant="outline" as={Link} to="images">

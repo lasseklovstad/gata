@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { CloudinaryImage } from "db/schema";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/utils";
+import { getIsVideo } from "~/utils/cloudinaryUtils";
 import { useDialog } from "~/utils/dialogUtils";
 
 import { Typography } from "./ui/typography";
@@ -87,18 +88,30 @@ export const CloudImageFullscreen = ({
             >
                <Loader2 className="animate-spin size-12" />
             </Typography>
-            <Image
-               loading="eager"
-               unstyled
-               className={cn("max-h-screen object-contain", isLoaded ? "opacity-100" : "opacity-30")}
-               fetchPriority="high"
-               src={cloudUrl}
-               background="auto"
-               alt=""
-               width={width}
-               height={height}
-               onLoad={() => setIsLoaded(true)}
-            />
+            {getIsVideo(cloudUrl) ? (
+               <video
+                  className={cn("max-h-screen object-contain max-w-full", isLoaded ? "opacity-100" : "opacity-30")}
+                  onCanPlay={() => setIsLoaded(true)}
+                  controls
+                  style={{ width, height }}
+                  src={cloudUrl}
+               >
+                  <track default kind="captions" />
+               </video>
+            ) : (
+               <Image
+                  loading="eager"
+                  unstyled
+                  className={cn("max-h-screen object-contain", isLoaded ? "opacity-100" : "opacity-30")}
+                  fetchPriority="high"
+                  src={cloudUrl}
+                  background="auto"
+                  alt=""
+                  width={width}
+                  height={height}
+                  onLoad={() => setIsLoaded(true)}
+               />
+            )}
          </dialog>
       </>
    );

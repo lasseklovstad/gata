@@ -127,7 +127,7 @@ export default function EventPage() {
          </div>
          <div className="space-y-8">
             {polls.length === 0 ? (
-               <Typography>Ingen avstmeninger lagt til enda...</Typography>
+               <Typography>Ingen avstemninger lagt til enda...</Typography>
             ) : (
                polls.map(({ poll }) => {
                   return (

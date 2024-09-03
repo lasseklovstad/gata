@@ -1,6 +1,7 @@
 import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Plus, Trash } from "lucide-react";
+import { useState } from "react";
 import { DayPicker } from "react-day-picker";
 
 import { Button } from "~/components/ui/button";
@@ -26,6 +27,7 @@ export const PollFormOptions = ({
    textOptions,
    existingOptions = [],
 }: Props) => {
+   const [month, setMonth] = useState(new Date());
    const currentYear = new Date().getFullYear();
    return (
       <>
@@ -53,6 +55,8 @@ export const PollFormOptions = ({
                      captionLayout="dropdown"
                      startMonth={new Date(currentYear, 0)}
                      endMonth={new Date(currentYear + 5, 0)}
+                     month={month}
+                     onMonthChange={setMonth}
                   />
                   <FormMessage />
                </FormItem>

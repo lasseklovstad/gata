@@ -82,7 +82,7 @@ test.describe("Event polls mobile", () => {
 
       const name = "Når skal det skje?";
       const options = [new Date(), addDays(new Date(), 1), addDays(new Date(), 2)];
-      const optionTexts = options.map((date) => formatDate(date, "dd.MMMM yyyy", { locale: nb }));
+      const optionTexts = options.map((date) => formatDate(date, "dd.MMM yyyy", { locale: nb }));
 
       await test.step("Create poll and verify", async () => {
          await eventPollPage.buttonCreatePoll.click();
@@ -119,7 +119,7 @@ test.describe("Event polls mobile", () => {
 
       const name = "Når skal det skje?";
       const options = [new Date(), addDays(new Date(), 1), addDays(new Date(), 2)];
-      const optionTexts = options.map((date) => formatDate(date, "dd.MMMM yyyy", { locale: nb }));
+      const optionTexts = options.map((date) => formatDate(date, "dd.MMM yyyy", { locale: nb }));
 
       await test.step("Create poll and verify", async () => {
          await eventPollPage.buttonCreatePoll.click();
@@ -145,7 +145,7 @@ test.describe("Event polls mobile", () => {
          const newPollOptions = [addDays(new Date(), 3), addDays(new Date(), 6)];
          await eventPollPage.addPollOptions(name, { type: "Dato", options: newPollOptions });
          const newPollOptionTexts = [...options, ...newPollOptions].map((date) =>
-            formatDate(date, "dd.MMMM yyyy", { locale: nb })
+            formatDate(date, "dd.MMM yyyy", { locale: nb })
          );
          await eventPollPage.verifyPollList(
             name,
