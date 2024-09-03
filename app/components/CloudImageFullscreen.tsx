@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import type { CloudinaryImage } from "db/schema";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/utils";
+import { getIsVideo } from "~/utils/cloudinaryUtils";
 import { useDialog } from "~/utils/dialogUtils";
 
 import { Typography } from "./ui/typography";
-import { getIsVideo } from "~/utils/cloudinaryUtils";
 
 type Props = {
    cloudImage: CloudinaryImage;
