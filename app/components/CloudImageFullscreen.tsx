@@ -27,6 +27,9 @@ export const CloudImageFullscreen = ({
    const dialog = useDialog({ defaultOpen: true });
    const [isLoaded, setIsLoaded] = useState(false);
 
+   const videoRegexp = /.*\/video\/upload\/.*/;
+   const isVideo = videoRegexp.test(cloudUrl);
+
    useEffect(() => {
       setIsLoaded(false);
    }, [cloudUrl]);
@@ -87,18 +90,30 @@ export const CloudImageFullscreen = ({
             >
                <Loader2 className="animate-spin size-12" />
             </Typography>
-            <Image
-               loading="eager"
-               unstyled
-               className={cn("max-h-screen object-contain", isLoaded ? "opacity-100" : "opacity-30")}
-               fetchPriority="high"
-               src={cloudUrl}
-               background="auto"
-               alt=""
-               width={width}
-               height={height}
-               onLoad={() => setIsLoaded(true)}
-            />
+            {isVideo ? (
+               <video
+                  className={cn("max-h-screen object-contain max-w-full", isLoaded ? "opacity-100" : "opacity-30")}
+                  onCanPlay={() => setIsLoaded(true)}
+                  controls
+                  style={{ width, height }}
+                  src={cloudUrl}
+               >
+                  <track default kind="captions" />
+               </video>
+            ) : (
+               <Image
+                  loading="eager"
+                  unstyled
+                  className={cn("max-h-screen object-contain", isLoaded ? "opacity-100" : "opacity-30")}
+                  fetchPriority="high"
+                  src={cloudUrl}
+                  background="auto"
+                  alt=""
+                  width={width}
+                  height={height}
+                  onLoad={() => setIsLoaded(true)}
+               />
+            )}
          </dialog>
       </>
    );

@@ -8,7 +8,7 @@ type Props = {
    eventId: number;
 };
 
-export const UploadImages = ({ eventId }: Props) => {
+export const UploadMedia = ({ eventId }: Props) => {
    const fetcher = useFetcher();
    const isLoading = fetcher.state !== "idle";
    const action = `/event/${eventId}/images`;
@@ -18,7 +18,7 @@ export const UploadImages = ({ eventId }: Props) => {
       <>
          <Typography variant="h3" className="flex gap-2 items-center flex-wrap">
             <Image />
-            Last opp bilder
+            Last opp bilder og video
          </Typography>
          {/* Important with max-w-full for iphone not extending out of screen */}
          <fetcher.Form
@@ -33,12 +33,12 @@ export const UploadImages = ({ eventId }: Props) => {
                type="file"
                multiple
                name="image"
-               accept="image/*"
+               accept="image/*,video/*"
                disabled={isLoading}
             />
             {isLoading ? (
                <Typography variant="largeText" className="flex gap-2 items-center">
-                  <Loader2 className="text-primary size-8 animate-spin" /> Laster opp bilder...
+                  <Loader2 className="text-primary size-8 animate-spin" /> Laster opp bilder/video...
                </Typography>
             ) : null}
          </fetcher.Form>

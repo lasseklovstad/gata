@@ -42,9 +42,11 @@ export function uploadImageToCloudinary(data: AsyncIterable<Uint8Array>, folder:
       const uploadStream = cloudinary.v2.uploader.upload_stream(
          {
             folder,
+            resource_type: "auto",
          },
          (error, result) => {
             if (error) {
+               console.error(error);
                reject(error);
                return;
             }
