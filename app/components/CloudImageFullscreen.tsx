@@ -98,7 +98,7 @@ export const CloudImageFullscreen = ({
                   controls
                   style={{ width, height }}
                   loop
-                  muted
+                  preload="metadata"
                   playsInline
                >
                   <source src={cloudUrl} type="video/mp4"></source>
