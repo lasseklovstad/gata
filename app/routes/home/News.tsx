@@ -25,9 +25,9 @@ export const News = ({ reports, loggedInUser, events }: NewsProps) => {
                Nyheter
             </Typography>
 
-            <Button as={Link} to="new">
+            <Button as={Link} to="new" variant="ghost">
                <Plus className="mr-1" />
-               Opprett
+               Nytt innlegg
             </Button>
          </div>
          <ul className="flex gap-2 flex-wrap mb-2" aria-label="Arrangement">

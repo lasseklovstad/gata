@@ -85,6 +85,13 @@ export const getEventPolls = async (eventId: number, loggedInUser: User) => {
       ...eventPoll,
       poll: {
          ...eventPoll.poll,
+         // Sort dates if not sorted
+         pollOptions:
+            eventPoll.poll.type === "date"
+               ? eventPoll.poll.pollOptions.sort((a, b) => {
+                    return new Date(a.textOption).valueOf() - new Date(b.textOption).valueOf();
+                 })
+               : eventPoll.poll.pollOptions,
          pollVotes: eventPoll.poll.pollVotes.map((pollVote) => ({
             ...pollVote,
             // Don't expose userId for vote if poll is Anonymous

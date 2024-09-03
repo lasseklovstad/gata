@@ -72,9 +72,9 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
                      return (
                         <>
                            <Typography variant="largeText">
-                              {formatDate(option.textOption, "iiii", { locale: nb })}
+                              {formatDate(option.textOption, "iii", { locale: nb })}
                            </Typography>
-                           <Typography>{formatDate(option.textOption, "dd.MMMM yyyy", { locale: nb })}</Typography>
+                           <Typography>{formatDate(option.textOption, "dd.MMM yyyy", { locale: nb })}</Typography>
                         </>
                      );
                   }}
@@ -105,7 +105,7 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
                      if (poll.type === "text") {
                         return option.textOption;
                      }
-                     return formatDate(option.textOption, "dd.MMMM yyyy", { locale: nb });
+                     return formatDate(option.textOption, "iii dd.MMM yyyy", { locale: nb });
                   }}
                />
             </div>
