@@ -29,7 +29,11 @@ export const CloudImageFullscreen = ({
    const [isLoaded, setIsLoaded] = useState(false);
 
    useEffect(() => {
-      setIsLoaded(false);
+      if (getIsVideo(cloudUrl)) {
+         setIsLoaded(true);
+      } else {
+         setIsLoaded(false);
+      }
    }, [cloudUrl]);
 
    return (
@@ -91,14 +95,13 @@ export const CloudImageFullscreen = ({
             {getIsVideo(cloudUrl) ? (
                <video
                   className={cn("max-h-screen object-contain max-w-full", isLoaded ? "opacity-100" : "opacity-30")}
-                  onCanPlay={() => setIsLoaded(true)}
                   controls
                   style={{ width, height }}
-                  src={cloudUrl}
                   loop
                   muted
                   playsInline
                >
+                  <source src={cloudUrl} type="video/mp4"></source>
                   <track default kind="captions" />
                </video>
             ) : (
