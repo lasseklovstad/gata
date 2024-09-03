@@ -68,7 +68,6 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
             const folder = `${getCloudinaryUploadFolder()}/event-${eventId}`;
             const response = await uploadImageToCloudinary(data, folder);
             const { secure_url, public_id, width, height } = response;
-            console.log(JSON.stringify(response));
             await insertCloudinaryImage(eventId, { cloudId: public_id, cloudUrl: secure_url, width, height });
             return secure_url;
          },
