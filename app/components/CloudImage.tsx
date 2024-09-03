@@ -11,8 +11,9 @@ type Props = {
 export const CloudImage = ({ cloudImage }: Props) => {
    if (getIsVideo(cloudImage.cloudUrl)) {
       return (
-         <div className="relative rounded shadow h-full object-cover">
-            <video className="h-full" loop muted playsInline preload="metadata">
+         <div className="relative h-full object-cover">
+            <video className="h-full rounded shadow" loop muted playsInline preload="metadata">
+               {/* Hack for ios for showing thumbnail: https://forums.developer.apple.com/forums/thread/129377 */}
                <source src={cloudImage.cloudUrl + "#t=0.001"} type="video/mp4"></source>
                <track default kind="captions" />
             </video>
