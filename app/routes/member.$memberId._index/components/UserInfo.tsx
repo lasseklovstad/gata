@@ -13,6 +13,7 @@ import { SelectPrimaryEmail } from "./SelectPrimaryEmail";
 import type { IContingentInfo } from "../../../types/ContingentInfo.type";
 import { isAdmin, isMember } from "../../../utils/roleUtils";
 import { memberIntent } from "../intent";
+import type { action } from "../route";
 
 type UserInfoProps = {
    user: User;
@@ -26,7 +27,7 @@ const years = Array.from({ length: numberOfYears }, (v, i) => todaysYear - numbe
 
 export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) => {
    const [selectedYear, setSelectedYear] = useState(todaysYear.toString());
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof action>();
 
    const notPaidYears = years
       .filter((y) => y <= todaysYear)

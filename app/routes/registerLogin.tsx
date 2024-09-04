@@ -1,4 +1,4 @@
-import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
+import { redirect, unstable_defineLoader as defineLoader } from "@remix-run/node";
 
 import { insertOrUpdateExternalUser, insertUser, getNumberOfAdmins } from "~/.server/db/user";
 import { Typography } from "~/components/ui/typography";
@@ -6,7 +6,7 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { env } from "~/utils/env.server";
 import { RoleName } from "~/utils/roleUtils";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = defineLoader(async ({ request }) => {
    const { authenticator, getSessionLoginPath } = createAuthenticator();
    const user = await authenticator.isAuthenticated(request);
    if (user) {
@@ -21,7 +21,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       return redirect(redirectPath ?? "/home");
    }
    return redirect("/login");
-};
+});
 
 export default function RegisterLogin() {
    return <Typography>Registrerer bruker...</Typography>;

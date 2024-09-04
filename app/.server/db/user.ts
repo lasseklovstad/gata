@@ -73,21 +73,12 @@ export const getResponsibilityYears = (userId: string) => {
    });
 };
 
-export const insertOrUpdateExternalUser = async (auth0User: Auth0User) => {
-   const email = auth0User.profile.emails && auth0User.profile.emails[0];
-   const photo = auth0User.profile.photos && auth0User.profile.photos[0];
-   const id = auth0User.profile.id;
-   if (!id) {
-      throw new Error("Bruker har ikke en id!");
-   }
-   if (!email?.value) {
-      throw new Error("Bruker har ikke en email?! " + id);
-   }
+export const insertOrUpdateExternalUser = async ({ email, id, name, photo }: Auth0User) => {
    const values = {
-      email: email.value,
+      email,
       lastLogin: sql`(CURRENT_TIMESTAMP)`,
-      name: auth0User.profile.displayName ?? email.value,
-      picture: photo?.value,
+      name: name ?? email,
+      picture: photo,
    };
    return await db
       .insert(externalUser)

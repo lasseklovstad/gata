@@ -1,5 +1,4 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { unstable_defineAction as defineAction, unstable_defineLoader as defineLoader } from "@remix-run/node";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 
 import { getReport } from "~/.server/db/report";
@@ -10,14 +9,14 @@ import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = defineLoader(async ({ request }) => {
    await createAuthenticator().getRequiredUser(request);
 
    const reportEmails = await getSubscribedUsers();
    return { reportEmails };
-};
+});
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request, params }) => {
    if (!params.reportId) {
       throw new Error("Report id is required");
    }
@@ -38,8 +37,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       to: reportEmails.map((user) => ({ email: user.email })),
       subject: `Nytt fra Gata! ${report.title}`,
    });
-   return json({ ok: true, emails: reportEmails.map((user) => user.email) });
-};
+   return { ok: true, emails: reportEmails.map((user) => user.email) };
+});
 
 export default function PublishReport() {
    const { dialogRef } = useDialog({ defaultOpen: true });
@@ -48,7 +47,7 @@ export default function PublishReport() {
    const { reportEmails } = useLoaderData<typeof loader>();
    const onClose = () => navigate("..");
 
-   if (fetcher.data && fetcher.data.ok) {
+   if (fetcher.data) {
       return (
          <Dialog ref={dialogRef}>
             <DialogHeading>Vellykket</DialogHeading>

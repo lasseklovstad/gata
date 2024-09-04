@@ -1,10 +1,10 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
+import { unstable_defineAction as defineAction } from "@remix-run/node";
 
 import { deletePushSubscription, insertPushSubscription } from "~/.server/db/pushSubscriptions";
 import { createAuthenticator } from "~/utils/auth.server";
 import { badRequest } from "~/utils/responseUtils";
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request }) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const subscription = (await request.json()) as PushSubscriptionJSON;
    if (!subscription.endpoint) {
@@ -19,4 +19,4 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       return { ok: true };
    }
    return badRequest("Method not allowed");
-};
+});

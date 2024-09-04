@@ -1,4 +1,5 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
+import { unstable_defineAction as defineAction, unstable_defineLoader as defineLoader } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Mail } from "lucide-react";
 
@@ -17,13 +18,13 @@ export const meta: MetaFunction<typeof loader> = () => {
    return [{ title: "Medlemmer - Gata" }];
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = defineLoader(async ({ request }) => {
    await createAuthenticator().getRequiredUser(request);
    const [users, externalUsers] = await Promise.all([getUsers(), getNotMemberUsers()]);
    return { users, externalUsers };
-};
+});
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request }) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    requireAdminRole(loggedInUser);
    const form = await request.formData();
@@ -36,21 +37,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       await deleteExternalUser(externalUserId);
       return { ok: true };
    }
-};
+});
 
 export default function MemberPage() {
    const { users, externalUsers } = useLoaderData<typeof loader>();
-   const { loggedInUser } = useRootLoader();
+   const rootLoaderData = useRootLoader();
 
    const admins = users.filter(isAdmin);
    const members = users.filter((user) => isMember(user) && !isAdmin(user));
    const nonMembers = users.filter((user) => !isMember(user) && !isAdmin(user));
+   const userIsAdmin = isAdmin(rootLoaderData?.loggedInUser);
 
    return (
       <PageLayout>
          <div className="flex justify-between items-center">
             <Typography variant="h1">Brukere</Typography>
-            {isAdmin(loggedInUser) && (
+            {userIsAdmin && (
                <TooltipProvider>
                   <Tooltip>
                      <TooltipTrigger asChild>
@@ -71,7 +73,7 @@ export default function MemberPage() {
          </Typography>
          <ul aria-labelledby="admin-title" className="divide-y">
             {admins.map((user) => {
-               return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
+               return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={userIsAdmin} />;
             })}
             {admins.length === 0 && <li>Ingen administratorer funnet</li>}
          </ul>
@@ -80,18 +82,18 @@ export default function MemberPage() {
          </Typography>
          <ul aria-labelledby="member-title" className="divide-y">
             {members.map((user) => {
-               return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
+               return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={userIsAdmin} />;
             })}
             {members.length === 0 && <li>Ingen medlemmer funnet</li>}
          </ul>
-         {isAdmin(loggedInUser) && (
+         {userIsAdmin && (
             <>
                <Typography variant="h2" id="non-member-title">
                   Ikke medlem
                </Typography>
                <ul aria-labelledby="non-member-title" className="divide-y">
                   {nonMembers.map((user) => {
-                     return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={isAdmin(loggedInUser)} />;
+                     return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={userIsAdmin} />;
                   })}
                   {nonMembers.length === 0 && <li>Ingen andre brukere</li>}
                </ul>

@@ -1,5 +1,5 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
+import { unstable_defineLoader as defineLoader } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Plus } from "lucide-react";
 
@@ -15,12 +15,12 @@ export const meta: MetaFunction<typeof loader> = () => {
    return [{ title: "Aktuelle dokumenter - Gata" }];
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = defineLoader(async ({ request }) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
 
    const [reports] = await Promise.all([getReportsSimple(ReportType.DOCUMENT)]);
-   return json({ reports, loggedInUser });
-};
+   return { reports, loggedInUser };
+});
 
 export default function ReportPage() {
    const { loggedInUser, reports } = useLoaderData<typeof loader>();

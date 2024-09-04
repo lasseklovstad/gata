@@ -1,5 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { unstable_defineLoader as defineLoader } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { Save } from "lucide-react";
 
@@ -8,14 +7,15 @@ import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { FormControl, FormItem, FormLabel, FormProvider } from "~/components/ui/form";
 import { NativeSelect } from "~/components/ui/native-select";
+import type { action } from "~/routes/member.$memberId.responsibility/route";
 import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = defineLoader(async ({ request }) => {
    await createAuthenticator().getRequiredUser(request);
    const responsibilities = await getResponsibilities();
-   return json({ responsibilities });
-};
+   return { responsibilities };
+});
 
 const numberOfYears = 10;
 const todaysYear = new Date().getFullYear();
@@ -24,7 +24,7 @@ const years = Array.from({ length: numberOfYears }, (v, i) => todaysYear - numbe
 export default function AddResponsibilityUserDialog() {
    const { responsibilities } = useLoaderData<typeof loader>();
    const { dialogRef } = useDialog({ defaultOpen: true });
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof action>();
 
    const responsibilityOptions = responsibilities.map((res) => {
       return { label: res.name, value: res.id };

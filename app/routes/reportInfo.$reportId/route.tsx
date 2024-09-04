@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
+import { unstable_defineAction as defineAction, unstable_defineLoader as defineLoader } from "@remix-run/node";
 import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { Edit, Mail, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -25,14 +25,14 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
    return [{ title: `${data?.report.title} - Gata` }];
 };
 
-export const loader = async ({ request, params: { reportId } }: LoaderFunctionArgs) => {
+export const loader = defineLoader(async ({ request, params: { reportId } }) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    if (!reportId) throw new Error("ReportId id required");
    const [report] = await Promise.all([getReport(reportId)]);
    return { report, loggedInUser };
-};
+});
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request, params }) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const formData = await request.formData();
    const intent = String(formData.get("intent"));
@@ -44,7 +44,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    switch (intent) {
       case reportInfoIntent.updateContentIntent: {
          await updateReportContent(params.reportId, String(formData.get("content")), loggedInUser);
-         return json({ ok: true, close: formData.get("close"), intent: reportInfoIntent.updateContentIntent } as const);
+         return { ok: true, close: String(formData.get("close")), intent: reportInfoIntent.updateContentIntent };
       }
       case reportInfoIntent.postFileIntent: {
          const data = String(formData.get("data"));
@@ -55,17 +55,17 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
             cloudId: public_id,
             cloudUrl: secure_url,
          });
-         return json({
+         return {
             ok: true,
             file,
             intent: reportInfoIntent.postFileIntent,
-         } as const);
+         };
       }
       default: {
          throw new Response(`Invalid intent "${intent}"`, { status: 400 });
       }
    }
-};
+});
 
 export default function ReportInfoPage() {
    const { report, loggedInUser } = useLoaderData<typeof loader>();

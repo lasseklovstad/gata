@@ -4,6 +4,7 @@ import { ThumbsUp } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import type { action } from "~/routes/event.$eventId._index/route";
 import { cn } from "~/utils";
 
 import { LikeIconMapping } from "./LikeIconMapping";
@@ -17,7 +18,7 @@ type Props = {
 };
 
 export const LikeButton = ({ messageId, loggInUserId, likes, size, className }: Props) => {
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof action>();
    const selectedLikeType = likes.find((like) => like.userId === loggInUserId)?.type;
    return (
       <>

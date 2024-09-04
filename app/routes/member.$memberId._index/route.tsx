@@ -1,5 +1,8 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import {
+   unstable_defineAction as defineAction,
+   unstable_defineLoader as defineLoader,
+   redirect,
+} from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { Trash } from "lucide-react";
 
@@ -26,7 +29,7 @@ import { isAdmin, requireAdminRole } from "~/utils/roleUtils";
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
 
-export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
+export const loader = defineLoader(async ({ request, params: { memberId } }) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
 
    if (!memberId) throw new Error("Member id required");
@@ -38,9 +41,9 @@ export const loader = async ({ request, params: { memberId } }: LoaderFunctionAr
       getNotMemberUsers(),
    ]);
    return { member, contingentInfo, roles, notMemberUsers, loggedInUser };
-};
+});
 
-export const action = async ({ request, params: { memberId } }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request, params: { memberId } }) => {
    if (!memberId) {
       throw badRequest("Member id required");
    }
@@ -89,11 +92,11 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
          throw new Response(`Invalid intent "${intent}"`, { status: 400 });
       }
    }
-};
+});
 
 export default function MemberInfoPage() {
    const { member, contingentInfo, roles, notMemberUsers, loggedInUser } = useLoaderData<typeof loader>();
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof action>();
    const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog({
       text: "Ved å slette mister vi all informasjon knyttet til brukeren",
       onConfirm: () => {

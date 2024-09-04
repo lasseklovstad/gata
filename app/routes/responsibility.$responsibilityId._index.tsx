@@ -1,5 +1,8 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
+import {
+   unstable_defineAction as defineAction,
+   unstable_defineLoader as defineLoader,
+   redirect,
+} from "@remix-run/node";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { SaveIcon } from "lucide-react";
 
@@ -13,23 +16,24 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 import { responsibilitySchema } from "~/utils/formSchema";
 import { isAdmin } from "~/utils/roleUtils";
+import { transformErrorResponse } from "~/utils/validateUtils";
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+export const loader = defineLoader(async ({ request, params }) => {
    await createAuthenticator().getRequiredUser(request);
    if (!params.responsibilityId) throw new Error("ResponsibilityId is required in url!");
    return {
       responsibility: params.responsibilityId !== "new" ? await getResponsibility(params.responsibilityId) : undefined,
    };
-};
+});
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request, params }) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    if (!isAdmin(loggedInUser)) {
       throw new Error("Du har ikke tilgang til å endre denne ressursen");
    }
    const responsibility = responsibilitySchema.safeParse(await request.formData());
    if (responsibility.error) {
-      return json({ ...responsibility.error.formErrors }, { status: 400 });
+      return transformErrorResponse(responsibility.error);
    }
 
    if (request.method === "POST") {
@@ -40,7 +44,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       await updateResponsibility(params.responsibilityId, responsibility.data);
       return redirect("/responsibility");
    }
-};
+});
 
 export default function EditResponsibility() {
    const navigate = useNavigate();
@@ -48,15 +52,13 @@ export default function EditResponsibility() {
    const { responsibility } = useLoaderData<typeof loader>();
    const method = responsibility ? "put" : "post";
    const fetcher = useFetcher<typeof action>();
-   const error = fetcher.data?.fieldErrors;
-   console.log(error);
    const onClose = () => navigate("..");
 
    return (
       <Dialog ref={dialogRef} onClose={onClose}>
          <fetcher.Form method={method} preventScrollReset>
             <DialogHeading>{method === "put" ? "Rediger Ansvarspost" : "Ny Ansvarspost"}</DialogHeading>
-            <FormProvider errors={error}>
+            <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
                <FormItem name="name">
                   <FormLabel>Navn</FormLabel>
                   <FormControl

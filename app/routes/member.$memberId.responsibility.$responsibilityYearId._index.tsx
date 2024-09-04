@@ -1,11 +1,10 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import { unstable_defineAction as defineAction, redirect } from "@remix-run/node";
 
 import { updateResponsibilityNote } from "~/.server/db/responsibility";
 import { createAuthenticator } from "~/utils/auth.server";
 import { updateResponsibilityYearSchema } from "~/utils/formSchema";
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request, params }) => {
    if (!params.responsibilityYearId) {
       throw new Error("ResponsibilityYearId id required");
    }
@@ -17,4 +16,4 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    }
 
    return redirect(`/member/${params.memberId}/responsibility`);
-};
+});

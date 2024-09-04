@@ -7,13 +7,14 @@ import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/
 
 import { ExternalUserIcon } from "./ExternalUserIcon";
 import { memberIntent } from "../intent";
+import type { action } from "../route";
 
 type Props = {
    user: User;
 };
 
 export const SelectPrimaryEmail = ({ user }: Props) => {
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof action>();
 
    const options = user.externalUsers.map((user) => ({
       label: user.email,

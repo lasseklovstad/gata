@@ -23,7 +23,6 @@ export const GataReportFormDialog = ({ type }: GataReportFormDialogProps) => {
    const method = report ? "PUT" : "POST";
    const [title, setTitle] = useState(report?.title || "");
    const [description, setDescription] = useState(report?.description || "");
-   const error = fetcher.data?.fieldErrors;
 
    const onClose = () => navigate("..");
 
@@ -31,7 +30,7 @@ export const GataReportFormDialog = ({ type }: GataReportFormDialogProps) => {
       <Dialog ref={dialogRef}>
          <fetcher.Form method={method}>
             <DialogHeading>{method === "PUT" ? "Rediger informasjon" : "Nytt dokument"}</DialogHeading>
-            <FormProvider errors={error}>
+            <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
                <FormItem name="title">
                   <FormLabel>Tittel</FormLabel>
                   <FormControl

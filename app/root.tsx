@@ -1,15 +1,11 @@
 import "react-day-picker/dist/style.css";
 import "./tailwind.css";
 
-import type {
-   ActionFunctionArgs,
-   LinksFunction,
-   LoaderFunctionArgs,
-   MetaFunction,
-   SerializeFrom,
-} from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
    NodeOnDiskFile,
+   unstable_defineAction as defineAction,
+   unstable_defineLoader as defineLoader,
    unstable_composeUploadHandlers,
    unstable_createFileUploadHandler,
    unstable_createMemoryUploadHandler,
@@ -145,7 +141,7 @@ export default function App() {
 
    return (
       <div className="flex flex-col min-h-lvh">
-         <ResponsiveAppBar auth0User={auth0User} loggedInUser={loggedInUser} pwaPublicKey={pwaPublicKey} />
+         <ResponsiveAppBar isLoggedIn={!!auth0User} loggedInUser={loggedInUser} pwaPublicKey={pwaPublicKey} />
          <main className="mb-8 max-w-[1000px] w-full me-auto ms-auto px-4">
             <Outlet />
          </main>
@@ -162,17 +158,20 @@ export default function App() {
    );
 }
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = defineLoader(async ({ request }) => {
    const auth0User = await createAuthenticator().authenticator.isAuthenticated(request);
-   const loggedInUser = auth0User
-      ? (await getOptionalUserFromExternalUserId(auth0User.profile.id ?? "")) || undefined
-      : undefined;
+   const loggedInUser = auth0User ? (await getOptionalUserFromExternalUserId(auth0User.id)) || undefined : undefined;
    const version = env.VERSION;
    const pwaPublicKey = env.PWA_PUBLIC_KEY;
-   return { auth0User, loggedInUser, version, pwaPublicKey };
-};
+   return {
+      auth0User,
+      loggedInUser,
+      version,
+      pwaPublicKey,
+   };
+});
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request }) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const uploadHandler = unstable_composeUploadHandlers(
       unstable_createFileUploadHandler({
@@ -214,10 +213,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
    }
 
    return badRequest("Invalid intent");
-};
+});
 
 export const useRootLoader = () => {
-   return useRouteLoaderData("root") as SerializeFrom<typeof loader>;
+   return useRouteLoaderData<typeof loader>("root");
 };
 
 export function ErrorBoundary() {
