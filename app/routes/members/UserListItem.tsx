@@ -26,7 +26,7 @@ export const UserListItem = ({ user, isLoggedInUserAdmin, isPushSubscribed }: Us
                      {isPushSubscribed ? (
                         <Bell className="text-primary" aria-label="Abonnerer på pushvarsler" />
                      ) : (
-                        <BellOff className="text-gray-500" aria-label="Abonnerer på pushvarsler" />
+                        <BellOff className="text-gray-500" aria-label="Abonnerer ikke på pushvarsler" />
                      )}
                      {user.subscribe ? (
                         <MailCheck className="text-primary" aria-label="Abonnerer på mail" />
