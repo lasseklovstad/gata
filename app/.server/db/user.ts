@@ -1,8 +1,7 @@
-import { and, count, desc, eq, inArray, isNull, notInArray, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, getTableColumns, inArray, isNull, notInArray, or, sql } from "drizzle-orm";
 
 import { db } from "db/config.server";
 import { contingent, externalUser, responsibilityYear, role, user, userRoles } from "db/schema";
-import type { Auth0User } from "~/types/Auth0User";
 import { RoleName } from "~/utils/roleUtils";
 
 export type User = Awaited<ReturnType<typeof getUser>>;
@@ -21,6 +20,14 @@ export const getUser = async (userId: string) => {
       throw new Error("Fant ingen bruker");
    }
    return userResult;
+};
+
+export const getExternalUserFromEmail = async (email: string) => {
+   return await db.select().from(externalUser).where(eq(externalUser.email, email));
+};
+
+export const getExternalUserFromId = async (id: string) => {
+   return await db.select().from(externalUser).where(eq(externalUser.id, id));
 };
 
 export const getOptionalUserFromExternalUserId = async (externalUserId: string) => {
@@ -73,21 +80,19 @@ export const getResponsibilityYears = (userId: string) => {
    });
 };
 
-export const insertOrUpdateExternalUser = async (auth0User: Auth0User) => {
-   const email = auth0User.profile.emails && auth0User.profile.emails[0];
-   const photo = auth0User.profile.photos && auth0User.profile.photos[0];
-   const id = auth0User.profile.id;
-   if (!id) {
-      throw new Error("Bruker har ikke en id!");
-   }
-   if (!email?.value) {
-      throw new Error("Bruker har ikke en email?! " + id);
-   }
+type UserInit = {
+   id: string;
+   email: string;
+   picture?: string;
+   name?: string;
+};
+
+export const insertOrUpdateExternalUser = async ({ email, id, name, picture }: UserInit) => {
    const values = {
-      email: email.value,
+      email,
       lastLogin: sql`(CURRENT_TIMESTAMP)`,
-      name: auth0User.profile.displayName ?? email.value,
-      picture: photo?.value,
+      name: name ?? email,
+      picture: picture ?? "/no-profile.jpg",
    };
    return await db
       .insert(externalUser)
@@ -96,7 +101,7 @@ export const insertOrUpdateExternalUser = async (auth0User: Auth0User) => {
          ...values,
       })
       .onConflictDoUpdate({ target: externalUser.id, set: values })
-      .returning({ id: externalUser.id });
+      .returning(getTableColumns(externalUser));
 };
 
 export const getNumberOfAdmins = async () => {
