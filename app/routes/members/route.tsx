@@ -3,6 +3,7 @@ import { unstable_defineAction as defineAction, unstable_defineLoader as defineL
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Mail } from "lucide-react";
 
+import { getAllSubscriptions } from "~/.server/db/pushSubscriptions";
 import { deleteExternalUser, getNotMemberUsers, getUsers, insertUser } from "~/.server/db/user";
 import { PageLayout } from "~/components/PageLayout";
 import { Button } from "~/components/ui/button";
@@ -20,8 +21,12 @@ export const meta: MetaFunction<typeof loader> = () => {
 
 export const loader = defineLoader(async ({ request }) => {
    await createAuthenticator().getRequiredUser(request);
-   const [users, externalUsers] = await Promise.all([getUsers(), getNotMemberUsers()]);
-   return { users, externalUsers };
+   const [users, externalUsers, subscriptions] = await Promise.all([
+      getUsers(),
+      getNotMemberUsers(),
+      getAllSubscriptions(""),
+   ]);
+   return { users, externalUsers, subscriptions: subscriptions.map((s) => s.userId) };
 });
 
 export const action = defineAction(async ({ request }) => {
@@ -40,7 +45,7 @@ export const action = defineAction(async ({ request }) => {
 });
 
 export default function MemberPage() {
-   const { users, externalUsers } = useLoaderData<typeof loader>();
+   const { users, externalUsers, subscriptions } = useLoaderData<typeof loader>();
    const rootLoaderData = useRootLoader();
 
    const admins = users.filter(isAdmin);
@@ -73,7 +78,14 @@ export default function MemberPage() {
          </Typography>
          <ul aria-labelledby="admin-title" className="divide-y">
             {admins.map((user) => {
-               return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={userIsAdmin} />;
+               return (
+                  <UserListItem
+                     key={user.id}
+                     user={user}
+                     isLoggedInUserAdmin={userIsAdmin}
+                     isPushSubscribed={subscriptions.includes(user.id)}
+                  />
+               );
             })}
             {admins.length === 0 && <li>Ingen administratorer funnet</li>}
          </ul>
@@ -82,7 +94,14 @@ export default function MemberPage() {
          </Typography>
          <ul aria-labelledby="member-title" className="divide-y">
             {members.map((user) => {
-               return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={userIsAdmin} />;
+               return (
+                  <UserListItem
+                     key={user.id}
+                     user={user}
+                     isLoggedInUserAdmin={userIsAdmin}
+                     isPushSubscribed={subscriptions.includes(user.id)}
+                  />
+               );
             })}
             {members.length === 0 && <li>Ingen medlemmer funnet</li>}
          </ul>
@@ -93,7 +112,14 @@ export default function MemberPage() {
                </Typography>
                <ul aria-labelledby="non-member-title" className="divide-y">
                   {nonMembers.map((user) => {
-                     return <UserListItem key={user.id} user={user} isLoggedInUserAdmin={userIsAdmin} />;
+                     return (
+                        <UserListItem
+                           key={user.id}
+                           user={user}
+                           isLoggedInUserAdmin={userIsAdmin}
+                           isPushSubscribed={subscriptions.includes(user.id)}
+                        />
+                     );
                   })}
                   {nonMembers.length === 0 && <li>Ingen andre brukere</li>}
                </ul>

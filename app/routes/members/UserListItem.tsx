@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import { Check, X } from "lucide-react";
+import { Check, X, Bell, BellOff, MailCheck, MailMinus } from "lucide-react";
 
 import type { User } from "~/.server/db/user";
 import { AvatarUser } from "~/components/AvatarUser";
@@ -10,9 +10,10 @@ import { isMember } from "../../utils/roleUtils";
 type UserListItemProps = {
    user: User;
    isLoggedInUserAdmin: boolean;
+   isPushSubscribed: boolean;
 };
 
-export const UserListItem = ({ user, isLoggedInUserAdmin }: UserListItemProps) => {
+export const UserListItem = ({ user, isLoggedInUserAdmin, isPushSubscribed }: UserListItemProps) => {
    const isCurrentContingentPaid = user.contingents.find((c) => c.year === new Date().getFullYear())?.isPaid;
    return (
       <li className="hover:bg-blue-50">
@@ -20,7 +21,19 @@ export const UserListItem = ({ user, isLoggedInUserAdmin }: UserListItemProps) =
             <div className="flex gap-4 p-2 items-center">
                <AvatarUser user={user} />
                <div>
-                  <Typography variant="largeText">{user.name}</Typography>
+                  <Typography variant="largeText" className="flex gap-2">
+                     {user.name}
+                     {isPushSubscribed ? (
+                        <Bell className="text-primary" aria-label="Abonnerer på pushvarsler" />
+                     ) : (
+                        <BellOff className="text-gray-500" aria-label="Abonnerer ikke på pushvarsler" />
+                     )}
+                     {user.subscribe ? (
+                        <MailCheck className="text-primary" aria-label="Abonnerer på mail" />
+                     ) : (
+                        <MailMinus className="text-gray-500" aria-label="Abonnerer ikke på mail" />
+                     )}
+                  </Typography>
                   <Typography variant="smallText" className="text-gray-500">
                      Sist innlogget: {new Date(user.primaryUser.lastLogin).toLocaleDateString("no")}
                   </Typography>
