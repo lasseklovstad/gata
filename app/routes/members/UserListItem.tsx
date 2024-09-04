@@ -20,20 +20,22 @@ export const UserListItem = ({ user, isLoggedInUserAdmin, isPushSubscribed }: Us
          <Link to={`/member/${user.id}`}>
             <div className="flex gap-4 p-2 items-center">
                <AvatarUser user={user} />
-               <div>
-                  <Typography variant="largeText" className="flex gap-2">
-                     {user.name}
-                     {isPushSubscribed ? (
-                        <Bell className="text-primary" aria-label="Abonnerer på pushvarsler" />
-                     ) : (
-                        <BellOff className="text-gray-500" aria-label="Abonnerer ikke på pushvarsler" />
-                     )}
-                     {user.subscribe ? (
-                        <MailCheck className="text-primary" aria-label="Abonnerer på mail" />
-                     ) : (
-                        <MailMinus className="text-gray-500" aria-label="Abonnerer ikke på mail" />
-                     )}
-                  </Typography>
+               <div className="flex-1">
+                  <div className="flex gap-2 justify-between">
+                     <Typography variant="largeText">{user.name}</Typography>
+                     <div className="flex gap-2">
+                        {isPushSubscribed ? (
+                           <Bell className="text-primary" aria-label="Abonnerer på pushvarsler" />
+                        ) : (
+                           <BellOff className="text-gray-500" aria-label="Abonnerer ikke på pushvarsler" />
+                        )}
+                        {user.subscribe ? (
+                           <MailCheck className="text-primary" aria-label="Abonnerer på mail" />
+                        ) : (
+                           <MailMinus className="text-gray-500" aria-label="Abonnerer ikke på mail" />
+                        )}
+                     </div>
+                  </div>
                   <Typography variant="smallText" className="text-gray-500">
                      Sist innlogget: {new Date(user.primaryUser.lastLogin).toLocaleDateString("no")}
                   </Typography>
