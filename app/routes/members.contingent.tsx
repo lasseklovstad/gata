@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
+import { unstable_defineLoader as defineLoader, unstable_defineAction as defineAction } from "@remix-run/node";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 
 import { getContingentInfo } from "~/.server/db/contigent";
@@ -10,7 +10,7 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 import { isAdmin } from "~/utils/roleUtils";
 
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = defineLoader(async ({ request }) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    if (!isAdmin(loggedInUser)) {
       throw new Error("Du har ikke tilgang her");
@@ -21,9 +21,9 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
       usersNotPaid: await getUsersThatHasNotPaidContingent(today.getFullYear()),
       contingentInfo: getContingentInfo(),
    };
-};
+});
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request }) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    if (!isAdmin(loggedInUser)) {
       throw new Error("Du har ikke tilgang her");
@@ -46,7 +46,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       )
    );
    return { ok: true, emails: usersNotPaid.map((user) => user.email) };
-};
+});
 
 export default function ConfirmDelete() {
    const { dialogRef } = useDialog({ defaultOpen: true });
@@ -55,7 +55,7 @@ export default function ConfirmDelete() {
    const navigate = useNavigate();
    const onClose = () => navigate("..");
 
-   if (fetcher.data && fetcher.data.ok) {
+   if (fetcher.data) {
       return (
          <Dialog ref={dialogRef}>
             <DialogHeading>Vellykket</DialogHeading>

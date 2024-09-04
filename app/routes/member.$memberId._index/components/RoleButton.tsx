@@ -5,6 +5,7 @@ import type { User } from "~/.server/db/user";
 import { Button } from "~/components/ui/button";
 
 import { memberIntent } from "../intent";
+import type { action } from "../route";
 
 type Props = {
    role: Role;
@@ -13,7 +14,7 @@ type Props = {
 
 export const RoleButton = ({ role, user }: Props) => {
    const hasRole = !!user.roles.find((r) => r.roleId === role.id);
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof action>();
    return (
       <fetcher.Form method={hasRole ? "DELETE" : "POST"}>
          <input readOnly hidden value={role.id} name="roleId" />

@@ -32,9 +32,24 @@ export const createAuthenticator = () => {
          clientSecret: env.AUTH0_CLIENT_SECRET!,
          domain: env.AUTH0_DOMAIN!,
       },
-      ({ profile, accessToken }) => {
+      ({ profile }) => {
+         const id = profile.id;
+         const email = profile.emails ? profile.emails[0]?.value : undefined;
+         if (!id) {
+            throw new Error("Bruker har ikke id!");
+         }
+         if (!email) {
+            throw new Error("Bruker har ikke email!");
+         }
          // Get the user data from your DB or API using the tokens and profile
-         return Promise.resolve({ profile, accessToken });
+         const user = {
+            email,
+            id,
+            photo: profile.photos ? profile.photos[0]?.value : undefined,
+            name: profile.displayName,
+         };
+
+         return Promise.resolve(user);
       }
    );
 
@@ -52,9 +67,7 @@ export const createAuthenticator = () => {
       if (!auth) {
          throw redirect("/login", { headers });
       }
-      const user = auth.profile.id
-         ? ((await getOptionalUserFromExternalUserId(auth.profile.id)) ?? undefined)
-         : undefined;
+      const user = auth.id ? ((await getOptionalUserFromExternalUserId(auth.id)) ?? undefined) : undefined;
 
       if (!user) {
          throw redirect("/login", { headers });

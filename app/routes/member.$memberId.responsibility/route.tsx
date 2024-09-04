@@ -1,5 +1,8 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import {
+   redirect,
+   unstable_defineAction as defineAction,
+   unstable_defineLoader as defineLoader,
+} from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Plus } from "lucide-react";
 
@@ -13,16 +16,16 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { newResponsibilityYearSchema } from "~/utils/formSchema";
 import { isAdmin, isMember } from "~/utils/roleUtils";
 
-export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
+export const loader = defineLoader(async ({ request, params: { memberId } }) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
 
    if (!memberId) throw new Error("Member id required");
 
    const [member, responsibilityYears] = await Promise.all([getUser(memberId), getResponsibilityYears(memberId)]);
    return { loggedInUser, responsibilityYears, member };
-};
+});
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request, params }) => {
    if (!params.memberId) {
       throw new Error("Member id required");
    }
@@ -32,7 +35,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       await insertResponsibilityYear(params.memberId, form.responsibilityId, form.year, loggedInUser);
    }
    return redirect(`/member/${params.memberId}/responsibility`);
-};
+});
 
 export default function MemberResponsibility() {
    const { loggedInUser, responsibilityYears, member } = useLoaderData<typeof loader>();

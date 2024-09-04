@@ -7,6 +7,7 @@ import { useId } from "react";
 import type { Poll as PollType } from "~/.server/db/gataEvent";
 import type { User } from "~/.server/db/user";
 import { Typography } from "~/components/ui/typography";
+import type { action } from "~/routes/event.$eventId.polls/route";
 
 import { PollActiveStatus } from "./PollActiveStatus";
 import { PollAddOption } from "./PollAddOption";
@@ -22,7 +23,7 @@ type Props = {
 };
 
 export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof action>();
    const titleId = useId();
    const isActiveMessageId = useId();
    const anonymousMessageId = useId();

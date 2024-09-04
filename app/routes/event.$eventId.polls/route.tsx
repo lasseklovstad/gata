@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { unstable_defineAction as defineAction, unstable_defineLoader as defineLoader } from "@remix-run/node";
 import { z } from "zod";
 
 import { addPollVoteAndNotify, createNewPoll, updatePollAndNotify } from "~/.server/data-layer/eventPoll";
@@ -26,7 +26,7 @@ const paramSchema = z.object({
    eventId: z.coerce.number(),
 });
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+export const loader = defineLoader(async ({ request, params }) => {
    const paramsParsed = paramSchema.safeParse(params);
    if (!paramsParsed.success) {
       throw badRequest(paramsParsed.error.message);
@@ -41,9 +41,9 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    const pollId = new URL(request.url).searchParams.get("pollId");
    const filteredPolls = pollId ? polls.filter((p) => p.pollId.toString() === pollId) : polls;
    return { event, polls: filteredPolls, loggedInUser, users };
-};
+});
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request, params }) => {
    const paramsParsed = paramSchema.safeParse(params);
    if (!paramsParsed.success) {
       throw badRequest(paramsParsed.error.message);
@@ -113,7 +113,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       return { ok: true };
    }
    throw badRequest("Intent not found " + intent);
-};
+});
 
 export default function EventPage() {
    const { event, polls, loggedInUser, users } = useLiveLoader<typeof loader>();

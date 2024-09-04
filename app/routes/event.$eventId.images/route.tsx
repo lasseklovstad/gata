@@ -2,8 +2,8 @@ import {
    unstable_composeUploadHandlers,
    unstable_createMemoryUploadHandler,
    unstable_parseMultipartFormData,
-   type ActionFunctionArgs,
-   type LoaderFunctionArgs,
+   unstable_defineAction as defineAction,
+   unstable_defineLoader as defineLoader,
 } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { Trash } from "lucide-react";
@@ -34,7 +34,7 @@ const paramSchema = z.object({
    eventId: z.coerce.number(),
 });
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+export const loader = defineLoader(async ({ request, params }) => {
    const paramsParsed = paramSchema.safeParse(params);
    if (!paramsParsed.success) {
       throw badRequest(paramsParsed.error.message);
@@ -43,13 +43,13 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const [cloudinaryImages, event] = await Promise.all([getEventCloudinaryImages(eventId), getEvent(eventId)]);
    return { cloudinaryImages, event, loggedInUser };
-};
+});
 
 const deleteImagesSchema = zfd.formData({
    image: zfd.repeatable(z.array(z.string())),
 });
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request, params }) => {
    const paramsParsed = paramSchema.safeParse(params);
    if (!paramsParsed.success) {
       throw badRequest(paramsParsed.error.message);
@@ -99,12 +99,12 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    }
 
    throw badRequest("Intent not found " + intent);
-};
+});
 
 export default function EventImages() {
    const { cloudinaryImages, event, loggedInUser } = useLoaderData<typeof loader>();
    const [mode, setMode] = useState<"default" | "mark">("default");
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof action>();
    const formId = useId();
    const isOrganizer = isUserOrganizer(event, loggedInUser);
    return (

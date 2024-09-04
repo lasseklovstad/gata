@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
 import { Textarea } from "~/components/ui/textarea";
 import { Typography } from "~/components/ui/typography";
+import type { action } from "~/routes/member.$memberId.responsibility.$responsibilityYearId._index";
 import { formatDateTime } from "~/utils/date.utils";
 
 import { isAdmin } from "../../utils/roleUtils";
@@ -23,7 +24,7 @@ export const ResponsibilityForm = ({
    user,
    loggedInUser,
 }: ResponsibilityFormProps) => {
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof action>();
    const [text, setText] = useState(note?.text ?? "");
    const canEditNote = loggedInUser.id === user.id || isAdmin(loggedInUser);
 

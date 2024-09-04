@@ -5,6 +5,7 @@ import type { Area, Point } from "react-easy-crop";
 import Cropper from "react-easy-crop";
 
 import type { User } from "~/.server/db/user";
+import type { action } from "~/routes/subscribe";
 
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { FormControl, FormDescription, FormItem, FormLabel, FormMessage } from "../ui/form";
@@ -38,7 +39,7 @@ export const UserForm = ({
 }: Props) => {
    const [subscription, setSubscription] = useState<PushSubscription | null>(null);
    const [error, setError] = useState("");
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof action>();
 
    useEffect(() => {
       if ("serviceWorker" in navigator && "PushManager" in window) {

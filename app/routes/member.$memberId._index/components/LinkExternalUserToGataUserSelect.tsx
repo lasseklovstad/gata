@@ -7,6 +7,7 @@ import type { ExternalUser } from "db/schema";
 import type { User } from "~/.server/db/user";
 import { Button } from "~/components/ui/button";
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
+import type { action } from "~/routes/member.$memberId._index/route";
 import { cn } from "~/utils";
 
 import { ExternalUserIcon } from "./ExternalUserIcon";
@@ -21,7 +22,7 @@ export const LinkExternalUserToGataUserSelect = ({
    user: { externalUsers, primaryExternalUserId },
    notMemberUsers,
 }: LinkExternalUserToGataUserSelectProps) => {
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof action>();
    const [query, setQuery] = useState("");
    const inputRef = useRef<HTMLInputElement>(null);
    const buttonRef = useRef<HTMLButtonElement>(null);

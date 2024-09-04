@@ -1,7 +1,7 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import { unstable_defineLoader as defineLoader } from "@remix-run/node";
 
 import { createEventStream } from "~/utils/events/create-event-stream.server";
 
-export function loader({ request, params }: LoaderFunctionArgs) {
+export const loader = defineLoader(({ request, params }) => {
    return createEventStream(request, `event-${params.eventId!}-polls`);
-}
+});

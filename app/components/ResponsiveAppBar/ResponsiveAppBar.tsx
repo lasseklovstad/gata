@@ -1,7 +1,6 @@
 import { Link } from "@remix-run/react";
 
 import type { User } from "~/.server/db/user";
-import type { Auth0User } from "~/types/Auth0User";
 
 import { SideBar } from "./Sidebar";
 import { UserMenu } from "./UserMenu";
@@ -9,12 +8,12 @@ import { isAdmin, isMember } from "../../utils/roleUtils";
 import { Button } from "../ui/button";
 
 type ResponsiveAppBarProps = {
-   auth0User: Auth0User | null;
+   isLoggedIn: boolean;
    loggedInUser: User | undefined;
    pwaPublicKey: string;
 };
 
-export const ResponsiveAppBar = ({ auth0User, loggedInUser, pwaPublicKey }: ResponsiveAppBarProps) => {
+export const ResponsiveAppBar = ({ isLoggedIn, loggedInUser, pwaPublicKey }: ResponsiveAppBarProps) => {
    const isUserMember = isMember(loggedInUser);
    const isUserAdmin = isAdmin(loggedInUser);
 
@@ -76,7 +75,7 @@ export const ResponsiveAppBar = ({ auth0User, loggedInUser, pwaPublicKey }: Resp
 
                <UserMenu
                   roleText={getRole()}
-                  isAuthenticated={!!auth0User}
+                  isAuthenticated={isLoggedIn}
                   loggedInUser={loggedInUser}
                   pwaPublicKey={pwaPublicKey}
                />

@@ -1,11 +1,14 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import {
+   unstable_defineAction as defineAction,
+   unstable_defineLoader as defineLoader,
+   redirect,
+} from "@remix-run/node";
 
 import { createAuthenticator } from "~/utils/auth.server";
 
-export const loader = () => redirect("/");
+export const loader = defineLoader(() => redirect("/"));
 
-export const action = ({ request }: ActionFunctionArgs) => {
+export const action = defineAction(async ({ request }) => {
    const { authenticator } = createAuthenticator();
-   return authenticator.authenticate("auth0", request);
-};
+   return await authenticator.authenticate("auth0", request);
+});

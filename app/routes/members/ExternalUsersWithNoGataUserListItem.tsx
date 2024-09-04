@@ -6,12 +6,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 
+import type { action } from "./route";
+
 type ExternalUsersWithNoGataUserListItemProps = {
    user: ExternalUser;
 };
 
 export const ExternalUsersWithNoGataUserListItem = ({ user }: ExternalUsersWithNoGataUserListItemProps) => {
-   const fetcher = useFetcher();
+   const fetcher = useFetcher<typeof action>();
 
    const handleAddClick = () => {
       fetcher.submit({ externalUserId: user.id }, { method: "POST" });

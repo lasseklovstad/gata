@@ -1,3 +1,6 @@
-import type { Auth0Profile } from "remix-auth-auth0";
-
-export type Auth0User = { profile: Auth0Profile; accessToken: string };
+export type Auth0User = {
+   email: string;
+   id: string;
+   name: string | undefined;
+   photo: string | undefined;
+};
