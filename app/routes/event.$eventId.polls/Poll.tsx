@@ -2,10 +2,11 @@ import type { SerializeFrom } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
-import { useId } from "react";
+import { useId, useState } from "react";
 
 import type { Poll as PollType } from "~/.server/db/gataEvent";
 import type { User } from "~/.server/db/user";
+import { Toggle } from "~/components/ui/toggle";
 import { Typography } from "~/components/ui/typography";
 import type { action } from "~/routes/event.$eventId.polls/route";
 
@@ -24,11 +25,20 @@ type Props = {
 
 export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
    const fetcher = useFetcher<typeof action>();
+   const [showOptionsWithMostVotes, setShowOptionsWithMostVotes] = useState(false);
    const titleId = useId();
    const isActiveMessageId = useId();
    const anonymousMessageId = useId();
    const hasVoted = poll.pollVotes.find((vote) => vote.userId === loggedInUser.id);
    const type = poll.canSelectMultiple ? "checkbox" : "radio";
+   const pollOptions = poll.pollOptions.map((option) => ({
+      ...option,
+      numberOfVotes: poll.pollVotes.filter((vote) => vote.pollOptionId === option.id).length,
+   }));
+   const maxVotes = Math.max(...pollOptions.map((pollOption) => pollOption.numberOfVotes));
+   const pollOptionsFiltered = showOptionsWithMostVotes
+      ? pollOptions.filter((pollOption) => pollOption.numberOfVotes >= maxVotes)
+      : pollOptions;
 
    return (
       <section aria-labelledby={titleId}>
@@ -36,6 +46,13 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
             <Typography variant="h3" className="mb-2" id={titleId}>
                {poll.name}
             </Typography>
+            <Toggle
+               variant="outline"
+               pressed={showOptionsWithMostVotes}
+               onPressedChange={(pressed) => setShowOptionsWithMostVotes(pressed)}
+            >
+               Vis flest valgt
+            </Toggle>
             {isOrganizer ? <PollMenu poll={poll} /> : null}
          </div>
          {poll.isAnonymous ? (
@@ -57,10 +74,7 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
                   isAnonymous={poll.isAnonymous}
                   disabled={!poll.isActive}
                   loggedInUser={loggedInUser}
-                  options={poll.pollOptions.map((option) => ({
-                     ...option,
-                     numberOfVotes: poll.pollVotes.filter((vote) => vote.pollOptionId === option.id).length,
-                  }))}
+                  options={pollOptionsFiltered}
                   pollVotes={poll.pollVotes}
                   users={users}
                   type={type}
@@ -93,10 +107,7 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
                   isAnonymous={poll.isAnonymous}
                   disabled={!poll.isActive}
                   loggedInUser={loggedInUser}
-                  options={poll.pollOptions.map((option) => ({
-                     ...option,
-                     numberOfVotes: poll.pollVotes.filter((vote) => vote.pollOptionId === option.id).length,
-                  }))}
+                  options={pollOptionsFiltered}
                   pollVotes={poll.pollVotes}
                   users={users}
                   type={type}
