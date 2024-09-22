@@ -1,8 +1,5 @@
-import {
-   unstable_defineAction as defineAction,
-   unstable_defineLoader as defineLoader,
-   redirect,
-} from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { SaveIcon } from "lucide-react";
 
@@ -18,15 +15,15 @@ import { responsibilitySchema } from "~/utils/formSchema";
 import { isAdmin } from "~/utils/roleUtils";
 import { transformErrorResponse } from "~/utils/validateUtils";
 
-export const loader = defineLoader(async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    await createAuthenticator().getRequiredUser(request);
    if (!params.responsibilityId) throw new Error("ResponsibilityId is required in url!");
    return {
       responsibility: params.responsibilityId !== "new" ? await getResponsibility(params.responsibilityId) : undefined,
    };
-});
+};
 
-export const action = defineAction(async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    if (!isAdmin(loggedInUser)) {
       throw new Error("Du har ikke tilgang til å endre denne ressursen");
@@ -44,7 +41,7 @@ export const action = defineAction(async ({ request, params }) => {
       await updateResponsibility(params.responsibilityId, responsibility.data);
       return redirect("/responsibility");
    }
-});
+};
 
 export default function EditResponsibility() {
    const navigate = useNavigate();

@@ -1,4 +1,4 @@
-import { unstable_defineLoader as defineLoader } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { Save } from "lucide-react";
 
@@ -11,11 +11,11 @@ import type { action } from "~/routes/member.$memberId.responsibility/route";
 import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
-export const loader = defineLoader(async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    await createAuthenticator().getRequiredUser(request);
    const responsibilities = await getResponsibilities();
    return { responsibilities };
-});
+};
 
 const numberOfYears = 10;
 const todaysYear = new Date().getFullYear();

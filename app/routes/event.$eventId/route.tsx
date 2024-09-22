@@ -1,4 +1,4 @@
-import { unstable_defineAction as defineAction, unstable_defineLoader as defineLoader } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import type { MetaFunction } from "@remix-run/react";
 import { Outlet, redirect, useLoaderData } from "@remix-run/react";
 import { formatDate } from "date-fns";
@@ -40,7 +40,7 @@ const paramSchema = z.object({
    eventId: z.coerce.number(),
 });
 
-export const loader = defineLoader(async ({ request, params }) => {
+export const loader = async ({ request, params }: ActionFunctionArgs) => {
    const paramsParsed = paramSchema.safeParse(params);
    if (!paramsParsed.success) {
       throw badRequest(paramsParsed.error.message);
@@ -54,7 +54,7 @@ export const loader = defineLoader(async ({ request, params }) => {
       getEventParticipants(eventId),
    ]);
    return { event, loggedInUser, users, numberOfImages, eventParticipants };
-});
+};
 
 const organizersUpdateSchema = zfd.formData({
    organizers: zfd.repeatable(z.array(z.string())),
@@ -64,7 +64,7 @@ const updateParticipatingSchema = zfd.formData({
    status: zfd.text(z.enum(["going", "notGoing"])),
 });
 
-export const action = defineAction(async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    const paramsParsed = paramSchema.safeParse(params);
    if (!paramsParsed.success) {
       throw badRequest(paramsParsed.error.message);
@@ -111,7 +111,7 @@ export const action = defineAction(async ({ request, params }) => {
    }
 
    throw badRequest("Intent not found " + intent);
-});
+};
 
 export default function EventPage() {
    const { event, loggedInUser, users, numberOfImages, eventParticipants } = useLoaderData<typeof loader>();

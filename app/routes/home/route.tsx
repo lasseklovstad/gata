@@ -1,4 +1,4 @@
-import { unstable_defineLoader as defineLoader } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 import { getUpCommingEvents } from "~/.server/db/gataEvent";
@@ -12,14 +12,14 @@ import { ReportType } from "~/types/GataReport.type";
 import { createAuthenticator } from "~/utils/auth.server";
 import { isMember } from "~/utils/roleUtils";
 
-export const loader = defineLoader(async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    const auth = await createAuthenticator().authenticator.isAuthenticated(request);
    const loggedInUser = auth?.id ? ((await getOptionalUserFromExternalUserId(auth.id)) ?? undefined) : undefined;
    return {
       reports: isMember(loggedInUser) ? await getReportsWithContent(ReportType.NEWS) : undefined,
       events: isMember(loggedInUser) ? await getUpCommingEvents() : undefined,
    };
-});
+};
 
 export default function Home() {
    const rootLoaderData = useRootLoader();

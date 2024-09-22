@@ -1,5 +1,4 @@
-import type { MetaFunction } from "@remix-run/node";
-import { unstable_defineAction as defineAction, unstable_defineLoader as defineLoader } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { Edit, Mail, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -25,14 +24,14 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
    return [{ title: `${data?.report.title} - Gata` }];
 };
 
-export const loader = defineLoader(async ({ request, params: { reportId } }) => {
+export const loader = async ({ request, params: { reportId } }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    if (!reportId) throw new Error("ReportId id required");
    const [report] = await Promise.all([getReport(reportId)]);
    return { report, loggedInUser };
-});
+};
 
-export const action = defineAction(async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const formData = await request.formData();
    const intent = String(formData.get("intent"));
@@ -65,7 +64,7 @@ export const action = defineAction(async ({ request, params }) => {
          throw new Response(`Invalid intent "${intent}"`, { status: 400 });
       }
    }
-});
+};
 
 export default function ReportInfoPage() {
    const { report, loggedInUser } = useLoaderData<typeof loader>();

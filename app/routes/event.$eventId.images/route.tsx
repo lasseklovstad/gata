@@ -1,9 +1,8 @@
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
    unstable_composeUploadHandlers,
    unstable_createMemoryUploadHandler,
    unstable_parseMultipartFormData,
-   unstable_defineAction as defineAction,
-   unstable_defineLoader as defineLoader,
 } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { Trash } from "lucide-react";
@@ -34,7 +33,7 @@ const paramSchema = z.object({
    eventId: z.coerce.number(),
 });
 
-export const loader = defineLoader(async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    const paramsParsed = paramSchema.safeParse(params);
    if (!paramsParsed.success) {
       throw badRequest(paramsParsed.error.message);
@@ -43,13 +42,13 @@ export const loader = defineLoader(async ({ request, params }) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const [cloudinaryImages, event] = await Promise.all([getEventCloudinaryImages(eventId), getEvent(eventId)]);
    return { cloudinaryImages, event, loggedInUser };
-});
+};
 
 const deleteImagesSchema = zfd.formData({
    image: zfd.repeatable(z.array(z.string())),
 });
 
-export const action = defineAction(async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    const paramsParsed = paramSchema.safeParse(params);
    if (!paramsParsed.success) {
       throw badRequest(paramsParsed.error.message);
@@ -99,7 +98,7 @@ export const action = defineAction(async ({ request, params }) => {
    }
 
    throw badRequest("Intent not found " + intent);
-});
+};
 
 export default function EventImages() {
    const { cloudinaryImages, event, loggedInUser } = useLoaderData<typeof loader>();

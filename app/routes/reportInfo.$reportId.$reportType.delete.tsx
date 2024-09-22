@@ -1,4 +1,5 @@
-import { unstable_defineAction as defineAction, redirect } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { useFetcher, useNavigate } from "@remix-run/react";
 
 import { deleteReport } from "~/.server/db/report";
@@ -7,14 +8,14 @@ import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
-export const action = defineAction(async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    await createAuthenticator().getRequiredUser(request);
 
    if (request.method === "DELETE" && params.reportId) {
       await deleteReport(params.reportId);
       return redirect(params.reportType === "NEWS" ? "/" : "/report");
    }
-});
+};
 
 export default function ConfirmDelete() {
    const { dialogRef } = useDialog({ defaultOpen: true });

@@ -1,4 +1,5 @@
-import { unstable_defineAction as defineAction, redirect } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { useFetcher, useNavigate } from "@remix-run/react";
 
 import { deleteResponsibilityYear } from "~/.server/db/responsibility";
@@ -7,7 +8,7 @@ import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
-export const action = defineAction(async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    if (!params.responsibilityYearId) {
       throw new Error("ResponsibilityYearId id required");
    }
@@ -18,7 +19,7 @@ export const action = defineAction(async ({ request, params }) => {
    }
 
    return redirect(`/member/${params.memberId}/responsibility`);
-});
+};
 
 export default function ConfirmDelete() {
    const { dialogRef } = useDialog({ defaultOpen: true });

@@ -1,8 +1,5 @@
-import {
-   unstable_defineAction as defineAction,
-   unstable_defineLoader as defineLoader,
-   redirect,
-} from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { Trash } from "lucide-react";
 
@@ -29,7 +26,7 @@ import { isAdmin, requireAdminRole } from "~/utils/roleUtils";
 import { RoleButton } from "./components/RoleButton";
 import { memberIntent } from "./intent";
 
-export const loader = defineLoader(async ({ request, params: { memberId } }) => {
+export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
 
    if (!memberId) throw new Error("Member id required");
@@ -41,9 +38,9 @@ export const loader = defineLoader(async ({ request, params: { memberId } }) => 
       getNotMemberUsers(),
    ]);
    return { member, contingentInfo, roles, notMemberUsers, loggedInUser };
-});
+};
 
-export const action = defineAction(async ({ request, params: { memberId } }) => {
+export const action = async ({ request, params: { memberId } }: ActionFunctionArgs) => {
    if (!memberId) {
       throw badRequest("Member id required");
    }
@@ -92,7 +89,7 @@ export const action = defineAction(async ({ request, params: { memberId } }) => 
          throw new Response(`Invalid intent "${intent}"`, { status: 400 });
       }
    }
-});
+};
 
 export default function MemberInfoPage() {
    const { member, contingentInfo, roles, notMemberUsers, loggedInUser } = useLoaderData<typeof loader>();
