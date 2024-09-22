@@ -1,4 +1,4 @@
-import { unstable_defineAction as defineAction } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { Link, redirect, useFetcher } from "@remix-run/react";
 import { Calendar } from "lucide-react";
 
@@ -14,7 +14,7 @@ import { transformErrorResponse } from "~/utils/validateUtils";
 import { EventForm } from "./event.$eventId/EventForm";
 import { eventSchema } from "../utils/schemas/eventSchema";
 
-export const action = defineAction(async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const event = eventSchema.safeParse(await request.formData());
    if (!event.success) {
@@ -22,7 +22,7 @@ export const action = defineAction(async ({ request }) => {
    }
    const eventId = await createEventAndNotify(loggedInUser, event.data);
    return redirect(`/event/${eventId}`);
-});
+};
 
 export default function NewEvent() {
    const fetcher = useFetcher<typeof action>();

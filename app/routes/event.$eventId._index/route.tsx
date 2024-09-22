@@ -1,4 +1,4 @@
-import { unstable_defineAction as defineAction, unstable_defineLoader as defineLoader } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useSearchParams } from "@remix-run/react";
 import { intervalToDuration } from "date-fns";
 import { Vote } from "lucide-react";
@@ -42,7 +42,7 @@ const paramSchema = z.object({
    eventId: z.coerce.number(),
 });
 
-export const loader = defineLoader(async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    const paramsParsed = paramSchema.safeParse(params);
    if (!paramsParsed.success) {
       throw badRequest(paramsParsed.error.message);
@@ -55,9 +55,9 @@ export const loader = defineLoader(async ({ request, params }) => {
       getEventMessages(eventId),
    ]);
    return { polls, cloudinaryImages, eventId, messages, loggedInUser };
-});
+};
 
-export const action = defineAction(async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    const loggendInUser = await createAuthenticator().getRequiredUser(request);
    const paramsParsed = paramSchema.safeParse(params);
    if (!paramsParsed.success) {
@@ -102,7 +102,7 @@ export const action = defineAction(async ({ request, params }) => {
       startEmit();
       return { ok: true } as const;
    }
-});
+};
 
 export default function EventActivities() {
    const { polls, cloudinaryImages, eventId, messages, loggedInUser } = useLiveLoader<typeof loader>();

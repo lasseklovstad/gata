@@ -5,6 +5,12 @@ import { defineConfig } from "vite";
 import checker from "vite-plugin-checker";
 import tsconfigPaths from "vite-tsconfig-paths";
 
+declare module "@remix-run/node" {
+   interface Future {
+      unstable_singleFetch: true;
+   }
+}
+
 export default defineConfig({
    ssr: {
       noExternal: ["react-easy-crop", "tslib"],

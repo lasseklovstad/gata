@@ -1,5 +1,4 @@
-import type { MetaFunction } from "@remix-run/node";
-import { unstable_defineAction as defineAction, unstable_defineLoader as defineLoader } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Mail } from "lucide-react";
 
@@ -19,7 +18,7 @@ export const meta: MetaFunction<typeof loader> = () => {
    return [{ title: "Medlemmer - Gata" }];
 };
 
-export const loader = defineLoader(async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    await createAuthenticator().getRequiredUser(request);
    const [users, externalUsers, subscriptions] = await Promise.all([
       getUsers(),
@@ -27,9 +26,9 @@ export const loader = defineLoader(async ({ request }) => {
       getAllSubscriptions(""),
    ]);
    return { users, externalUsers, subscriptions: subscriptions.map((s) => s.userId) };
-});
+};
 
-export const action = defineAction(async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    requireAdminRole(loggedInUser);
    const form = await request.formData();
@@ -42,7 +41,7 @@ export const action = defineAction(async ({ request }) => {
       await deleteExternalUser(externalUserId);
       return { ok: true };
    }
-});
+};
 
 export default function MemberPage() {
    const { users, externalUsers, subscriptions } = useLoaderData<typeof loader>();

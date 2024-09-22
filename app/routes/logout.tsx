@@ -1,9 +1,10 @@
-import { unstable_defineAction as defineAction, redirect } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 
 import { createAuthenticator } from "~/utils/auth.server";
 import { env } from "~/utils/env.server";
 
-export const loader = defineAction(async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    const { getSession, destroySession } = createAuthenticator();
    const session = await getSession(request.headers.get("Cookie"));
    const logoutURL = new URL(`https://${env.AUTH0_DOMAIN}/v2/logout`); // i.e https://YOUR_TENANT.us.auth0.com/v2/logout
@@ -19,4 +20,4 @@ export const loader = defineAction(async ({ request }) => {
          "Set-Cookie": await destroySession(session),
       },
    });
-});
+};

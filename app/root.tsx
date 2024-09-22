@@ -1,11 +1,9 @@
 import "react-day-picker/dist/style.css";
 import "./tailwind.css";
 
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import type { ActionFunctionArgs, LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import {
    NodeOnDiskFile,
-   unstable_defineAction as defineAction,
-   unstable_defineLoader as defineLoader,
    unstable_composeUploadHandlers,
    unstable_createFileUploadHandler,
    unstable_createMemoryUploadHandler,
@@ -158,7 +156,7 @@ export default function App() {
    );
 }
 
-export const loader = defineLoader(async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    const auth0User = await createAuthenticator().authenticator.isAuthenticated(request);
    const loggedInUser = auth0User ? (await getOptionalUserFromExternalUserId(auth0User.id)) || undefined : undefined;
    const version = env.VERSION;
@@ -169,9 +167,9 @@ export const loader = defineLoader(async ({ request }) => {
       version,
       pwaPublicKey,
    };
-});
+};
 
-export const action = defineAction(async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const uploadHandler = unstable_composeUploadHandlers(
       unstable_createFileUploadHandler({
@@ -213,7 +211,7 @@ export const action = defineAction(async ({ request }) => {
    }
 
    return badRequest("Invalid intent");
-});
+};
 
 export const useRootLoader = () => {
    return useRouteLoaderData<typeof loader>("root");

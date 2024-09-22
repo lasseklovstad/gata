@@ -1,5 +1,4 @@
-import type { MetaFunction } from "@remix-run/node";
-import { unstable_defineLoader as defineLoader } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Pencil, Plus, Trash } from "lucide-react";
 
@@ -14,12 +13,12 @@ export const meta: MetaFunction<typeof loader> = () => {
    return [{ title: "Ansvarsposter - Gata" }];
 };
 
-export const loader = defineLoader(async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const [responsibilities] = await Promise.all([getResponsibilitiesWithCurrentlyResponsibleUsername()]);
 
    return { responsibilities, loggedInUser };
-});
+};
 
 export default function ResponsibilityPage() {
    const { responsibilities, loggedInUser } = useLoaderData<typeof loader>();

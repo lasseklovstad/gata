@@ -1,10 +1,10 @@
-import { unstable_defineLoader as defineLoader } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 
 import { createAuthenticator } from "~/utils/auth.server";
 
-export const loader = defineLoader(({ request }) => {
+export const loader = ({ request }: LoaderFunctionArgs) => {
    return createAuthenticator().authenticator.authenticate("auth0", request, {
       successRedirect: "/registerLogin",
       failureRedirect: "/login",
    });
-});
+};

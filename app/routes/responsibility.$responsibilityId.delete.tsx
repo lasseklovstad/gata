@@ -1,4 +1,5 @@
-import { unstable_defineAction as defineAction, redirect } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { useFetcher, useNavigate } from "@remix-run/react";
 
 import { deleteResponsibility } from "~/.server/db/responsibility";
@@ -8,7 +9,7 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 import { isAdmin } from "~/utils/roleUtils";
 
-export const action = defineAction(async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
 
    if (!isAdmin(loggedInUser)) {
@@ -19,7 +20,7 @@ export const action = defineAction(async ({ request, params }) => {
       await deleteResponsibility(params.responsibilityId);
       return redirect("/responsibility");
    }
-});
+};
 
 export default function ConfirmDeleteResponsibility() {
    const { dialogRef } = useDialog({ defaultOpen: true });
