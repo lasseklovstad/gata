@@ -67,7 +67,7 @@ test.describe("Events (Admin created)", () => {
       await EventFormPage(adminPage).createEvent({
          title: "Arr kunn for arrangører 2",
          description: "Denne skal ikke være synlig før vi har endret på event",
-         visibility: "Alle",
+         visibility: "Arrangører",
       });
       const homePage = HomePage(memberPage);
 
@@ -84,6 +84,7 @@ test.describe("Events (Admin created)", () => {
          await homePage.goto();
          await expect(homePage.getEventLink("Arr for alle")).toBeVisible();
          await expect(homePage.getEventLink("Arr kunn for arrangører 1")).toBeVisible();
+         await expect(homePage.getEventLink("Arr kunn for arrangører 2")).toBeVisible();
          await homePage.gotoEvent("Arr kunn for arrangører 1");
          await eventPage.selectOrganizers(env.memberUsername);
       });
