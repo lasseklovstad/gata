@@ -1,9 +1,4 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import {
-   unstable_composeUploadHandlers,
-   unstable_createMemoryUploadHandler,
-   unstable_parseMultipartFormData,
-} from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { Image, Trash } from "lucide-react";
 import { useId, useState } from "react";
@@ -18,7 +13,7 @@ import {
    insertCloudinaryImage,
    updateEvent,
 } from "~/.server/db/gataEvent";
-import { deleteImage, generateZip, uploadImageToCloudinary } from "~/.server/services/cloudinaryService";
+import { deleteImage, generateZip } from "~/.server/services/cloudinaryService";
 import { CloudImageCheckbox } from "~/components/CloudImageCheckbox";
 import { CloudImageGallery } from "~/components/CloudImageGallery";
 import { Button } from "~/components/ui/button";
@@ -28,6 +23,7 @@ import { UploadMedia } from "~/components/UploadMedia";
 import { createAuthenticator } from "~/utils/auth.server";
 import { getCloudinaryUploadFolder } from "~/utils/cloudinaryUtils";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
+import { isCloudinaryFilePart, uploadFilesToCloudinaryAndGetMultiformParts } from "~/utils/multipartUtils";
 import { badRequest } from "~/utils/responseUtils";
 
 import { DownloadZip } from "./DownloadZip";
@@ -64,23 +60,17 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    const isMulitipart = contentType?.includes("multipart/form-data");
 
    if (request.method === "POST" && isMulitipart) {
-      const uploadHandler = unstable_composeUploadHandlers(
-         // our custom upload handler
-         async ({ name, data }) => {
-            if (name !== "image") {
-               return undefined;
-            }
-
-            const response = await uploadImageToCloudinary(data, folder);
-            const { secure_url, public_id, width, height } = response;
-            await insertCloudinaryImage(eventId, { cloudId: public_id, cloudUrl: secure_url, width, height });
-            return secure_url;
-         },
-         // fallback to memory for everything else
-         unstable_createMemoryUploadHandler()
-      );
-
-      await unstable_parseMultipartFormData(request, uploadHandler);
+      const parts = await uploadFilesToCloudinaryAndGetMultiformParts(request, { cloudinaryFolder: folder });
+      for (const part of parts) {
+         if (isCloudinaryFilePart(part)) {
+            await insertCloudinaryImage(eventId, {
+               cloudId: part.cloudId,
+               cloudUrl: part.cloudUrl,
+               height: part.height,
+               width: part.width,
+            });
+         }
+      }
       await notifyParticipantsImagesIsUploaded(loggedInUser, eventId);
 
       return { ok: true };

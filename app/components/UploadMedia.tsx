@@ -29,7 +29,7 @@ export const UploadMedia = ({ eventId }: Props) => {
                className="w-fit"
                type="file"
                multiple
-               name="image"
+               name="cloudinary-file"
                accept="image/*,video/*"
                disabled={isLoading}
             />

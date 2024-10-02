@@ -1,4 +1,4 @@
-import { writeAsyncIterableToWritable } from "@remix-run/node"; // `writeAsyncIterableToWritable` is a Node-only utility
+import { writeReadableStreamToWritable } from "@remix-run/node"; // `writeAsyncIterableToWritable` is a Node-only utility
 import type { UploadApiResponse } from "cloudinary";
 // eslint-disable-next-line import/default
 import cloudinary from "cloudinary";
@@ -47,7 +47,7 @@ export const deleteImage = (publicId: string) => {
    });
 };
 
-export function uploadImageToCloudinary(data: AsyncIterable<Uint8Array>, folder: string) {
+export function uploadImageToCloudinary(data: ReadableStream<Uint8Array>, folder: string) {
    const uploadPromise = new Promise<UploadApiResponse>((resolve, reject) => {
       const uploadStream = cloudinary.v2.uploader.upload_stream(
          {
@@ -65,7 +65,7 @@ export function uploadImageToCloudinary(data: AsyncIterable<Uint8Array>, folder:
             }
          }
       );
-      void writeAsyncIterableToWritable(data, uploadStream);
+      void writeReadableStreamToWritable(data, uploadStream);
    });
 
    return uploadPromise;
