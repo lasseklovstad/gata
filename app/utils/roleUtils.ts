@@ -5,11 +5,11 @@ export enum RoleName {
    Admin,
 }
 
-export const isMember = (user?: User): user is User => {
+export const isMember = (user?: User) => {
    return !!user?.roles.some(({ role }) => role.roleName === RoleName.Member);
 };
 
-export const isAdmin = (user?: User): user is User => {
+export const isAdmin = (user?: User) => {
    return !!user?.roles.some(({ role }) => role.roleName === RoleName.Admin);
 };
 
