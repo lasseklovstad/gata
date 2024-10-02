@@ -33,33 +33,35 @@ export const updateParticipatingAndNotify = async (
 export const updateEventAndNotify = async (
    loggedInUser: User,
    eventId: number,
-   { startDate, startTime, description, title }: EventSchema
+   { startDate, startTime, description, title, visibility }: EventSchema,
+   shouldNotifyNewEvent: boolean
 ) => {
-   await updateEvent(eventId, { title, description, startTime: startTime ?? null, startDate: startDate ?? null });
-   const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, loggedInUser.id);
-   const event = await getEvent(eventId);
-   await sendPushNotification(
-      subscriptions.map((s) => s.subscription as PushSubscription),
-      {
-         body: `📅 Arrangement ${event.title} er oppdatert`,
-         data: { url: `/event/${eventId}` },
-         icon: "/logo192.png",
-      }
-   );
-};
-
-export const createEventAndNotify = async (
-   loggedInUser: User,
-   { startDate, startTime, description, title }: EventSchema
-) => {
-   const eventId = await insertEvent({
+   await updateEvent(eventId, {
       title,
       description,
       startTime: startTime ?? null,
       startDate: startDate ?? null,
-      createdBy: loggedInUser.id,
+      visibility,
    });
 
+   const event = await getEvent(eventId);
+
+   if (shouldNotifyNewEvent) {
+      await notifyNewEvent(loggedInUser, event.title, event.id);
+   } else {
+      const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, loggedInUser.id);
+      await sendPushNotification(
+         subscriptions.map((s) => s.subscription as PushSubscription),
+         {
+            body: `📅 Arrangement ${event.title} er oppdatert`,
+            data: { url: `/event/${eventId}` },
+            icon: "/logo192.png",
+         }
+      );
+   }
+};
+
+const notifyNewEvent = async (loggedInUser: User, title: string, eventId: number) => {
    const subscriptions = await getAllSubscriptions(loggedInUser.id);
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),
@@ -69,6 +71,24 @@ export const createEventAndNotify = async (
          icon: "/logo192.png",
       }
    );
+};
+
+export const createEventAndNotify = async (
+   loggedInUser: User,
+   { startDate, startTime, description, title, visibility }: EventSchema
+) => {
+   const eventId = await insertEvent({
+      title,
+      description,
+      startTime: startTime ?? null,
+      startDate: startDate ?? null,
+      createdBy: loggedInUser.id,
+      visibility,
+   });
+
+   if (visibility === "everyone") {
+      await notifyNewEvent(loggedInUser, title, eventId);
+   }
 
    return eventId;
 };

@@ -95,7 +95,9 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       if (!updateEventForm.success) {
          return transformErrorResponse(updateEventForm.error);
       }
-      await updateEventAndNotify(loggedInUser, eventId, updateEventForm.data);
+      // Notify all members when visibility is changed to everyone
+      const shouldNotifyNewEvent = event.visibility !== "everyone" && updateEventForm.data.visibility === "everyone";
+      await updateEventAndNotify(loggedInUser, eventId, updateEventForm.data, shouldNotifyNewEvent);
       return { ok: true };
    }
    if (intent === "updateOrganizers") {
