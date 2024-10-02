@@ -18,7 +18,7 @@ import {
    insertCloudinaryImage,
    updateEvent,
 } from "~/.server/db/gataEvent";
-import { deleteImage, getZipDownloadUrls, uploadImageToCloudinary } from "~/.server/services/cloudinaryService";
+import { deleteImage, generateZip, uploadImageToCloudinary } from "~/.server/services/cloudinaryService";
 import { CloudImageCheckbox } from "~/components/CloudImageCheckbox";
 import { CloudImageGallery } from "~/components/CloudImageGallery";
 import { Button } from "~/components/ui/button";
@@ -61,9 +61,9 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const folder = `${getCloudinaryUploadFolder()}/event-${eventId}`;
    const contentType = request.headers.get("Content-Type");
-   console.log(contentType);
+   const isMulitipart = contentType?.includes("multipart/form-data");
 
-   if (request.method === "POST" && contentType === "multipart/form-data") {
+   if (request.method === "POST" && isMulitipart) {
       const uploadHandler = unstable_composeUploadHandlers(
          // our custom upload handler
          async ({ name, data }) => {
@@ -92,7 +92,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    const event = await getEvent(eventId);
 
    if (intent === "generateZipUrl") {
-      const zipUrl = getZipDownloadUrls(folder, event.title);
+      const zipUrl = generateZip(folder, event.title);
       await updateEvent(eventId, { zipUrl });
       return { ok: true, zipUrl };
    }

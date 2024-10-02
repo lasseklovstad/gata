@@ -25,7 +25,7 @@ export const uploadImage = (data: string, folder: string) => {
    });
 };
 
-export const getZipDownloadUrls = (folderName: string, zipName: string) => {
+export const generateZip = (folderName: string, zipName: string) => {
    const zipUrl = cloudinary.v2.utils.download_zip_url({
       resource_type: "all",
       prefixes: folderName,
