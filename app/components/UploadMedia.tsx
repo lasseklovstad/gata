@@ -1,5 +1,5 @@
 import { useFetcher } from "@remix-run/react";
-import { Image, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import { Input } from "~/components/ui/input";
 import { Typography } from "~/components/ui/typography";
@@ -17,10 +17,6 @@ export const UploadMedia = ({ eventId }: Props) => {
    const encType = "multipart/form-data";
    return (
       <>
-         <Typography variant="h3" className="flex gap-2 items-center flex-wrap">
-            <Image />
-            Last opp bilder og video
-         </Typography>
          {/* Important with max-w-full for iphone not extending out of screen */}
          <fetcher.Form
             action={actionPath}

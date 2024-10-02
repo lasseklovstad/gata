@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useSearchParams } from "@remix-run/react";
 import { intervalToDuration } from "date-fns";
-import { Vote } from "lucide-react";
+import { Image, Vote } from "lucide-react";
 import { useEffect, useId } from "react";
 import { z } from "zod";
 
@@ -139,6 +139,10 @@ export default function EventActivities() {
                </ul>
             </>
          ) : null}
+         <Typography variant="h3" className="flex gap-2 items-center flex-wrap">
+            <Image />
+            Last opp bilder og video
+         </Typography>
          <UploadMedia eventId={eventId} />
          <CloudImageGallery cloudImages={cloudinaryImages.slice(0, 8)} />
          {cloudinaryImages.length ? (

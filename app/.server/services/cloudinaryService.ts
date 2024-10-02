@@ -25,6 +25,16 @@ export const uploadImage = (data: string, folder: string) => {
    });
 };
 
+export const generateZip = (folderName: string, zipName: string) => {
+   const zipUrl = cloudinary.v2.utils.download_zip_url({
+      resource_type: "all",
+      prefixes: folderName,
+      flatten_folders: true,
+      target_public_id: zipName,
+   });
+   return zipUrl;
+};
+
 export const deleteImage = (publicId: string) => {
    return new Promise((resolve, reject) => {
       void cloudinary.v2.uploader.destroy(publicId, (error, result) => {

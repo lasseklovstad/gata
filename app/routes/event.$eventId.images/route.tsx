@@ -5,7 +5,7 @@ import {
    unstable_parseMultipartFormData,
 } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
-import { Trash } from "lucide-react";
+import { Image, Trash } from "lucide-react";
 import { useId, useState } from "react";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
@@ -16,8 +16,9 @@ import {
    getEvent,
    getEventCloudinaryImages,
    insertCloudinaryImage,
+   updateEvent,
 } from "~/.server/db/gataEvent";
-import { deleteImage, uploadImageToCloudinary } from "~/.server/services/cloudinaryService";
+import { deleteImage, generateZip, uploadImageToCloudinary } from "~/.server/services/cloudinaryService";
 import { CloudImageCheckbox } from "~/components/CloudImageCheckbox";
 import { CloudImageGallery } from "~/components/CloudImageGallery";
 import { Button } from "~/components/ui/button";
@@ -28,6 +29,8 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { getCloudinaryUploadFolder } from "~/utils/cloudinaryUtils";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
 import { badRequest } from "~/utils/responseUtils";
+
+import { DownloadZip } from "./DownloadZip";
 
 const paramSchema = z.object({
    eventId: z.coerce.number(),
@@ -56,15 +59,18 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    const { eventId } = paramsParsed.data;
 
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
+   const folder = `${getCloudinaryUploadFolder()}/event-${eventId}`;
+   const contentType = request.headers.get("Content-Type");
+   const isMulitipart = contentType?.includes("multipart/form-data");
 
-   if (request.method === "POST") {
+   if (request.method === "POST" && isMulitipart) {
       const uploadHandler = unstable_composeUploadHandlers(
          // our custom upload handler
          async ({ name, data }) => {
             if (name !== "image") {
                return undefined;
             }
-            const folder = `${getCloudinaryUploadFolder()}/event-${eventId}`;
+
             const response = await uploadImageToCloudinary(data, folder);
             const { secure_url, public_id, width, height } = response;
             await insertCloudinaryImage(eventId, { cloudId: public_id, cloudUrl: secure_url, width, height });
@@ -84,6 +90,13 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    const intent = formdata.get("intent") as string;
 
    const event = await getEvent(eventId);
+
+   if (intent === "generateZipUrl") {
+      const zipUrl = generateZip(folder, event.title);
+      await updateEvent(eventId, { zipUrl });
+      return { ok: true, zipUrl };
+   }
+
    if (!isUserOrganizer(event, loggedInUser)) {
       throw badRequest("Du har ikke tilgang til å endre denne ressursen");
    }
@@ -103,11 +116,19 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 export default function EventImages() {
    const { cloudinaryImages, event, loggedInUser } = useLoaderData<typeof loader>();
    const [mode, setMode] = useState<"default" | "mark">("default");
+
    const fetcher = useFetcher<typeof action>();
    const formId = useId();
    const isOrganizer = isUserOrganizer(event, loggedInUser);
    return (
       <div className="flex flex-col gap-2">
+         <div className="flex gap-2 justify-between">
+            <Typography variant="h3" className="flex gap-2 items-center flex-wrap">
+               <Image />
+               Last opp bilder og video
+            </Typography>
+            {isOrganizer ? <DownloadZip event={event} /> : null}
+         </div>
          <UploadMedia eventId={event.id} />
          {cloudinaryImages.length === 0 ? (
             <Typography>Ingen bilder lastet opp enda...</Typography>
