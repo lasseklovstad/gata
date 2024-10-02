@@ -30,13 +30,17 @@ export const EventFormPage = (page: Page) => {
       if (startTime) {
          await inputTime.fill(startTime);
       }
-      await groupVisibility.getByRole("radio", { name: visibility }).check();
+      await selectVisibility(visibility);
       if (startDate) {
          await buttonOpenDatePicker.click();
          const dateDialog = page.getByRole("dialog", { name: "Velg dato" });
          await expect(dateDialog).toBeVisible();
          await selectDate(startDate, dateDialog);
       }
+   };
+
+   const selectVisibility = async (name: "Alle" | "Arrangører") => {
+      await groupVisibility.getByRole("radio", { name }).check();
    };
 
    const verifyForm = async ({ title, description, startTime, startDate }: GataEventForm) => {
@@ -63,5 +67,5 @@ export const EventFormPage = (page: Page) => {
       await eventFormPage.submit();
    };
 
-   return { fillForm, submit, cancel, inputTitle, inputDescription, verifyForm, createEvent };
+   return { fillForm, submit, cancel, inputTitle, inputDescription, verifyForm, createEvent, selectVisibility };
 };

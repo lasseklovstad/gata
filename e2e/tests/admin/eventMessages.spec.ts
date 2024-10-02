@@ -73,7 +73,7 @@ test.describe("Events (Admin created)", () => {
 
       await test.step("Verify event is hidden", async () => {
          await homePage.goto();
-         await expect(homePage.welcomeTitle).toBeVisible();
+         await expect(homePage.memberWelcomeTitle).toBeVisible();
          await expect(homePage.getEventLink("Arr for alle")).toBeVisible();
          await expect(homePage.getEventLink("Arr kunn for arrangører 1")).toBeHidden();
          await expect(homePage.getEventLink("Arr kunn for arrangører 2")).toBeHidden();
@@ -95,6 +95,23 @@ test.describe("Events (Admin created)", () => {
          await expect(homePage.getEventLink("Arr for alle")).toBeVisible();
          await expect(homePage.getEventLink("Arr kunn for arrangører 1")).toBeVisible();
          await expect(homePage.getEventLink("Arr kunn for arrangører 2")).toBeHidden();
+      });
+
+      await test.step("Goto event 2 as admin and change visiblity", async () => {
+         const homePage = HomePage(adminPage);
+         const eventPage = EventPage(adminPage);
+         const eventFormPage = EventFormPage(adminPage);
+         await homePage.gotoEvent("Arr kunn for arrangører 2");
+         await eventPage.openMenu("Rediger");
+         await eventFormPage.selectVisibility("Alle");
+         await eventFormPage.submit();
+      });
+
+      await test.step("Member should now have access to all hidden events", async () => {
+         await homePage.goto();
+         await expect(homePage.getEventLink("Arr for alle")).toBeVisible();
+         await expect(homePage.getEventLink("Arr kunn for arrangører 1")).toBeVisible();
+         await expect(homePage.getEventLink("Arr kunn for arrangører 2")).toBeVisible();
       });
    });
 });
