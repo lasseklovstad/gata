@@ -72,6 +72,7 @@ test.describe("Events (Admin created)", () => {
       const homePage = HomePage(memberPage);
 
       await test.step("Verify event is hidden", async () => {
+         await homePage.goto();
          await expect(homePage.welcomeTitle).toBeVisible();
          await expect(homePage.getEventLink("Arr for alle")).toBeVisible();
          await expect(homePage.getEventLink("Arr kunn for arrangører 1")).toBeHidden();
