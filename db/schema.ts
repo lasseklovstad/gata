@@ -145,6 +145,9 @@ export const gataEvent = sqliteTable("gata_event", {
    startDate: text("start_date"), // yyyy-MM-dd
    startTime: text("start_time"), // kk.mm
    createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
+   visibility: text("visibility", { enum: ["everyone", "event-organizers"] })
+      .default("everyone")
+      .notNull(),
    zipUrl: text("zip_url"),
 });
 

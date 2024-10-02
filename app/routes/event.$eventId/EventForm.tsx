@@ -6,7 +6,15 @@ import { DayPicker } from "react-day-picker";
 
 import type { GataEvent } from "~/.server/db/gataEvent";
 import { Button } from "~/components/ui/button";
-import { FormControl, FormItem, FormLabel, FormMessage } from "~/components/ui/form";
+import {
+   FormControl,
+   FormDescription,
+   FormFieldset,
+   FormItem,
+   FormLabel,
+   FormLegend,
+   FormMessage,
+} from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
@@ -35,6 +43,35 @@ export const EventForm = ({ event }: Props) => {
             <FormControl
                render={(props) => <Textarea {...props} defaultValue={event?.description} autoComplete="off" />}
             />
+            <FormMessage />
+         </FormItem>
+         <FormItem name="visibility">
+            <FormFieldset>
+               <FormLegend className="mb-2">Velg synlighet</FormLegend>
+               <div className="flex gap-2 mb-2">
+                  <Label className="flex items-center gap-2 cursor-pointer">
+                     <input
+                        className="size-4"
+                        type="radio"
+                        name="visibility"
+                        value="everyone"
+                        defaultChecked={!event || event.visibility === "everyone"}
+                     />
+                     Alle
+                  </Label>
+                  <Label className="flex items-center gap-2 cursor-pointer">
+                     <input
+                        className="size-4"
+                        type="radio"
+                        name="visibility"
+                        value="event-organizers"
+                        defaultChecked={event?.visibility === "event-organizers"}
+                     />
+                     Arrangører
+                  </Label>
+               </div>
+               <FormDescription>Hvis du velger alle vil det sendes ut en notifikasjon til alle i Gata</FormDescription>
+            </FormFieldset>
             <FormMessage />
          </FormItem>
          <div className="flex gap-8">

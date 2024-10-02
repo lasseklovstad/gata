@@ -57,6 +57,13 @@
       "when": 1727886742491,
       "tag": "0007_zippy_pretty_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1727897118306,
+      "tag": "0008_freezing_phalanx",
+      "breakpoints": true
     }
   ]
 }

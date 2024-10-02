@@ -17,7 +17,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
    const loggedInUser = auth?.id ? ((await getOptionalUserFromExternalUserId(auth.id)) ?? undefined) : undefined;
    return {
       reports: isMember(loggedInUser) ? await getReportsWithContent(ReportType.NEWS) : undefined,
-      events: isMember(loggedInUser) ? await getUpCommingEvents() : undefined,
+      events: isMember(loggedInUser) ? await getUpCommingEvents(loggedInUser.id) : undefined,
    };
 };
 

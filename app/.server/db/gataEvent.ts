@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, exists, or, sql } from "drizzle-orm";
 
 import { db } from "db/config.server";
 import {
@@ -15,7 +15,10 @@ import {
    poll,
    pollOption,
    pollVote,
+   role,
+   userRoles,
 } from "db/schema";
+import { RoleName } from "~/utils/roleUtils";
 
 import type { User } from "./user";
 
@@ -27,8 +30,33 @@ export const insertEvent = async (event: Omit<typeof gataEvent.$inferInsert, "cr
    });
 };
 
-export const getUpCommingEvents = async () => {
-   return await db.select().from(gataEvent).orderBy(desc(gataEvent.id));
+export const getUpCommingEvents = async (loggedInUserId: string) => {
+   return await db
+      .select()
+      .from(gataEvent)
+      .where(
+         or(
+            eq(gataEvent.visibility, "everyone"),
+            and(
+               // Filter out event only visible to event organizers and admins
+               eq(gataEvent.visibility, "event-organizers"),
+               exists(
+                  db
+                     .select({ userId: eventOrganizer.userId })
+                     .from(eventOrganizer)
+                     .innerJoin(userRoles, eq(userRoles.usersId, loggedInUserId))
+                     .innerJoin(role, eq(role.id, userRoles.roleId))
+                     .where(
+                        or(
+                           and(eq(eventOrganizer.eventId, gataEvent.id), eq(eventOrganizer.userId, loggedInUserId)),
+                           eq(role.roleName, RoleName.Admin)
+                        )
+                     )
+               )
+            )
+         )
+      )
+      .orderBy(desc(gataEvent.id));
 };
 
 export type GataEvent = Awaited<ReturnType<typeof getEvent>>;

@@ -15,6 +15,7 @@ export const eventSchema = zfd.formData({
          .regex(/\d{2}:\d{2}/)
          .optional()
    ),
+   visibility: zfd.text(z.enum(["everyone", "event-organizers"])),
 });
 
 export type EventSchema = z.infer<typeof eventSchema>;
