@@ -11,6 +11,7 @@ export type GataEventForm = {
    description: string;
    startTime?: string;
    startDate?: Date;
+   visibility?: "Alle" | "Arrangører";
 };
 
 export const EventFormPage = (page: Page) => {
@@ -18,16 +19,18 @@ export const EventFormPage = (page: Page) => {
    const inputTitle = dialog.getByLabel("Tittel");
    const inputDescription = dialog.getByLabel("Beskrivelse");
    const inputTime = dialog.getByLabel("Starttidspunkt");
+   const groupVisibility = dialog.getByRole("group", { name: "Velg synlighet" });
    const inputDate = dialog.locator('input[type="date"]');
    const buttonOpenDatePicker = dialog.getByRole("button", { name: "Åpne kalender" });
 
-   const fillForm = async ({ title, description, startTime, startDate }: GataEventForm) => {
+   const fillForm = async ({ title, description, startTime, startDate, visibility = "Alle" }: GataEventForm) => {
       await expect(dialog).toBeVisible();
       await inputTitle.fill(title);
       await inputDescription.fill(description);
       if (startTime) {
          await inputTime.fill(startTime);
       }
+      await groupVisibility.getByRole("radio", { name: visibility }).check();
       if (startDate) {
          await buttonOpenDatePicker.click();
          const dateDialog = page.getByRole("dialog", { name: "Velg dato" });
