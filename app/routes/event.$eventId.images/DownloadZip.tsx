@@ -7,7 +7,6 @@ import type { GataEvent } from "~/.server/db/gataEvent";
 import { Button } from "~/components/ui/button";
 import { DialogHeading, DialogCloseButton, DialogFooter, Dialog } from "~/components/ui/dialog";
 import { Typography } from "~/components/ui/typography";
-import { formatDateTime } from "~/utils/date.utils";
 import { useDialog } from "~/utils/dialogUtils";
 
 import type { action } from "./route";
@@ -25,6 +24,7 @@ export const DownloadZip = ({ event }: Props) => {
    const timestampString = zipUrl ? new URL(zipUrl).searchParams.get("timestamp") : undefined;
    const timestamp = timestampString ? parseInt(timestampString) * 1000 : undefined;
    const timestampNow = new Date().valueOf();
+   // Link invalidates after one hour
    const linkInvalid = timestamp ? timestamp + 1000 * 60 * 60 > timestampNow : false;
 
    return (
