@@ -43,18 +43,21 @@ export const updateEventAndNotify = async (
       startDate: startDate ?? null,
       visibility,
    });
-   const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, loggedInUser.id);
+
    const event = await getEvent(eventId);
-   await sendPushNotification(
-      subscriptions.map((s) => s.subscription as PushSubscription),
-      {
-         body: `📅 Arrangement ${event.title} er oppdatert`,
-         data: { url: `/event/${eventId}` },
-         icon: "/logo192.png",
-      }
-   );
+
    if (shouldNotifyNewEvent) {
       await notifyNewEvent(loggedInUser, event.title, event.id);
+   } else {
+      const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, loggedInUser.id);
+      await sendPushNotification(
+         subscriptions.map((s) => s.subscription as PushSubscription),
+         {
+            body: `📅 Arrangement ${event.title} er oppdatert`,
+            data: { url: `/event/${eventId}` },
+            icon: "/logo192.png",
+         }
+      );
    }
 };
 
