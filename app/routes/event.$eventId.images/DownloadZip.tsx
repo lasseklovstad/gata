@@ -20,7 +20,7 @@ export const DownloadZip = ({ event }: Props) => {
 
    const fetcherZip = useFetcher<typeof action>();
 
-   const zipUrl = fetcherZip.data ? fetcherZip.data.zipUrl : event.zipUrl;
+   const zipUrl = fetcherZip.data && "zipUrl" in fetcherZip.data ? fetcherZip.data.zipUrl : event.zipUrl;
    const timestampString = zipUrl ? new URL(zipUrl).searchParams.get("timestamp") : undefined;
    const timestamp = timestampString ? parseInt(timestampString) * 1000 : undefined;
    const timestampNow = new Date().valueOf();
