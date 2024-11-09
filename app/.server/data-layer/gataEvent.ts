@@ -15,9 +15,10 @@ import { sendPushNotification } from "../services/pushNoticiationService";
 export const updateParticipatingAndNotify = async (
    loggedInUser: User,
    eventId: number,
-   status: "going" | "notGoing"
+   status: "going" | "notGoing" | undefined,
+   unsubscribed: boolean
 ) => {
-   await updateIsUserParticipating(eventId, loggedInUser.id, status === "going");
+   await updateIsUserParticipating(eventId, loggedInUser.id, status ? status === "going" : null, unsubscribed);
    const event = await getEvent(eventId);
    const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, loggedInUser.id);
    await sendPushNotification(

@@ -216,11 +216,19 @@ export const getEventParticipants = async (eventId: number) => {
    });
 };
 
-export const updateIsUserParticipating = async (eventId: number, userId: string, isParticipating: boolean) => {
+export const updateIsUserParticipating = async (
+   eventId: number,
+   userId: string,
+   isParticipating: boolean | null,
+   unsubscribed: boolean
+) => {
    await db
       .insert(eventParticipants)
-      .values({ eventId, userId, isParticipating })
-      .onConflictDoUpdate({ target: [eventParticipants.eventId, eventParticipants.userId], set: { isParticipating } });
+      .values({ eventId, userId, isParticipating, unsubscribed })
+      .onConflictDoUpdate({
+         target: [eventParticipants.eventId, eventParticipants.userId],
+         set: { isParticipating, unsubscribed },
+      });
 };
 
 export const getEventMessages = async (eventId: number) => {

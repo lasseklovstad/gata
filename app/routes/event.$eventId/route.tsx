@@ -61,7 +61,8 @@ const organizersUpdateSchema = zfd.formData({
 });
 
 const updateParticipatingSchema = zfd.formData({
-   status: zfd.text(z.enum(["going", "notGoing"])),
+   status: zfd.text(z.enum(["going", "notGoing"]).optional()),
+   subscribed: zfd.checkbox(),
 });
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
@@ -76,8 +77,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    const intent = formdata.get("intent") as string;
    const event = await getEvent(eventId);
    if (intent === "updateParticipating") {
-      const { status } = updateParticipatingSchema.parse(formdata);
-      await updateParticipatingAndNotify(loggedInUser, eventId, status);
+      const { status, subscribed } = updateParticipatingSchema.parse(formdata);
+      await updateParticipatingAndNotify(loggedInUser, eventId, status, !subscribed);
       return { ok: true };
    }
 

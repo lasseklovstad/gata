@@ -1,0 +1,1 @@
+ALTER TABLE `event_participants` ADD `unsubscribed` integer DEFAULT false NOT NULL;
