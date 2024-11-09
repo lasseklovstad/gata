@@ -102,7 +102,10 @@ export const AttendingSelect = ({ eventParticipants, loggedInUser }: Props) => {
                   <FormDescription>Skru av push notifikasjoner</FormDescription>
                </FormItem>
             ) : (
-               <PushSubscription />
+               <>
+                  <input hidden readOnly name="subscribed" value="on" />
+                  <PushSubscription />
+               </>
             )}
             <input hidden readOnly name="intent" value="updateParticipating" />
          </div>
