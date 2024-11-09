@@ -8,7 +8,7 @@ import { AvatarUser } from "~/components/AvatarUser";
 import { AvatarUserList } from "~/components/AvatarUserList";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogCloseButton, DialogHeading } from "~/components/ui/dialog";
-import { FormControl, FormItem, FormLabel } from "~/components/ui/form";
+import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
 import { Label } from "~/components/ui/label";
 import { NativeSelect } from "~/components/ui/native-select";
 import { Switch } from "~/components/ui/switch";
@@ -46,7 +46,9 @@ export const AttendingSelect = ({ eventParticipants, loggedInUser }: Props) => {
                   name="status"
                   onChange={() => $form.current?.requestSubmit()}
                >
-                  <option value="">Ikke valgt</option>
+                  <option value="" disabled>
+                     Ikke valgt
+                  </option>
                   <option value="going">Skal</option>
                   <option value="notGoing">Kan ikke</option>
                </NativeSelect>
@@ -78,19 +80,22 @@ export const AttendingSelect = ({ eventParticipants, loggedInUser }: Props) => {
                   </ul>
                </Dialog>
             </div>
-            <FormItem name="subscribed" className="p-2 flex justify-between items-center w-fit gap-2">
-               <FormLabel className="flex gap-2 items-center">
-                  <Bell /> Notifikasjoner
-               </FormLabel>
-               <FormControl
-                  render={(props) => (
-                     <Switch
-                        {...props}
-                        defaultChecked={!isLoggedInUserParticipating?.unsubscribed}
-                        onCheckedChange={() => $form.current?.requestSubmit()}
-                     />
-                  )}
-               />
+            <FormItem name="subscribed">
+               <div className="p-1 flex justify-between items-center w-fit gap-2">
+                  <FormLabel className="flex gap-2 items-center">
+                     <Bell /> Notifikasjoner
+                  </FormLabel>
+                  <FormControl
+                     render={(props) => (
+                        <Switch
+                           {...props}
+                           defaultChecked={!isLoggedInUserParticipating?.unsubscribed}
+                           onCheckedChange={() => $form.current?.requestSubmit()}
+                        />
+                     )}
+                  />
+               </div>
+               <FormDescription>Skru av push notifikasjoner</FormDescription>
             </FormItem>
             <input hidden readOnly name="intent" value="updateParticipating" />
          </div>

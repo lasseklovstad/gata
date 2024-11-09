@@ -2,7 +2,7 @@ import type { PushSubscription } from "web-push";
 
 import type { EventSchema } from "~/utils/schemas/eventSchema";
 
-import { getEvent, insertEvent, updateEvent, updateIsUserParticipating } from "../db/gataEvent";
+import { getEvent, getEventParticipant, insertEvent, updateEvent, updateIsUserParticipating } from "../db/gataEvent";
 import {
    getAllSubscriptions,
    getAllSubscriptionsNotUnsubscribedEvent,
@@ -18,17 +18,23 @@ export const updateParticipatingAndNotify = async (
    status: "going" | "notGoing" | undefined,
    unsubscribed: boolean
 ) => {
-   await updateIsUserParticipating(eventId, loggedInUser.id, status ? status === "going" : null, unsubscribed);
-   const event = await getEvent(eventId);
-   const subscriptions = await getAllSubscriptionsNotUnsubscribedEvent(eventId, loggedInUser.id);
-   await sendPushNotification(
-      subscriptions.map((s) => s.subscription as PushSubscription),
-      {
-         body: `${status === "going" ? "✔️" : "❌"} ${loggedInUser.name} ${status === "going" ? "skal delta på" : "kan ikke delta på"} arrangement ${event.title}`,
-         data: { url: `/event/${eventId}` },
-         icon: "/logo192.png",
-      }
-   );
+   const oldEventParticipant = await getEventParticipant(eventId, loggedInUser.id);
+   const isParticipating = status ? status === "going" : null;
+   await updateIsUserParticipating(eventId, loggedInUser.id, isParticipating, unsubscribed);
+
+   if (isParticipating !== null && oldEventParticipant?.isParticipating !== isParticipating) {
+      const event = await getEvent(eventId);
+      const subscriptions = await getAllSubscriptionsNotUnsubscribedEvent(eventId, loggedInUser.id);
+
+      await sendPushNotification(
+         subscriptions.map((s) => s.subscription as PushSubscription),
+         {
+            body: `${status === "going" ? "✔️" : "❌"} ${loggedInUser.name} ${status === "going" ? "skal delta på" : "kan ikke delta på"} arrangement ${event.title}`,
+            data: { url: `/event/${eventId}` },
+            icon: "/logo192.png",
+         }
+      );
+   }
 };
 
 export const updateEventAndNotify = async (

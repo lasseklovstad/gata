@@ -216,6 +216,13 @@ export const getEventParticipants = async (eventId: number) => {
    });
 };
 
+export const getEventParticipant = async (eventId: number, userId: string) => {
+   return await db.query.eventParticipants.findFirst({
+      where: and(eq(eventParticipants.eventId, eventId), eq(eventParticipants.userId, userId)),
+      with: { user: { with: { primaryUser: true } } },
+   });
+};
+
 export const updateIsUserParticipating = async (
    eventId: number,
    userId: string,
