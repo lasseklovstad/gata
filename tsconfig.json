@@ -6,7 +6,7 @@
     "**/.server/**/*.tsx",
     "**/.client/**/*.ts",
     "**/.client/**/*.tsx",
-    ".eslintrc.cjs",
+    "eslint.config.js",
     "postcss.config.cjs",
     "server.mjs",
     "launch-webkit.js",

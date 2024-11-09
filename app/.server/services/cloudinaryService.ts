@@ -1,6 +1,5 @@
 import { writeReadableStreamToWritable } from "@remix-run/node"; // `writeAsyncIterableToWritable` is a Node-only utility
 import type { UploadApiResponse } from "cloudinary";
-// eslint-disable-next-line import/default
 import cloudinary from "cloudinary";
 
 cloudinary.v2.config({
@@ -16,7 +15,7 @@ export const uploadImage = (data: string, folder: string) => {
       void cloudinary.v2.uploader.upload(data, { folder }, (error, result) => {
          if (error) {
             console.error(error);
-            reject(error);
+            reject(error as Error);
          }
          if (result) {
             resolve(result);
@@ -39,7 +38,7 @@ export const deleteImage = (publicId: string) => {
    return new Promise((resolve, reject) => {
       void cloudinary.v2.uploader.destroy(publicId, (error, result) => {
          if (error) {
-            reject(error);
+            reject(error as Error);
          } else {
             resolve(result);
          }
@@ -57,7 +56,7 @@ export function uploadImageToCloudinary(data: ReadableStream<Uint8Array>, folder
          (error, result) => {
             if (error) {
                console.error(error);
-               reject(error);
+               reject(error as Error);
                return;
             }
             if (result) {

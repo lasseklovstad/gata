@@ -10,9 +10,10 @@ type RichTextPreviewProps = {
 };
 
 export const RichTextPreview = ({ content }: RichTextPreviewProps) => {
-   const contentParsed: Descendant[] = useMemo(
-      () =>
-         (content && JSON.parse(content)) || [
+   const contentParsed = useMemo(
+      (): Descendant[] =>
+         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+         (content && (JSON.parse(content) as Descendant[])) || [
             {
                type: "body1",
                children: [{ text: "A line of text in a paragraph." }],

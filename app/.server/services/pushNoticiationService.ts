@@ -11,7 +11,6 @@ export const sendPushNotification = async (
 ) => {
    await Promise.all(
       subscriptions.map((subscription) =>
-         // eslint-disable-next-line import/no-named-as-default-member
          webpush
             .sendNotification(subscription, JSON.stringify(notification), {
                headers: { "Content-Type": "application/json" },

@@ -7,7 +7,10 @@ import type { Auth0User } from "~/types/Auth0User";
 
 import { env } from "./env.server";
 
-const userPreferences = createCookie("user_pref", { maxAge: 60 });
+type UserPreference = {
+   loginPath: string;
+};
+const userPreferences = createCookie("user_pref", { maxAge: 120 });
 
 export const createAuthenticator = () => {
    const sessionStorage = createCookieSessionStorage({
@@ -17,7 +20,7 @@ export const createAuthenticator = () => {
          path: "/",
          httpOnly: true,
          secure: process.env.NODE_ENV === "production",
-         secrets: [env.AUTH0_COOKIE_SECRET!],
+         secrets: [env.AUTH0_COOKIE_SECRET],
          maxAge: 60 * 60 * 24 * 400, // 400 days
       },
    });
@@ -27,10 +30,10 @@ export const createAuthenticator = () => {
    const auth0Strategy = new Auth0Strategy(
       {
          callbackURL: "/callback",
-         clientID: env.AUTH0_CLIENT_ID!,
-         audience: env.AUTH0_AUDIENCE!,
-         clientSecret: env.AUTH0_CLIENT_SECRET!,
-         domain: env.AUTH0_DOMAIN!,
+         clientID: env.AUTH0_CLIENT_ID,
+         audience: env.AUTH0_AUDIENCE,
+         clientSecret: env.AUTH0_CLIENT_SECRET,
+         domain: env.AUTH0_DOMAIN,
       },
       ({ profile }) => {
          const id = profile.id;
@@ -61,7 +64,7 @@ export const createAuthenticator = () => {
       const auth = await authenticator.isAuthenticated(request);
       const url = new URL(request.url);
       const headers = {
-         "Set-Cookie": await userPreferences.serialize({ loginPath: url.pathname }),
+         "Set-Cookie": await userPreferences.serialize({ loginPath: url.pathname } satisfies UserPreference),
       };
 
       if (!auth) {
@@ -78,7 +81,9 @@ export const createAuthenticator = () => {
 
    const getSessionLoginPath = async (request: Request) => {
       const cookieHeader = request.headers.get("Cookie");
-      const path = (await userPreferences.parse(cookieHeader))?.loginPath;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const userPreference: UserPreference | null = await userPreferences.parse(cookieHeader);
+      const path = userPreference?.loginPath;
       return path;
    };
 

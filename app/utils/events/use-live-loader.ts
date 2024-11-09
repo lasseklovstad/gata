@@ -10,7 +10,6 @@ export function useLiveLoader<T>() {
 
    useEffect(() => {
       revalidate();
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- "we know better" — Moishi
    }, [data]);
 
    return useLoaderData<T>();

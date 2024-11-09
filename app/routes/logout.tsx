@@ -12,7 +12,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
    const url = new URL(request.url);
    url.protocol = url.hostname === "localhost" ? "http:" : "https:";
    const returnTo = url.origin;
-   logoutURL.searchParams.set("client_id", env.AUTH0_CLIENT_ID!);
+   logoutURL.searchParams.set("client_id", env.AUTH0_CLIENT_ID);
    logoutURL.searchParams.set("returnTo", returnTo);
 
    return redirect(logoutURL.toString(), {

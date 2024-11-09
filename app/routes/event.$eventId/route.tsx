@@ -133,8 +133,8 @@ export default function EventPage() {
                         <Button
                            size="icon"
                            variant="ghost"
-                           onClick={async () => {
-                              await navigator.clipboard.writeText(`${location.origin}/event/${event.id}/public`);
+                           onClick={() => {
+                              void navigator.clipboard.writeText(`${location.origin}/event/${event.id}/public`);
                            }}
                         >
                            <span className="sr-only">Kopier link for å dele</span>

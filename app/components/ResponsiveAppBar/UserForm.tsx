@@ -173,8 +173,12 @@ export const UserForm = ({
                   <Switch
                      {...props}
                      checked={subscription !== null}
-                     onCheckedChange={async (checked) => {
-                        await (checked ? subscribe() : unsubscribe());
+                     onCheckedChange={(checked) => {
+                        if (checked) {
+                           void subscribe();
+                        } else {
+                           void unsubscribe();
+                        }
                      }}
                   />
                )}

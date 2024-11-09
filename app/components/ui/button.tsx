@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { Loader2 } from "lucide-react";
 import type React from "react";
-import type { ComponentProps, ElementType, ForwardedRef, ReactNode } from "react";
+import type { ComponentProps, ElementType, ForwardedRef, LegacyRef, ReactNode } from "react";
 import { forwardRef } from "react";
 
 import { cn } from "~/utils";
@@ -33,25 +33,26 @@ const buttonVariants = cva(
 );
 
 type Props<T extends React.ElementType = "button"> = VariantProps<typeof buttonVariants> &
-   ComponentProps<T> & {
+   Omit<ComponentProps<T>, "className"> & {
       as?: T;
       isLoading?: boolean;
+      className?: string;
    };
 
 type ButtonComponent = <T extends React.ElementType = "button">(props: Props<T>) => ReactNode;
 
 export const Button: ButtonComponent = forwardRef(
    <T extends React.ElementType = "button">(
-      { className, variant, size, as, children, isLoading, ...props }: Props<T>,
+      { className, variant, size, as, children, isLoading, disabled, ...props }: Props<T>,
       ref?: ForwardedRef<ElementType<T>>
    ) => {
       const Comp = as ?? "button";
       return (
          <Comp
             className={cn(buttonVariants({ variant, size, className }))}
+            disabled={disabled || isLoading}
+            ref={ref as LegacyRef<HTMLButtonElement>}
             {...props}
-            disabled={props.disabled || isLoading}
-            ref={ref}
          >
             {size === "icon" ? (
                <>{isLoading ? <Loader2 className=" h-6 w-6 animate-spin" /> : children}</>
@@ -69,7 +70,7 @@ export const Button: ButtonComponent = forwardRef(
 type ButtonResponsiveProps = {
    label: string;
    icon: ReactNode;
-} & Omit<ComponentProps<ButtonComponent>, "children" | "size">;
+} & Omit<ComponentProps<ButtonComponent>, "children" | "size" | "className">;
 
 export const ButtonResponsive = ({ label, icon, ...buttonProps }: ButtonResponsiveProps) => {
    return (

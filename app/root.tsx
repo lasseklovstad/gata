@@ -89,7 +89,7 @@ export function Layout({ children }: ComponentProps<never>) {
       if (!standalone) {
          return; // not standalone; no pull to refresh needed
       }
-      // eslint-disable-next-line import/no-named-as-default-member
+
       PullToRefresh.init({
          mainElement: "body",
          instructionsRefreshing: "Laster inn siden på nytt",
@@ -100,7 +100,6 @@ export function Layout({ children }: ComponentProps<never>) {
          },
       });
       return () => {
-         // eslint-disable-next-line import/no-named-as-default-member
          PullToRefresh.destroyAll();
       };
    }, []);
@@ -114,7 +113,7 @@ export default function App() {
    useEffect(() => {
       if (!("serviceWorker" in navigator)) return;
       const sessionStorageKey = "serviceWorkerNavigateUrl";
-      function navigateOnMessage(event: MessageEvent) {
+      function navigateOnMessage(event: MessageEvent<{ url: string }>) {
          if ("url" in event.data) {
             if (loggedInUser) {
                sessionStorage.removeItem(sessionStorageKey);
@@ -210,7 +209,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       return { ok: true };
    }
 
-   return badRequest("Invalid intent");
+   throw badRequest("Invalid intent");
 };
 
 export const useRootLoader = () => {

@@ -29,7 +29,7 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
 
             <Button
                size="icon"
-               onMouseDown={(ev) => ev.preventDefault()}
+               onMouseDown={(ev: React.MouseEvent) => ev.preventDefault()}
                onClick={() => {
                   Transforms.removeNodes(editor, { at: path });
                }}
@@ -47,7 +47,7 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
                {element?.size && element.size > 10 && (
                   <Button
                      size="icon"
-                     onMouseDown={(ev) => ev.preventDefault()}
+                     onMouseDown={(ev: React.MouseEvent) => ev.preventDefault()}
                      onClick={() => {
                         Transforms.setNodes<Element>(editor, { type: "image", size: (element.size || 0) - 10 });
                      }}
@@ -59,7 +59,7 @@ export const SlateImage = ({ attributes, children, element }: Partial<RenderElem
                {element?.size && element.size < 100 && (
                   <Button
                      size="icon"
-                     onMouseDown={(ev) => ev.preventDefault()}
+                     onMouseDown={(ev: React.MouseEvent) => ev.preventDefault()}
                      onClick={() => {
                         Transforms.setNodes<Element>(editor, { type: "image", size: (element.size || 0) + 10 });
                      }}

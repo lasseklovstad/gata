@@ -30,8 +30,9 @@ export const RichTextEditor = ({ onCancel, onSave, isLoading, initialContent }: 
    const renderLeaf = useCallback((props: RenderLeafProps) => {
       return <RichTextLeaf {...props} />;
    }, []);
-   const initialValue: Descendant[] = useMemo(() => {
-      const contentParsed = (initialContent && JSON.parse(initialContent)) || [];
+   const initialValue = useMemo((): Descendant[] => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      const contentParsed = (initialContent && (JSON.parse(initialContent) as Descendant[])) || [];
       return contentParsed.length
          ? contentParsed
          : [
@@ -41,7 +42,7 @@ export const RichTextEditor = ({ onCancel, onSave, isLoading, initialContent }: 
               },
            ];
    }, [initialContent]);
-   const content = useRef<Descendant[]>(initialValue);
+   const content = useRef(initialValue);
 
    const handleSave = useCallback(
       (close: boolean) => {

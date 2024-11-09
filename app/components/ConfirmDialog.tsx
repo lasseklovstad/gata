@@ -47,7 +47,13 @@ export const ConfirmDialog = ({
                </Button>
             ) : (
                <>
-                  <Button onClick={onConfirm} isLoading={isLoading} disabled={disabled}>
+                  <Button
+                     onClick={() => {
+                        void onConfirm();
+                     }}
+                     isLoading={isLoading}
+                     disabled={disabled}
+                  >
                      Jeg er sikker
                   </Button>
                   <Button onClick={onClose} variant="ghost">

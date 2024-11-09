@@ -44,7 +44,7 @@ export const sendMail = async (mailData: MailData) => {
       if (response.ok) {
          console.log("Email sent successfully!");
       } else {
-         const errorData = await response.json();
+         const errorData: unknown = await response.json();
          console.error("Error sending email:", errorData);
       }
    } catch (error) {

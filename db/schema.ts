@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import { blob, integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 import { env } from "~/utils/env.server";
+import type { RoleName } from "~/utils/roleUtils";
 
 export const user = sqliteTable("gata_user", {
    id: text("id")
@@ -30,7 +31,7 @@ export const role = sqliteTable("gata_role", {
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
    name: text("name").notNull(),
-   roleName: integer("role_name").default(0).notNull().unique(),
+   roleName: integer("role_name").default(0).notNull().unique().$type<RoleName>(),
 });
 
 export type Role = typeof role.$inferSelect;
