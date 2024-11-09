@@ -1,6 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useSearchParams } from "@remix-run/react";
-import { intervalToDuration } from "date-fns";
 import { Image, Vote } from "lucide-react";
 import { useEffect, useId } from "react";
 import { z } from "zod";
@@ -25,7 +24,7 @@ import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { cn } from "~/utils";
 import { createAuthenticator } from "~/utils/auth.server";
-import { formatDateTime, getDateWithTimeZone } from "~/utils/date.utils";
+import { formatDateTime } from "~/utils/date.utils";
 import { emitter } from "~/utils/events/emitter.server";
 import { useLiveLoader } from "~/utils/events/use-live-loader";
 import { badRequest } from "~/utils/responseUtils";
