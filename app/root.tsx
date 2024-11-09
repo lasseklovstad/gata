@@ -35,6 +35,7 @@ import { createAuthenticator } from "./utils/auth.server";
 import { env } from "./utils/env.server";
 import { badRequest } from "./utils/responseUtils";
 import { profileSchema } from "./utils/schemas/profileSchema";
+import { useRevalidateOnFocus } from "./utils/useRevalidateOnFocus";
 import { transformErrorResponse } from "./utils/validateUtils";
 
 export const meta: MetaFunction = () => {
@@ -109,6 +110,7 @@ export function Layout({ children }: ComponentProps<never>) {
 export default function App() {
    const { auth0User, loggedInUser, version, pwaPublicKey } = useLoaderData<typeof loader>();
    const navigate = useNavigate();
+   useRevalidateOnFocus();
 
    useEffect(() => {
       if (!("serviceWorker" in navigator)) return;
