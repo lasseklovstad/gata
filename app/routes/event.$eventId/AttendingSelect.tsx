@@ -6,6 +6,8 @@ import type { EventParticipant } from "~/.server/db/gataEvent";
 import type { User } from "~/.server/db/user";
 import { AvatarUser } from "~/components/AvatarUser";
 import { AvatarUserList } from "~/components/AvatarUserList";
+import { usePushSubscriptionContext } from "~/components/PushSubscriptionContext";
+import { PushSubscription } from "~/components/ResponsiveAppBar/PushSubscription";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogCloseButton, DialogHeading } from "~/components/ui/dialog";
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
@@ -20,6 +22,7 @@ type Props = {
 };
 
 export const AttendingSelect = ({ eventParticipants, loggedInUser }: Props) => {
+   const { subscription } = usePushSubscriptionContext();
    const dialog = useDialog({ defaultOpen: false });
    const selectId = useId();
    const $form = useRef<HTMLFormElement>(null);
@@ -80,23 +83,27 @@ export const AttendingSelect = ({ eventParticipants, loggedInUser }: Props) => {
                   </ul>
                </Dialog>
             </div>
-            <FormItem name="subscribed">
-               <div className="p-1 flex justify-between items-center w-fit gap-2">
-                  <FormLabel className="flex gap-2 items-center">
-                     <Bell /> Notifikasjoner
-                  </FormLabel>
-                  <FormControl
-                     render={(props) => (
-                        <Switch
-                           {...props}
-                           defaultChecked={!isLoggedInUserParticipating?.unsubscribed}
-                           onCheckedChange={() => $form.current?.requestSubmit()}
-                        />
-                     )}
-                  />
-               </div>
-               <FormDescription>Skru av push notifikasjoner</FormDescription>
-            </FormItem>
+            {subscription ? (
+               <FormItem name="subscribed">
+                  <div className="p-1 flex justify-between items-center w-fit gap-2">
+                     <FormLabel className="flex gap-2 items-center">
+                        <Bell /> Notifikasjoner
+                     </FormLabel>
+                     <FormControl
+                        render={(props) => (
+                           <Switch
+                              {...props}
+                              defaultChecked={!isLoggedInUserParticipating?.unsubscribed}
+                              onCheckedChange={() => $form.current?.requestSubmit()}
+                           />
+                        )}
+                     />
+                  </div>
+                  <FormDescription>Skru av push notifikasjoner</FormDescription>
+               </FormItem>
+            ) : (
+               <PushSubscription />
+            )}
             <input hidden readOnly name="intent" value="updateParticipating" />
          </div>
       </Form>

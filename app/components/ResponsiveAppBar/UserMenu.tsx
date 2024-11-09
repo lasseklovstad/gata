@@ -23,10 +23,9 @@ type UserMenuProps = {
    roleText: string;
    isAuthenticated: boolean;
    loggedInUser: User | undefined;
-   pwaPublicKey: string;
 };
 
-export const UserMenu = ({ roleText, isAuthenticated, loggedInUser, pwaPublicKey }: UserMenuProps) => {
+export const UserMenu = ({ roleText, isAuthenticated, loggedInUser }: UserMenuProps) => {
    const editProfileDialog = useDialog({ defaultOpen: false });
    const fetcher = useFetcher<typeof action>();
    const formRef = useRef<HTMLFormElement>(null);
@@ -88,7 +87,6 @@ export const UserMenu = ({ roleText, isAuthenticated, loggedInUser, pwaPublicKey
                   <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
                      <UserForm
                         user={loggedInUser}
-                        pwaPublicKey={pwaPublicKey}
                         area={area}
                         crop={crop}
                         picture={picture}

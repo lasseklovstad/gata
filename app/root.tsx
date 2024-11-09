@@ -28,6 +28,7 @@ import { useEffect } from "react";
 
 import { getOptionalUserFromExternalUserId, updateUser } from "./.server/db/user";
 import { cropProfileImage } from "./.server/services/localImageService";
+import { PushSubscriptionProvider } from "./components/PushSubscriptionContext";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
 import { Button } from "./components/ui/button";
 import { Typography } from "./components/ui/typography";
@@ -139,21 +140,23 @@ export default function App() {
    }, [navigate, loggedInUser]);
 
    return (
-      <div className="flex flex-col min-h-lvh">
-         <ResponsiveAppBar isLoggedIn={!!auth0User} loggedInUser={loggedInUser} pwaPublicKey={pwaPublicKey} />
-         <main className="mb-8 max-w-[1000px] w-full me-auto ms-auto px-4">
-            <Outlet />
-         </main>
-         <footer className="p-4 flex gap-4 max-w-[1000px] w-full ms-auto me-auto mt-auto items-center">
-            <Button variant="link" as={Link} to="/privacy">
-               Privacy
-            </Button>
-            <Button variant="link" as={Link} to="/about">
-               About
-            </Button>
-            Versjon: {version}
-         </footer>
-      </div>
+      <PushSubscriptionProvider pwaPublicKey={pwaPublicKey}>
+         <div className="flex flex-col min-h-lvh">
+            <ResponsiveAppBar isLoggedIn={!!auth0User} loggedInUser={loggedInUser} />
+            <main className="mb-8 max-w-[1000px] w-full me-auto ms-auto px-4">
+               <Outlet />
+            </main>
+            <footer className="p-4 flex gap-4 max-w-[1000px] w-full ms-auto me-auto mt-auto items-center">
+               <Button variant="link" as={Link} to="/privacy">
+                  Privacy
+               </Button>
+               <Button variant="link" as={Link} to="/about">
+                  About
+               </Button>
+               Versjon: {version}
+            </footer>
+         </div>
+      </PushSubscriptionProvider>
    );
 }
 
