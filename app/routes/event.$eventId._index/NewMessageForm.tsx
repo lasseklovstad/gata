@@ -37,7 +37,13 @@ export const NewMessageForm = () => {
                <FormMessage />
             </FormItem>
          </FormProvider>
-         <Button type="submit" name="intent" value="createMessage" variant="outline">
+         <Button
+            type="submit"
+            name="intent"
+            value="createMessage"
+            variant="outline"
+            isLoading={fetcher.state !== "idle"}
+         >
             <span>Publiser innlegg</span>
             <Send className="ml-2" />
          </Button>

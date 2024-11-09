@@ -236,7 +236,8 @@ export const eventParticipants = sqliteTable(
       userId: text("user_id")
          .notNull()
          .references(() => user.id, { onDelete: "cascade" }),
-      isParticipating: integer("is_participating", { mode: "boolean" }).notNull(),
+      isParticipating: integer("is_participating", { mode: "boolean" }),
+      unsubscribed: integer("unsubscribed", { mode: "boolean" }).notNull().default(false),
    },
    (table) => ({ pk: primaryKey({ columns: [table.eventId, table.userId] }) })
 );

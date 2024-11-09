@@ -2,10 +2,10 @@ import type { PushSubscription } from "web-push";
 
 import type { EventSchema } from "~/utils/schemas/eventSchema";
 
-import { getEvent, insertEvent, updateEvent, updateIsUserParticipating } from "../db/gataEvent";
+import { getEvent, getEventParticipant, insertEvent, updateEvent, updateIsUserParticipating } from "../db/gataEvent";
 import {
    getAllSubscriptions,
-   getAllSubscriptionsGoingToEvent,
+   getAllSubscriptionsNotUnsubscribedEvent,
    getAllSubscriptionsInvolvedInMessage,
    getSubscriptionForMessage,
 } from "../db/pushSubscriptions";
@@ -15,19 +15,26 @@ import { sendPushNotification } from "../services/pushNoticiationService";
 export const updateParticipatingAndNotify = async (
    loggedInUser: User,
    eventId: number,
-   status: "going" | "notGoing"
+   status: "going" | "notGoing" | undefined,
+   unsubscribed: boolean
 ) => {
-   await updateIsUserParticipating(eventId, loggedInUser.id, status === "going");
-   const event = await getEvent(eventId);
-   const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, loggedInUser.id);
-   await sendPushNotification(
-      subscriptions.map((s) => s.subscription as PushSubscription),
-      {
-         body: `${status === "going" ? "✔️" : "❌"} ${loggedInUser.name} ${status === "going" ? "skal delta på" : "kan ikke delta på"} arrangement ${event.title}`,
-         data: { url: `/event/${eventId}` },
-         icon: "/logo192.png",
-      }
-   );
+   const oldEventParticipant = await getEventParticipant(eventId, loggedInUser.id);
+   const isParticipating = status ? status === "going" : null;
+   await updateIsUserParticipating(eventId, loggedInUser.id, isParticipating, unsubscribed);
+
+   if (isParticipating !== null && oldEventParticipant?.isParticipating !== isParticipating) {
+      const event = await getEvent(eventId);
+      const subscriptions = await getAllSubscriptionsNotUnsubscribedEvent(eventId, loggedInUser.id);
+
+      await sendPushNotification(
+         subscriptions.map((s) => s.subscription as PushSubscription),
+         {
+            body: `${status === "going" ? "✔️" : "❌"} ${loggedInUser.name} ${status === "going" ? "skal delta på" : "kan ikke delta på"} arrangement ${event.title}`,
+            data: { url: `/event/${eventId}` },
+            icon: "/logo192.png",
+         }
+      );
+   }
 };
 
 export const updateEventAndNotify = async (
@@ -49,7 +56,7 @@ export const updateEventAndNotify = async (
    if (shouldNotifyNewEvent) {
       await notifyNewEvent(loggedInUser, event.title, event.id);
    } else {
-      const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, loggedInUser.id);
+      const subscriptions = await getAllSubscriptionsNotUnsubscribedEvent(eventId, loggedInUser.id);
       await sendPushNotification(
          subscriptions.map((s) => s.subscription as PushSubscription),
          {
@@ -94,7 +101,7 @@ export const createEventAndNotify = async (
 };
 
 export const notifyParticipantsImagesIsUploaded = async (loggedInUser: User, eventId: number) => {
-   const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, loggedInUser.id);
+   const subscriptions = await getAllSubscriptionsNotUnsubscribedEvent(eventId, loggedInUser.id);
    const event = await getEvent(eventId);
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),
@@ -111,7 +118,7 @@ export const notifyParticipantsNewPostCreated = async (
    eventId: number,
    messageId: number
 ) => {
-   const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, userThatCreatedPost.id);
+   const subscriptions = await getAllSubscriptionsNotUnsubscribedEvent(eventId, userThatCreatedPost.id);
    const event = await getEvent(eventId);
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),

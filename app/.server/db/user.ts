@@ -100,7 +100,7 @@ export const getNumberOfAdmins = async () => {
 };
 
 export const insertUser = async (auth0UserId: string, roleName?: RoleName) => {
-   await db.transaction(async (tx) => {
+   return await db.transaction(async (tx) => {
       const [externalUserResult] = await tx.select().from(externalUser).where(eq(externalUser.id, auth0UserId));
       const [createdUser] = await tx
          .insert(user)
@@ -115,6 +115,7 @@ export const insertUser = async (auth0UserId: string, roleName?: RoleName) => {
          const [userRole] = await tx.selectDistinct().from(role).where(eq(role.roleName, roleName));
          await tx.insert(userRoles).values({ usersId: createdUser.id, roleId: userRole.id });
       }
+      return createdUser.id;
    });
 };
 

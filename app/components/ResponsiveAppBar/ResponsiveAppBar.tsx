@@ -10,10 +10,9 @@ import { Button } from "../ui/button";
 type ResponsiveAppBarProps = {
    isLoggedIn: boolean;
    loggedInUser: User | undefined;
-   pwaPublicKey: string;
 };
 
-export const ResponsiveAppBar = ({ isLoggedIn, loggedInUser, pwaPublicKey }: ResponsiveAppBarProps) => {
+export const ResponsiveAppBar = ({ isLoggedIn, loggedInUser }: ResponsiveAppBarProps) => {
    const isUserMember = isMember(loggedInUser);
    const isUserAdmin = isAdmin(loggedInUser);
 
@@ -73,12 +72,7 @@ export const ResponsiveAppBar = ({ isLoggedIn, loggedInUser, pwaPublicKey }: Res
                   })}
                </div>
 
-               <UserMenu
-                  roleText={getRole()}
-                  isAuthenticated={isLoggedIn}
-                  loggedInUser={loggedInUser}
-                  pwaPublicKey={pwaPublicKey}
-               />
+               <UserMenu roleText={getRole()} isAuthenticated={isLoggedIn} loggedInUser={loggedInUser} />
             </div>
          </div>
       </header>

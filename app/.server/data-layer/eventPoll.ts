@@ -3,7 +3,7 @@ import type { PushSubscription } from "web-push";
 import type { NewPollSchema, PollVoteSchema, UpdatePollSchema } from "~/utils/schemas/eventPollSchema";
 
 import { getEvent, getPoll, insertNewPoll, insertPollVote, updatePoll } from "../db/gataEvent";
-import { getAllSubscriptionEventOrganizers, getAllSubscriptionsGoingToEvent } from "../db/pushSubscriptions";
+import { getAllSubscriptionEventOrganizers, getAllSubscriptionsNotUnsubscribedEvent } from "../db/pushSubscriptions";
 import type { User } from "../db/user";
 import { sendPushNotification } from "../services/pushNoticiationService";
 
@@ -13,7 +13,7 @@ export const createNewPoll = async (
    { dateOption, textOption, ...poll }: NewPollSchema
 ) => {
    await insertNewPoll(eventId, poll, poll.type === "text" ? textOption : dateOption);
-   const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, loggedInUser.id);
+   const subscriptions = await getAllSubscriptionsNotUnsubscribedEvent(eventId, loggedInUser.id);
    const event = await getEvent(eventId);
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),
@@ -31,7 +31,7 @@ export const updatePollAndNotify = async (
    { pollId, isFinished, ...pollValues }: UpdatePollSchema
 ) => {
    await updatePoll(pollId, { ...pollValues, isActive: !isFinished });
-   const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, loggedInUser.id);
+   const subscriptions = await getAllSubscriptionsNotUnsubscribedEvent(eventId, loggedInUser.id);
    const event = await getEvent(eventId);
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),

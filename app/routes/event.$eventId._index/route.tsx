@@ -1,6 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useSearchParams } from "@remix-run/react";
-import { intervalToDuration } from "date-fns";
 import { Image, Vote } from "lucide-react";
 import { useEffect, useId } from "react";
 import { z } from "zod";
@@ -25,7 +24,7 @@ import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { cn } from "~/utils";
 import { createAuthenticator } from "~/utils/auth.server";
-import { formatDateTime, getDateWithTimeZone } from "~/utils/date.utils";
+import { formatDateTime } from "~/utils/date.utils";
 import { emitter } from "~/utils/events/emitter.server";
 import { useLiveLoader } from "~/utils/events/use-live-loader";
 import { badRequest } from "~/utils/responseUtils";
@@ -35,6 +34,7 @@ import { transformErrorResponse } from "~/utils/validateUtils";
 import { LikeButton } from "./LikeButton";
 import { Likes } from "./Likes";
 import { NewMessageForm } from "./NewMessageForm";
+import { ReplyList } from "./ReplyList";
 import { ReplyMessageForm } from "./ReplyMessageForm";
 import { UploadMedia } from "../../components/UploadMedia";
 
@@ -110,13 +110,13 @@ export default function EventActivities() {
    const activePollsTitleId = useId();
    const activePolls = polls.filter((p) => p.poll.isActive);
 
-   const messageId = searchParams.get("messageId");
+   const focusMessageId = searchParams.get("messageId");
    useEffect(() => {
       // Focus message when a user has clicked notification
-      if (messageId) {
-         document.getElementById(`message-${messageId}`)?.scrollIntoView();
+      if (focusMessageId) {
+         document.getElementById(`message-${focusMessageId}`)?.scrollIntoView();
       }
-   }, [messageId]);
+   }, [focusMessageId]);
 
    return (
       <div className="flex flex-col gap-4 items-start">
@@ -158,7 +158,7 @@ export default function EventActivities() {
                   id={`message-${message.id}`}
                   className={cn(
                      "flex flex-col gap-2 p-4 w-full whitespace-pre-line border rounded shadow-sm",
-                     message.id.toString() === messageId && "outline outline-primary outline-offset-2"
+                     message.id.toString() === focusMessageId && "outline outline-primary outline-offset-2"
                   )}
                >
                   <div className="flex gap-2 items-center">
@@ -175,69 +175,16 @@ export default function EventActivities() {
                   <div>
                      <LikeButton
                         messageId={message.id}
-                        loggInUserId={loggedInUser.id}
+                        loggedInUserId={loggedInUser.id}
                         likes={message.likes}
                         size="normal"
                      />
                   </div>
-                  <ul className="flex flex-col gap-2" aria-label="Kommentarer">
-                     {message.replies.map(({ reply }) => {
-                        const timeSince = getTimeDifference(reply.dateTime);
-                        return (
-                           <li
-                              key={reply.id}
-                              id={`message-${reply.id}`}
-                              className={cn(
-                                 reply.id.toString() === messageId && "outline outline-primary outline-offset-4 rounded"
-                              )}
-                           >
-                              <div className="flex gap-2">
-                                 <AvatarUserButton className="size-8" user={reply.user} />
-                                 <div>
-                                    <div className="p-2 bg-gray-200 rounded-xl">
-                                       <Typography variant="mutedText">{reply.user.name}</Typography>
-                                       {reply.message}
-
-                                       <Likes likes={reply.likes} size="small" />
-                                    </div>
-
-                                    <div className="flex">
-                                       <LikeButton
-                                          messageId={reply.id}
-                                          loggInUserId={loggedInUser.id}
-                                          likes={reply.likes}
-                                          size="small"
-                                          className="-mt-2"
-                                       />
-                                       <Typography variant="mutedText">{timeSince}</Typography>
-                                    </div>
-                                 </div>
-                              </div>
-                           </li>
-                        );
-                     })}
-                  </ul>
+                  <ReplyList message={message} loggedInUserId={loggedInUser.id} focusMessageId={focusMessageId} />
                   <ReplyMessageForm messageId={message.id} />
                </li>
             ))}
          </ul>
       </div>
    );
-}
-
-function getTimeDifference(dateString: string) {
-   const now = new Date();
-
-   const duration = intervalToDuration({ start: getDateWithTimeZone(dateString), end: now });
-
-   if (duration.days && duration.days > 0) {
-      return `${duration.days} dager siden`;
-   } else if (duration.hours && duration.hours > 0) {
-      return `${duration.hours} timer siden`;
-   } else if (duration.minutes && duration.minutes > 0) {
-      return `${duration.minutes} minutter siden`;
-   } else if (duration.seconds && duration.seconds >= 0) {
-      return `${duration.seconds} sekunder siden`;
-   }
-   return "Nå";
 }

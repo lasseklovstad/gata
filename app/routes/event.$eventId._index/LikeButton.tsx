@@ -12,14 +12,14 @@ import { LikeIconMapping } from "./LikeIconMapping";
 type Props = {
    messageId: number;
    likes: { type: string; userId: string }[];
-   loggInUserId: string;
+   loggedInUserId: string;
    size: "normal" | "small";
    className?: string;
 };
 
-export const LikeButton = ({ messageId, loggInUserId, likes, size, className }: Props) => {
+export const LikeButton = ({ messageId, loggedInUserId, likes, size, className }: Props) => {
    const fetcher = useFetcher<typeof action>();
-   const selectedLikeType = likes.find((like) => like.userId === loggInUserId)?.type;
+   const selectedLikeType = likes.find((like) => like.userId === loggedInUserId)?.type;
    return (
       <>
          <Popover className={cn("relative", className)}>

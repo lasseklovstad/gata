@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { vitePlugin as remix } from "@remix-run/dev";
 import { remixDevTools } from "remix-development-tools";
 import { defineConfig } from "vite";
@@ -32,4 +33,16 @@ export default defineConfig({
       tsconfigPaths(),
       process.env.NODE_ENV === "development" ? checker({ typescript: true }) : undefined,
    ],
+   test: {
+      environment: "node",
+      dir: "./app",
+      include: ["**/*.test.ts"],
+      setupFiles: ["./tests/vitestSetup.ts"],
+      clearMocks: true,
+      maxWorkers: 1,
+      minWorkers: 1,
+      env: {
+         APP_DATABASE_URL: "sqlite_test.db",
+      },
+   },
 });

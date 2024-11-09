@@ -64,6 +64,20 @@
       "when": 1727897118306,
       "tag": "0008_freezing_phalanx",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1731160406632,
+      "tag": "0009_nifty_moira_mactaggert",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1731161901881,
+      "tag": "0010_low_microchip",
+      "breakpoints": true
     }
   ]
 }

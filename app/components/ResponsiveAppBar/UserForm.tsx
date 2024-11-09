@@ -1,20 +1,16 @@
-import { useFetcher } from "@remix-run/react";
-import { Bell, Mail } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Mail } from "lucide-react";
 import type { Area, Point } from "react-easy-crop";
 import Cropper from "react-easy-crop";
 
 import type { User } from "~/.server/db/user";
-import type { action } from "~/routes/subscribe";
 
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { PushSubscription } from "./PushSubscription";
 import { FormControl, FormDescription, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 import { Switch } from "../ui/switch";
 
 type Props = {
    user: User;
-   pwaPublicKey: string;
    crop: Point;
    setCrop: (crop: Point) => void;
    zoom: number;
@@ -25,76 +21,7 @@ type Props = {
    setPicture: (value: string | undefined) => void;
 };
 
-export const UserForm = ({
-   user,
-   pwaPublicKey,
-   area,
-   crop,
-   picture,
-   setCrop,
-   setPicture,
-   setZoom,
-   zoom,
-   setArea,
-}: Props) => {
-   const [subscription, setSubscription] = useState<PushSubscription | null>(null);
-   const [error, setError] = useState("");
-   const fetcher = useFetcher<typeof action>();
-
-   useEffect(() => {
-      if ("serviceWorker" in navigator && "PushManager" in window) {
-         void navigator.serviceWorker.ready.then(async (registration) => {
-            await registration.pushManager.getSubscription().then((sub) => {
-               setSubscription(sub);
-            });
-         });
-      } else {
-         setError(
-            "Din nettleser støtter ikke pushnotifikasjoner. Prøv å oppdatere til nyeste versjon av nettleseren. Hvis du bruker Iphone må du legge til nettsiden til Hjem-skjerm for å kunne bruke pushnotifkasjoner og påse at du har nyeste versjon av iOS. Spør Lasse..."
-         );
-      }
-   }, []);
-
-   const subscribe = async () => {
-      await navigator.serviceWorker.ready.then((registration) => {
-         registration.pushManager
-            .subscribe({
-               userVisibleOnly: true,
-               applicationServerKey: pwaPublicKey,
-            })
-            .then((subscription) => {
-               setSubscription(subscription);
-
-               fetcher.submit(JSON.stringify(subscription), {
-                  action: "/subscribe",
-                  encType: "application/json",
-                  preventScrollReset: true,
-                  method: "POST",
-               });
-            })
-            .catch((error) => {
-               setError(String(error));
-            });
-      });
-   };
-
-   const unsubscribe = async () => {
-      if (!subscription) return;
-      await subscription
-         .unsubscribe()
-         .then(() => {
-            setSubscription(null);
-            fetcher.submit(JSON.stringify(subscription), {
-               action: "/subscribe",
-               encType: "application/json",
-               preventScrollReset: true,
-               method: "DELETE",
-            });
-         })
-         .catch((error) => {
-            console.error("Failed to unsubscribe the user: ", error);
-         });
-   };
+export const UserForm = ({ user, area, crop, picture, setCrop, setPicture, setZoom, zoom, setArea }: Props) => {
    return (
       <>
          <FormItem name="name">
@@ -159,39 +86,7 @@ export const UserForm = ({
             </div>
             <FormControl render={(props) => <Switch {...props} defaultChecked={user.subscribe} />} />
          </FormItem>
-         <FormItem name="pushSubscription" className="border p-2 flex justify-between items-center rounded">
-            <div>
-               <FormLabel className="flex gap-2 items-center">
-                  <Bell /> Push notifikasjoner
-               </FormLabel>
-               <FormDescription>
-                  Få tilsendt push notifikasjoner på enheten ved feks. endringer i et arrangement du deltar på
-               </FormDescription>
-            </div>
-            <FormControl
-               render={(props) => (
-                  <Switch
-                     {...props}
-                     checked={subscription !== null}
-                     onCheckedChange={(checked) => {
-                        if (checked) {
-                           void subscribe();
-                        } else {
-                           void unsubscribe();
-                        }
-                     }}
-                  />
-               )}
-            />
-         </FormItem>
-         {error ? (
-            <Alert variant="warning">
-               <AlertTitle>Kunne ikke skru på notifikasjoner</AlertTitle>
-               <AlertDescription>
-                  Det ser ut som du må resette instillinger for tillatelser for denne nettsiden. {error}
-               </AlertDescription>
-            </Alert>
-         ) : null}
+         <PushSubscription />
       </>
    );
 };

@@ -216,11 +216,26 @@ export const getEventParticipants = async (eventId: number) => {
    });
 };
 
-export const updateIsUserParticipating = async (eventId: number, userId: string, isParticipating: boolean) => {
+export const getEventParticipant = async (eventId: number, userId: string) => {
+   return await db.query.eventParticipants.findFirst({
+      where: and(eq(eventParticipants.eventId, eventId), eq(eventParticipants.userId, userId)),
+      with: { user: { with: { primaryUser: true } } },
+   });
+};
+
+export const updateIsUserParticipating = async (
+   eventId: number,
+   userId: string,
+   isParticipating: boolean | null,
+   unsubscribed: boolean
+) => {
    await db
       .insert(eventParticipants)
-      .values({ eventId, userId, isParticipating })
-      .onConflictDoUpdate({ target: [eventParticipants.eventId, eventParticipants.userId], set: { isParticipating } });
+      .values({ eventId, userId, isParticipating, unsubscribed })
+      .onConflictDoUpdate({
+         target: [eventParticipants.eventId, eventParticipants.userId],
+         set: { isParticipating, unsubscribed },
+      });
 };
 
 export const getEventMessages = async (eventId: number) => {

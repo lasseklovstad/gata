@@ -37,7 +37,14 @@ export const ReplyMessageForm = ({ messageId }: Props) => {
                      )}
                   />
                   <input hidden readOnly value={messageId} name="messageId" />
-                  <Button type="submit" variant="ghost" size="icon" name="intent" value="replyMessage">
+                  <Button
+                     type="submit"
+                     variant="ghost"
+                     size="icon"
+                     name="intent"
+                     value="replyMessage"
+                     isLoading={fetcher.state !== "idle"}
+                  >
                      <Send />
                      <span className="sr-only">Kommenter</span>
                   </Button>
