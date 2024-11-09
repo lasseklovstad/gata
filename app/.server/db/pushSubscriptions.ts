@@ -1,4 +1,4 @@
-import { and, eq, ne } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, ne, sql } from "drizzle-orm";
 import { union } from "drizzle-orm/sqlite-core";
 
 import { db } from "db/config.server";
@@ -34,13 +34,13 @@ export const getAllSubscriptionsInvolvedInMessage = async (messageId: number, no
    return await union(
       // Users from message
       db
-         .select({ subscription: pushSubscriptions.subscription })
+         .select(getTableColumns(pushSubscriptions))
          .from(messages)
          .innerJoin(pushSubscriptions, eq(messages.userId, pushSubscriptions.userId))
          .where(and(eq(messages.id, messageId), ne(pushSubscriptions.userId, notIncludedUser))),
       // Users from replies
       db
-         .select({ subscription: pushSubscriptions.subscription })
+         .select(getTableColumns(pushSubscriptions))
          .from(messageReplies)
          .innerJoin(messages, eq(messages.id, messageReplies.replyId))
          .innerJoin(pushSubscriptions, eq(messages.userId, pushSubscriptions.userId))
