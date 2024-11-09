@@ -1,4 +1,4 @@
-import { Form, useSubmit } from "@remix-run/react";
+import { Form } from "@remix-run/react";
 import { Bell } from "lucide-react";
 import { useId, useRef } from "react";
 
@@ -8,7 +8,7 @@ import { AvatarUser } from "~/components/AvatarUser";
 import { AvatarUserList } from "~/components/AvatarUserList";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogCloseButton, DialogHeading } from "~/components/ui/dialog";
-import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
+import { FormControl, FormItem, FormLabel } from "~/components/ui/form";
 import { Label } from "~/components/ui/label";
 import { NativeSelect } from "~/components/ui/native-select";
 import { Switch } from "~/components/ui/switch";

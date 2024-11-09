@@ -5,7 +5,7 @@ import type { EventSchema } from "~/utils/schemas/eventSchema";
 import { getEvent, insertEvent, updateEvent, updateIsUserParticipating } from "../db/gataEvent";
 import {
    getAllSubscriptions,
-   getAllSubscriptionsGoingToEvent,
+   getAllSubscriptionsNotUnsubscribedEvent,
    getAllSubscriptionsInvolvedInMessage,
    getSubscriptionForMessage,
 } from "../db/pushSubscriptions";
@@ -20,7 +20,7 @@ export const updateParticipatingAndNotify = async (
 ) => {
    await updateIsUserParticipating(eventId, loggedInUser.id, status ? status === "going" : null, unsubscribed);
    const event = await getEvent(eventId);
-   const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, loggedInUser.id);
+   const subscriptions = await getAllSubscriptionsNotUnsubscribedEvent(eventId, loggedInUser.id);
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),
       {
@@ -50,7 +50,7 @@ export const updateEventAndNotify = async (
    if (shouldNotifyNewEvent) {
       await notifyNewEvent(loggedInUser, event.title, event.id);
    } else {
-      const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, loggedInUser.id);
+      const subscriptions = await getAllSubscriptionsNotUnsubscribedEvent(eventId, loggedInUser.id);
       await sendPushNotification(
          subscriptions.map((s) => s.subscription as PushSubscription),
          {
@@ -95,7 +95,7 @@ export const createEventAndNotify = async (
 };
 
 export const notifyParticipantsImagesIsUploaded = async (loggedInUser: User, eventId: number) => {
-   const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, loggedInUser.id);
+   const subscriptions = await getAllSubscriptionsNotUnsubscribedEvent(eventId, loggedInUser.id);
    const event = await getEvent(eventId);
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),
@@ -112,7 +112,7 @@ export const notifyParticipantsNewPostCreated = async (
    eventId: number,
    messageId: number
 ) => {
-   const subscriptions = await getAllSubscriptionsGoingToEvent(eventId, userThatCreatedPost.id);
+   const subscriptions = await getAllSubscriptionsNotUnsubscribedEvent(eventId, userThatCreatedPost.id);
    const event = await getEvent(eventId);
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),

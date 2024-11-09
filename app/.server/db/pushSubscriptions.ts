@@ -1,4 +1,4 @@
-import { and, desc, eq, getTableColumns, ne, sql } from "drizzle-orm";
+import { and, eq, getTableColumns, isNull, ne, or } from "drizzle-orm";
 import { union } from "drizzle-orm/sqlite-core";
 
 import { db } from "db/config.server";
@@ -16,16 +16,18 @@ export const getAllSubscriptions = async (notIncludedUser: string) => {
    return await db.select().from(pushSubscriptions).where(ne(pushSubscriptions.userId, notIncludedUser));
 };
 
-export const getAllSubscriptionsGoingToEvent = async (eventId: number, notIncludedUser: string) => {
+export const getAllSubscriptionsNotUnsubscribedEvent = async (eventId: number, notIncludedUser: string) => {
    return await db
-      .select({ subscription: pushSubscriptions.subscription })
+      .select(getTableColumns(pushSubscriptions))
       .from(pushSubscriptions)
-      .innerJoin(eventParticipants, eq(eventParticipants.userId, pushSubscriptions.userId))
+      .leftJoin(
+         eventParticipants,
+         and(eq(eventParticipants.userId, pushSubscriptions.userId), eq(eventParticipants.eventId, eventId))
+      )
       .where(
          and(
-            eq(eventParticipants.eventId, eventId),
-            eq(eventParticipants.isParticipating, true),
-            ne(pushSubscriptions.userId, notIncludedUser)
+            ne(pushSubscriptions.userId, notIncludedUser),
+            or(isNull(eventParticipants.unsubscribed), eq(eventParticipants.unsubscribed, false))
          )
       );
 };
