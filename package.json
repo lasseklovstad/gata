@@ -89,7 +89,7 @@
       "eslint-plugin-prettier": "^5.2.1",
       "eslint-plugin-react": "^7.37.2",
       "globals": "^15.12.0",
-      "knip": "5.39.1",
+      "knip": "5.39.2",
       "postcss": "^8.4.38",
       "prettier": "3.4.2",
       "remix-development-tools": "^4.1.6",
