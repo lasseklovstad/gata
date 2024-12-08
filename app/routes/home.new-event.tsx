@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { Link, redirect, useFetcher } from "@remix-run/react";
+import type { ActionFunctionArgs } from "react-router";
+import { Link, redirect, useFetcher } from "react-router";
 import { Calendar } from "lucide-react";
 
 import { createEventAndNotify } from "~/.server/data-layer/gataEvent";

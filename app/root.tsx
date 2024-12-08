@@ -1,14 +1,13 @@
 import "react-day-picker/dist/style.css";
 import "./tailwind.css";
 
-import type { ActionFunctionArgs, LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import {
-   NodeOnDiskFile,
-   unstable_composeUploadHandlers,
-   unstable_createFileUploadHandler,
-   unstable_createMemoryUploadHandler,
-   unstable_parseMultipartFormData,
-} from "@remix-run/node";
+import os from "os";
+import path from "path";
+
+import { type FileUpload, parseFormData } from "@mjackson/form-data-parser";
+import { LocalFileStorage } from "@mjackson/file-storage/local";
+
+import type { ActionFunctionArgs, LinksFunction, LoaderFunctionArgs, MetaFunction } from "react-router";
 import {
    Link,
    Links,
@@ -21,7 +20,7 @@ import {
    useNavigate,
    useRouteError,
    useRouteLoaderData,
-} from "@remix-run/react";
+} from "react-router";
 import PullToRefresh from "pulltorefreshjs";
 import type { ComponentProps } from "react";
 import { useEffect } from "react";
@@ -161,7 +160,7 @@ export default function App() {
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-   const auth0User = await createAuthenticator().authenticator.isAuthenticated(request);
+   const auth0User = await createAuthenticator().getOptionalUser(request);
    const loggedInUser = auth0User ? (await getOptionalUserFromExternalUserId(auth0User.id)) || undefined : undefined;
    const version = env.VERSION;
    const pwaPublicKey = env.PWA_PUBLIC_KEY;
@@ -175,15 +174,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
-   const uploadHandler = unstable_composeUploadHandlers(
-      unstable_createFileUploadHandler({
-         maxPartSize: 5_000_000,
-         file: ({ filename }) => filename,
-      }),
-      // parse everything else into memory
-      unstable_createMemoryUploadHandler()
-   );
-   const formData = await unstable_parseMultipartFormData(request, uploadHandler);
+
+   const formData = await parseFormData(request, createTempUploadHandler("profile-pictures"), {
+      maxFileSize: 20 * 1024 * 1024,
+   });
 
    const intent = formData.get("intent");
 
@@ -193,8 +187,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
          return transformErrorResponse(formResult.error);
       }
       const form = formResult.data;
-      if (form.picture instanceof NodeOnDiskFile) {
-         const newName = await cropProfileImage(form.picture.getFilePath(), {
+      if (form.picture) {
+         const newName = await cropProfileImage(form.picture, {
             height: form.pictureCropHeight,
             width: form.pictureCropWidth,
             left: form.pictureCropX,
@@ -216,6 +210,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
    throw badRequest("Invalid intent");
 };
+
+function createTempUploadHandler(prefix: string) {
+   const directory = path.join(os.tmpdir(), prefix);
+   const fileStorage = new LocalFileStorage(directory);
+
+   async function uploadHandler(fileUpload: FileUpload) {
+      if (fileUpload.fieldName === "picture" && fileUpload.type.startsWith("image/")) {
+         const key = new Date().getTime().toString(36);
+         await fileStorage.set(key, fileUpload);
+         return fileStorage.get(key);
+      }
+
+      // Ignore any files we don't recognize the name of...
+   }
+   return uploadHandler;
+}
 
 export const useRootLoader = () => {
    return useRouteLoaderData<typeof loader>("root");

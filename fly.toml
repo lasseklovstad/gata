@@ -15,6 +15,7 @@ destination = "/data"
 
 [env]
   DEFAULT_CONTINGENT_SIZE= "600"
+  AUTH0_CALLBACK=https://gataersamla.no/callback
 
 [http_service]
   internal_port = 3000

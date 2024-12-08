@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 
 import { getReportFile } from "~/.server/db/reportFile";
 import { createAuthenticator } from "~/utils/auth.server";

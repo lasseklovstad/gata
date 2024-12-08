@@ -7,8 +7,8 @@ import { env } from "~/utils/env.server";
 
 const PRIVATE_PICTURE_ENDPOINT_URL = "/picture";
 
-export const cropProfileImage = async (filepath: string, region: sharp.Region) => {
-   const image = sharp(resolve(filepath));
+export const cropProfileImage = async (file: File, region: sharp.Region) => {
+   const image = sharp(await file.arrayBuffer());
    const imageMetadata = await image.metadata();
    const newName = `profile/${crypto.randomUUID()}.${imageMetadata.format}`;
    const newImagePath = resolve(`${env.IMAGE_DIR}/${newName}`);

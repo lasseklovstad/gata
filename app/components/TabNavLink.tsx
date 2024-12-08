@@ -1,4 +1,4 @@
-import { NavLink } from "@remix-run/react";
+import { NavLink } from "react-router";
 import type { ComponentProps } from "react";
 
 export const TabNavLink = (props: ComponentProps<typeof NavLink>) => {

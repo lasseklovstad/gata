@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 
 import { PageLayout } from "~/components/PageLayout";
 import { Button } from "~/components/ui/button";

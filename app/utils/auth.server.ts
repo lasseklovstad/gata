@@ -1,11 +1,11 @@
-import { createCookie, createCookieSessionStorage, redirect } from "@remix-run/node";
+import { createCookie, createCookieSessionStorage, redirect } from "react-router";
 import { Authenticator } from "remix-auth";
-import { Auth0Strategy } from "remix-auth-auth0";
 
 import { getOptionalUserFromExternalUserId } from "~/.server/db/user";
 import type { Auth0User } from "~/types/Auth0User";
 
 import { env } from "./env.server";
+import { Auth0Strategy } from "./auth0";
 
 type UserPreference = {
    loginPath: string;
@@ -13,7 +13,7 @@ type UserPreference = {
 const userPreferences = createCookie("user_pref", { maxAge: 120 });
 
 export const createAuthenticator = () => {
-   const sessionStorage = createCookieSessionStorage({
+   const sessionStorage = createCookieSessionStorage<{ user: Auth0User }>({
       cookie: {
          name: "_remix_session",
          sameSite: "lax",
@@ -25,12 +25,12 @@ export const createAuthenticator = () => {
       },
    });
 
-   const authenticator = new Authenticator<Auth0User>(sessionStorage);
+   const authenticator = new Authenticator<Auth0User>();
 
    const auth0Strategy = new Auth0Strategy(
       {
-         callbackURL: "/callback",
-         clientID: env.AUTH0_CLIENT_ID,
+         redirectURI: env.AUTH0_CALLBACK,
+         clientId: env.AUTH0_CLIENT_ID,
          audience: env.AUTH0_AUDIENCE,
          clientSecret: env.AUTH0_CLIENT_SECRET,
          domain: env.AUTH0_DOMAIN,
@@ -58,10 +58,14 @@ export const createAuthenticator = () => {
 
    authenticator.use(auth0Strategy);
 
-   const { getSession, destroySession } = sessionStorage;
+   const getOptionalUser = async (request: Request) => {
+      const session = await sessionStorage.getSession(request.headers.get("cookie"));
+      return session.get("user");
+   };
 
    const getRequiredUser = async (request: Request) => {
-      const auth = await authenticator.isAuthenticated(request);
+      const session = await sessionStorage.getSession(request.headers.get("cookie"));
+      const auth = session.get("user");
       const url = new URL(request.url);
       const headers = {
          "Set-Cookie": await userPreferences.serialize({ loginPath: url.pathname } satisfies UserPreference),
@@ -88,10 +92,10 @@ export const createAuthenticator = () => {
    };
 
    return {
-      getSession,
-      destroySession,
+      sessionStorage,
       authenticator,
       getRequiredUser,
+      getOptionalUser,
       getSessionLoginPath,
    };
 };

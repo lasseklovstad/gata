@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { Check, X, Bell, BellOff, MailCheck, MailMinus } from "lucide-react";
 
 import type { User } from "~/.server/db/user";

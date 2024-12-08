@@ -1,5 +1,5 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "react-router";
+import { useLoaderData } from "react-router";
 
 import { getUpCommingEvents } from "~/.server/db/gataEvent";
 import { getReportsWithContent } from "~/.server/db/report";
@@ -13,7 +13,7 @@ import { createAuthenticator } from "~/utils/auth.server";
 import { isMember } from "~/utils/roleUtils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-   const auth = await createAuthenticator().authenticator.isAuthenticated(request);
+   const auth = (await createAuthenticator().sessionStorage.getSession(request.headers.get("cookie"))).get("user");
    const loggedInUser = auth?.id ? ((await getOptionalUserFromExternalUserId(auth.id)) ?? undefined) : undefined;
    return {
       reports: isMember(loggedInUser) ? await getReportsWithContent(ReportType.NEWS) : undefined,

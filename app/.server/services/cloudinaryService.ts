@@ -1,4 +1,4 @@
-import { writeReadableStreamToWritable } from "@remix-run/node"; // `writeAsyncIterableToWritable` is a Node-only utility
+import { writeReadableStreamToWritable } from "@react-router/node"; // `writeAsyncIterableToWritable` is a Node-only utility
 import type { UploadApiResponse } from "cloudinary";
 import cloudinary from "cloudinary";
 

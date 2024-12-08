@@ -1,4 +1,4 @@
-import type { SubmitFunction } from "@remix-run/react";
+import type { SubmitFunction } from "react-router";
 import { Editor, Element, Transforms } from "slate";
 
 import { reportInfoIntent } from "~/routes/reportInfo.$reportId/intent";

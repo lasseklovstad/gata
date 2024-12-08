@@ -1,6 +1,6 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import type { MetaFunction } from "@remix-run/react";
-import { Outlet, redirect, useLoaderData } from "@remix-run/react";
+import type { ActionFunctionArgs } from "react-router";
+import type { MetaFunction } from "react-router";
+import { Outlet, redirect, useLoaderData } from "react-router";
 import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Copy } from "lucide-react";

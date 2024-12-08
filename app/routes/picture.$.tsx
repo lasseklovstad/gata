@@ -1,7 +1,7 @@
 import { createReadStream, existsSync, promises } from "node:fs";
 import { resolve } from "node:path";
 
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 import mime from "mime/lite";
 
 import { createAuthenticator } from "~/utils/auth.server";

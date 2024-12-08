@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-import { NavLink, useNavigation } from "@remix-run/react";
+import { NavLink, useNavigation } from "react-router";
 import { Menu } from "lucide-react";
 import { useEffect } from "react";
 

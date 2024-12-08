@@ -1,5 +1,4 @@
-import type { SerializeFrom } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher } from "react-router";
 import { Edit, EllipsisVertical, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -20,7 +19,7 @@ import { useDialog } from "~/utils/dialogUtils";
 import type { action } from "./route";
 
 type Props = {
-   poll: SerializeFrom<Poll["poll"]>;
+   poll: Poll["poll"];
 };
 
 export const PollMenu = ({ poll }: Props) => {

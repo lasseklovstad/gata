@@ -1,4 +1,4 @@
-import { useFetcher } from "@remix-run/react";
+import { useFetcher } from "react-router";
 import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Download } from "lucide-react";

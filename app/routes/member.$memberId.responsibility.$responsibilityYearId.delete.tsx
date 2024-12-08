@@ -1,6 +1,6 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { useFetcher, useNavigate } from "@remix-run/react";
+import type { ActionFunctionArgs } from "react-router";
+import { redirect } from "react-router";
+import { useFetcher, useNavigate } from "react-router";
 
 import { deleteResponsibilityYear } from "~/.server/db/responsibility";
 import { Button } from "~/components/ui/button";
