@@ -1,5 +1,5 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useSearchParams } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { Image, Vote } from "lucide-react";
 import { useEffect, useId } from "react";
 import { z } from "zod";

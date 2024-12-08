@@ -1,5 +1,5 @@
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher } from "react-router";
 import { ThumbsUp } from "lucide-react";
 
 import { Button } from "~/components/ui/button";

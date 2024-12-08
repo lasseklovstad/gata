@@ -1,5 +1,5 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
 
 import { insertOrUpdateExternalUser, insertUser, getNumberOfAdmins } from "~/.server/db/user";
 import { Typography } from "~/components/ui/typography";
@@ -8,8 +8,9 @@ import { env } from "~/utils/env.server";
 import { RoleName } from "~/utils/roleUtils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-   const { authenticator, getSessionLoginPath } = createAuthenticator();
-   const user = await authenticator.isAuthenticated(request);
+   const { sessionStorage, getSessionLoginPath } = createAuthenticator();
+   let session = await sessionStorage.getSession(request.headers.get("cookie"));
+   const user = session.get("user");
    if (user) {
       const [externalUser] = await insertOrUpdateExternalUser(user);
       if (env.MAKE_FIRST_USER_ADMIN === "true") {

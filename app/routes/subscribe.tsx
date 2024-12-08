@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs } from "react-router";
 
 import { deletePushSubscription, insertPushSubscription } from "~/.server/db/pushSubscriptions";
 import { createAuthenticator } from "~/utils/auth.server";

@@ -1,6 +1,6 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
+import { Link, Outlet, useLoaderData } from "react-router";
 import { Plus } from "lucide-react";
 
 import { insertResponsibilityYear } from "~/.server/db/responsibility";

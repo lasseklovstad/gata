@@ -10,12 +10,13 @@
     "postcss.config.cjs",
     "server.mjs",
     "launch-webkit.js",
-    "public/sw.js"
+    "public/sw.js",
+    ".react-router/types/**/*"
   ],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "types": ["@remix-run/node", "vite/client"],
+    "types": ["@react-router/node", "vite/client"],
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
@@ -31,6 +32,7 @@
     "paths": {
       "~/*": ["./app/*"]
     },
+    "rootDirs": [".", "./.react-router/types"],
 
     // Vite takes care of building everything, not tsc.
     "noEmit": true

@@ -1,6 +1,6 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import type { MetaFunction } from "@remix-run/react";
-import { Outlet, useParams } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "react-router";
+import type { MetaFunction } from "react-router";
+import { Outlet, useParams } from "react-router";
 
 import { getUser } from "~/.server/db/user";
 import { TabNavLink } from "~/components/TabNavLink";

@@ -1,5 +1,5 @@
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
-import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
+import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
+import { useFetcher, useLoaderData, useNavigate } from "react-router";
 
 import { getContingentInfo } from "~/.server/db/contigent";
 import { getUsersThatHasNotPaidContingent } from "~/.server/db/user";

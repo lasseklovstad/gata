@@ -1,4 +1,4 @@
-import { useFetcher } from "@remix-run/react";
+import { useFetcher } from "react-router";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 import type { action } from "~/routes/subscribe";

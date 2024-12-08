@@ -1,4 +1,4 @@
-import { useFetcher } from "@remix-run/react";
+import { useFetcher } from "react-router";
 import { Loader2 } from "lucide-react";
 
 import { Input } from "~/components/ui/input";

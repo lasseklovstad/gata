@@ -1,5 +1,4 @@
-import type { SerializeFrom } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher } from "react-router";
 import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
 import { useId, useState } from "react";
@@ -17,7 +16,7 @@ import { PollFormTable } from "./PollFormTable";
 import { PollMenu } from "./PollMenu";
 
 type Props = {
-   poll: SerializeFrom<PollType["poll"]>;
+   poll: PollType["poll"];
    isOrganizer: boolean;
    loggedInUser: User;
    users: User[];

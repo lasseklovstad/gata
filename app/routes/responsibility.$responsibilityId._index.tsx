@@ -1,6 +1,6 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
+import { useFetcher, useLoaderData, useNavigate } from "react-router";
 import { SaveIcon } from "lucide-react";
 
 import { getResponsibility, insertResponsibility, updateResponsibility } from "~/.server/db/responsibility";
