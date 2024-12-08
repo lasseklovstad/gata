@@ -1,7 +1,7 @@
 import { OAuth2Strategy } from "remix-auth-oauth2";
 import type { Strategy } from "remix-auth/strategy";
 
-export interface Auth0StrategyOptions {
+interface Auth0StrategyOptions {
    domain: string;
    clientId: string;
    clientSecret: string;
@@ -13,7 +13,7 @@ export interface Auth0StrategyOptions {
    connection?: string;
 }
 
-export interface Auth0Profile {
+interface Auth0Profile {
    id?: string;
    emails?: { value: string }[];
    photos?: { value: string }[];
@@ -28,7 +28,7 @@ export interface Auth0Profile {
 /**
  * @see https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims
  */
-export type Auth0Scope = "openid" | "profile" | "email" | string;
+type Auth0Scope = "openid" | "profile" | "email" | string;
 
 interface Auth0UserInfo {
    sub?: string;
@@ -57,9 +57,9 @@ interface Auth0UserInfo {
    org_name?: string;
 }
 
-export const Auth0StrategyDefaultName = "auth0";
-export const Auth0StrategyDefaultScope: Auth0Scope = "openid profile email";
-export const Auth0StrategyScopeSeperator = " ";
+const Auth0StrategyDefaultName = "auth0";
+const Auth0StrategyDefaultScope: Auth0Scope = "openid profile email";
+const Auth0StrategyScopeSeperator = " ";
 
 export class Auth0Strategy<User> extends OAuth2Strategy<User> {
    name = Auth0StrategyDefaultName;

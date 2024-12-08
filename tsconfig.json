@@ -11,7 +11,8 @@
     "server.mjs",
     "launch-webkit.js",
     "public/sw.js",
-    ".react-router/types/**/*"
+    ".react-router/types/**/*",
+    "knip.ts"
   ],
   "exclude": ["node_modules"],
   "compilerOptions": {
