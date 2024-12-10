@@ -1,5 +1,5 @@
-import { useFetcher } from "react-router";
 import { useState } from "react";
+import { useFetcher } from "react-router";
 
 import type { User } from "~/.server/db/user";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";

@@ -4,10 +4,11 @@ import "./tailwind.css";
 import os from "os";
 import path from "path";
 
-import { type FileUpload, parseFormData } from "@mjackson/form-data-parser";
 import { LocalFileStorage } from "@mjackson/file-storage/local";
-
-import type { ActionFunctionArgs, LinksFunction, LoaderFunctionArgs, MetaFunction } from "react-router";
+import { type FileUpload, parseFormData } from "@mjackson/form-data-parser";
+import PullToRefresh from "pulltorefreshjs";
+import type { ComponentProps } from "react";
+import { useEffect } from "react";
 import {
    Link,
    Links,
@@ -21,9 +22,7 @@ import {
    useRouteError,
    useRouteLoaderData,
 } from "react-router";
-import PullToRefresh from "pulltorefreshjs";
-import type { ComponentProps } from "react";
-import { useEffect } from "react";
+import type { ActionFunctionArgs, LinksFunction, LoaderFunctionArgs, MetaFunction } from "react-router";
 
 import { getOptionalUserFromExternalUserId, updateUser } from "./.server/db/user";
 import { cropProfileImage } from "./.server/services/localImageService";
@@ -119,7 +118,7 @@ export default function App() {
          if ("url" in event.data) {
             if (loggedInUser) {
                sessionStorage.removeItem(sessionStorageKey);
-               navigate(event.data.url);
+               void navigate(event.data.url);
             } else {
                sessionStorage.setItem(sessionStorageKey, event.data.url);
             }
@@ -129,7 +128,7 @@ export default function App() {
          const url = sessionStorage.getItem(sessionStorageKey);
          if (url) {
             sessionStorage.removeItem(sessionStorageKey);
-            navigate(url);
+            void navigate(url);
          }
       }
       navigator.serviceWorker.addEventListener("message", navigateOnMessage);

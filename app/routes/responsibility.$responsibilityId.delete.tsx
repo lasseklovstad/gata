@@ -1,6 +1,5 @@
 import type { ActionFunctionArgs } from "react-router";
-import { redirect } from "react-router";
-import { useFetcher, useNavigate } from "react-router";
+import { redirect, useFetcher, useNavigate } from "react-router";
 
 import { deleteResponsibility } from "~/.server/db/responsibility";
 import { Button } from "~/components/ui/button";
@@ -29,7 +28,7 @@ export default function ConfirmDeleteResponsibility() {
    const onClose = () => navigate("..");
 
    return (
-      <Dialog ref={dialogRef} onClose={onClose}>
+      <Dialog ref={dialogRef} onClose={() => void onClose()}>
          <fetcher.Form method="DELETE" preventScrollReset>
             <DialogHeading>Er du sikker?</DialogHeading>
             <div>Ved å slette ansvarsposten mister du all data</div>
@@ -37,7 +36,7 @@ export default function ConfirmDeleteResponsibility() {
                <Button type="submit" isLoading={fetcher.state !== "idle"}>
                   Jeg er sikker
                </Button>
-               <Button type="button" onClick={onClose} variant="ghost">
+               <Button type="button" onClick={() => void onClose()} variant="ghost">
                   Avbryt
                </Button>
             </DialogFooter>

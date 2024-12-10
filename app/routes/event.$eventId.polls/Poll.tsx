@@ -1,7 +1,7 @@
-import { useFetcher } from "react-router";
 import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
 import { useId, useState } from "react";
+import { useFetcher } from "react-router";
 
 import type { Poll as PollType } from "~/.server/db/gataEvent";
 import type { User } from "~/.server/db/user";
@@ -78,7 +78,7 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
                   users={users}
                   type={type}
                   numberOfVotes={poll.numberOfVotes}
-                  onChange={(e) => fetcher.submit(e.target.form, { method: hasVoted ? "PUT" : "POST" })}
+                  onChange={(e) => void fetcher.submit(e.target.form, { method: hasVoted ? "PUT" : "POST" })}
                   renderOptionHeader={(option) => {
                      if (poll.type === "text") {
                         return option.textOption;
@@ -111,7 +111,7 @@ export const Poll = ({ poll, loggedInUser, users, isOrganizer }: Props) => {
                   users={users}
                   type={type}
                   numberOfVotes={poll.numberOfVotes}
-                  onChange={(e) => fetcher.submit(e.target.form, { method: hasVoted ? "PUT" : "POST" })}
+                  onChange={(e) => void fetcher.submit(e.target.form, { method: hasVoted ? "PUT" : "POST" })}
                   renderOptionHeader={(option) => {
                      if (poll.type === "text") {
                         return option.textOption;

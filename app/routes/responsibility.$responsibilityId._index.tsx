@@ -1,7 +1,6 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { redirect } from "react-router";
-import { useFetcher, useLoaderData, useNavigate } from "react-router";
 import { SaveIcon } from "lucide-react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { redirect, useFetcher, useLoaderData, useNavigate } from "react-router";
 
 import { getResponsibility, insertResponsibility, updateResponsibility } from "~/.server/db/responsibility";
 import { Button } from "~/components/ui/button";
@@ -52,7 +51,7 @@ export default function EditResponsibility() {
    const onClose = () => navigate("..");
 
    return (
-      <Dialog ref={dialogRef} onClose={onClose}>
+      <Dialog ref={dialogRef} onClose={() => void onClose()}>
          <fetcher.Form method={method} preventScrollReset>
             <DialogHeading>{method === "put" ? "Rediger Ansvarspost" : "Ny Ansvarspost"}</DialogHeading>
             <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
@@ -74,7 +73,7 @@ export default function EditResponsibility() {
                   <SaveIcon className="mr-1" />
                   Lagre
                </Button>
-               <Button type="button" onClick={onClose} variant="ghost">
+               <Button type="button" onClick={() => void onClose()} variant="ghost">
                   Avbryt
                </Button>
             </DialogFooter>

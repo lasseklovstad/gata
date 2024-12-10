@@ -1,7 +1,7 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "react-router";
-import { Link, Outlet, useFetcher, useLoaderData } from "react-router";
 import { Edit, Mail, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "react-router";
+import { Link, Outlet, useFetcher, useLoaderData } from "react-router";
 import type { Descendant } from "slate";
 
 import { getReport, updateReportContent } from "~/.server/db/report";
@@ -74,7 +74,7 @@ export default function ReportInfoPage() {
 
    const handleSaveContent = (content: Descendant[] | undefined, close: boolean) => {
       if (content) {
-         fetcher.submit(
+         void fetcher.submit(
             {
                content: JSON.stringify(content),
                close: close ? "true" : "false",

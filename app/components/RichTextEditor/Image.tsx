@@ -1,6 +1,6 @@
-import { useFetcher } from "react-router";
 import { Minus, Plus, Trash } from "lucide-react";
 import { useEffect } from "react";
+import { useFetcher } from "react-router";
 import type { Element } from "slate";
 import { Transforms } from "slate";
 import type { RenderElementProps } from "slate-react";
@@ -94,7 +94,7 @@ const InternalImage = ({ id, selected = false, focused = false, size = 50 }: Ima
 
    const { load } = fetcher;
    useEffect(() => {
-      load(`/file/${id}`);
+      void load(`/file/${id}`);
    }, [id, load]);
 
    const imageSrc = fetcher.data?.data || fetcher.data?.cloudUrl;

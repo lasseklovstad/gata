@@ -1,6 +1,6 @@
-import { useFetcher, useLoaderData, useNavigate } from "react-router";
 import { Save } from "lucide-react";
 import { useState } from "react";
+import { useFetcher, useLoaderData, useNavigate } from "react-router";
 
 import { useDialog } from "~/utils/dialogUtils";
 
@@ -24,7 +24,7 @@ export const GataReportFormDialog = ({ type }: GataReportFormDialogProps) => {
    const [title, setTitle] = useState(report?.title || "");
    const [description, setDescription] = useState(report?.description || "");
 
-   const onClose = () => navigate("..");
+   const onClose = () => void navigate("..");
 
    return (
       <Dialog ref={dialogRef}>

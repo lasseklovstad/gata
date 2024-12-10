@@ -53,7 +53,7 @@ export default function ConfirmDelete() {
    const { usersNotPaid, contingentInfo } = useLoaderData<typeof loader>();
    const fetcher = useFetcher<typeof action>();
    const navigate = useNavigate();
-   const onClose = () => navigate("..");
+   const onClose = () => void navigate("..");
 
    if (fetcher.data) {
       return (

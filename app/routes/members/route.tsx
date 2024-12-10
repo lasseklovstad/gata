@@ -1,6 +1,6 @@
+import { Mail } from "lucide-react";
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "react-router";
 import { Link, Outlet, useLoaderData } from "react-router";
-import { Mail } from "lucide-react";
 
 import { getAllSubscriptions } from "~/.server/db/pushSubscriptions";
 import { deleteExternalUser, getNotMemberUsers, getUsers, insertUser } from "~/.server/db/user";

@@ -1,6 +1,6 @@
+import { Calendar } from "lucide-react";
 import type { ActionFunctionArgs } from "react-router";
 import { Link, redirect, useFetcher } from "react-router";
-import { Calendar } from "lucide-react";
 
 import { createEventAndNotify } from "~/.server/data-layer/gataEvent";
 import { Button } from "~/components/ui/button";

@@ -1,5 +1,5 @@
-import { useFetcher } from "react-router";
 import { Loader2 } from "lucide-react";
+import { useFetcher } from "react-router";
 
 import { Input } from "~/components/ui/input";
 import { Typography } from "~/components/ui/typography";
@@ -25,7 +25,7 @@ export const UploadMedia = ({ eventId }: Props) => {
             encType={encType}
          >
             <Input
-               onChange={(e) => fetcher.submit(e.target.form, { method, encType, action: actionPath })}
+               onChange={(e) => void fetcher.submit(e.target.form, { method, encType, action: actionPath })}
                className="w-fit"
                type="file"
                multiple

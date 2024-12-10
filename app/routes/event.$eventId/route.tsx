@@ -1,10 +1,9 @@
-import type { ActionFunctionArgs } from "react-router";
-import type { MetaFunction } from "react-router";
-import { Outlet, redirect, useLoaderData } from "react-router";
 import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Copy } from "lucide-react";
 import { useId } from "react";
+import { Outlet, redirect, useLoaderData } from "react-router";
+import type { MetaFunction, ActionFunctionArgs } from "react-router";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 

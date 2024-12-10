@@ -1,7 +1,6 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { redirect } from "react-router";
-import { Link, Outlet, useLoaderData } from "react-router";
 import { Plus } from "lucide-react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { redirect, Link, Outlet, useLoaderData } from "react-router";
 
 import { insertResponsibilityYear } from "~/.server/db/responsibility";
 import { getResponsibilityYears, getUser } from "~/.server/db/user";

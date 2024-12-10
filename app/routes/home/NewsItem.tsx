@@ -1,5 +1,5 @@
-import { Link } from "react-router";
 import { Edit } from "lucide-react";
+import { Link } from "react-router";
 
 import type { GataReport } from "db/schema";
 import type { User } from "~/.server/db/user";

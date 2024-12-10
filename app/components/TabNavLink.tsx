@@ -1,5 +1,5 @@
-import { NavLink } from "react-router";
 import type { ComponentProps } from "react";
+import { NavLink } from "react-router";
 
 export const TabNavLink = (props: ComponentProps<typeof NavLink>) => {
    return (

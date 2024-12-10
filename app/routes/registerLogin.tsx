@@ -9,7 +9,7 @@ import { RoleName } from "~/utils/roleUtils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
    const { sessionStorage, getSessionLoginPath } = createAuthenticator();
-   let session = await sessionStorage.getSession(request.headers.get("cookie"));
+   const session = await sessionStorage.getSession(request.headers.get("cookie"));
    const user = session.get("user");
    if (user) {
       const [externalUser] = await insertOrUpdateExternalUser(user);

@@ -7,9 +7,9 @@ import { Typography } from "~/components/ui/typography";
 import { cn } from "~/utils";
 import { getDateWithTimeZone } from "~/utils/date.utils";
 
+import type { Route } from "./+types/route";
 import { LikeButton } from "./LikeButton";
 import { Likes } from "./Likes";
-import type { Route } from "./+types/route";
 
 type Props = {
    message: Route.ComponentProps["loaderData"]["messages"][number]["message"];

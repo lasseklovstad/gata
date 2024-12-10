@@ -1,12 +1,12 @@
-import { OAuth2Strategy } from "remix-auth-oauth2";
 import type { Strategy } from "remix-auth/strategy";
+import { OAuth2Strategy } from "remix-auth-oauth2";
 
 interface Auth0StrategyOptions {
    domain: string;
    clientId: string;
    clientSecret: string;
    redirectURI: string;
-   scope?: Auth0Scope[] | string;
+   scope?: Auth0Scope[];
    audience?: string;
    organization?: string;
    invitation?: string;
@@ -28,7 +28,7 @@ interface Auth0Profile {
 /**
  * @see https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims
  */
-type Auth0Scope = "openid" | "profile" | "email" | string;
+type Auth0Scope = "openid" | "profile" | "email";
 
 interface Auth0UserInfo {
    sub?: string;
@@ -58,7 +58,7 @@ interface Auth0UserInfo {
 }
 
 const Auth0StrategyDefaultName = "auth0";
-const Auth0StrategyDefaultScope: Auth0Scope = "openid profile email";
+const Auth0StrategyDefaultScope: Auth0Scope[] = ["openid", "profile", "email"];
 const Auth0StrategyScopeSeperator = " ";
 
 export class Auth0Strategy<User> extends OAuth2Strategy<User> {
@@ -101,13 +101,7 @@ export class Auth0Strategy<User> extends OAuth2Strategy<User> {
 
    // Allow users the option to pass a scope string, or typed array
    private getScope(scope: Auth0StrategyOptions["scope"]) {
-      if (!scope) {
-         return [Auth0StrategyDefaultScope];
-      } else if (typeof scope === "string") {
-         return scope.split(Auth0StrategyScopeSeperator) as Auth0Scope[];
-      }
-
-      return scope;
+      return scope ?? Auth0StrategyDefaultScope;
    }
 
    protected authorizationParams(params: URLSearchParams) {
@@ -129,7 +123,7 @@ export class Auth0Strategy<User> extends OAuth2Strategy<User> {
    }
 
    protected async userProfile(accessToken: string): Promise<Auth0Profile> {
-      let profile: Auth0Profile = {
+      const profile: Auth0Profile = {
          provider: Auth0StrategyDefaultName,
       };
 
@@ -137,10 +131,10 @@ export class Auth0Strategy<User> extends OAuth2Strategy<User> {
          return profile;
       }
 
-      let response = await fetch(this.userInfoURL, {
+      const response = await fetch(this.userInfoURL, {
          headers: { Authorization: `Bearer ${accessToken}` },
       });
-      let data: Auth0UserInfo = await response.json();
+      const data = (await response.json()) as Auth0UserInfo;
       profile._json = data;
       if (data.sub) {
          profile.id = data.sub;

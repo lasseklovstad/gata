@@ -1,6 +1,6 @@
+import { Plus } from "lucide-react";
 import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 import { Link, Outlet, useLoaderData } from "react-router";
-import { Plus } from "lucide-react";
 
 import { getReportsSimple } from "~/.server/db/report";
 import { PageLayout } from "~/components/PageLayout";

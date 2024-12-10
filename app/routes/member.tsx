@@ -1,5 +1,4 @@
-import type { LoaderFunctionArgs } from "react-router";
-import type { MetaFunction } from "react-router";
+import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 import { Outlet, useParams } from "react-router";
 
 import { getUser } from "~/.server/db/user";

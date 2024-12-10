@@ -1,6 +1,6 @@
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
-import { useFetcher } from "react-router";
 import { ChevronDown } from "lucide-react";
+import { useFetcher } from "react-router";
 
 import type { User } from "~/.server/db/user";
 import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/ui/form";
@@ -34,7 +34,7 @@ export const SelectPrimaryEmail = ({ user }: Props) => {
                      name={props.name}
                      value={selectedOption?.value}
                      onChange={(option) => {
-                        fetcher.submit(
+                        void fetcher.submit(
                            { primaryUserEmail: option, intent: memberIntent.updatePrimaryUserEmail },
                            { method: "POST" }
                         );

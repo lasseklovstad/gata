@@ -1,7 +1,9 @@
-import type { RouteConfigEntry } from "@react-router/dev/routes";
-import { KnipConfig } from "knip";
 import path from "path";
 import { fileURLToPath } from "url";
+
+import type { RouteConfigEntry } from "@react-router/dev/routes";
+
+import type { KnipConfig } from "knip";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 const appDir = __dirname + "/app";

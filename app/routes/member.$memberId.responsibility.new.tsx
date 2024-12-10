@@ -1,6 +1,6 @@
+import { Save } from "lucide-react";
 import type { LoaderFunctionArgs } from "react-router";
 import { Link, useFetcher, useLoaderData } from "react-router";
-import { Save } from "lucide-react";
 
 import { getResponsibilities } from "~/.server/db/responsibility";
 import { Button } from "~/components/ui/button";

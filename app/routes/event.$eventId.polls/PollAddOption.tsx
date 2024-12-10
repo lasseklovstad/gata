@@ -1,6 +1,6 @@
-import { useFetcher } from "react-router";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useFetcher } from "react-router";
 
 import type { Poll } from "~/.server/db/gataEvent";
 import { Button } from "~/components/ui/button";

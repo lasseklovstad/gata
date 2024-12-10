@@ -28,7 +28,7 @@ export const withImages = (editor: Editor, submit: SubmitFunction) => {
                   const tempId = generateSavingImageId();
                   if (typeof data === "string") {
                      insertSavingImage(editor, tempId);
-                     submit(
+                     void submit(
                         { data, intent: reportInfoIntent.postFileIntent },
                         { method: "POST", fetcherKey: tempId, navigate: false }
                      );

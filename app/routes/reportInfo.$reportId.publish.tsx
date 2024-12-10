@@ -45,7 +45,7 @@ export default function PublishReport() {
    const fetcher = useFetcher<typeof action>();
    const navigate = useNavigate();
    const { reportEmails } = useLoaderData<typeof loader>();
-   const onClose = () => navigate("..");
+   const onClose = () => void navigate("..");
 
    if (fetcher.data) {
       return (

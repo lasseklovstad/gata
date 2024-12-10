@@ -4,8 +4,8 @@ import { Authenticator } from "remix-auth";
 import { getOptionalUserFromExternalUserId } from "~/.server/db/user";
 import type { Auth0User } from "~/types/Auth0User";
 
-import { env } from "./env.server";
 import { Auth0Strategy } from "./auth0";
+import { env } from "./env.server";
 
 type UserPreference = {
    loginPath: string;

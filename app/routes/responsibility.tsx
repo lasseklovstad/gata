@@ -1,6 +1,6 @@
+import { Pencil, Plus, Trash } from "lucide-react";
 import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 import { Link, Outlet, useLoaderData } from "react-router";
-import { Pencil, Plus, Trash } from "lucide-react";
 
 import { getResponsibilitiesWithCurrentlyResponsibleUsername } from "~/.server/db/responsibility";
 import { PageLayout } from "~/components/PageLayout";

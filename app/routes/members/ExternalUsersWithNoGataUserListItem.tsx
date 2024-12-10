@@ -1,5 +1,5 @@
-import { useFetcher } from "react-router";
 import { Plus, Trash, User } from "lucide-react";
+import { useFetcher } from "react-router";
 
 import type { ExternalUser } from "db/schema";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -16,11 +16,11 @@ export const ExternalUsersWithNoGataUserListItem = ({ user }: ExternalUsersWithN
    const fetcher = useFetcher<typeof action>();
 
    const handleAddClick = () => {
-      fetcher.submit({ externalUserId: user.id }, { method: "POST" });
+      void fetcher.submit({ externalUserId: user.id }, { method: "POST" });
    };
 
    const handleDeleteClick = () => {
-      fetcher.submit({ externalUserId: user.id }, { method: "DELETE" });
+      void fetcher.submit({ externalUserId: user.id }, { method: "DELETE" });
    };
 
    return (

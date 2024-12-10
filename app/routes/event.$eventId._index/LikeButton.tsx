@@ -1,6 +1,6 @@
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import { useFetcher } from "react-router";
 import { ThumbsUp } from "lucide-react";
+import { useFetcher } from "react-router";
 
 import { Button } from "~/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
@@ -42,9 +42,12 @@ export const LikeButton = ({ messageId, loggedInUserId, likes, size, className }
                      value={selectedLikeType}
                      onValueChange={(type) => {
                         if (!type) {
-                           fetcher.submit({ type: "thumbsUp", intent: "likeMessage", messageId }, { method: "DELETE" });
+                           void fetcher.submit(
+                              { type: "thumbsUp", intent: "likeMessage", messageId },
+                              { method: "DELETE" }
+                           );
                         } else {
-                           fetcher.submit({ type: type, intent: "likeMessage", messageId }, { method: "POST" });
+                           void fetcher.submit({ type: type, intent: "likeMessage", messageId }, { method: "POST" });
                         }
                         close();
                      }}
