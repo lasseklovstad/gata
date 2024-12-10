@@ -26,10 +26,6 @@ jobs:
       - name: Download deps
         uses: bahmutov/npm-install@v1
 
-      - name: Run typescript checks
-        run: |
-          npm run typecheck
-
       - name: Run linting checks
         run: |
           npm run lint:ci
@@ -50,7 +46,7 @@ jobs:
 
       - name: Run frontend tests
         run: |
-          npm run knip          
+          npm run typecheck && npm run knip          
   integration:
     name: Integration tests
     runs-on: "ubuntu-latest"
