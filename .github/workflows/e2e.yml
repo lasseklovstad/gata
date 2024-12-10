@@ -28,7 +28,7 @@ jobs:
 
       - name: Run linting checks
         run: |
-          npm run lint:ci
+          npm run typecheck && npm run lint:ci
   knip:
     name: Knip Frontend
     runs-on: "ubuntu-latest"
