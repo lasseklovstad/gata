@@ -18,7 +18,7 @@ import { getCloudinaryUploadFolder } from "~/utils/cloudinaryUtils";
 import { formatDateTime } from "~/utils/date.utils";
 import { isAdmin } from "~/utils/roleUtils";
 
-import { reportInfoIntent } from "./intent";
+import { reportInfoIntent, ReportInfoSchema } from "./intent";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
    return [{ title: `${data?.report.title} - Gata` }];
@@ -34,19 +34,19 @@ export const loader = async ({ request, params: { reportId } }: LoaderFunctionAr
 export const action = async ({ request, params }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    const formData = await request.formData();
-   const intent = String(formData.get("intent"));
+   const result = ReportInfoSchema.parse(formData);
 
    if (!params.reportId) {
       throw new Error("Report id is required");
    }
 
-   switch (intent) {
+   switch (result.intent) {
       case reportInfoIntent.updateContentIntent: {
-         await updateReportContent(params.reportId, String(formData.get("content")), loggedInUser);
-         return { ok: true, close: String(formData.get("close")), intent: reportInfoIntent.updateContentIntent };
+         await updateReportContent(params.reportId, result.content, loggedInUser);
+         return { ok: true, close: result.close, intent: reportInfoIntent.updateContentIntent };
       }
       case reportInfoIntent.postFileIntent: {
-         const data = String(formData.get("data"));
+         const data = result.data;
          const folder = `${getCloudinaryUploadFolder()}/report-${params.reportId}`;
          const { public_id, secure_url } = await uploadImage(data, folder);
          const [file] = await insertReportFile({
@@ -59,9 +59,6 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
             file,
             intent: reportInfoIntent.postFileIntent,
          };
-      }
-      default: {
-         throw new Response(`Invalid intent "${intent}"`, { status: 400 });
       }
    }
 };

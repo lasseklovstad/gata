@@ -18,12 +18,11 @@ import { Typography } from "~/components/ui/typography";
 import { LinkExternalUserToGataUserSelect } from "~/routes/member.$memberId._index/components/LinkExternalUserToGataUserSelect";
 import { UserInfo } from "~/routes/member.$memberId._index/components/UserInfo";
 import { createAuthenticator } from "~/utils/auth.server";
-import { updateContingentSchema } from "~/utils/formSchema";
 import { badRequest } from "~/utils/responseUtils";
 import { isAdmin, requireAdminRole } from "~/utils/roleUtils";
 
 import { RoleButton } from "./components/RoleButton";
-import { memberIntent } from "./intent";
+import { MemberActionSchema, memberIntent } from "./intent";
 
 export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
@@ -44,10 +43,15 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
       throw badRequest("Member id required");
    }
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
-   const formData = await request.formData();
-   const intent = String(formData.get("intent"));
+   const result = MemberActionSchema.safeParse(await request.formData());
 
-   switch (intent) {
+   if (!result.success) {
+      throw new Response(`Feil ved validering av skjema`, { status: 400 });
+   }
+
+   const form = result.data;
+
+   switch (form.intent) {
       case memberIntent.deleteUser: {
          requireAdminRole(loggedInUser);
          if (loggedInUser.id === memberId) {
@@ -58,34 +62,28 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
       }
       case memberIntent.updateRole: {
          requireAdminRole(loggedInUser);
-         const roleId = String(formData.get("roleId"));
          if (request.method === "DELETE") {
-            await deleteRole(roleId, memberId);
+            await deleteRole(form.roleId, memberId);
          } else if (request.method === "POST") {
-            await insertRole(roleId, memberId);
+            await insertRole(form.roleId, memberId);
          }
          return { ok: true };
       }
       case memberIntent.updateContingent: {
          requireAdminRole(loggedInUser);
-         const { amount, hasPaid, year } = updateContingentSchema.parse(formData);
+         const { amount, hasPaid, year } = form;
          await updateContingent(memberId, year, hasPaid, amount);
 
          return { ok: true };
       }
       case memberIntent.updateLinkedUsers: {
          requireAdminRole(loggedInUser);
-         const externalUserIds = formData.getAll("externalUserId").map(String);
-         await updateLinkedExternalUsers(memberId, externalUserIds);
+         await updateLinkedExternalUsers(memberId, form.externalUserId);
          return { ok: true };
       }
       case memberIntent.updatePrimaryUserEmail: {
-         const primaryUserEmail = String(formData.get("primaryUserEmail"));
-         await updatePrimaryEmail(memberId, primaryUserEmail);
+         await updatePrimaryEmail(memberId, form.primaryUserEmail);
          return { ok: true };
-      }
-      default: {
-         throw new Response(`Invalid intent "${intent}"`, { status: 400 });
       }
    }
 };

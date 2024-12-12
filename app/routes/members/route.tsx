@@ -1,6 +1,7 @@
 import { Mail } from "lucide-react";
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "react-router";
 import { Link, Outlet, useLoaderData } from "react-router";
+import { zfd } from "zod-form-data";
 
 import { getAllSubscriptions } from "~/.server/db/pushSubscriptions";
 import { deleteExternalUser, getNotMemberUsers, getUsers, insertUser } from "~/.server/db/user";
@@ -28,11 +29,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
    return { users, externalUsers, subscriptions: subscriptions.map((s) => s.userId) };
 };
 
+const MembersActionSchema = zfd.formData({
+   externalUserId: zfd.text(),
+});
+
 export const action = async ({ request }: ActionFunctionArgs) => {
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
    requireAdminRole(loggedInUser);
-   const form = await request.formData();
-   const externalUserId = String(form.get("externalUserId"));
+   const { externalUserId } = MembersActionSchema.parse(await request.formData());
    if (request.method === "POST") {
       await insertUser(externalUserId);
       return { ok: true };
