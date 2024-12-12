@@ -1,6 +1,6 @@
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/react";
-import { useSubmit } from "@remix-run/react";
 import { Check, ChevronDown } from "lucide-react";
+import { useSubmit } from "react-router";
 
 import type { User } from "~/.server/db/user";
 
@@ -19,7 +19,7 @@ export const EventOrganizers = ({ users, organizers }: Props) => {
             const formData = new FormData();
             organizers.forEach((userId) => formData.append("organizers", userId));
             formData.set("intent", "updateOrganizers");
-            submit(formData, { method: "PUT" });
+            void submit(formData, { method: "PUT" });
          }}
       >
          <ListboxButton className="border items-center outline-none rounded bg-background flex gap-2 py-2 px-2 data-[focus]:ring-2 data-[focus]:ring-ring data-[focus]:ring-offset-2">

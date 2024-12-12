@@ -1,7 +1,6 @@
-import type { SerializeFrom } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
 import { Edit, EllipsisVertical, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useFetcher } from "react-router";
 
 import type { GataEvent } from "~/.server/db/gataEvent";
 import { ConfirmDialog } from "~/components/ConfirmDialog";
@@ -20,7 +19,7 @@ import { EventForm } from "./EventForm";
 import type { action } from "./route";
 
 type Props = {
-   event: SerializeFrom<GataEvent>;
+   event: GataEvent;
    numberOfImages: number;
 };
 
@@ -63,8 +62,8 @@ export const EventMenu = ({ event, numberOfImages }: Props) => {
                   ? "Er du sikker på at du vil slette arrangmentet?"
                   : "Du kan ikke slette arrangementet ettersom det fortsatt finnes bilder..."
             }
-            onConfirm={() => {
-               fetcher.submit({ intent: "deleteEvent" }, { method: "DELETE" });
+            onConfirm={async () => {
+               await fetcher.submit({ intent: "deleteEvent" }, { method: "DELETE" });
             }}
             isLoading={fetcher.state !== "idle"}
             disabled={numberOfImages > 0}

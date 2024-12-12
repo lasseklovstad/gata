@@ -1,5 +1,5 @@
-import { Link } from "@remix-run/react";
 import { Check, X, Bell, BellOff, MailCheck, MailMinus } from "lucide-react";
+import { Link } from "react-router";
 
 import type { User } from "~/.server/db/user";
 import { AvatarUser } from "~/components/AvatarUser";

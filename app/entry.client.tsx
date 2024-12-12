@@ -1,6 +1,6 @@
-import { RemixBrowser } from "@remix-run/react";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
+import { HydratedRouter } from "react-router/dom";
 
 if ("serviceWorker" in navigator) {
    navigator.serviceWorker
@@ -17,7 +17,7 @@ startTransition(() => {
    hydrateRoot(
       document,
       <StrictMode>
-         <RemixBrowser />
+         <HydratedRouter />
       </StrictMode>
    );
 });

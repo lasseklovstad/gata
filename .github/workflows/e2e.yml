@@ -26,13 +26,9 @@ jobs:
       - name: Download deps
         uses: bahmutov/npm-install@v1
 
-      - name: Run typescript checks
-        run: |
-          npm run typecheck
-
       - name: Run linting checks
         run: |
-          npm run lint:ci
+          npm run typecheck && npm run lint:ci
   knip:
     name: Knip Frontend
     runs-on: "ubuntu-latest"
@@ -50,7 +46,7 @@ jobs:
 
       - name: Run frontend tests
         run: |
-          npm run knip          
+          npm run typecheck && npm run knip          
   integration:
     name: Integration tests
     runs-on: "ubuntu-latest"
@@ -77,6 +73,7 @@ jobs:
       AUTH0_CLIENT_ID: ${{secrets.AUTH0_CLIENT_ID}}
       AUTH0_CLIENT_SECRET: ${{secrets.AUTH0_CLIENT_SECRET}}
       AUTH0_AUDIENCE: "https://gataersamla.no"
+      AUTH0_CALLBACK: "http://localhost:3000/callback"
       AUTH0_COOKIE_SECRET: "s3cret"
       APP_DATABASE_URL: "./sqlite.db"
       DEFAULT_CONTINGENT_SIZE: 600

@@ -1,6 +1,6 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Plus } from "lucide-react";
+import type { LoaderFunctionArgs, MetaFunction } from "react-router";
+import { Link, Outlet, useLoaderData } from "react-router";
 
 import { getReportsSimple } from "~/.server/db/report";
 import { PageLayout } from "~/components/PageLayout";

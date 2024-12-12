@@ -1,6 +1,6 @@
-import { Form } from "@remix-run/react";
 import { Bell } from "lucide-react";
 import { useId, useRef } from "react";
+import { Form } from "react-router";
 
 import type { EventParticipant } from "~/.server/db/gataEvent";
 import type { User } from "~/.server/db/user";

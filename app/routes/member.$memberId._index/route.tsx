@@ -1,7 +1,6 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { useFetcher, useLoaderData } from "@remix-run/react";
 import { Trash } from "lucide-react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { redirect, useFetcher, useLoaderData } from "react-router";
 
 import { getContingentInfo, updateContingent } from "~/.server/db/contigent";
 import { deleteRole, getRoles, insertRole } from "~/.server/db/role";
@@ -96,8 +95,8 @@ export default function MemberInfoPage() {
    const fetcher = useFetcher<typeof action>();
    const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog({
       text: "Ved å slette mister vi all informasjon knyttet til brukeren",
-      onConfirm: () => {
-         fetcher.submit({ intent: memberIntent.deleteUser }, { method: "DELETE" });
+      onConfirm: async () => {
+         await fetcher.submit({ intent: memberIntent.deleteUser }, { method: "DELETE" });
       },
    });
    const isUserAdmin = isAdmin(loggedInUser);

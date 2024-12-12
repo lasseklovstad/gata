@@ -1,6 +1,6 @@
-import { useSubmit } from "@remix-run/react";
 import { Loader2, Save } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useSubmit } from "react-router";
 import { createEditor } from "slate";
 import type { Descendant } from "slate";
 import { withHistory } from "slate-history";

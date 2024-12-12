@@ -1,6 +1,5 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { useFetcher, useNavigate } from "@remix-run/react";
+import type { ActionFunctionArgs } from "react-router";
+import { redirect, useFetcher, useNavigate } from "react-router";
 
 import { deleteResponsibilityYear } from "~/.server/db/responsibility";
 import { Button } from "~/components/ui/button";
@@ -25,7 +24,7 @@ export default function ConfirmDelete() {
    const { dialogRef } = useDialog({ defaultOpen: true });
    const navigate = useNavigate();
    const fetcher = useFetcher<typeof action>();
-   const onClose = () => navigate("..");
+   const onClose = () => void navigate("..");
 
    return (
       <Dialog ref={dialogRef} onClose={onClose}>

@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 
 import { addPollVoteAndNotify, createNewPoll, updatePollAndNotify } from "~/.server/data-layer/eventPoll";

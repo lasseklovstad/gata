@@ -1,15 +1,9 @@
 /// <reference types="vitest" />
-import { vitePlugin as remix } from "@remix-run/dev";
-import { remixDevTools } from "remix-development-tools";
+import { reactRouter } from "@react-router/dev/vite";
+import { reactRouterDevTools } from "react-router-devtools";
 import { defineConfig } from "vite";
 import checker from "vite-plugin-checker";
 import tsconfigPaths from "vite-tsconfig-paths";
-
-declare module "@remix-run/node" {
-   interface Future {
-      unstable_singleFetch: true;
-   }
-}
 
 export default defineConfig({
    ssr: {
@@ -19,17 +13,8 @@ export default defineConfig({
       port: 3000,
    },
    plugins: [
-      process.env.SHOW_REMIX_DEVTOOLS === "true" ? remixDevTools() : undefined,
-      remix({
-         future: {
-            v3_fetcherPersist: true,
-            v3_relativeSplatPath: true,
-            v3_throwAbortReason: true,
-            unstable_optimizeDeps: true,
-            v3_lazyRouteDiscovery: true,
-            v3_singleFetch: true,
-         },
-      }),
+      process.env.SHOW_REMIX_DEVTOOLS === "true" ? reactRouterDevTools() : undefined,
+      reactRouter(),
       tsconfigPaths(),
       process.env.NODE_ENV === "development" ? checker({ typescript: true }) : undefined,
    ],

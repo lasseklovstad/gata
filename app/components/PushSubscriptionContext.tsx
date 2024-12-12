@@ -1,5 +1,5 @@
-import { useFetcher } from "@remix-run/react";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useFetcher } from "react-router";
 
 import type { action } from "~/routes/subscribe";
 
@@ -39,10 +39,10 @@ export const PushSubscriptionProvider = ({ children, pwaPublicKey }: { children:
                userVisibleOnly: true,
                applicationServerKey: pwaPublicKey,
             })
-            .then((subscription) => {
+            .then(async (subscription) => {
                setSubscription(subscription);
 
-               fetcher.submit(JSON.stringify(subscription), {
+               await fetcher.submit(JSON.stringify(subscription), {
                   action: "/subscribe",
                   encType: "application/json",
                   preventScrollReset: true,
@@ -59,9 +59,9 @@ export const PushSubscriptionProvider = ({ children, pwaPublicKey }: { children:
       if (!subscription) return;
       await subscription
          .unsubscribe()
-         .then(() => {
+         .then(async () => {
             setSubscription(null);
-            fetcher.submit(JSON.stringify(subscription), {
+            await fetcher.submit(JSON.stringify(subscription), {
                action: "/subscribe",
                encType: "application/json",
                preventScrollReset: true,

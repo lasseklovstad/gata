@@ -1,6 +1,6 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Mail } from "lucide-react";
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "react-router";
+import { Link, Outlet, useLoaderData } from "react-router";
 
 import { getAllSubscriptions } from "~/.server/db/pushSubscriptions";
 import { deleteExternalUser, getNotMemberUsers, getUsers, insertUser } from "~/.server/db/user";

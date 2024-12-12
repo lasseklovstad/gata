@@ -1,7 +1,7 @@
 import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from "@headlessui/react";
-import { useFetcher } from "@remix-run/react";
 import { ChevronDown, X } from "lucide-react";
 import { useRef, useState } from "react";
+import { useFetcher } from "react-router";
 
 import type { ExternalUser } from "db/schema";
 import type { User } from "~/.server/db/user";
@@ -56,7 +56,7 @@ export const LinkExternalUserToGataUserSelect = ({
       const formData = new FormData();
       formData.set("intent", memberIntent.updateLinkedUsers);
       userIds.forEach((userId) => formData.append("externalUserId", userId));
-      fetcher.submit(formData, { method: "PUT" });
+      void fetcher.submit(formData, { method: "PUT" });
       setQuery("");
    };
    return (

@@ -1,5 +1,5 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Navigate, useLoaderData } from "@remix-run/react";
+import type { LoaderFunctionArgs, MetaFunction } from "react-router";
+import { Navigate, useLoaderData } from "react-router";
 import { z } from "zod";
 
 import { getEvent } from "~/.server/db/gataEvent";

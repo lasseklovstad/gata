@@ -1,6 +1,6 @@
-import { useFetcher } from "@remix-run/react";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useFetcher } from "react-router";
 
 import { Button, ButtonResponsive } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";

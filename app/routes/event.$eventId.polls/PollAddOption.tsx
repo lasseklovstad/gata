@@ -1,7 +1,6 @@
-import type { SerializeFrom } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useFetcher } from "react-router";
 
 import type { Poll } from "~/.server/db/gataEvent";
 import { Button } from "~/components/ui/button";
@@ -13,7 +12,7 @@ import { PollFormOptions } from "./PollFormOptions";
 import type { action } from "./route";
 
 type Props = {
-   poll: SerializeFrom<Poll["poll"]>;
+   poll: Poll["poll"];
 };
 
 export const PollAddOption = ({ poll }: Props) => {

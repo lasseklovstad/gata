@@ -1,4 +1,4 @@
-import type { SubmitFunction } from "@remix-run/react";
+import type { SubmitFunction } from "react-router";
 import { Editor, Element, Transforms } from "slate";
 
 import { reportInfoIntent } from "~/routes/reportInfo.$reportId/intent";
@@ -28,7 +28,7 @@ export const withImages = (editor: Editor, submit: SubmitFunction) => {
                   const tempId = generateSavingImageId();
                   if (typeof data === "string") {
                      insertSavingImage(editor, tempId);
-                     submit(
+                     void submit(
                         { data, intent: reportInfoIntent.postFileIntent },
                         { method: "POST", fetcherKey: tempId, navigate: false }
                      );

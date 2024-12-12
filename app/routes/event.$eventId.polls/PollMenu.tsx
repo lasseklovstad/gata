@@ -1,7 +1,6 @@
-import type { SerializeFrom } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
 import { Edit, EllipsisVertical, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useFetcher } from "react-router";
 
 import type { Poll } from "~/.server/db/gataEvent";
 import { ConfirmDialog } from "~/components/ConfirmDialog";
@@ -20,7 +19,7 @@ import { useDialog } from "~/utils/dialogUtils";
 import type { action } from "./route";
 
 type Props = {
-   poll: SerializeFrom<Poll["poll"]>;
+   poll: Poll["poll"];
 };
 
 export const PollMenu = ({ poll }: Props) => {
@@ -58,8 +57,8 @@ export const PollMenu = ({ poll }: Props) => {
             onClose={() => setDeleteDialogOpen(false)}
             open={deleteDialogOpen}
             text="Er du sikker på at du vil slette avstemningen?"
-            onConfirm={() => {
-               fetcher.submit({ intent: "deletePoll", pollId: poll.id }, { method: "DELETE" });
+            onConfirm={async () => {
+               await fetcher.submit({ intent: "deletePoll", pollId: poll.id }, { method: "DELETE" });
             }}
             isLoading={fetcher.state !== "idle"}
          />

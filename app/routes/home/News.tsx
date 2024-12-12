@@ -1,6 +1,6 @@
-import { Link, Outlet } from "@remix-run/react";
 import { Plus, Calendar } from "lucide-react";
 import { useId } from "react";
+import { Link, Outlet } from "react-router";
 
 import type { GataReport } from "db/schema";
 import type { User } from "~/.server/db/user";

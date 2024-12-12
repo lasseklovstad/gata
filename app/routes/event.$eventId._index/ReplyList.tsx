@@ -1,4 +1,3 @@
-import type { SerializeFrom } from "@remix-run/node";
 import { intervalToDuration } from "date-fns";
 import { useState } from "react";
 
@@ -8,12 +7,12 @@ import { Typography } from "~/components/ui/typography";
 import { cn } from "~/utils";
 import { getDateWithTimeZone } from "~/utils/date.utils";
 
+import type { Route } from "./+types/route";
 import { LikeButton } from "./LikeButton";
 import { Likes } from "./Likes";
-import type { loader } from "./route";
 
 type Props = {
-   message: SerializeFrom<typeof loader>["messages"][number]["message"];
+   message: Route.ComponentProps["loaderData"]["messages"][number]["message"];
    focusMessageId: string | null;
    loggedInUserId: string;
 };
