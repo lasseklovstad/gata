@@ -24,7 +24,7 @@ const UpdateContingentSchema = zfd.formData({
 });
 const UpdateLinkedUsersSchema = zfd.formData({
    intent: z.literal(memberIntent.updateLinkedUsers),
-   externalUserId: z.array(zfd.text()),
+   externalUserId: zfd.repeatable(z.array(zfd.text()).min(1)),
 });
 const UpdatePrimaryUserEmailSchema = zfd.formData({
    intent: z.literal(memberIntent.updatePrimaryUserEmail),
