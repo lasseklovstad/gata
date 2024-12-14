@@ -23,6 +23,10 @@ export const getUser = async (userId: string) => {
    return userResult;
 };
 
+export const getUserByName = (name: string) => {
+   return db.query.user.findFirst({ where: eq(user.name, name) });
+};
+
 export const getOptionalUserFromExternalUserId = async (externalUserId: string) => {
    const userResult = await db.query.externalUser.findFirst({
       columns: {},

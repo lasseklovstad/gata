@@ -18,6 +18,7 @@ import {
    insertEventMessageReply,
    insertMessageLike,
 } from "~/.server/db/gataEvent";
+import { getAllUsersWithSubscription } from "~/.server/db/pushSubscriptions";
 import { AvatarUserButton } from "~/components/AvatarUser";
 import { CloudImageGallery } from "~/components/CloudImageGallery";
 import { Button } from "~/components/ui/button";
@@ -49,12 +50,13 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    }
    const { eventId } = paramsParsed.data;
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
-   const [polls, cloudinaryImages, messages] = await Promise.all([
+   const [polls, cloudinaryImages, messages, usersWithSubscription] = await Promise.all([
       getEventPollsSimple(eventId),
       getEventCloudinaryImages(eventId),
       getEventMessages(eventId),
+      getAllUsersWithSubscription(loggedInUser.id),
    ]);
-   return { polls, cloudinaryImages, eventId, messages, loggedInUser };
+   return { polls, cloudinaryImages, eventId, messages, loggedInUser, usersWithSubscription };
 };
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
@@ -76,7 +78,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       }
       const { message } = parsedForm.data;
       const messageId = await insertEventMessage(eventId, loggendInUser.id, message);
-      await notifyParticipantsNewPostCreated(loggendInUser, eventId, messageId);
+      await notifyParticipantsNewPostCreated(loggendInUser, eventId, messageId, message);
       startEmit();
       return { ok: true } as const;
    }
@@ -105,7 +107,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 };
 
 export default function EventActivities() {
-   const { polls, cloudinaryImages, eventId, messages, loggedInUser } = useLiveLoader<typeof loader>();
+   const { polls, cloudinaryImages, eventId, messages, loggedInUser, usersWithSubscription } =
+      useLiveLoader<typeof loader>();
    const [searchParams] = useSearchParams();
    const activePollsTitleId = useId();
    const activePolls = polls.filter((p) => p.poll.isActive);
@@ -150,7 +153,7 @@ export default function EventActivities() {
                Se alle bilder
             </Button>
          ) : null}
-         <NewMessageForm />
+         <NewMessageForm usersWithSubscription={usersWithSubscription} />
          <ul className="flex flex-col gap-2 w-full" aria-label="Innlegg">
             {messages.map(({ message }) => (
                <li
@@ -181,7 +184,7 @@ export default function EventActivities() {
                      />
                   </div>
                   <ReplyList message={message} loggedInUserId={loggedInUser.id} focusMessageId={focusMessageId} />
-                  <ReplyMessageForm messageId={message.id} />
+                  <ReplyMessageForm messageId={message.id} usersWithSubscription={usersWithSubscription} />
                </li>
             ))}
          </ul>

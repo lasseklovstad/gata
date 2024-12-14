@@ -22,8 +22,9 @@ import {
    useRouteError,
    useRouteLoaderData,
 } from "react-router";
+import { z } from "zod";
 
-import { getOptionalUserFromExternalUserId, updateUser } from "./.server/db/user";
+import { getOptionalUserFromExternalUserId, getUserByName, updateUser } from "./.server/db/user";
 import { cropProfileImage } from "./.server/services/localImageService";
 import { PushSubscriptionProvider } from "./components/PushSubscriptionContext";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
@@ -153,7 +154,20 @@ export const action = async ({ request }: ActionFunctionArgs) => {
    const intent = formData.get("intent");
 
    if (intent === "updateProfile") {
-      const formResult = profileSchema.safeParse(formData);
+      const formResult = await profileSchema
+         .superRefine(async (profile, ctx) => {
+            const existingUser = await getUserByName(profile.name);
+            if (existingUser && loggedInUser.id !== existingUser.id) {
+               ctx.addIssue({
+                  path: ["name"],
+                  code: z.ZodIssueCode.custom,
+                  message: "Du kan ikke ha samme navn som en annen bruker",
+               });
+               return z.NEVER;
+            }
+            return profile;
+         })
+         .safeParseAsync(formData);
       if (!formResult.success) {
          return transformErrorResponse(formResult.error);
       }

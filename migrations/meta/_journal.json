@@ -78,6 +78,13 @@
       "when": 1731161901881,
       "tag": "0010_low_microchip",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1734216120138,
+      "tag": "0011_chilly_fallen_one",
+      "breakpoints": true
     }
   ]
 }

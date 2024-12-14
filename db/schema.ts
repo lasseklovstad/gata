@@ -10,7 +10,7 @@ export const user = sqliteTable("gata_user", {
       .$defaultFn(() => crypto.randomUUID()),
    subscribe: integer("subscribe", { mode: "boolean" }).default(false).notNull(),
    primaryExternalUserId: text("primary_external_user_id").notNull().unique(),
-   name: text("name").notNull(),
+   name: text("name").notNull().unique(),
    picture: text("picture").notNull(),
    //.references((): AnySQLiteColumn => externalUser.id),
 });

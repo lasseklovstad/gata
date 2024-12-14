@@ -1,8 +1,8 @@
-import { and, eq, getTableColumns, isNull, ne, or } from "drizzle-orm";
+import { and, eq, exists, getTableColumns, isNull, ne, or } from "drizzle-orm";
 import { union } from "drizzle-orm/sqlite-core";
 
 import { db } from "db/config.server";
-import { eventOrganizer, eventParticipants, messageReplies, messages, pushSubscriptions } from "db/schema";
+import { eventOrganizer, eventParticipants, messageReplies, messages, pushSubscriptions, user } from "db/schema";
 
 export const insertPushSubscription = async (userId: string, endpoint: string, subscription: PushSubscriptionJSON) => {
    await db.insert(pushSubscriptions).values({ userId, subscription, endpoint });
@@ -16,14 +16,44 @@ export const getAllSubscriptions = async (notIncludedUser: string) => {
    return await db.select().from(pushSubscriptions).where(ne(pushSubscriptions.userId, notIncludedUser));
 };
 
-export const getAllSubscriptionsNotUnsubscribedEvent = async (eventId: number, notIncludedUser: string) => {
+export const getAllUsersWithSubscription = async (notIncludedUser: string) => {
    return await db
-      .select(getTableColumns(pushSubscriptions))
+      .select()
+      .from(user)
+      .where(
+         and(
+            ne(user.id, notIncludedUser),
+            exists(
+               db
+                  .select({ id: pushSubscriptions.userId })
+                  .from(pushSubscriptions)
+                  .where(eq(pushSubscriptions.userId, user.id))
+            )
+         )
+      );
+};
+
+export const getAllSubscriptionsForEvent = async (eventId: number, notIncludedUser: string) => {
+   return await db
+      .select({ ...getTableColumns(pushSubscriptions), name: user.name, unsubscribed: eventParticipants.unsubscribed })
       .from(pushSubscriptions)
       .leftJoin(
          eventParticipants,
          and(eq(eventParticipants.userId, pushSubscriptions.userId), eq(eventParticipants.eventId, eventId))
       )
+      .innerJoin(user, eq(user.id, pushSubscriptions.userId))
+      .where(ne(pushSubscriptions.userId, notIncludedUser));
+};
+
+export const getAllSubscriptionsNotUnsubscribedEvent = async (eventId: number, notIncludedUser: string) => {
+   return await db
+      .select({ ...getTableColumns(pushSubscriptions), name: user.name })
+      .from(pushSubscriptions)
+      .leftJoin(
+         eventParticipants,
+         and(eq(eventParticipants.userId, pushSubscriptions.userId), eq(eventParticipants.eventId, eventId))
+      )
+      .innerJoin(user, eq(user.id, pushSubscriptions.userId))
       .where(
          and(
             ne(pushSubscriptions.userId, notIncludedUser),
