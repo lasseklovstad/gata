@@ -150,13 +150,28 @@ export const notifyParticipantsReplyToPost = async (
    );
 };
 
-export const notifyParticipantLikeOnPost = async (loggedInUser: User, eventId: number, messageId: number) => {
+const likeMapping = {
+   thumbsUp: "👍",
+   thumbsDown: "👎",
+   heart: "❤️",
+   party: "🎉",
+   cry: "😢",
+   angry: "😠",
+   haha: "😂",
+};
+
+export const notifyParticipantLikeOnPost = async (
+   loggedInUser: User,
+   eventId: number,
+   messageId: number,
+   type: keyof typeof likeMapping
+) => {
    const subscriptions = await getSubscriptionForMessage(messageId, loggedInUser.id);
    const event = await getEvent(eventId);
    await sendPushNotification(
       subscriptions.map((s) => s.subscription as PushSubscription),
       {
-         body: `${loggedInUser.name} reagerte på ditt innlegg`,
+         body: `${loggedInUser.name} reagerte ${likeMapping[type]} på ditt innlegg`,
          data: { url: `/event/${eventId}?messageId=${messageId}` },
          icon: "/logo192.png",
          title: event.title,

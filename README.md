@@ -10,6 +10,9 @@
 3. Start app `npm run dev`
 4. Start tests `npx playwright test`
 
+# Testing push notifications on iOS local
+Expose appen: https://dashboard.ngrok.com/get-started/setup/windows. Bytt AUTH0_CALLBACK i `.env` til https://1da4-178-232-121-255.ngrok-free.app/callback. Sjekk at den urlen ligger inne i allowed callbacks i auth0 dashboard.
+
 # Autentisering med Auth0
 
 Google app er registrert her: https://console.cloud.google.com/

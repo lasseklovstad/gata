@@ -23,7 +23,8 @@
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx db/seed.ts",
     "knip:debug": "tsx knip.ts",
-    "launch:webkit": "node launch-webkit.js"
+    "launch:webkit": "node launch-webkit.js",
+    "generate:keys": "node generate-vapid-keys.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.0.3",

@@ -11,6 +11,13 @@ if ("serviceWorker" in navigator) {
       .catch((error) => {
          console.error("Service Worker registration failed:", error);
       });
+
+   // Listen to service worker messages sent via postMessage()
+   navigator.serviceWorker.addEventListener("message", (event) => {
+      if ("url" in event.data) {
+         window.location.href = event.data.url;
+      }
+   });
 }
 
 startTransition(() => {
