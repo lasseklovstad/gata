@@ -12,7 +12,7 @@
     "launch-webkit.js",
     "public/sw.js",
     ".react-router/types/**/*",
-    "knip.ts"
+    "generate-vapid-keys.js"
   ],
   "exclude": ["node_modules"],
   "compilerOptions": {

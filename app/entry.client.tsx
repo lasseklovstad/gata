@@ -13,7 +13,7 @@ if ("serviceWorker" in navigator) {
       });
 
    // Listen to service worker messages sent via postMessage()
-   navigator.serviceWorker.addEventListener("message", (event) => {
+   navigator.serviceWorker.addEventListener("message", (event: MessageEvent<{ url: string }>) => {
       if ("url" in event.data) {
          window.location.href = event.data.url;
       }
