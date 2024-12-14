@@ -22,7 +22,12 @@ export const UserListItem = ({ user, isLoggedInUserAdmin, isPushSubscribed }: Us
                <AvatarUser user={user} />
                <div className="flex-1">
                   <div className="flex gap-2 justify-between">
-                     <Typography variant="largeText">{user.name}</Typography>
+                     <Typography
+                        variant="largeText"
+                        className="text-ellipsis max-w-[190px] sm:max-w-full overflow-hidden"
+                     >
+                        {user.name}
+                     </Typography>
                      <div className="flex gap-2">
                         {isPushSubscribed ? (
                            <Bell className="text-primary" aria-label="Abonnerer på pushvarsler" />

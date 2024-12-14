@@ -43,7 +43,7 @@ export const EventActivityPage = (page: Page) => {
    const addReply = async (message: string, reply: string) => {
       const inputComment = getPostListItem(message).getByPlaceholder("Legg til en kommentar");
       await inputComment.fill(reply);
-      await inputComment.press("Enter");
+      await getPostListItem(message).getByRole("button", { name: "Kommenter" }).click();
       await expect(inputComment).toHaveValue("");
    };
 

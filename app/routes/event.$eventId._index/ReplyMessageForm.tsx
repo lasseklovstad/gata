@@ -1,29 +1,32 @@
 import { Send } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useFetcher } from "react-router";
 
 import { Button } from "~/components/ui/button";
 import { FormControl, FormItem, FormLabel, FormMessage, FormProvider } from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
 
 import type { action } from "./route";
+import { TextareaWithAutocomplete } from "./TextareaWithAutocomplete";
+
+type User = { id: string; name: string; picture: string };
 
 type Props = {
    messageId: number;
+   usersWithSubscription: User[];
 };
 
-export const ReplyMessageForm = ({ messageId }: Props) => {
+export const ReplyMessageForm = ({ messageId, usersWithSubscription }: Props) => {
    const fetcher = useFetcher<typeof action>();
-   const formRef = useRef<HTMLFormElement>(null);
+   const [value, setValue] = useState("");
 
    useEffect(() => {
       if (fetcher.state === "idle" && fetcher.data?.ok) {
-         formRef.current?.reset();
+         setValue("");
       }
    }, [fetcher]);
 
    return (
-      <fetcher.Form className="w-full" method="POST" ref={formRef}>
+      <fetcher.Form className="w-full" method="POST">
          <FormProvider
             errors={fetcher.data?.ok === false ? fetcher.data.errors : undefined}
             className="flex flex-col gap-2 w-full"
@@ -33,7 +36,17 @@ export const ReplyMessageForm = ({ messageId }: Props) => {
                <div className="flex gap-2 w-full">
                   <FormControl
                      render={(props) => (
-                        <Input {...props} autoComplete="off" className="w-full" placeholder="Legg til en kommentar" />
+                        <TextareaWithAutocomplete
+                           inputProps={{
+                              ...props,
+                              placeholder: "Legg til en kommentar. Tag folk med @",
+                              rows: 2,
+                              className: "min-h-2",
+                           }}
+                           setValue={setValue}
+                           value={value}
+                           usersWithSubscription={usersWithSubscription}
+                        />
                      )}
                   />
                   <input hidden readOnly value={messageId} name="messageId" />

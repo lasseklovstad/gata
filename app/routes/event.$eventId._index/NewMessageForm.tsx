@@ -1,20 +1,27 @@
 import { Send } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFetcher } from "react-router";
 
 import { Button } from "~/components/ui/button";
 import { FormControl, FormItem, FormLabel, FormMessage, FormProvider } from "~/components/ui/form";
-import { Textarea } from "~/components/ui/textarea";
 
 import type { action } from "./route";
+import { TextareaWithAutocomplete } from "./TextareaWithAutocomplete";
 
-export const NewMessageForm = () => {
+type User = { id: string; name: string; picture: string };
+
+type Props = {
+   usersWithSubscription: User[];
+};
+
+export const NewMessageForm = ({ usersWithSubscription }: Props) => {
    const fetcher = useFetcher<typeof action>();
    const formRef = useRef<HTMLFormElement>(null);
+   const [value, setValue] = useState("");
 
    useEffect(() => {
       if (fetcher.state === "idle" && fetcher.data?.ok) {
-         formRef.current?.reset();
+         setValue("");
       }
    }, [fetcher]);
 
@@ -25,12 +32,11 @@ export const NewMessageForm = () => {
                <FormLabel>Nytt innlegg</FormLabel>
                <FormControl
                   render={(props) => (
-                     <Textarea
-                        {...props}
-                        autoComplete="off"
-                        name="message"
-                        className="w-full"
-                        placeholder="Skriv noe..."
+                     <TextareaWithAutocomplete
+                        inputProps={{ ...props, placeholder: "Tag folk med @" }}
+                        setValue={setValue}
+                        value={value}
+                        usersWithSubscription={usersWithSubscription}
                      />
                   )}
                />

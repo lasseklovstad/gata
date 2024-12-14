@@ -8,6 +8,7 @@ import {
    getAllSubscriptionsNotUnsubscribedEvent,
    getAllSubscriptionsInvolvedInMessage,
    getSubscriptionForMessage,
+   getAllSubscriptionsForEvent,
 } from "../db/pushSubscriptions";
 import type { User } from "../db/user";
 import { sendPushNotification } from "../services/pushNoticiationService";
@@ -116,18 +117,28 @@ export const notifyParticipantsImagesIsUploaded = async (loggedInUser: User, eve
 export const notifyParticipantsNewPostCreated = async (
    userThatCreatedPost: User,
    eventId: number,
-   messageId: number
+   messageId: number,
+   message: string
 ) => {
-   const subscriptions = await getAllSubscriptionsNotUnsubscribedEvent(eventId, userThatCreatedPost.id);
+   const subscriptions = await getAllSubscriptionsForEvent(eventId, userThatCreatedPost.id);
    const event = await getEvent(eventId);
-   await sendPushNotification(
-      subscriptions.map((s) => s.subscription as PushSubscription),
-      {
-         body: `${userThatCreatedPost.name} publiserte et nytt innlegg`,
-         data: { url: `/event/${eventId}?messageId=${messageId}` },
-         icon: "/logo192.png",
-         title: event.title,
-      }
+   await Promise.all(
+      subscriptions.map((s) => {
+         const subscribed = s.unsubscribed === false || s.unsubscribed === null;
+         const isTagged = message.includes(`@${s.name}`);
+         if (subscribed || isTagged) {
+            // Send push if user is tagged or subscribed
+            return sendPushNotification([s.subscription as PushSubscription], {
+               body: isTagged
+                  ? `${userThatCreatedPost.name} tagget deg i et nytt innlegg`
+                  : `${userThatCreatedPost.name} publiserte et nytt innlegg`,
+               data: { url: `/event/${eventId}?messageId=${messageId}` },
+               icon: "/logo192.png",
+               title: event.title,
+            });
+         }
+         return Promise.resolve();
+      })
    );
 };
 
@@ -135,18 +146,31 @@ export const notifyParticipantsReplyToPost = async (
    loggedInUser: User,
    eventId: number,
    messageId: number,
-   replyId: number
+   replyId: number,
+   message: string
 ) => {
-   const subscriptions = await getAllSubscriptionsInvolvedInMessage(messageId, loggedInUser.id);
+   const subscriptionsInvolvedInMessage = await getAllSubscriptionsInvolvedInMessage(messageId, loggedInUser.id);
+   const subscriptions = await getAllSubscriptionsForEvent(eventId, loggedInUser.id);
    const event = await getEvent(eventId);
-   await sendPushNotification(
-      subscriptions.map((s) => s.subscription as PushSubscription),
-      {
-         body: `${loggedInUser.name} kommenterte på et innlegg`,
-         data: { url: `/event/${eventId}?messageId=${replyId}` },
-         icon: "/logo192.png",
-         title: event.title,
-      }
+   await Promise.all(
+      subscriptions.map((s) => {
+         const subscribedToMessage = subscriptionsInvolvedInMessage.find(
+            (subscription) => subscription.userId === s.userId
+         );
+         const isTagged = message.includes(`@${s.name}`);
+         if (subscribedToMessage || isTagged) {
+            // Send push if user is tagged or subscribed
+            return sendPushNotification([s.subscription as PushSubscription], {
+               body: isTagged
+                  ? `${loggedInUser.name} tagget deg i en kommentar`
+                  : `${loggedInUser.name} kommenterte på et innlegg`,
+               data: { url: `/event/${eventId}?messageId=${replyId}` },
+               icon: "/logo192.png",
+               title: event.title,
+            });
+         }
+         return Promise.resolve();
+      })
    );
 };
 

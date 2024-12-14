@@ -18,6 +18,7 @@ import {
    insertEventMessageReply,
    insertMessageLike,
 } from "~/.server/db/gataEvent";
+import { getAllUsersWithSubscription } from "~/.server/db/pushSubscriptions";
 import { AvatarUserButton } from "~/components/AvatarUser";
 import { CloudImageGallery } from "~/components/CloudImageGallery";
 import { Button } from "~/components/ui/button";
@@ -33,6 +34,7 @@ import { transformErrorResponse } from "~/utils/validateUtils";
 
 import { LikeButton } from "./LikeButton";
 import { Likes } from "./Likes";
+import { Message } from "./Message";
 import { NewMessageForm } from "./NewMessageForm";
 import { ReplyList } from "./ReplyList";
 import { ReplyMessageForm } from "./ReplyMessageForm";
@@ -49,12 +51,13 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    }
    const { eventId } = paramsParsed.data;
    const loggedInUser = await createAuthenticator().getRequiredUser(request);
-   const [polls, cloudinaryImages, messages] = await Promise.all([
+   const [polls, cloudinaryImages, messages, usersWithSubscription] = await Promise.all([
       getEventPollsSimple(eventId),
       getEventCloudinaryImages(eventId),
       getEventMessages(eventId),
+      getAllUsersWithSubscription(loggedInUser.id),
    ]);
-   return { polls, cloudinaryImages, eventId, messages, loggedInUser };
+   return { polls, cloudinaryImages, eventId, messages, loggedInUser, usersWithSubscription };
 };
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
@@ -76,7 +79,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       }
       const { message } = parsedForm.data;
       const messageId = await insertEventMessage(eventId, loggendInUser.id, message);
-      await notifyParticipantsNewPostCreated(loggendInUser, eventId, messageId);
+      await notifyParticipantsNewPostCreated(loggendInUser, eventId, messageId, message);
       startEmit();
       return { ok: true } as const;
    }
@@ -87,7 +90,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       }
       const { reply, messageId } = parsedForm.data;
       const replyId = await insertEventMessageReply(loggendInUser.id, messageId, reply);
-      await notifyParticipantsReplyToPost(loggendInUser, eventId, messageId, replyId);
+      await notifyParticipantsReplyToPost(loggendInUser, eventId, messageId, replyId, reply);
       startEmit();
       return { ok: true } as const;
    }
@@ -105,7 +108,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 };
 
 export default function EventActivities() {
-   const { polls, cloudinaryImages, eventId, messages, loggedInUser } = useLiveLoader<typeof loader>();
+   const { polls, cloudinaryImages, eventId, messages, loggedInUser, usersWithSubscription } =
+      useLiveLoader<typeof loader>();
    const [searchParams] = useSearchParams();
    const activePollsTitleId = useId();
    const activePolls = polls.filter((p) => p.poll.isActive);
@@ -150,7 +154,7 @@ export default function EventActivities() {
                Se alle bilder
             </Button>
          ) : null}
-         <NewMessageForm />
+         <NewMessageForm usersWithSubscription={usersWithSubscription} />
          <ul className="flex flex-col gap-2 w-full" aria-label="Innlegg">
             {messages.map(({ message }) => (
                <li
@@ -168,7 +172,9 @@ export default function EventActivities() {
                         <Typography variant="mutedText">{formatDateTime(message.dateTime)}</Typography>
                      </div>
                   </div>
-                  <div className="p-1">{message.message}</div>
+                  <div className="p-1">
+                     <Message message={message.message} username={loggedInUser.name} />
+                  </div>
                   <div className="border-b-2 py-2">
                      <Likes likes={message.likes} size="normal" />
                   </div>
@@ -180,8 +186,8 @@ export default function EventActivities() {
                         size="normal"
                      />
                   </div>
-                  <ReplyList message={message} loggedInUserId={loggedInUser.id} focusMessageId={focusMessageId} />
-                  <ReplyMessageForm messageId={message.id} />
+                  <ReplyList message={message} loggedInUser={loggedInUser} focusMessageId={focusMessageId} />
+                  <ReplyMessageForm messageId={message.id} usersWithSubscription={usersWithSubscription} />
                </li>
             ))}
          </ul>
