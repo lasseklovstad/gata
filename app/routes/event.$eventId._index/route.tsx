@@ -34,6 +34,7 @@ import { transformErrorResponse } from "~/utils/validateUtils";
 
 import { LikeButton } from "./LikeButton";
 import { Likes } from "./Likes";
+import { Message } from "./Message";
 import { NewMessageForm } from "./NewMessageForm";
 import { ReplyList } from "./ReplyList";
 import { ReplyMessageForm } from "./ReplyMessageForm";
@@ -89,7 +90,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       }
       const { reply, messageId } = parsedForm.data;
       const replyId = await insertEventMessageReply(loggendInUser.id, messageId, reply);
-      await notifyParticipantsReplyToPost(loggendInUser, eventId, messageId, replyId);
+      await notifyParticipantsReplyToPost(loggendInUser, eventId, messageId, replyId, reply);
       startEmit();
       return { ok: true } as const;
    }
@@ -171,7 +172,9 @@ export default function EventActivities() {
                         <Typography variant="mutedText">{formatDateTime(message.dateTime)}</Typography>
                      </div>
                   </div>
-                  <div className="p-1">{message.message}</div>
+                  <div className="p-1">
+                     <Message message={message.message} username={loggedInUser.name} />
+                  </div>
                   <div className="border-b-2 py-2">
                      <Likes likes={message.likes} size="normal" />
                   </div>
@@ -183,7 +186,7 @@ export default function EventActivities() {
                         size="normal"
                      />
                   </div>
-                  <ReplyList message={message} loggedInUserId={loggedInUser.id} focusMessageId={focusMessageId} />
+                  <ReplyList message={message} loggedInUser={loggedInUser} focusMessageId={focusMessageId} />
                   <ReplyMessageForm messageId={message.id} usersWithSubscription={usersWithSubscription} />
                </li>
             ))}

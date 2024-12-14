@@ -1,6 +1,7 @@
 import { intervalToDuration } from "date-fns";
 import { useState } from "react";
 
+import type { User } from "~/.server/db/user";
 import { AvatarUserButton } from "~/components/AvatarUser";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
@@ -10,14 +11,15 @@ import { getDateWithTimeZone } from "~/utils/date.utils";
 import type { Route } from "./+types/route";
 import { LikeButton } from "./LikeButton";
 import { Likes } from "./Likes";
+import { Message } from "./Message";
 
 type Props = {
    message: Route.ComponentProps["loaderData"]["messages"][number]["message"];
    focusMessageId: string | null;
-   loggedInUserId: string;
+   loggedInUser: User;
 };
 
-export const ReplyList = ({ message, focusMessageId, loggedInUserId }: Props) => {
+export const ReplyList = ({ message, focusMessageId, loggedInUser }: Props) => {
    const [replyStartIndex, setReplyStartIndex] = useState(message.replies.length > 5 ? message.replies.length - 5 : 0);
    return (
       <ul className="flex flex-col gap-2" aria-label="Kommentarer">
@@ -49,15 +51,14 @@ export const ReplyList = ({ message, focusMessageId, loggedInUserId }: Props) =>
                      <div>
                         <div className="p-2 bg-gray-200 rounded-xl">
                            <Typography variant="mutedText">{reply.user.name}</Typography>
-                           {reply.message}
-
+                           <Message message={reply.message} username={loggedInUser.name} />
                            <Likes likes={reply.likes} size="small" />
                         </div>
 
                         <div className="flex">
                            <LikeButton
                               messageId={reply.id}
-                              loggedInUserId={loggedInUserId}
+                              loggedInUserId={loggedInUser.id}
                               likes={reply.likes}
                               size="small"
                               className="-mt-2"

@@ -146,18 +146,31 @@ export const notifyParticipantsReplyToPost = async (
    loggedInUser: User,
    eventId: number,
    messageId: number,
-   replyId: number
+   replyId: number,
+   message: string
 ) => {
-   const subscriptions = await getAllSubscriptionsInvolvedInMessage(messageId, loggedInUser.id);
+   const subscriptionsInvolvedInMessage = await getAllSubscriptionsInvolvedInMessage(messageId, loggedInUser.id);
+   const subscriptions = await getAllSubscriptionsForEvent(eventId, loggedInUser.id);
    const event = await getEvent(eventId);
-   await sendPushNotification(
-      subscriptions.map((s) => s.subscription as PushSubscription),
-      {
-         body: `${loggedInUser.name} kommenterte på et innlegg`,
-         data: { url: `/event/${eventId}?messageId=${replyId}` },
-         icon: "/logo192.png",
-         title: event.title,
-      }
+   await Promise.all(
+      subscriptions.map((s) => {
+         const subscribedToMessage = subscriptionsInvolvedInMessage.find(
+            (subscription) => subscription.userId === s.userId
+         );
+         const isTagged = message.includes(`@${s.name}`);
+         if (subscribedToMessage || isTagged) {
+            // Send push if user is tagged or subscribed
+            return sendPushNotification([s.subscription as PushSubscription], {
+               body: isTagged
+                  ? `${loggedInUser.name} tagget deg i en kommentar`
+                  : `${loggedInUser.name} kommenterte på et innlegg`,
+               data: { url: `/event/${eventId}?messageId=${replyId}` },
+               icon: "/logo192.png",
+               title: event.title,
+            });
+         }
+         return Promise.resolve();
+      })
    );
 };
 
