@@ -37,7 +37,9 @@ export const newEventMessageReplySchema = zfd.formData({
    ),
 });
 
+const likeTypes = ["thumbsUp", "thumbsDown", "heart", "party", "cry", "angry", "haha"] as const;
+
 export const likeMessageSchema = zfd.formData({
    messageId: zfd.text(z.coerce.number()),
-   type: zfd.text(z.string().trim()),
+   type: z.enum(likeTypes),
 });

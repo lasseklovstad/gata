@@ -22,7 +22,6 @@ self.addEventListener("notificationclick", function (event) {
             clientList[0].postMessage({ url: event.notification.data.url });
             return clientList[0].focus();
          }
-
          // Otherwise, open a new page.
          return self.clients.openWindow(event.notification.data.url);
       })

@@ -9,6 +9,7 @@ import { type FileUpload, parseFormData } from "@mjackson/form-data-parser";
 import PullToRefresh from "pulltorefreshjs";
 import type { ComponentProps } from "react";
 import { useEffect } from "react";
+import type { ActionFunctionArgs, LinksFunction, LoaderFunctionArgs, MetaFunction } from "react-router";
 import {
    Link,
    Links,
@@ -18,11 +19,9 @@ import {
    ScrollRestoration,
    isRouteErrorResponse,
    useLoaderData,
-   useNavigate,
    useRouteError,
    useRouteLoaderData,
 } from "react-router";
-import type { ActionFunctionArgs, LinksFunction, LoaderFunctionArgs, MetaFunction } from "react-router";
 
 import { getOptionalUserFromExternalUserId, updateUser } from "./.server/db/user";
 import { cropProfileImage } from "./.server/services/localImageService";
@@ -108,34 +107,7 @@ export function Layout({ children }: ComponentProps<never>) {
 
 export default function App() {
    const { auth0User, loggedInUser, version, pwaPublicKey } = useLoaderData<typeof loader>();
-   const navigate = useNavigate();
    useRevalidateOnFocus();
-
-   useEffect(() => {
-      if (!("serviceWorker" in navigator)) return;
-      const sessionStorageKey = "serviceWorkerNavigateUrl";
-      function navigateOnMessage(event: MessageEvent<{ url: string }>) {
-         if ("url" in event.data) {
-            if (loggedInUser) {
-               sessionStorage.removeItem(sessionStorageKey);
-               void navigate(event.data.url);
-            } else {
-               sessionStorage.setItem(sessionStorageKey, event.data.url);
-            }
-         }
-      }
-      if (loggedInUser) {
-         const url = sessionStorage.getItem(sessionStorageKey);
-         if (url) {
-            sessionStorage.removeItem(sessionStorageKey);
-            void navigate(url);
-         }
-      }
-      navigator.serviceWorker.addEventListener("message", navigateOnMessage);
-      return () => {
-         navigator.serviceWorker.removeEventListener("message", navigateOnMessage);
-      };
-   }, [navigate, loggedInUser]);
 
    return (
       <PushSubscriptionProvider pwaPublicKey={pwaPublicKey}>

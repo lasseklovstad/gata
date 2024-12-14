@@ -95,7 +95,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       const { messageId, type } = likeMessageSchema.parse(formData);
       if (request.method === "POST") {
          await insertMessageLike(loggendInUser.id, messageId, type);
-         await notifyParticipantLikeOnPost(loggendInUser, eventId, messageId);
+         await notifyParticipantLikeOnPost(loggendInUser, eventId, messageId, type);
       } else {
          await deleteMessageLike(loggendInUser.id, messageId);
       }
