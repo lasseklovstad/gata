@@ -44,7 +44,7 @@ export const ResponsiveAppBar = ({ isLoggedIn, loggedInUser }: ResponsiveAppBarP
             <div className="flex items-center">
                <Link to="/home" className="mr-2 hidden md:block">
                   <span className="sr-only">Gå hjem</span>
-                  <img src="/logo192.png" alt="Hesten blå" className="h-[48px]" />
+                  <img src="/logo.svg" alt="Hesten blå" className="h-[48px]" />
                </Link>
 
                <div className="flex grow md:hidden">
@@ -52,7 +52,7 @@ export const ResponsiveAppBar = ({ isLoggedIn, loggedInUser }: ResponsiveAppBarP
                </div>
                <Link to="/home" className="grow md:hidden">
                   <span className="sr-only">Gå hjem</span>
-                  <img src="/logo192.png" className="h-[40px]" alt="Hesten blå" />
+                  <img src="/logo.svg" className="h-[40px]" alt="Hesten blå" />
                </Link>
 
                <div className="grow flex-wrap hidden md:flex gap-1">
