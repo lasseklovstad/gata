@@ -148,7 +148,9 @@ export default function EventPage({
                <Typography variant="h4" as="h2" id={descriptionTitleId}>
                   Beskrivelse
                </Typography>
-               <Typography className="mb-2">{event.description || "Ingen beskrivelse fra arrangør"}</Typography>
+               <Typography className="mb-2 whitespace-pre-wrap">
+                  {event.description || "Ingen beskrivelse fra arrangør"}
+               </Typography>
                {event.startDate ? (
                   <Typography>
                      Startdato:{" "}

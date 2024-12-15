@@ -14,6 +14,7 @@ import { FormControl, FormDescription, FormItem, FormLabel } from "~/components/
 import { Label } from "~/components/ui/label";
 import { NativeSelect } from "~/components/ui/native-select";
 import { Switch } from "~/components/ui/switch";
+import { Typography } from "~/components/ui/typography";
 import { useDialog } from "~/utils/dialogUtils";
 
 type Props = {
@@ -29,6 +30,9 @@ export const AttendingSelect = ({ eventParticipants, loggedInUser }: Props) => {
    const isLoggedInUserParticipating = eventParticipants.find((participant) => participant.userId === loggedInUser.id);
    const usersAttending = eventParticipants
       .filter((participant) => participant.isParticipating)
+      .map((participant) => participant.user);
+   const usersNotAttending = eventParticipants
+      .filter((participant) => !participant.isParticipating)
       .map((participant) => participant.user);
    return (
       <Form method="PUT" ref={$form}>
@@ -56,7 +60,7 @@ export const AttendingSelect = ({ eventParticipants, loggedInUser }: Props) => {
                   <option value="notGoing">Kan ikke</option>
                </NativeSelect>
 
-               {usersAttending.length ? (
+               {eventParticipants.length ? (
                   <Button
                      variant={"outline"}
                      className="flex gap-2"
@@ -64,8 +68,18 @@ export const AttendingSelect = ({ eventParticipants, loggedInUser }: Props) => {
                      onClick={dialog.open}
                      type="button"
                   >
-                     <AvatarUserList aria-label="Personer som deltar" className="justify-end" users={usersAttending} />
-                     {usersAttending.length}
+                     {usersAttending.length === 0 ? (
+                        "Ingen deltakere"
+                     ) : (
+                        <>
+                           <AvatarUserList
+                              aria-label="Personer som deltar"
+                              className="justify-end"
+                              users={usersAttending}
+                           />
+                           {usersAttending.length}
+                        </>
+                     )}
                   </Button>
                ) : null}
                <Dialog ref={dialog.dialogRef}>
@@ -81,6 +95,21 @@ export const AttendingSelect = ({ eventParticipants, loggedInUser }: Props) => {
                         );
                      })}
                   </ul>
+                  {usersNotAttending.length > 0 ? (
+                     <>
+                        <Typography variant="h2">Kan ikke</Typography>
+                        <ul className="flex flex-col gap-2">
+                           {usersNotAttending.map((user) => {
+                              return (
+                                 <li key={user.id} className="flex gap-2 items-center">
+                                    <AvatarUser user={user} />
+                                    {user.name}
+                                 </li>
+                              );
+                           })}
+                        </ul>
+                     </>
+                  ) : null}
                </Dialog>
             </div>
             {subscription ? (
