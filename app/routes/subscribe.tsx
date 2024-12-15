@@ -1,11 +1,11 @@
 import type { ActionFunctionArgs } from "react-router";
 
 import { deletePushSubscription, insertPushSubscription } from "~/.server/db/pushSubscriptions";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { badRequest } from "~/utils/responseUtils";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+   const loggedInUser = await getRequiredUser(request);
    const subscription = (await request.json()) as PushSubscriptionJSON;
    if (!subscription.endpoint) {
       return badRequest("Endpoint url required in subscription");

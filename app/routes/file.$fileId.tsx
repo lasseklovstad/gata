@@ -1,12 +1,9 @@
-import type { LoaderFunctionArgs } from "react-router";
-
 import { getReportFile } from "~/.server/db/reportFile";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-   if (!params.fileId) {
-      throw new Error("File id is required");
-   }
-   await createAuthenticator().getRequiredUser(request);
+import type { Route } from "./+types/file.$fileId";
+
+export const loader = async ({ request, params }: Route.LoaderArgs) => {
+   await getRequiredUser(request);
    return await getReportFile(params.fileId);
 };

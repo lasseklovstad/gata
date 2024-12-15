@@ -1,28 +1,25 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { useFetcher, useLoaderData, useNavigate } from "react-router";
+import { useFetcher, useNavigate } from "react-router";
 
 import { getReport } from "~/.server/db/report";
 import { getSubscribedUsers } from "~/.server/db/user";
 import { sendMail } from "~/.server/services/sendgrid";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-   await createAuthenticator().getRequiredUser(request);
+import type { Route } from "./+types/reportInfo.$reportId.publish";
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
+   await getRequiredUser(request);
 
    const reportEmails = await getSubscribedUsers();
    return { reportEmails };
 };
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   if (!params.reportId) {
-      throw new Error("Report id is required");
-   }
-   await createAuthenticator().getRequiredUser(request);
-   const reportEmails = await getSubscribedUsers();
-   const report = await getReport(params.reportId);
+export const action = async ({ request, params }: Route.ActionArgs) => {
+   await getRequiredUser(request);
+   const [reportEmails, report] = await Promise.all([getSubscribedUsers(), getReport(params.reportId)]);
    const url = new URL(request.url);
    await sendMail({
       html: `
@@ -40,11 +37,10 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    return { ok: true, emails: reportEmails.map((user) => user.email) };
 };
 
-export default function PublishReport() {
+export default function PublishReport({ loaderData: { reportEmails } }: Route.ComponentProps) {
    const { dialogRef } = useDialog({ defaultOpen: true });
    const fetcher = useFetcher<typeof action>();
    const navigate = useNavigate();
-   const { reportEmails } = useLoaderData<typeof loader>();
    const onClose = () => void navigate("..");
 
    if (fetcher.data) {

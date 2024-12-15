@@ -1,11 +1,10 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 
-import { createAuthenticator } from "~/utils/auth.server";
+import { sessionStorage } from "~/utils/auth.server";
 import { env } from "~/utils/env.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-   const { sessionStorage } = createAuthenticator();
    const session = await sessionStorage.getSession(request.headers.get("Cookie"));
    const logoutURL = new URL(`https://${env.AUTH0_DOMAIN}/v2/logout`); // i.e https://YOUR_TENANT.us.auth0.com/v2/logout
 

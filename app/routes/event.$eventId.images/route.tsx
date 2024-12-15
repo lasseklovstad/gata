@@ -1,7 +1,6 @@
 import { Image, Trash } from "lucide-react";
 import { useId, useState } from "react";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { useFetcher, useLoaderData } from "react-router";
+import { useFetcher } from "react-router";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 
@@ -20,25 +19,18 @@ import { Button } from "~/components/ui/button";
 import { Toggle } from "~/components/ui/toggle";
 import { Typography } from "~/components/ui/typography";
 import { UploadMedia } from "~/components/UploadMedia";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { getCloudinaryUploadFolder } from "~/utils/cloudinaryUtils";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
 import { isCloudinaryFilePart, uploadFilesToCloudinaryAndGetMultiformParts } from "~/utils/multipartUtils";
 import { badRequest } from "~/utils/responseUtils";
 
+import type { Route } from "./+types/route";
 import { DownloadZip } from "./DownloadZip";
 
-const paramSchema = z.object({
-   eventId: z.coerce.number(),
-});
-
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-   const paramsParsed = paramSchema.safeParse(params);
-   if (!paramsParsed.success) {
-      throw badRequest(paramsParsed.error.message);
-   }
-   const { eventId } = paramsParsed.data;
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+export const loader = async ({ request, params }: Route.LoaderArgs) => {
+   const eventId = z.coerce.number().parse(params.eventId);
+   const loggedInUser = await getRequiredUser(request);
    const [cloudinaryImages, event] = await Promise.all([getEventCloudinaryImages(eventId), getEvent(eventId)]);
    return { cloudinaryImages, event, loggedInUser };
 };
@@ -47,14 +39,9 @@ const deleteImagesSchema = zfd.formData({
    image: zfd.repeatable(z.array(z.string())),
 });
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   const paramsParsed = paramSchema.safeParse(params);
-   if (!paramsParsed.success) {
-      throw badRequest(paramsParsed.error.message);
-   }
-   const { eventId } = paramsParsed.data;
-
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+export const action = async ({ request, params }: Route.ActionArgs) => {
+   const eventId = z.coerce.number().parse(params.eventId);
+   const loggedInUser = await getRequiredUser(request);
    const folder = `${getCloudinaryUploadFolder()}/event-${eventId}`;
    const contentType = request.headers.get("Content-Type");
    const isMulitipart = contentType?.includes("multipart/form-data");
@@ -103,8 +90,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    throw badRequest("Intent not found " + intent);
 };
 
-export default function EventImages() {
-   const { cloudinaryImages, event, loggedInUser } = useLoaderData<typeof loader>();
+export default function EventImages({ loaderData: { cloudinaryImages, event, loggedInUser } }: Route.ComponentProps) {
    const [mode, setMode] = useState<"default" | "mark">("default");
 
    const fetcher = useFetcher<typeof action>();

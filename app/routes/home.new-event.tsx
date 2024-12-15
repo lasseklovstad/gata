@@ -1,5 +1,4 @@
 import { Calendar } from "lucide-react";
-import type { ActionFunctionArgs } from "react-router";
 import { Link, redirect, useFetcher } from "react-router";
 
 import { createEventAndNotify } from "~/.server/data-layer/gataEvent";
@@ -7,15 +6,16 @@ import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { FormProvider } from "~/components/ui/form";
 import { Typography } from "~/components/ui/typography";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 import { transformErrorResponse } from "~/utils/validateUtils";
 
+import type { Route } from "./+types/home.new-event";
 import { EventForm } from "./event.$eventId/EventForm";
 import { eventSchema } from "../utils/schemas/eventSchema";
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+export const action = async ({ request }: Route.ActionArgs) => {
+   const loggedInUser = await getRequiredUser(request);
    const event = eventSchema.safeParse(await request.formData());
    if (!event.success) {
       return transformErrorResponse(event.error);

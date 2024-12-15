@@ -7,7 +7,7 @@ import { Typography } from "~/components/ui/typography";
 export default function NotFound() {
    return (
       <PageLayout>
-         <Typography>Du er på en side som ikke eksisterer</Typography>
+         <Typography>Du har kommet til en side som ikke er i bruk</Typography>
          <Button as={Link} to="/">
             Gå hjem
          </Button>

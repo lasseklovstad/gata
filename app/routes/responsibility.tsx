@@ -1,28 +1,27 @@
 import { Pencil, Plus, Trash } from "lucide-react";
-import type { LoaderFunctionArgs, MetaFunction } from "react-router";
-import { Link, Outlet, useLoaderData } from "react-router";
+import { Link, Outlet } from "react-router";
 
 import { getResponsibilitiesWithCurrentlyResponsibleUsername } from "~/.server/db/responsibility";
 import { PageLayout } from "~/components/PageLayout";
 import { Button, ButtonResponsive } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { isAdmin } from "~/utils/roleUtils";
 
-export const meta: MetaFunction<typeof loader> = () => {
+import type { Route } from "./+types/responsibility";
+
+export const meta = () => {
    return [{ title: "Ansvarsposter - Gata" }];
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+export const loader = async ({ request }: Route.LoaderArgs) => {
+   const loggedInUser = await getRequiredUser(request);
    const [responsibilities] = await Promise.all([getResponsibilitiesWithCurrentlyResponsibleUsername()]);
 
    return { responsibilities, loggedInUser };
 };
 
-export default function ResponsibilityPage() {
-   const { responsibilities, loggedInUser } = useLoaderData<typeof loader>();
-
+export default function ResponsibilityPage({ loaderData: { responsibilities, loggedInUser } }: Route.ComponentProps) {
    return (
       <PageLayout>
          <div className="flex justify-between items-center">

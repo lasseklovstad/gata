@@ -1,6 +1,5 @@
 import { Save } from "lucide-react";
-import type { LoaderFunctionArgs } from "react-router";
-import { Link, useFetcher, useLoaderData } from "react-router";
+import { Link, useFetcher } from "react-router";
 
 import { getResponsibilities } from "~/.server/db/responsibility";
 import { Button } from "~/components/ui/button";
@@ -8,11 +7,13 @@ import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { FormControl, FormItem, FormLabel, FormProvider } from "~/components/ui/form";
 import { NativeSelect } from "~/components/ui/native-select";
 import type { action } from "~/routes/member.$memberId.responsibility/route";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-   await createAuthenticator().getRequiredUser(request);
+import type { Route } from "./+types/member.$memberId.responsibility.new";
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
+   await getRequiredUser(request);
    const responsibilities = await getResponsibilities();
    return { responsibilities };
 };
@@ -21,8 +22,7 @@ const numberOfYears = 10;
 const todaysYear = new Date().getFullYear();
 const years = Array.from({ length: numberOfYears }, (v, i) => todaysYear - numberOfYears + 2 + i).reverse();
 
-export default function AddResponsibilityUserDialog() {
-   const { responsibilities } = useLoaderData<typeof loader>();
+export default function AddResponsibilityUserDialog({ loaderData: { responsibilities } }: Route.ComponentProps) {
    const { dialogRef } = useDialog({ defaultOpen: true });
    const fetcher = useFetcher<typeof action>();
 

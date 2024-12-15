@@ -1,6 +1,5 @@
 import { Trash } from "lucide-react";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { redirect, useFetcher, useLoaderData } from "react-router";
+import { redirect, useFetcher } from "react-router";
 
 import { getContingentInfo, updateContingent } from "~/.server/db/contigent";
 import { deleteRole, getRoles, insertRole } from "~/.server/db/role";
@@ -17,18 +16,16 @@ import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { LinkExternalUserToGataUserSelect } from "~/routes/member.$memberId._index/components/LinkExternalUserToGataUserSelect";
 import { UserInfo } from "~/routes/member.$memberId._index/components/UserInfo";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { badRequest } from "~/utils/responseUtils";
 import { isAdmin, requireAdminRole } from "~/utils/roleUtils";
 
+import type { Route } from "./+types/route";
 import { RoleButton } from "./components/RoleButton";
 import { MemberActionSchema, memberIntent } from "./intent";
 
-export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
-
-   if (!memberId) throw new Error("Member id required");
-
+export const loader = async ({ request, params: { memberId } }: Route.LoaderArgs) => {
+   const loggedInUser = await getRequiredUser(request);
    const [member, roles, contingentInfo, notMemberUsers] = await Promise.all([
       getUser(memberId),
       getRoles(),
@@ -38,11 +35,8 @@ export const loader = async ({ request, params: { memberId } }: LoaderFunctionAr
    return { member, contingentInfo, roles, notMemberUsers, loggedInUser };
 };
 
-export const action = async ({ request, params: { memberId } }: ActionFunctionArgs) => {
-   if (!memberId) {
-      throw badRequest("Member id required");
-   }
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+export const action = async ({ request, params: { memberId } }: Route.ActionArgs) => {
+   const loggedInUser = await getRequiredUser(request);
    const result = MemberActionSchema.safeParse(await request.formData());
 
    if (!result.success) {
@@ -88,8 +82,9 @@ export const action = async ({ request, params: { memberId } }: ActionFunctionAr
    }
 };
 
-export default function MemberInfoPage() {
-   const { member, contingentInfo, roles, notMemberUsers, loggedInUser } = useLoaderData<typeof loader>();
+export default function MemberInfoPage({
+   loaderData: { member, contingentInfo, roles, notMemberUsers, loggedInUser },
+}: Route.ComponentProps) {
    const fetcher = useFetcher<typeof action>();
    const { openConfirmDialog, ConfirmDialogComponent } = useConfirmDialog({
       text: "Ved å slette mister vi all informasjon knyttet til brukeren",

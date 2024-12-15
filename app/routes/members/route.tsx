@@ -1,6 +1,5 @@
 import { Mail } from "lucide-react";
-import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "react-router";
-import { Link, Outlet, useLoaderData } from "react-router";
+import { Link, Outlet } from "react-router";
 import { zfd } from "zod-form-data";
 
 import { getAllSubscriptions } from "~/.server/db/pushSubscriptions";
@@ -9,33 +8,33 @@ import { PageLayout } from "~/components/PageLayout";
 import { Button } from "~/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
 import { Typography } from "~/components/ui/typography";
-import { useRootLoader } from "~/root";
 import { ExternalUsersWithNoGataUser } from "~/routes/members/ExternalUsersWithNoGataUser";
 import { UserListItem } from "~/routes/members/UserListItem";
-import { createAuthenticator } from "~/utils/auth.server";
-import { isAdmin, isMember, requireAdminRole } from "~/utils/roleUtils";
+import { getRequiredUser } from "~/utils/auth.server";
+import { isAdmin, isMember, RoleName } from "~/utils/roleUtils";
 
-export const meta: MetaFunction<typeof loader> = () => {
+import type { Route } from "./+types/route";
+
+export const meta = () => {
    return [{ title: "Medlemmer - Gata" }];
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-   await createAuthenticator().getRequiredUser(request);
+export const loader = async ({ request }: Route.LoaderArgs) => {
+   const loggedInUser = await getRequiredUser(request);
    const [users, externalUsers, subscriptions] = await Promise.all([
       getUsers(),
       getNotMemberUsers(),
       getAllSubscriptions(""),
    ]);
-   return { users, externalUsers, subscriptions: subscriptions.map((s) => s.userId) };
+   return { users, externalUsers, subscriptions: subscriptions.map((s) => s.userId), loggedInUser };
 };
 
 const MembersActionSchema = zfd.formData({
    externalUserId: zfd.text(),
 });
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
-   requireAdminRole(loggedInUser);
+export const action = async ({ request }: Route.ActionArgs) => {
+   await getRequiredUser(request, [RoleName.Admin]);
    const { externalUserId } = MembersActionSchema.parse(await request.formData());
    if (request.method === "POST") {
       await insertUser(externalUserId);
@@ -47,14 +46,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
    }
 };
 
-export default function MemberPage() {
-   const { users, externalUsers, subscriptions } = useLoaderData<typeof loader>();
-   const rootLoaderData = useRootLoader();
-
+export default function MemberPage({
+   loaderData: { users, externalUsers, subscriptions, loggedInUser },
+}: Route.ComponentProps) {
    const admins = users.filter(isAdmin);
    const members = users.filter((user) => isMember(user) && !isAdmin(user));
    const nonMembers = users.filter((user) => !isMember(user) && !isAdmin(user));
-   const userIsAdmin = isAdmin(rootLoaderData?.loggedInUser);
+   const userIsAdmin = isAdmin(loggedInUser);
 
    return (
       <PageLayout>
