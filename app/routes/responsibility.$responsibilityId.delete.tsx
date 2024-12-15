@@ -1,22 +1,19 @@
-import type { ActionFunctionArgs } from "react-router";
 import { redirect, useFetcher, useNavigate } from "react-router";
 
 import { deleteResponsibility } from "~/.server/db/responsibility";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
-import { isAdmin } from "~/utils/roleUtils";
+import { RoleName } from "~/utils/roleUtils";
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+import type { Route } from "./+types/responsibility.$responsibilityId.delete";
 
-   if (!isAdmin(loggedInUser)) {
-      throw new Error("Du har ikke tilgang til å endre denne ressursen");
-   }
+export const action = async ({ request, params: { responsibilityId } }: Route.ActionArgs) => {
+   await getRequiredUser(request, [RoleName.Admin]);
 
-   if (request.method === "DELETE" && params.responsibilityId) {
-      await deleteResponsibility(params.responsibilityId);
+   if (request.method === "DELETE") {
+      await deleteResponsibility(responsibilityId);
       return redirect("/responsibility");
    }
 };

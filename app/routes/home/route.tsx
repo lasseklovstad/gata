@@ -1,6 +1,3 @@
-import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData } from "react-router";
-
 import { getUpCommingEvents } from "~/.server/db/gataEvent";
 import { getReportsWithContent } from "~/.server/db/report";
 import { getOptionalUserFromExternalUserId } from "~/.server/db/user";
@@ -9,21 +6,24 @@ import { Typography } from "~/components/ui/typography";
 import { useRootLoader } from "~/root";
 import { News } from "~/routes/home/News";
 import { ReportType } from "~/types/GataReport.type";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getUserSession } from "~/utils/auth.server";
 import { isMember } from "~/utils/roleUtils";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-   const auth = (await createAuthenticator().sessionStorage.getSession(request.headers.get("cookie"))).get("user");
-   const loggedInUser = auth?.id ? ((await getOptionalUserFromExternalUserId(auth.id)) ?? undefined) : undefined;
+import type { Route } from "./+types/route";
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
+   const userSession = await getUserSession(request);
+   const loggedInUser = userSession?.id
+      ? ((await getOptionalUserFromExternalUserId(userSession.id)) ?? undefined)
+      : undefined;
    return {
       reports: isMember(loggedInUser) ? await getReportsWithContent(ReportType.NEWS) : undefined,
       events: loggedInUser && isMember(loggedInUser) ? await getUpCommingEvents(loggedInUser.id) : undefined,
    };
 };
 
-export default function Home() {
+export default function Home({ loaderData: { reports, events } }: Route.ComponentProps) {
    const rootLoaderData = useRootLoader();
-   const { reports, events } = useLoaderData<typeof loader>();
    if (rootLoaderData?.auth0User) {
       if (rootLoaderData.loggedInUser && isMember(rootLoaderData.loggedInUser) && reports && events) {
          return <News reports={reports} loggedInUser={rootLoaderData.loggedInUser} events={events} />;

@@ -1,20 +1,18 @@
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
-import { useFetcher, useLoaderData, useNavigate } from "react-router";
+import { useFetcher, useNavigate } from "react-router";
 
 import { getContingentInfo } from "~/.server/db/contigent";
 import { getUsersThatHasNotPaidContingent } from "~/.server/db/user";
 import { sendMail } from "~/.server/services/sendgrid";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
-import { isAdmin } from "~/utils/roleUtils";
+import { RoleName } from "~/utils/roleUtils";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
-   if (!isAdmin(loggedInUser)) {
-      throw new Error("Du har ikke tilgang her");
-   }
+import type { Route } from "./+types/members.contingent";
+
+export const loader = async ({ request }: Route.LoaderArgs) => {
+   await getRequiredUser(request, [RoleName.Admin]);
    const today = new Date();
    // Todo: Hent ut brukere som ikke har betalt kontingent
    return {
@@ -23,11 +21,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
    };
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
-   if (!isAdmin(loggedInUser)) {
-      throw new Error("Du har ikke tilgang her");
-   }
+export const action = async ({ request }: Route.ActionArgs) => {
+   await getRequiredUser(request, [RoleName.Admin]);
+
    const today = new Date();
    const { size, bank } = getContingentInfo();
    const usersNotPaid = await getUsersThatHasNotPaidContingent(today.getFullYear());
@@ -48,9 +44,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
    return { ok: true, emails: usersNotPaid.map((user) => user.email) };
 };
 
-export default function ConfirmDelete() {
+export default function ConfirmDelete({ loaderData: { usersNotPaid, contingentInfo } }: Route.ComponentProps) {
    const { dialogRef } = useDialog({ defaultOpen: true });
-   const { usersNotPaid, contingentInfo } = useLoaderData<typeof loader>();
    const fetcher = useFetcher<typeof action>();
    const navigate = useNavigate();
    const onClose = () => void navigate("..");

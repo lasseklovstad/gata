@@ -2,8 +2,7 @@ import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Copy } from "lucide-react";
 import { useId } from "react";
-import { Outlet, redirect, useLoaderData } from "react-router";
-import type { MetaFunction, ActionFunctionArgs } from "react-router";
+import { Outlet, redirect } from "react-router";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 
@@ -21,31 +20,24 @@ import { TabNavLink } from "~/components/TabNavLink";
 import { Button } from "~/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
 import { Typography } from "~/components/ui/typography";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
 import { badRequest } from "~/utils/responseUtils";
 import { transformErrorResponse } from "~/utils/validateUtils";
 
+import type { Route } from "./+types/route";
 import { AttendingSelect } from "./AttendingSelect";
 import { EventMenu } from "./EventMenu";
 import { EventOrganizers } from "./EventOrganizers";
 import { eventSchema } from "../../utils/schemas/eventSchema";
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-   return [{ title: `${data?.event.title} - Gata` }];
+export const meta = ({ data }: Route.MetaArgs) => {
+   return [{ title: `${data.event.title} - Gata` }];
 };
 
-const paramSchema = z.object({
-   eventId: z.coerce.number(),
-});
-
-export const loader = async ({ request, params }: ActionFunctionArgs) => {
-   const paramsParsed = paramSchema.safeParse(params);
-   if (!paramsParsed.success) {
-      throw badRequest(paramsParsed.error.message);
-   }
-   const { eventId } = paramsParsed.data;
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+export const loader = async ({ request, params }: Route.LoaderArgs) => {
+   const loggedInUser = await getRequiredUser(request);
+   const eventId = z.coerce.number().parse(params.eventId);
    const [event, users, numberOfImages, eventParticipants] = await Promise.all([
       getEvent(eventId),
       getUsers(),
@@ -64,14 +56,9 @@ const updateParticipatingSchema = zfd.formData({
    subscribed: zfd.checkbox(),
 });
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   const paramsParsed = paramSchema.safeParse(params);
-   if (!paramsParsed.success) {
-      throw badRequest(paramsParsed.error.message);
-   }
-   const { eventId } = paramsParsed.data;
-
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+export const action = async ({ request, params }: Route.ActionArgs) => {
+   const eventId = z.coerce.number().parse(params.eventId);
+   const loggedInUser = await getRequiredUser(request);
    const formdata = await request.formData();
    const intent = formdata.get("intent") as string;
    const event = await getEvent(eventId);
@@ -115,8 +102,9 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    throw badRequest("Intent not found " + intent);
 };
 
-export default function EventPage() {
-   const { event, loggedInUser, users, numberOfImages, eventParticipants } = useLoaderData<typeof loader>();
+export default function EventPage({
+   loaderData: { event, loggedInUser, users, numberOfImages, eventParticipants },
+}: Route.ComponentProps) {
    const descriptionTitleId = useId();
    const organizers = users.filter((user) => event.organizers.find((organizer) => organizer.userId === user.id));
 

@@ -1,7 +1,6 @@
 import { Edit, Mail, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "react-router";
-import { Link, Outlet, useFetcher, useLoaderData } from "react-router";
+import { Link, Outlet, useFetcher } from "react-router";
 import type { Descendant } from "slate";
 
 import { getReport, updateReportContent } from "~/.server/db/report";
@@ -13,32 +12,28 @@ import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
 import { RichTextPreview } from "~/components/RichTextEditor/RichTextPreview";
 import { ButtonResponsive } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { getCloudinaryUploadFolder } from "~/utils/cloudinaryUtils";
 import { formatDateTime } from "~/utils/date.utils";
 import { isAdmin } from "~/utils/roleUtils";
 
+import type { Route } from "./+types/route";
 import { reportInfoIntent, ReportInfoSchema } from "./intent";
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-   return [{ title: `${data?.report.title} - Gata` }];
+export const meta = ({ data }: Route.MetaArgs) => {
+   return [{ title: `${data.report.title} - Gata` }];
 };
 
-export const loader = async ({ request, params: { reportId } }: LoaderFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
-   if (!reportId) throw new Error("ReportId id required");
+export const loader = async ({ request, params: { reportId } }: Route.LoaderArgs) => {
+   const loggedInUser = await getRequiredUser(request);
    const [report] = await Promise.all([getReport(reportId)]);
    return { report, loggedInUser };
 };
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+export const action = async ({ request, params }: Route.ActionArgs) => {
+   const loggedInUser = await getRequiredUser(request);
    const formData = await request.formData();
    const result = ReportInfoSchema.parse(formData);
-
-   if (!params.reportId) {
-      throw new Error("Report id is required");
-   }
 
    switch (result.intent) {
       case reportInfoIntent.updateContentIntent: {
@@ -63,8 +58,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    }
 };
 
-export default function ReportInfoPage() {
-   const { report, loggedInUser } = useLoaderData<typeof loader>();
+export default function ReportInfoPage({ loaderData: { report, loggedInUser } }: Route.ComponentProps) {
    const canEdit = report.createdBy === loggedInUser.id || isAdmin(loggedInUser);
    const [editing, setEditing] = useState(false);
    const fetcher = useFetcher<typeof action>();

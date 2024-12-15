@@ -1,17 +1,15 @@
-import type { ActionFunctionArgs } from "react-router";
 import { redirect, useFetcher, useNavigate } from "react-router";
 
 import { deleteResponsibilityYear } from "~/.server/db/responsibility";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   if (!params.responsibilityYearId) {
-      throw new Error("ResponsibilityYearId id required");
-   }
-   await createAuthenticator().getRequiredUser(request);
+import type { Route } from "./+types/member.$memberId.responsibility.$responsibilityYearId.delete";
+
+export const action = async ({ request, params }: Route.ActionArgs) => {
+   await getRequiredUser(request);
 
    if (request.method === "DELETE") {
       await deleteResponsibilityYear(params.responsibilityYearId);

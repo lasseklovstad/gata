@@ -1,6 +1,5 @@
 import { Plus } from "lucide-react";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { redirect, Link, Outlet, useLoaderData } from "react-router";
+import { Link, Outlet, redirect } from "react-router";
 
 import { insertResponsibilityYear } from "~/.server/db/responsibility";
 import { getResponsibilityYears, getUser } from "~/.server/db/user";
@@ -8,24 +7,21 @@ import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { ResponsibilityForm } from "~/routes/member.$memberId.responsibility/ResponsibilityForm";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { newResponsibilityYearSchema } from "~/utils/formSchema";
 import { isAdmin, isMember } from "~/utils/roleUtils";
 
-export const loader = async ({ request, params: { memberId } }: LoaderFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+import type { Route } from "./+types/route";
 
-   if (!memberId) throw new Error("Member id required");
+export const loader = async ({ request, params: { memberId } }: Route.LoaderArgs) => {
+   const loggedInUser = await getRequiredUser(request);
 
    const [member, responsibilityYears] = await Promise.all([getUser(memberId), getResponsibilityYears(memberId)]);
    return { loggedInUser, responsibilityYears, member };
 };
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   if (!params.memberId) {
-      throw new Error("Member id required");
-   }
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+export const action = async ({ request, params }: Route.ActionArgs) => {
+   const loggedInUser = await getRequiredUser(request);
    if (request.method === "POST") {
       const form = newResponsibilityYearSchema.parse(await request.formData());
       await insertResponsibilityYear(params.memberId, form.responsibilityId, form.year, loggedInUser);
@@ -33,9 +29,9 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    return redirect(`/member/${params.memberId}/responsibility`);
 };
 
-export default function MemberResponsibility() {
-   const { loggedInUser, responsibilityYears, member } = useLoaderData<typeof loader>();
-
+export default function MemberResponsibility({
+   loaderData: { loggedInUser, responsibilityYears, member },
+}: Route.ComponentProps) {
    if (!isMember(member)) {
       return (
          <Alert>

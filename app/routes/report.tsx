@@ -1,28 +1,27 @@
 import { Plus } from "lucide-react";
-import type { LoaderFunctionArgs, MetaFunction } from "react-router";
-import { Link, Outlet, useLoaderData } from "react-router";
+import { Link, Outlet } from "react-router";
 
 import { getReportsSimple } from "~/.server/db/report";
 import { PageLayout } from "~/components/PageLayout";
 import { ButtonResponsive } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { ReportType } from "~/types/GataReport.type";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { isAdmin } from "~/utils/roleUtils";
 
-export const meta: MetaFunction<typeof loader> = () => {
+import type { Route } from "./+types/report";
+
+export const meta = () => {
    return [{ title: "Aktuelle dokumenter - Gata" }];
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
-
+export const loader = async ({ request }: Route.LoaderArgs) => {
+   const loggedInUser = await getRequiredUser(request);
    const [reports] = await Promise.all([getReportsSimple(ReportType.DOCUMENT)]);
    return { reports, loggedInUser };
 };
 
-export default function ReportPage() {
-   const { loggedInUser, reports } = useLoaderData<typeof loader>();
+export default function ReportPage({ loaderData: { loggedInUser, reports } }: Route.ComponentProps) {
    return (
       <PageLayout>
          <div className="flex justify-between items-center">

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { useLoaderData, useResolvedPath, useRevalidator } from "react-router";
+import { useResolvedPath, useRevalidator } from "react-router";
 import { useEventSource } from "remix-utils/sse/react";
 
-export function useLiveLoader<T>() {
+export function useLiveLoader() {
    const path = useResolvedPath("./stream");
    const data = useEventSource(path.pathname);
 
@@ -12,6 +12,4 @@ export function useLiveLoader<T>() {
    useEffect(() => {
       void revalidate();
    }, [data]);
-
-   return useLoaderData<T>();
 }

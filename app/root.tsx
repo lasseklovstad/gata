@@ -9,7 +9,7 @@ import { type FileUpload, parseFormData } from "@mjackson/form-data-parser";
 import PullToRefresh from "pulltorefreshjs";
 import type { ComponentProps } from "react";
 import { useEffect } from "react";
-import type { ActionFunctionArgs, LinksFunction, LoaderFunctionArgs, MetaFunction } from "react-router";
+import type { LinksFunction, MetaFunction } from "react-router";
 import {
    Link,
    Links,
@@ -18,19 +18,19 @@ import {
    Scripts,
    ScrollRestoration,
    isRouteErrorResponse,
-   useLoaderData,
    useRouteError,
    useRouteLoaderData,
 } from "react-router";
 import { z } from "zod";
 
+import type { Route } from "./+types/root";
 import { getOptionalUserFromExternalUserId, getUserByName, updateUser } from "./.server/db/user";
 import { cropProfileImage } from "./.server/services/localImageService";
 import { PushSubscriptionProvider } from "./components/PushSubscriptionContext";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
 import { Button } from "./components/ui/button";
 import { Typography } from "./components/ui/typography";
-import { createAuthenticator } from "./utils/auth.server";
+import { getRequiredUser, getUserSession } from "./utils/auth.server";
 import { env } from "./utils/env.server";
 import { badRequest } from "./utils/responseUtils";
 import { profileSchema } from "./utils/schemas/profileSchema";
@@ -106,33 +106,8 @@ export function Layout({ children }: ComponentProps<never>) {
    return <Document>{children}</Document>;
 }
 
-export default function App() {
-   const { auth0User, loggedInUser, version, pwaPublicKey } = useLoaderData<typeof loader>();
-   useRevalidateOnFocus();
-
-   return (
-      <PushSubscriptionProvider pwaPublicKey={pwaPublicKey}>
-         <div className="flex flex-col min-h-lvh">
-            <ResponsiveAppBar isLoggedIn={!!auth0User} loggedInUser={loggedInUser} />
-            <main className="mb-8 max-w-[1000px] w-full me-auto ms-auto px-4">
-               <Outlet />
-            </main>
-            <footer className="p-4 flex gap-4 max-w-[1000px] w-full ms-auto me-auto mt-auto items-center">
-               <Button variant="link" as={Link} to="/privacy">
-                  Privacy
-               </Button>
-               <Button variant="link" as={Link} to="/about">
-                  About
-               </Button>
-               Versjon: {version}
-            </footer>
-         </div>
-      </PushSubscriptionProvider>
-   );
-}
-
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-   const auth0User = await createAuthenticator().getOptionalUser(request);
+export const loader = async ({ request }: Route.LoaderArgs) => {
+   const auth0User = await getUserSession(request);
    const loggedInUser = auth0User ? (await getOptionalUserFromExternalUserId(auth0User.id)) || undefined : undefined;
    const version = env.VERSION;
    const pwaPublicKey = env.PWA_PUBLIC_KEY;
@@ -144,8 +119,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
    };
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+export const action = async ({ request }: Route.ActionArgs) => {
+   const loggedInUser = await getRequiredUser(request);
 
    const formData = await parseFormData(request, createTempUploadHandler("profile-pictures"), {
       maxFileSize: 20 * 1024 * 1024,
@@ -195,6 +170,30 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
    throw badRequest("Invalid intent");
 };
+
+export default function App({ loaderData: { auth0User, loggedInUser, version, pwaPublicKey } }: Route.ComponentProps) {
+   useRevalidateOnFocus();
+
+   return (
+      <PushSubscriptionProvider pwaPublicKey={pwaPublicKey}>
+         <div className="flex flex-col min-h-lvh">
+            <ResponsiveAppBar isLoggedIn={!!auth0User} loggedInUser={loggedInUser} />
+            <main className="mb-8 max-w-[1000px] w-full me-auto ms-auto px-4">
+               <Outlet />
+            </main>
+            <footer className="p-4 flex gap-4 max-w-[1000px] w-full ms-auto me-auto mt-auto items-center">
+               <Button variant="link" as={Link} to="/privacy">
+                  Privacy
+               </Button>
+               <Button variant="link" as={Link} to="/about">
+                  About
+               </Button>
+               Versjon: {version}
+            </footer>
+         </div>
+      </PushSubscriptionProvider>
+   );
+}
 
 function createTempUploadHandler(prefix: string) {
    const directory = path.join(os.tmpdir(), prefix);

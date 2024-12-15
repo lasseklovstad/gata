@@ -1,6 +1,6 @@
 import { SaveIcon } from "lucide-react";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { redirect, useFetcher, useLoaderData, useNavigate } from "react-router";
+import type { ActionFunctionArgs } from "react-router";
+import { redirect, useFetcher, useNavigate } from "react-router";
 
 import { getResponsibility, insertResponsibility, updateResponsibility } from "~/.server/db/responsibility";
 import { Button } from "~/components/ui/button";
@@ -8,25 +8,23 @@ import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import { FormControl, FormItem, FormLabel, FormMessage, FormProvider } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 import { responsibilitySchema } from "~/utils/formSchema";
-import { isAdmin } from "~/utils/roleUtils";
+import { RoleName } from "~/utils/roleUtils";
 import { transformErrorResponse } from "~/utils/validateUtils";
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-   await createAuthenticator().getRequiredUser(request);
-   if (!params.responsibilityId) throw new Error("ResponsibilityId is required in url!");
+import type { Route } from "./+types/responsibility.$responsibilityId._index";
+
+export const loader = async ({ request, params }: Route.LoaderArgs) => {
+   await getRequiredUser(request);
    return {
       responsibility: params.responsibilityId !== "new" ? await getResponsibility(params.responsibilityId) : undefined,
    };
 };
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
-   if (!isAdmin(loggedInUser)) {
-      throw new Error("Du har ikke tilgang til å endre denne ressursen");
-   }
+   await getRequiredUser(request, [RoleName.Admin]);
    const responsibility = responsibilitySchema.safeParse(await request.formData());
    if (responsibility.error) {
       return transformErrorResponse(responsibility.error);
@@ -42,10 +40,9 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    }
 };
 
-export default function EditResponsibility() {
+export default function EditResponsibility({ loaderData: { responsibility } }: Route.ComponentProps) {
    const navigate = useNavigate();
    const { dialogRef } = useDialog({ defaultOpen: true });
-   const { responsibility } = useLoaderData<typeof loader>();
    const method = responsibility ? "put" : "post";
    const fetcher = useFetcher<typeof action>();
    const onClose = () => navigate("..");

@@ -1,16 +1,17 @@
-import type { ActionFunctionArgs } from "react-router";
 import { redirect, useFetcher, useNavigate } from "react-router";
 
 import { deleteReport } from "~/.server/db/report";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { useDialog } from "~/utils/dialogUtils";
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   await createAuthenticator().getRequiredUser(request);
+import type { Route } from "./+types/reportInfo.$reportId.$reportType.delete";
 
-   if (request.method === "DELETE" && params.reportId) {
+export const action = async ({ request, params }: Route.ActionArgs) => {
+   await getRequiredUser(request);
+
+   if (request.method === "DELETE") {
       await deleteReport(params.reportId);
       return redirect(params.reportType === "NEWS" ? "/" : "/report");
    }

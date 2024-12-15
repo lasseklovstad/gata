@@ -1,11 +1,10 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { z } from "zod";
 
 import { addPollVoteAndNotify, createNewPoll, updatePollAndNotify } from "~/.server/data-layer/eventPoll";
 import { deletePoll, getEvent, getEventPolls, getIsPollActive, insertPollOptions } from "~/.server/db/gataEvent";
 import { getUsers } from "~/.server/db/user";
 import { Typography } from "~/components/ui/typography";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { emitter } from "~/utils/events/emitter.server";
 import { useLiveLoader } from "~/utils/events/use-live-loader";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
@@ -19,20 +18,13 @@ import {
 } from "~/utils/schemas/eventPollSchema";
 import { transformErrorResponse } from "~/utils/validateUtils";
 
+import type { Route } from "./+types/route";
 import { Poll } from "./Poll";
 import { PollNew } from "./PollNew";
 
-const paramSchema = z.object({
-   eventId: z.coerce.number(),
-});
-
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-   const paramsParsed = paramSchema.safeParse(params);
-   if (!paramsParsed.success) {
-      throw badRequest(paramsParsed.error.message);
-   }
-   const { eventId } = paramsParsed.data;
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+export const loader = async ({ request, params }: Route.LoaderArgs) => {
+   const eventId = z.coerce.number().parse(params.eventId);
+   const loggedInUser = await getRequiredUser(request);
    const [event, polls, users] = await Promise.all([
       getEvent(eventId),
       getEventPolls(eventId, loggedInUser),
@@ -43,14 +35,9 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    return { event, polls: filteredPolls, loggedInUser, users };
 };
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   const paramsParsed = paramSchema.safeParse(params);
-   if (!paramsParsed.success) {
-      throw badRequest(paramsParsed.error.message);
-   }
-   const { eventId } = paramsParsed.data;
-
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+export const action = async ({ request, params }: Route.ActionArgs) => {
+   const eventId = z.coerce.number().parse(params.eventId);
+   const loggedInUser = await getRequiredUser(request);
    const formdata = await request.formData();
    const intent = formdata.get("intent") as string;
 
@@ -115,9 +102,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
    throw badRequest("Intent not found " + intent);
 };
 
-export default function EventPage() {
-   const { event, polls, loggedInUser, users } = useLiveLoader<typeof loader>();
-
+export default function EventPage({ loaderData: { event, polls, loggedInUser, users } }: Route.ComponentProps) {
+   useLiveLoader();
    const isOrganizer = isUserOrganizer(event, loggedInUser);
    return (
       <div>

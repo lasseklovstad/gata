@@ -1,15 +1,13 @@
-import type { ActionFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 
 import { updateResponsibilityNote } from "~/.server/db/responsibility";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { updateResponsibilityYearSchema } from "~/utils/formSchema";
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   if (!params.responsibilityYearId) {
-      throw new Error("ResponsibilityYearId id required");
-   }
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+import type { Route } from "./+types/member.$memberId.responsibility.$responsibilityYearId._index";
+
+export const action = async ({ request, params }: Route.ActionArgs) => {
+   const loggedInUser = await getRequiredUser(request);
 
    if (request.method === "PUT") {
       const { text } = updateResponsibilityYearSchema.parse(await request.formData());

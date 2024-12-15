@@ -1,6 +1,5 @@
 import { Image, Vote } from "lucide-react";
 import { useEffect, useId } from "react";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { Link, useSearchParams } from "react-router";
 import { z } from "zod";
 
@@ -24,14 +23,14 @@ import { CloudImageGallery } from "~/components/CloudImageGallery";
 import { Button } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { cn } from "~/utils";
-import { createAuthenticator } from "~/utils/auth.server";
+import { getRequiredUser } from "~/utils/auth.server";
 import { formatDateTime } from "~/utils/date.utils";
 import { emitter } from "~/utils/events/emitter.server";
 import { useLiveLoader } from "~/utils/events/use-live-loader";
-import { badRequest } from "~/utils/responseUtils";
 import { createEventMessageSchema, likeMessageSchema, newEventMessageReplySchema } from "~/utils/schemas/eventSchema";
 import { transformErrorResponse } from "~/utils/validateUtils";
 
+import type { Route } from "./+types/route";
 import { LikeButton } from "./LikeButton";
 import { Likes } from "./Likes";
 import { Message } from "./Message";
@@ -40,17 +39,9 @@ import { ReplyList } from "./ReplyList";
 import { ReplyMessageForm } from "./ReplyMessageForm";
 import { UploadMedia } from "../../components/UploadMedia";
 
-const paramSchema = z.object({
-   eventId: z.coerce.number(),
-});
-
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-   const paramsParsed = paramSchema.safeParse(params);
-   if (!paramsParsed.success) {
-      throw badRequest(paramsParsed.error.message);
-   }
-   const { eventId } = paramsParsed.data;
-   const loggedInUser = await createAuthenticator().getRequiredUser(request);
+export const loader = async ({ request, params }: Route.LoaderArgs) => {
+   const eventId = z.coerce.number().parse(params.eventId);
+   const loggedInUser = await getRequiredUser(request);
    const [polls, cloudinaryImages, messages, usersWithSubscription] = await Promise.all([
       getEventPollsSimple(eventId),
       getEventCloudinaryImages(eventId),
@@ -60,13 +51,9 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
    return { polls, cloudinaryImages, eventId, messages, loggedInUser, usersWithSubscription };
 };
 
-export const action = async ({ request, params }: ActionFunctionArgs) => {
-   const loggendInUser = await createAuthenticator().getRequiredUser(request);
-   const paramsParsed = paramSchema.safeParse(params);
-   if (!paramsParsed.success) {
-      throw badRequest(paramsParsed.error.message);
-   }
-   const { eventId } = paramsParsed.data;
+export const action = async ({ request, params }: Route.ActionArgs) => {
+   const eventId = z.coerce.number().parse(params.eventId);
+   const loggedInUser = await getRequiredUser(request);
    const formData = await request.formData();
    const intent = formData.get("intent");
 
@@ -78,8 +65,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
          return transformErrorResponse(parsedForm.error);
       }
       const { message } = parsedForm.data;
-      const messageId = await insertEventMessage(eventId, loggendInUser.id, message);
-      await notifyParticipantsNewPostCreated(loggendInUser, eventId, messageId, message);
+      const messageId = await insertEventMessage(eventId, loggedInUser.id, message);
+      await notifyParticipantsNewPostCreated(loggedInUser, eventId, messageId, message);
       startEmit();
       return { ok: true } as const;
    }
@@ -89,27 +76,28 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
          return transformErrorResponse(parsedForm.error);
       }
       const { reply, messageId } = parsedForm.data;
-      const replyId = await insertEventMessageReply(loggendInUser.id, messageId, reply);
-      await notifyParticipantsReplyToPost(loggendInUser, eventId, messageId, replyId, reply);
+      const replyId = await insertEventMessageReply(loggedInUser.id, messageId, reply);
+      await notifyParticipantsReplyToPost(loggedInUser, eventId, messageId, replyId, reply);
       startEmit();
       return { ok: true } as const;
    }
    if (intent === "likeMessage") {
       const { messageId, type } = likeMessageSchema.parse(formData);
       if (request.method === "POST") {
-         await insertMessageLike(loggendInUser.id, messageId, type);
-         await notifyParticipantLikeOnPost(loggendInUser, eventId, messageId, type);
+         await insertMessageLike(loggedInUser.id, messageId, type);
+         await notifyParticipantLikeOnPost(loggedInUser, eventId, messageId, type);
       } else {
-         await deleteMessageLike(loggendInUser.id, messageId);
+         await deleteMessageLike(loggedInUser.id, messageId);
       }
       startEmit();
       return { ok: true } as const;
    }
 };
 
-export default function EventActivities() {
-   const { polls, cloudinaryImages, eventId, messages, loggedInUser, usersWithSubscription } =
-      useLiveLoader<typeof loader>();
+export default function EventActivities({
+   loaderData: { polls, cloudinaryImages, eventId, messages, loggedInUser, usersWithSubscription },
+}: Route.ComponentProps) {
+   useLiveLoader();
    const [searchParams] = useSearchParams();
    const activePollsTitleId = useId();
    const activePolls = polls.filter((p) => p.poll.isActive);

@@ -1,19 +1,20 @@
-import type { LoaderFunctionArgs, MetaFunction } from "react-router";
-import { Navigate, useLoaderData } from "react-router";
+import { Navigate } from "react-router";
 import { z } from "zod";
 
 import { getEvent } from "~/.server/db/gataEvent";
 import { badRequest } from "~/utils/responseUtils";
 
+import type { Route } from "./+types/route";
+
 const paramSchema = z.object({
    eventId: z.coerce.number(),
 });
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-   return [{ title: `Gata - ${data?.event.title}` }];
+export const meta = ({ data }: Route.MetaArgs) => {
+   return [{ title: `Gata - ${data.event.title}` }];
 };
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ params }: Route.LoaderArgs) => {
    const paramsParsed = paramSchema.safeParse(params);
    if (!paramsParsed.success) {
       throw badRequest(paramsParsed.error.message);
@@ -22,7 +23,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
    return { event: await getEvent(eventId) };
 };
 
-export default function PublicEvent() {
-   const { event } = useLoaderData<typeof loader>();
+export default function PublicEvent({ loaderData: { event } }: Route.ComponentProps) {
    return <Navigate to={`/event/${event.id}`} />;
 }
