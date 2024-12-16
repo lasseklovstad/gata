@@ -81,7 +81,7 @@
     "@types/better-sqlite3": "^7.6.10",
     "@types/eslint__js": "^8.42.3",
     "@types/pulltorefreshjs": "^0.1.7",
-    "@types/react": "18.3.16",
+    "@types/react": "18.3.17",
     "@types/react-dom": "18.3.5",
     "@types/textarea-caret": "^3.0.3",
     "@types/web-push": "^3.6.3",
