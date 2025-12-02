@@ -1,12 +1,11 @@
-name: 'pr'
+name: "pr"
 
 on:
   push:
     branches:
-      - '**'
-      - '!main'
+      - "**"
+      - "!main"
   workflow_dispatch:
-
 
 jobs:
   lint-fe:
@@ -14,57 +13,64 @@ jobs:
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          ref: ${{ github.ref }}
-
-      - name: Setup node
-        uses: actions/setup-node@v4
+          package_json_file: "package.json"
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
-
-      - name: Download deps
-        uses: bahmutov/npm-install@v1
-
-      - name: Run linting checks
-        run: |
-          npm run typecheck && npm run lint:ci
+          node-version-file: "package.json"
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+      - run: pnpm i --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint:ci
   knip:
     name: Knip Frontend
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          node-version: 22
+          package_json_file: "package.json"
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: "package.json"
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+      - run: pnpm i --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm knip
 
-      - name: Download deps
-        uses: bahmutov/npm-install@v1
-
-      - name: Run frontend tests
-        run: |
-          npm run typecheck && npm run knip          
   integration:
     name: Integration tests
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          node-version: 22
-
-      - name: Download deps
-        uses: bahmutov/npm-install@v1
+          package_json_file: "package.json"
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: "package.json"
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+      - run: pnpm i --frozen-lockfile
 
       - name: Run frontend tests
         run: |
-          npm run test:ci   
+          pnpm test:ci
 
   playwright:
     runs-on: ubuntu-latest
@@ -81,28 +87,30 @@ jobs:
       MAKE_FIRST_USER_ADMIN: true
 
     steps:
-      - name: Cloning repo
-        uses: actions/checkout@v4
-
-      - name: Setup node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          node-version: 22
-
-      - name: Download deps
-        uses: bahmutov/npm-install@v1
+          package_json_file: "package.json"
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: "package.json"
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+      - run: pnpm i --frozen-lockfile
 
       - name: Build frontend
-        run: |
-          npm run build
+        run: pnpm build
 
       - name: Run migrations
         run: |
-            npm run db:migrate
+          pnpm db:migrate
 
       - name: Install playwright
         run: |
-          npx playwright install --with-deps chromium
+          pnpm exec playwright install --with-deps chromium
 
       - name: Run E2E tests
         env:
@@ -118,7 +126,7 @@ jobs:
           # DEBUG: pw:webserver
           # DEBUG: pw:api
         run: |
-          npx playwright test
+          pnpm exec playwright test
 
       - name: Upload test results
         if: always()
