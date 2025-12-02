@@ -159,9 +159,6 @@ importers:
       '@types/better-sqlite3':
         specifier: ^7.6.10
         version: 7.6.13
-      '@types/eslint__js':
-        specifier: ^8.42.3
-        version: 8.42.3
       '@types/pulltorefreshjs':
         specifier: ^0.1.7
         version: 0.1.7
@@ -211,7 +208,7 @@ importers:
         specifier: ^15.12.0
         version: 15.15.0
       knip:
-        specifier: ^5.39.2
+        specifier: ^5.71.0
         version: 5.71.0(@types/node@24.10.1)(typescript@5.7.2)
       postcss:
         specifier: ^8.4.38
@@ -2101,9 +2098,6 @@ packages:
 
   '@types/eslint@9.6.1':
     resolution: {integrity: sha512-FXx2pKgId/WyYo2jXw63kk7/+TY7u7AziEJxJAnSFzHlqTAS3Ync6SvgYAN/k4/PQpnnVuzoMuVnByKK2qp0ag==}
-
-  '@types/eslint__js@8.42.3':
-    resolution: {integrity: sha512-alfG737uhmPdnvkrLdZLcEKJ/B8s9Y4hrZ+YAdzUeoArBlSUERA2E87ROfOaS4jd/C45fzOoZzidLc1IPwLqOw==}
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
@@ -6820,10 +6814,7 @@ snapshots:
     dependencies:
       '@types/estree': 1.0.8
       '@types/json-schema': 7.0.15
-
-  '@types/eslint__js@8.42.3':
-    dependencies:
-      '@types/eslint': 9.6.1
+    optional: true
 
   '@types/estree@1.0.8': {}
 

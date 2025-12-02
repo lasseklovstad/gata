@@ -26,13 +26,8 @@ import { MemberActionSchema, memberIntent } from "./intent";
 
 export const loader = async ({ request, params: { memberId } }: Route.LoaderArgs) => {
    const loggedInUser = await getRequiredUser(request);
-   const [member, roles, contingentInfo, notMemberUsers] = await Promise.all([
-      getUser(memberId),
-      getRoles(),
-      getContingentInfo(),
-      getNotMemberUsers(),
-   ]);
-   return { member, contingentInfo, roles, notMemberUsers, loggedInUser };
+   const [member, roles, notMemberUsers] = await Promise.all([getUser(memberId), getRoles(), getNotMemberUsers()]);
+   return { member, contingentInfo: getContingentInfo(), roles, notMemberUsers, loggedInUser };
 };
 
 export const action = async ({ request, params: { memberId } }: Route.ActionArgs) => {

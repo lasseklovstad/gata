@@ -24,8 +24,8 @@ export const TextareaWithAutocomplete = ({ setValue, usersWithSubscription, valu
 
    const filteredPeople = trigger
       ? usersWithSubscription.filter((person) => {
-         return person.name.toLowerCase().includes(searchValue.toLowerCase());
-      })
+           return person.name.toLowerCase().includes(searchValue.toLowerCase());
+        })
       : [];
 
    useLayoutEffect(() => {
@@ -130,8 +130,9 @@ function getTriggerOffset(element: HTMLTextAreaElement, triggers = defaultTrigge
 
 function replaceValue(offset: number, searchValue: string, displayValue: string) {
    return (prevValue: string) => {
-      const nextValue = `${prevValue.slice(0, offset) + displayValue
-         } ${prevValue.slice(offset + searchValue.length + 1)}`;
+      const nextValue = `${
+         prevValue.slice(0, offset) + displayValue
+      } ${prevValue.slice(offset + searchValue.length + 1)}`;
       return nextValue;
    };
 }
