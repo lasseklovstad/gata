@@ -1,6 +1,7 @@
-FROM node:22.16-alpine3.20 as base
+FROM node:24-bookworm-slim AS base
 
 LABEL fly_launch_runtime="Remix"
+RUN npm install -g pnpm
 
 # Remix app lives here
 WORKDIR /app
@@ -10,22 +11,20 @@ ENV NODE_ENV=production
 ENV APP_DATABASE_URL=/data/sqlite.db
 ENV IMAGE_DIR=/data/images
 
+FROM base AS production-deps
+WORKDIR /app
+ADD package.json pnpm-lock.yaml ./
+RUN pnpm i --prod --frozen-lockfile
+
 
 # Throw-away build stage to reduce size of final image
 FROM base as build
-
-# Install node modules
-COPY --link package-lock.json package.json ./
-RUN npm ci --include=dev
-
+ADD package.json pnpm-lock.yaml ./
+RUN pnpm i --frozen-lockfile
 # Copy application code
 COPY --link . .
-
 # Build application
-RUN npm run build
-
-# Remove development dependencies
-RUN npm prune --omit=dev
+RUN pnpm build
 
 
 # Final stage for app image
@@ -33,7 +32,7 @@ FROM base
 
 # Copy built application
 COPY --from=build /app/build /app/build
-COPY --from=build /app/node_modules /app/node_modules
+COPY --from=production-deps /app/node_modules /app/node_modules
 COPY --from=build /app/package.json /app/package.json
 COPY --from=build /app/server.mjs /app/server.mjs
 COPY --from=build /app/migrations /app/migrations

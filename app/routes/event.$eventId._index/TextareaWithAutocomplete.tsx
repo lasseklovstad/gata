@@ -39,7 +39,7 @@ export const TextareaWithAutocomplete = ({ setValue, usersWithSubscription, valu
    const rect = ref.current?.getBoundingClientRect();
    return (
       <Combobox
-         onChange={(option: User | undefined) => {
+         onChange={(option: User | undefined | null) => {
             if (!textarea || !option) return;
             const offset = getTriggerOffset(textarea);
             const displayValue = option.name;

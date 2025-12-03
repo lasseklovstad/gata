@@ -57,7 +57,7 @@ const config: PlaywrightTestConfig = {
    webServer: [
       {
          timeout: 30 * 1000,
-         command: "npm run start",
+         command: "pnpm start",
          url: process.env.PLAYWRIGHT_BASE_URL + "/health",
          reuseExistingServer: !process.env.CI,
       },

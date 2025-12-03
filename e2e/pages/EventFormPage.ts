@@ -65,6 +65,7 @@ export const EventFormPage = (page: Page) => {
       await homePage.buttonCreateEvent.click();
       await eventFormPage.fillForm(event);
       await eventFormPage.submit();
+      await expect(page.getByRole("heading", { name: event.title })).toBeVisible();
    };
 
    return { fillForm, submit, cancel, inputTitle, inputDescription, verifyForm, createEvent, selectVisibility };

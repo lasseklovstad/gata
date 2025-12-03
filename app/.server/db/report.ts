@@ -90,19 +90,17 @@ export const updateReport = async (reportId: string, values: ReportSchema, logge
 };
 
 export const deleteReport = async (reportId: string) => {
-   await db.transaction(async (tx) => {
-      const reportFiles = await tx.select().from(reportFile).where(eq(reportFile.reportId, reportId));
-      await Promise.all(
-         reportFiles.map(async (file) => {
-            if (!file.cloudId) {
-               throw new Error("No cloud id!");
-            }
-            await deleteImage(file.cloudId);
-            await tx.delete(reportFile).where(eq(reportFile.id, file.id));
-         })
-      );
-      await tx.delete(gataReport).where(eq(gataReport.id, reportId));
-   });
+   const reportFiles = await db.select().from(reportFile).where(eq(reportFile.reportId, reportId));
+   await Promise.all(
+      reportFiles.map(async (file) => {
+         if (!file.cloudId) {
+            throw new Error("No cloud id!");
+         }
+         await deleteImage(file.cloudId);
+         await db.delete(reportFile).where(eq(reportFile.id, file.id));
+      })
+   );
+   await db.delete(gataReport).where(eq(gataReport.id, reportId));
 };
 
 export const updateReportContent = async (reportId: string, content: string, loggedInUser: User) => {

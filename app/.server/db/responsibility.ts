@@ -50,15 +50,13 @@ export const insertResponsibilityYear = async (
    year: number,
    loggedInUser: User
 ) => {
-   await db.transaction(async (tx) => {
-      const [{ id }] = await tx
-         .insert(responsibilityYear)
-         .values({ responsibilityId, year, userId })
-         .returning({ id: responsibilityYear.id });
-      await tx.insert(responsibilityNote).values({
-         responsibilityYearId: id,
-         lastModifiedBy: loggedInUser.name,
-      });
+   const [{ id }] = await db
+      .insert(responsibilityYear)
+      .values({ responsibilityId, year, userId })
+      .returning({ id: responsibilityYear.id });
+   await db.insert(responsibilityNote).values({
+      responsibilityYearId: id,
+      lastModifiedBy: loggedInUser.name,
    });
 };
 

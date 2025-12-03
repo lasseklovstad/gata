@@ -5,7 +5,6 @@ import { useEventSource } from "remix-utils/sse/react";
 export function useLiveLoader() {
    const path = useResolvedPath("./stream");
    const data = useEventSource(path.pathname);
-
    // eslint-disable-next-line @typescript-eslint/unbound-method
    const { revalidate } = useRevalidator();
 

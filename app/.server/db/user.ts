@@ -104,23 +104,21 @@ export const getNumberOfAdmins = async () => {
 };
 
 export const insertUser = async (auth0UserId: string, roleName?: RoleName) => {
-   return await db.transaction(async (tx) => {
-      const [externalUserResult] = await tx.select().from(externalUser).where(eq(externalUser.id, auth0UserId));
-      const [createdUser] = await tx
-         .insert(user)
-         .values({
-            primaryExternalUserId: auth0UserId,
-            name: externalUserResult.name,
-            picture: externalUserResult.picture ?? "/no-profile.jpg",
-         })
-         .returning({ id: user.id });
-      await tx.update(externalUser).set({ userId: createdUser.id }).where(eq(externalUser.id, auth0UserId));
-      if (roleName !== undefined) {
-         const [userRole] = await tx.selectDistinct().from(role).where(eq(role.roleName, roleName));
-         await tx.insert(userRoles).values({ usersId: createdUser.id, roleId: userRole.id });
-      }
-      return createdUser.id;
-   });
+   const [externalUserResult] = await db.select().from(externalUser).where(eq(externalUser.id, auth0UserId));
+   const [createdUser] = await db
+      .insert(user)
+      .values({
+         primaryExternalUserId: auth0UserId,
+         name: externalUserResult.name,
+         picture: externalUserResult.picture ?? "/no-profile.jpg",
+      })
+      .returning({ id: user.id });
+   await db.update(externalUser).set({ userId: createdUser.id }).where(eq(externalUser.id, auth0UserId));
+   if (roleName !== undefined) {
+      const [userRole] = await db.selectDistinct().from(role).where(eq(role.roleName, roleName));
+      await db.insert(userRoles).values({ usersId: createdUser.id, roleId: userRole.id });
+   }
+   return createdUser.id;
 };
 
 export const updateUser = async (
@@ -131,13 +129,11 @@ export const updateUser = async (
 };
 
 export const updateLinkedExternalUsers = async (userId: string, externalUserIds: string[]) => {
-   await db.transaction(async (tx) => {
-      await tx
-         .update(externalUser)
-         .set({ userId: null })
-         .where(and(eq(externalUser.userId, userId), notInArray(externalUser.id, externalUserIds)));
-      await tx.update(externalUser).set({ userId }).where(inArray(externalUser.id, externalUserIds));
-   });
+   await db
+      .update(externalUser)
+      .set({ userId: null })
+      .where(and(eq(externalUser.userId, userId), notInArray(externalUser.id, externalUserIds)));
+   await db.update(externalUser).set({ userId }).where(inArray(externalUser.id, externalUserIds));
 };
 
 export const updatePrimaryEmail = async (userId: string, primaryExternalUserId: string) => {

@@ -23,11 +23,9 @@ import { RoleName } from "~/utils/roleUtils";
 import type { User } from "./user";
 
 export const insertEvent = async (event: Omit<typeof gataEvent.$inferInsert, "createdBy"> & { createdBy: string }) => {
-   return await db.transaction(async (tx) => {
-      const [{ eventId }] = await tx.insert(gataEvent).values(event).returning({ eventId: gataEvent.id });
-      await tx.insert(eventOrganizer).values({ userId: event.createdBy, eventId });
-      return eventId;
-   });
+   const [{ eventId }] = await db.insert(gataEvent).values(event).returning({ eventId: gataEvent.id });
+   await db.insert(eventOrganizer).values({ userId: event.createdBy, eventId });
+   return eventId;
 };
 
 export const getUpCommingEvents = async (loggedInUserId: string) => {
@@ -142,11 +140,9 @@ type InsertPollVote = {
 };
 
 export const insertPollVote = async ({ userId, pollId, options }: InsertPollVote) => {
-   await db.transaction(async (tx) => {
-      await tx.delete(pollVote).where(and(eq(pollVote.userId, userId), eq(pollVote.pollId, pollId)));
-      if (!options.length) return;
-      await tx.insert(pollVote).values(options.map((pollOptionId) => ({ pollId, pollOptionId, userId })));
-   });
+   await db.delete(pollVote).where(and(eq(pollVote.userId, userId), eq(pollVote.pollId, pollId)));
+   if (!options.length) return;
+   await db.insert(pollVote).values(options.map((pollOptionId) => ({ pollId, pollOptionId, userId })));
 };
 
 export const updatePoll = async (pollId: number, values: Partial<typeof poll.$inferInsert>) => {
@@ -158,11 +154,9 @@ export const deletePoll = async (pollId: number) => {
 };
 
 export const insertNewPoll = async (eventId: number, pollValues: typeof poll.$inferInsert, options: string[]) => {
-   await db.transaction(async (tx) => {
-      const [{ pollId }] = await tx.insert(poll).values(pollValues).returning({ pollId: poll.id });
-      await tx.insert(eventPolls).values({ pollId, eventId });
-      await tx.insert(pollOption).values(options.map((textOption) => ({ textOption, pollId })));
-   });
+   const [{ pollId }] = await db.insert(poll).values(pollValues).returning({ pollId: poll.id });
+   await db.insert(eventPolls).values({ pollId, eventId });
+   await db.insert(pollOption).values(options.map((textOption) => ({ textOption, pollId })));
 };
 
 export const insertPollOptions = async (pollId: number, options: string[]) => {
@@ -170,17 +164,13 @@ export const insertPollOptions = async (pollId: number, options: string[]) => {
 };
 
 export const updateOrganizers = async (eventId: number, organizers: string[]) => {
-   await db.transaction(async (tx) => {
-      await tx.delete(eventOrganizer).where(eq(eventOrganizer.eventId, eventId));
-      await tx.insert(eventOrganizer).values(organizers.map((userId) => ({ userId, eventId })));
-   });
+   await db.delete(eventOrganizer).where(eq(eventOrganizer.eventId, eventId));
+   await db.insert(eventOrganizer).values(organizers.map((userId) => ({ userId, eventId })));
 };
 
 export const insertCloudinaryImage = async (eventId: number, values: typeof cloudinaryImage.$inferInsert) => {
-   return await db.transaction(async (tx) => {
-      await tx.insert(cloudinaryImage).values(values);
-      await tx.insert(eventCloudinaryImages).values({ eventId, cloudId: values.cloudId });
-   });
+   await db.insert(cloudinaryImage).values(values);
+   await db.insert(eventCloudinaryImages).values({ eventId, cloudId: values.cloudId });
 };
 
 export const getEventCloudinaryImages = async (eventId: number) => {
@@ -265,25 +255,18 @@ export const getEventMessages = async (eventId: number) => {
 };
 
 export const insertEventMessage = async (eventId: number, userId: string, message: string) => {
-   return await db.transaction(async (tx) => {
-      const [{ messageId }] = await tx
-         .insert(messages)
-         .values({ userId, message })
-         .returning({ messageId: messages.id });
-      await tx.insert(eventMessages).values({ messageId, eventId });
-      return messageId;
-   });
+   const [{ messageId }] = await db.insert(messages).values({ userId, message }).returning({ messageId: messages.id });
+   await db.insert(eventMessages).values({ messageId, eventId });
+   return messageId;
 };
 
 export const insertEventMessageReply = async (userId: string, messageId: number, reply: string) => {
-   return await db.transaction(async (tx) => {
-      const [{ replyId }] = await tx
-         .insert(messages)
-         .values({ userId, message: reply })
-         .returning({ replyId: messages.id });
-      await tx.insert(messageReplies).values({ messageId, replyId });
-      return replyId;
-   });
+   const [{ replyId }] = await db
+      .insert(messages)
+      .values({ userId, message: reply })
+      .returning({ replyId: messages.id });
+   await db.insert(messageReplies).values({ messageId, replyId });
+   return replyId;
 };
 
 export const insertMessageLike = async (userId: string, messageId: number, type: string) => {
