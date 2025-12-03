@@ -129,13 +129,11 @@ export const updateUser = async (
 };
 
 export const updateLinkedExternalUsers = async (userId: string, externalUserIds: string[]) => {
-   await db.transaction(async (tx) => {
-      await tx
-         .update(externalUser)
-         .set({ userId: null })
-         .where(and(eq(externalUser.userId, userId), notInArray(externalUser.id, externalUserIds)));
-      await tx.update(externalUser).set({ userId }).where(inArray(externalUser.id, externalUserIds));
-   });
+   await db
+      .update(externalUser)
+      .set({ userId: null })
+      .where(and(eq(externalUser.userId, userId), notInArray(externalUser.id, externalUserIds)));
+   await db.update(externalUser).set({ userId }).where(inArray(externalUser.id, externalUserIds));
 };
 
 export const updatePrimaryEmail = async (userId: string, primaryExternalUserId: string) => {

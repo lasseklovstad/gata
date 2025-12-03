@@ -140,11 +140,9 @@ type InsertPollVote = {
 };
 
 export const insertPollVote = async ({ userId, pollId, options }: InsertPollVote) => {
-   await db.transaction(async (tx) => {
-      await tx.delete(pollVote).where(and(eq(pollVote.userId, userId), eq(pollVote.pollId, pollId)));
-      if (!options.length) return;
-      await tx.insert(pollVote).values(options.map((pollOptionId) => ({ pollId, pollOptionId, userId })));
-   });
+   await db.delete(pollVote).where(and(eq(pollVote.userId, userId), eq(pollVote.pollId, pollId)));
+   if (!options.length) return;
+   await db.insert(pollVote).values(options.map((pollOptionId) => ({ pollId, pollOptionId, userId })));
 };
 
 export const updatePoll = async (pollId: number, values: Partial<typeof poll.$inferInsert>) => {
@@ -156,11 +154,9 @@ export const deletePoll = async (pollId: number) => {
 };
 
 export const insertNewPoll = async (eventId: number, pollValues: typeof poll.$inferInsert, options: string[]) => {
-   await db.transaction(async (tx) => {
-      const [{ pollId }] = await tx.insert(poll).values(pollValues).returning({ pollId: poll.id });
-      await tx.insert(eventPolls).values({ pollId, eventId });
-      await tx.insert(pollOption).values(options.map((textOption) => ({ textOption, pollId })));
-   });
+   const [{ pollId }] = await db.insert(poll).values(pollValues).returning({ pollId: poll.id });
+   await db.insert(eventPolls).values({ pollId, eventId });
+   await db.insert(pollOption).values(options.map((textOption) => ({ textOption, pollId })));
 };
 
 export const insertPollOptions = async (pollId: number, options: string[]) => {
@@ -168,17 +164,13 @@ export const insertPollOptions = async (pollId: number, options: string[]) => {
 };
 
 export const updateOrganizers = async (eventId: number, organizers: string[]) => {
-   await db.transaction(async (tx) => {
-      await tx.delete(eventOrganizer).where(eq(eventOrganizer.eventId, eventId));
-      await tx.insert(eventOrganizer).values(organizers.map((userId) => ({ userId, eventId })));
-   });
+   await db.delete(eventOrganizer).where(eq(eventOrganizer.eventId, eventId));
+   await db.insert(eventOrganizer).values(organizers.map((userId) => ({ userId, eventId })));
 };
 
 export const insertCloudinaryImage = async (eventId: number, values: typeof cloudinaryImage.$inferInsert) => {
-   return await db.transaction(async (tx) => {
-      await tx.insert(cloudinaryImage).values(values);
-      await tx.insert(eventCloudinaryImages).values({ eventId, cloudId: values.cloudId });
-   });
+   await db.insert(cloudinaryImage).values(values);
+   await db.insert(eventCloudinaryImages).values({ eventId, cloudId: values.cloudId });
 };
 
 export const getEventCloudinaryImages = async (eventId: number) => {
