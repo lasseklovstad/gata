@@ -15,6 +15,7 @@ playwright-report
 playwright/.cache/
 *StorageState.json
 sqlite*.db
+sqlite*.db-journal
 /data
 /db-backups
 .react-router/
