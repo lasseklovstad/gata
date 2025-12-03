@@ -23,11 +23,9 @@ import { RoleName } from "~/utils/roleUtils";
 import type { User } from "./user";
 
 export const insertEvent = async (event: Omit<typeof gataEvent.$inferInsert, "createdBy"> & { createdBy: string }) => {
-   return await db.transaction(async (tx) => {
-      const [{ eventId }] = await tx.insert(gataEvent).values(event).returning({ eventId: gataEvent.id });
-      await tx.insert(eventOrganizer).values({ userId: event.createdBy, eventId });
-      return eventId;
-   });
+   const [{ eventId }] = await db.insert(gataEvent).values(event).returning({ eventId: gataEvent.id });
+   await db.insert(eventOrganizer).values({ userId: event.createdBy, eventId });
+   return eventId;
 };
 
 export const getUpCommingEvents = async (loggedInUserId: string) => {
@@ -265,25 +263,18 @@ export const getEventMessages = async (eventId: number) => {
 };
 
 export const insertEventMessage = async (eventId: number, userId: string, message: string) => {
-   return await db.transaction(async (tx) => {
-      const [{ messageId }] = await tx
-         .insert(messages)
-         .values({ userId, message })
-         .returning({ messageId: messages.id });
-      await tx.insert(eventMessages).values({ messageId, eventId });
-      return messageId;
-   });
+   const [{ messageId }] = await db.insert(messages).values({ userId, message }).returning({ messageId: messages.id });
+   await db.insert(eventMessages).values({ messageId, eventId });
+   return messageId;
 };
 
 export const insertEventMessageReply = async (userId: string, messageId: number, reply: string) => {
-   return await db.transaction(async (tx) => {
-      const [{ replyId }] = await tx
-         .insert(messages)
-         .values({ userId, message: reply })
-         .returning({ replyId: messages.id });
-      await tx.insert(messageReplies).values({ messageId, replyId });
-      return replyId;
-   });
+   const [{ replyId }] = await db
+      .insert(messages)
+      .values({ userId, message: reply })
+      .returning({ replyId: messages.id });
+   await db.insert(messageReplies).values({ messageId, replyId });
+   return replyId;
 };
 
 export const insertMessageLike = async (userId: string, messageId: number, type: string) => {
