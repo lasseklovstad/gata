@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useRevalidator } from "react-router";
 
 export function useRevalidateOnFocus() {
+   // eslint-disable-next-line @typescript-eslint/unbound-method
    const { revalidate, state } = useRevalidator();
 
    useEffect(
