@@ -1,4 +1,4 @@
-import { parseMultipartRequest } from "@mjackson/multipart-parser";
+import { parseMultipartRequest } from "@remix-run/multipart-parser";
 
 import { uploadImageToCloudinary } from "~/.server/services/cloudinaryService";
 
@@ -26,13 +26,13 @@ export const uploadFilesToCloudinaryAndGetMultiformParts = async (request: Reque
    for await (const part of parseMultipartRequest(request)) {
       const name = part.name;
       if (part.isFile && name === "cloudinary-file") {
-         const response = await uploadImageToCloudinary(part.body, options.cloudinaryFolder);
+         const response = await uploadImageToCloudinary(part.arrayBuffer, options.cloudinaryFolder);
          const { secure_url, public_id, width, height } = response;
          parts.push({ cloudId: public_id, cloudUrl: secure_url, width, height, name });
-      } else if (name) {
+      } else if (name && part.isFile) {
          parts.push({
             name: part.name,
-            value: await part.text(),
+            value: part.text,
          });
       }
    }

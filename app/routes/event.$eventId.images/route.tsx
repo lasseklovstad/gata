@@ -44,9 +44,9 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
    const loggedInUser = await getRequiredUser(request);
    const folder = `${getCloudinaryUploadFolder()}/event-${eventId}`;
    const contentType = request.headers.get("Content-Type");
-   const isMulitipart = contentType?.includes("multipart/form-data");
+   const isMultipart = contentType?.includes("multipart/form-data");
 
-   if (request.method === "POST" && isMulitipart) {
+   if (request.method === "POST" && isMultipart) {
       const parts = await uploadFilesToCloudinaryAndGetMultiformParts(request, { cloudinaryFolder: folder });
       for (const part of parts) {
          if (isCloudinaryFilePart(part)) {

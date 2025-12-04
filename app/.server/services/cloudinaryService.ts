@@ -1,4 +1,5 @@
-import { writeReadableStreamToWritable } from "@react-router/node"; // `writeAsyncIterableToWritable` is a Node-only utility
+import { Readable } from "stream";
+
 import type { UploadApiResponse } from "cloudinary";
 import cloudinary from "cloudinary";
 
@@ -46,7 +47,8 @@ export const deleteImage = (publicId: string) => {
    });
 };
 
-export function uploadImageToCloudinary(data: ReadableStream<Uint8Array>, folder: string) {
+export function uploadImageToCloudinary(data: ArrayBuffer, folder: string) {
+   const buffer = Buffer.from(data);
    const uploadPromise = new Promise<UploadApiResponse>((resolve, reject) => {
       const uploadStream = cloudinary.v2.uploader.upload_stream(
          {
@@ -64,7 +66,9 @@ export function uploadImageToCloudinary(data: ReadableStream<Uint8Array>, folder
             }
          }
       );
-      void writeReadableStreamToWritable(data, uploadStream);
+      // Pipe the buffer to Cloudinary
+      const readableStream = Readable.from(buffer);
+      readableStream.pipe(uploadStream);
    });
 
    return uploadPromise;

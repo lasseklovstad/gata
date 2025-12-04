@@ -1,9 +1,7 @@
-/// <reference types="vitest" />
 import { reactRouter } from "@react-router/dev/vite";
-import { reactRouterDevTools } from "react-router-devtools";
-import { defineConfig } from "vite";
 import checker from "vite-plugin-checker";
 import tsconfigPaths from "vite-tsconfig-paths";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
    ssr: {
@@ -13,7 +11,6 @@ export default defineConfig({
       port: 3000,
    },
    plugins: [
-      process.env.SHOW_REMIX_DEVTOOLS === "true" ? reactRouterDevTools() : undefined,
       reactRouter(),
       tsconfigPaths(),
       process.env.NODE_ENV === "development" ? checker({ typescript: true }) : undefined,
@@ -25,7 +22,6 @@ export default defineConfig({
       setupFiles: ["./tests/vitestSetup.ts"],
       clearMocks: true,
       maxWorkers: 1,
-      minWorkers: 1,
       env: {
          APP_DATABASE_URL: "sqlite_test.db",
       },
