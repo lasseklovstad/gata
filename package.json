@@ -28,9 +28,9 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.0.3",
-    "@mjackson/file-storage": "^0.3.0",
-    "@mjackson/form-data-parser": "^0.5.0",
-    "@mjackson/multipart-parser": "^0.7.0",
+    "@remix-run/file-storage": "0.13.0",
+    "@remix-run/form-data-parser": "0.14.0",
+    "@remix-run/multipart-parser": "0.14.0",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-slot": "^1.0.2",

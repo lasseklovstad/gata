@@ -4,8 +4,8 @@ import "./tailwind.css";
 import os from "os";
 import path from "path";
 
-import { LocalFileStorage } from "@mjackson/file-storage/local";
-import { type FileUpload, parseFormData } from "@mjackson/form-data-parser";
+import { createFsFileStorage } from "@remix-run/file-storage/fs";
+import { type FileUpload, parseFormData } from "@remix-run/form-data-parser";
 import PullToRefresh from "pulltorefreshjs";
 import type { ComponentProps } from "react";
 import { useEffect } from "react";
@@ -125,9 +125,13 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 export const action = async ({ request }: Route.ActionArgs) => {
    const loggedInUser = await getRequiredUser(request);
 
-   const formData = await parseFormData(request, createTempUploadHandler("profile-pictures"), {
-      maxFileSize: 20 * 1024 * 1024,
-   });
+   const formData = await parseFormData(
+      request,
+      {
+         maxFileSize: 20 * 1024 * 1024,
+      },
+      createTempUploadHandler("profile-pictures")
+   );
 
    const intent = formData.get("intent");
 
@@ -200,7 +204,7 @@ export default function App({ loaderData: { auth0User, loggedInUser, version, pw
 
 function createTempUploadHandler(prefix: string) {
    const directory = path.join(os.tmpdir(), prefix);
-   const fileStorage = new LocalFileStorage(directory);
+   const fileStorage = createFsFileStorage(directory);
 
    async function uploadHandler(fileUpload: FileUpload) {
       if (fileUpload.fieldName === "picture" && fileUpload.type.startsWith("image/")) {
