@@ -27,7 +27,7 @@
     "generate:keys": "node generate-vapid-keys.js"
   },
   "dependencies": {
-    "@headlessui/react": "^2.0.3",
+    "@headlessui/react": "2.2.9",
     "@remix-run/file-storage": "0.13.0",
     "@remix-run/form-data-parser": "0.14.0",
     "@remix-run/multipart-parser": "0.14.0",

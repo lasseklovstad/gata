@@ -14,7 +14,12 @@ type Props = {
    inputProps: Partial<ComponentProps<typeof Textarea>>;
 };
 
-export const TextareaWithAutocomplete = ({ setValue, usersWithSubscription, value, inputProps }: Props) => {
+export const TextareaWithAutocomplete = ({
+   setValue,
+   usersWithSubscription,
+   value,
+   inputProps: { name, ...inputProps },
+}: Props) => {
    const ref = useRef<HTMLInputElement>(null);
    const [searchValue, setSearchValue] = useState("");
    const [trigger, setTrigger] = useState<string | null>(null);
@@ -36,71 +41,74 @@ export const TextareaWithAutocomplete = ({ setValue, usersWithSubscription, valu
 
    const caretCoordinates = textarea ? getCaretCoordinates(textarea, getTriggerOffset(textarea) + 1) : undefined;
 
-   const rect = ref.current?.getBoundingClientRect();
+   const rect = textarea?.getBoundingClientRect();
    return (
-      <Combobox
-         onChange={(option: User | undefined | null) => {
-            if (!textarea || !option) return;
-            const offset = getTriggerOffset(textarea);
-            const displayValue = option.name;
-            setTrigger(null);
-            setValue(replaceValue(offset + 1, searchValue, displayValue));
-            const nextCaretOffset = offset + displayValue.length + 1;
-            setCaretOffset(nextCaretOffset);
-         }}
-      >
-         <ComboboxInput
-            {...inputProps}
-            as={Textarea}
-            value={value}
-            ref={ref}
-            onKeyDown={(e) => {
-               if (e.key === "Enter") {
-                  // Headless ui prevents this from happening
-                  setValue(value + "\n");
-               }
+      <>
+         <Combobox
+            onChange={(option: User | undefined | null) => {
+               if (!textarea || !option) return;
+               const offset = getTriggerOffset(textarea);
+               const displayValue = option.name;
+               setTrigger(null);
+               setValue(replaceValue(offset + 1, searchValue, displayValue));
+               const nextCaretOffset = offset + displayValue.length + 1;
+               setCaretOffset(nextCaretOffset);
             }}
-            onChange={(event) => {
-               if (!textarea) return;
-               const trigger = getTrigger(textarea);
-               const searchValue = getSearchValue(textarea);
-               // If there's a trigger character, we'll show the combobox popover. This can
-               // be true both when the trigger character has just been typed and when
-               // content has been deleted (e.g., with backspace) and the character right
-               // before the caret is the trigger.
-               if (trigger) {
-                  setTrigger(trigger);
-               }
-               // There will be no trigger and no search value if the trigger character has
-               // just been deleted.
-               else if (!searchValue) {
-                  setTrigger(null);
-               }
-               // Sets our textarea value.
-               setValue(event.target.value);
-               // Sets the combobox value that will be used to search in the list.
-               setSearchValue(searchValue);
-            }}
-         />
-         {filteredPeople.length > 0 ? (
-            <ComboboxOptions
-               static
-               className="border bg-white rounded"
-               anchor={{
-                  to: "bottom start",
-                  gap: `${caretCoordinates && rect ? caretCoordinates.top + caretCoordinates.height - rect.height : 0}px`,
-                  offset: `${caretCoordinates?.left ?? 0}px`,
+         >
+            <ComboboxInput
+               {...inputProps}
+               as={Textarea}
+               value={value}
+               ref={ref}
+               onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                     // Headless ui prevents this from happening
+                     setValue(value + "\n");
+                  }
                }}
-            >
-               {filteredPeople.map((person) => (
-                  <ComboboxOption key={person.id} value={person} className="data-[focus]:bg-blue-100 p-2 flex gap-2">
-                     <AvatarUser user={person} className="size-6" />
-                     {person.name}
-                  </ComboboxOption>
-               ))}
-            </ComboboxOptions>
-         ) : null}
-      </Combobox>
+               onChange={(event) => {
+                  if (!textarea) return;
+                  const trigger = getTrigger(textarea);
+                  const searchValue = getSearchValue(textarea);
+                  // If there's a trigger character, we'll show the combobox popover. This can
+                  // be true both when the trigger character has just been typed and when
+                  // content has been deleted (e.g., with backspace) and the character right
+                  // before the caret is the trigger.
+                  if (trigger) {
+                     setTrigger(trigger);
+                  }
+                  // There will be no trigger and no search value if the trigger character has
+                  // just been deleted.
+                  else if (!searchValue) {
+                     setTrigger(null);
+                  }
+                  // Sets our textarea value.
+                  setValue(event.target.value);
+                  // Sets the combobox value that will be used to search in the list.
+                  setSearchValue(searchValue);
+               }}
+            />
+            {filteredPeople.length > 0 ? (
+               <ComboboxOptions
+                  static
+                  className="border bg-white rounded"
+                  anchor={{
+                     to: "bottom start",
+                     gap: `${caretCoordinates && rect ? caretCoordinates.top + caretCoordinates.height - rect.height : 0}px`,
+                     offset: `${caretCoordinates?.left ?? 0}px`,
+                  }}
+               >
+                  {filteredPeople.map((person) => (
+                     <ComboboxOption key={person.id} value={person} className="data-[focus]:bg-blue-100 p-2 flex gap-2">
+                        <AvatarUser user={person} className="size-6" />
+                        {person.name}
+                     </ComboboxOption>
+                  ))}
+               </ComboboxOptions>
+            ) : null}
+         </Combobox>
+         {name ? <input name={name} value={value} type="hidden" /> : null}
+      </>
    );
 };
 
