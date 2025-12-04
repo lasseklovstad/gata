@@ -41,7 +41,7 @@
     "@react-router/express": "7.10.0",
     "@react-router/fs-routes": "7.10.0",
     "@react-router/node": "7.10.0",
-    "@unpic/react": "^0.1.14",
+    "@unpic/react": "^1.0.0",
     "better-sqlite3": "^12.5.0",
     "class-variance-authority": "0.7.1",
     "cloudinary": "2.8.0",
