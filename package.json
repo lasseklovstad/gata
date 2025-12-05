@@ -86,7 +86,7 @@
     "@types/textarea-caret": "3.0.4",
     "@types/web-push": "3.6.4",
     "autoprefixer": "^10.4.19",
-    "dotenv": "^16.4.5",
+    "dotenv": "^17.0.0",
     "drizzle-kit": "^0.30.0",
     "eslint": "9.39.1",
     "eslint-config-prettier": "10.1.8",
