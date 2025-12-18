@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { blob, integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { blob, integer, primaryKey, sqliteTable, text, numeric } from "drizzle-orm/sqlite-core";
 
 import { env } from "~/utils/env.server";
 import type { RoleName } from "~/utils/roleUtils";
@@ -138,6 +138,28 @@ export const gataReport = sqliteTable("gata_report", {
 });
 
 export type GataReport = typeof gataReport.$inferSelect;
+
+export const userTimelineEvent = sqliteTable("user_timeline_event", {
+   id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+   userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+   eventType: text("event_type", { enum: ["civil-status", "home", "work"] }).notNull(),
+   eventDate: text("event_date").notNull(), // yyyy-MM-dd
+   description: text("description").default("").notNull(),
+   place: text("place"),
+   longitude: numeric("longitude", { mode: "number" }),
+   latitude: numeric("latitude", { mode: "number" }),
+   isVerified: integer("is_verified", { mode: "boolean" }).default(false).notNull(),
+   createdAt: text("created_at")
+      .default(sql`(CURRENT_TIMESTAMP)`)
+      .notNull(),
+   createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+});
 
 export const gataEvent = sqliteTable("gata_event", {
    id: integer("id").primaryKey(),

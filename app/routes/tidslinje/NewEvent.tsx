@@ -53,7 +53,7 @@ export const NewEvent = ({ users }: Props) => {
          <ButtonResponsive onClick={() => dialog.open()} variant="outline" icon={<Plus />} label="Ny hendelse" />
          <Dialog ref={dialog.dialogRef}>
             <fetcher.Form method="POST" ref={formRef}>
-               <FormProvider>
+               <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
                   <DialogHeading>Ny hendelse</DialogHeading>
                   <div className="space-y-4">
                      <FormItem name="user">
@@ -123,6 +123,7 @@ export const NewEvent = ({ users }: Props) => {
                                  />
                               </dialog>
                            </div>
+                           <FormMessage />
                         </FormItem>
                      </div>
                      <FormItem name="type">
@@ -178,14 +179,18 @@ export const NewEvent = ({ users }: Props) => {
                               <FormItem name="longitude">
                                  <FormLabel>Lengdegrad</FormLabel>
                                  <FormControl
-                                    render={(props) => <Input {...props} type="number" autoComplete="off" />}
+                                    render={(props) => (
+                                       <Input {...props} type="number" step={0.0001} autoComplete="off" />
+                                    )}
                                  />
                                  <FormMessage />
                               </FormItem>
                               <FormItem name="latitude">
                                  <FormLabel>Breddegrad</FormLabel>
                                  <FormControl
-                                    render={(props) => <Input {...props} type="number" autoComplete="off" />}
+                                    render={(props) => (
+                                       <Input {...props} type="number" step={0.0001} autoComplete="off" />
+                                    )}
                                  />
                                  <FormMessage />
                               </FormItem>
