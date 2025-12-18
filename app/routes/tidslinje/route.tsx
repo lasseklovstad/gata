@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Map from "react-map-gl/maplibre";
 import { Form, useNavigation } from "react-router";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
@@ -21,6 +20,7 @@ import { transformErrorResponse } from "~/utils/validateUtils";
 
 import type { Route } from "./+types/route";
 import { NewEvent } from "./NewEvent";
+import { TimeLineMap } from "./TimelineMap";
 
 // logg inn på https://cloud.maptiler.com/
 
@@ -125,7 +125,6 @@ export default function Timeline({ loaderData: { users, timelineEvents, loggedIn
       (responsibilityYear) => responsibilityYear.responsibility.name === "Oversiktsansvarlig"
    );
 
-   // Filter events by selected user (if any)
    const filteredEvents = selectedUserId
       ? timelineEvents.filter((event) => event.userId === selectedUserId)
       : timelineEvents;
@@ -182,15 +181,7 @@ export default function Timeline({ loaderData: { users, timelineEvents, loggedIn
             </ul>
          </nav>
          <div className={cn(activeTab !== "map" && "hidden")}>
-            <Map
-               initialViewState={{
-                  longitude: 10.7461,
-                  latitude: 59.9127,
-                  zoom: 5,
-               }}
-               style={{ width: "100%", height: "600px" }}
-               mapStyle="https://api.maptiler.com/maps/base-v4/style.json?key=lLMSHC7KCVK6NsfkNcUu"
-            />
+            <TimeLineMap timelineEvents={timelineEvents} users={users} />
          </div>
 
          {/* List View */}

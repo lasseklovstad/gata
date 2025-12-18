@@ -8,6 +8,8 @@ export const insertUserTimelineEvent = async (event: typeof userTimelineEvent.$i
    return eventId;
 };
 
+export type TimeLineEvent = Awaited<ReturnType<typeof getAllUserTimelineEvents>>[number];
+
 export const getAllUserTimelineEvents = async () => {
    return await db.select().from(userTimelineEvent);
 };

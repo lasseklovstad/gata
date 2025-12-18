@@ -1,7 +1,7 @@
 import { formatDate, isValid } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Calendar, Plus, X } from "lucide-react";
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import { useFetcher } from "react-router";
 
@@ -48,11 +48,24 @@ export const NewEvent = ({ users }: Props) => {
          setType(event.target.value);
       }
    };
+
+   const handleReset = () => {
+      setType("");
+      setDate(undefined);
+      setRawDate("");
+   };
+
+   useEffect(() => {
+      if (fetcher.data?.ok && fetcher.state === "idle") {
+         formRef.current?.reset();
+      }
+   }, [fetcher.data, fetcher.state]);
+
    return (
       <>
          <ButtonResponsive onClick={() => dialog.open()} variant="outline" icon={<Plus />} label="Ny hendelse" />
          <Dialog ref={dialog.dialogRef}>
-            <fetcher.Form method="POST" ref={formRef}>
+            <fetcher.Form method="POST" ref={formRef} onReset={handleReset}>
                <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
                   <DialogHeading>Ny hendelse</DialogHeading>
                   <div className="space-y-4">
