@@ -28,6 +28,7 @@ export const getUserByName = (name: string) => {
 };
 
 export const getOptionalUserFromExternalUserId = async (externalUserId: string) => {
+   const currentYear = new Date().getFullYear();
    const userResult = await db.query.externalUser.findFirst({
       columns: {},
       where: eq(externalUser.id, externalUserId),
@@ -38,6 +39,7 @@ export const getOptionalUserFromExternalUserId = async (externalUserId: string) 
                roles: { with: { role: true }, columns: { roleId: true } },
                contingents: true,
                primaryUser: true,
+               responsibilityYears: { where: eq(responsibilityYear.year, currentYear), with: { responsibility: true } },
             },
          },
       },
