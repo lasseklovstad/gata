@@ -40,7 +40,11 @@ export const TimelineList = ({ loggedInUser, users, timelineEvents }: Props) => 
 
    return (
       <div>
-         <NativeSelect value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)} className="w-fit">
+         <NativeSelect
+            value={selectedUserId}
+            onChange={(e) => setSelectedUserId(e.target.value)}
+            className="w-fit min-w-60 mb-4"
+         >
             <option value="">Alle medlemmer</option>
             {sortedUsers.map((user) => (
                <option key={user.id} value={user.id}>
