@@ -68,7 +68,7 @@ export const NewEvent = ({ users }: Props) => {
    return (
       <>
          <ButtonResponsive onClick={() => dialog.open()} variant="outline" icon={<Plus />} label="Ny hendelse" />
-         <Dialog ref={dialog.dialogRef}>
+         <Dialog ref={dialog.dialogRef} className="max-w-4xl">
             <fetcher.Form method="POST" ref={formRef} onReset={handleReset}>
                <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
                   <DialogHeading>Ny hendelse</DialogHeading>
@@ -77,7 +77,7 @@ export const NewEvent = ({ users }: Props) => {
                         <FormLabel>Medlem</FormLabel>
                         <FormControl
                            render={(props) => (
-                              <NativeSelect {...props} className="w-fit">
+                              <NativeSelect {...props} className="w-fit min-w-60">
                                  {users.map((user) => {
                                     return (
                                        <option value={user.id} key={user.id}>
