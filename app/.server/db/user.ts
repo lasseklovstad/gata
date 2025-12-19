@@ -8,6 +8,7 @@ import { RoleName } from "~/utils/roleUtils";
 export type User = Awaited<ReturnType<typeof getUser>>;
 
 export const getUser = async (userId: string) => {
+   const currentYear = new Date().getFullYear();
    const userResult = await db.query.user.findFirst({
       where: eq(user.id, userId),
       with: {
@@ -15,6 +16,7 @@ export const getUser = async (userId: string) => {
          roles: { with: { role: true }, columns: { roleId: true } },
          contingents: true,
          primaryUser: true,
+         responsibilityYears: { where: eq(responsibilityYear.year, currentYear), with: { responsibility: true } },
       },
    });
    if (!userResult) {
@@ -48,12 +50,14 @@ export const getOptionalUserFromExternalUserId = async (externalUserId: string) 
 };
 
 export const getUsers = () => {
+   const currentYear = new Date().getFullYear();
    return db.query.user.findMany({
       with: {
          externalUsers: true,
          roles: { with: { role: true }, columns: { roleId: true } },
          contingents: true,
          primaryUser: true,
+         responsibilityYears: { where: eq(responsibilityYear.year, currentYear), with: { responsibility: true } },
       },
    });
 };

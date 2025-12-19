@@ -18,3 +18,9 @@ export const requireAdminRole = (user: User) => {
       throw new Response("Du har ikke tilgang til denne ressursen", { status: 403 });
    }
 };
+
+export const getIsTimelineAdmin = (user: User | undefined) => {
+   return !!user?.responsibilityYears.find(
+      (responsibilityYear) => responsibilityYear.responsibility.name === "Oversiktsansvarlig"
+   );
+};
