@@ -26,13 +26,13 @@ destination = "/data"
   processes = ['app']
 
 [[http_service.checks]]
-  grace_period = "10s"
+  grace_period = "30s"
   interval = "30s"
   method = "GET"
-  timeout = "5s"
+  timeout = "10s"
   path = "/health"
 
-[[vm]]
+[vm]
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
