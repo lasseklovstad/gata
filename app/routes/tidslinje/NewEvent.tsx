@@ -226,7 +226,7 @@ export const NewEvent = ({ users }: Props) => {
                   </DialogFooter>
                </FormProvider>
             </fetcher.Form>
-         </Dialog>
+         </>
       </>
    );
 };
