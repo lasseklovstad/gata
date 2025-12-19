@@ -85,6 +85,13 @@
       "when": 1734216120138,
       "tag": "0011_chilly_fallen_one",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1766085682297,
+      "tag": "0012_tidy_photon",
+      "breakpoints": true
     }
   ]
 }

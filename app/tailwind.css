@@ -70,6 +70,7 @@
    * {
       @apply border-border;
    }
+
    body {
       @apply bg-background text-foreground;
    }
@@ -77,4 +78,20 @@
 
 .rdp-root {
    --rdp-accent-color: hsl(var(--primary));
+}
+
+@layer components {
+
+   /* Hide native date picker icon for our Input component when type="date" */
+   .input-hide-date-picker {
+      -webkit-appearance: none;
+      -moz-appearance: textfield;
+   }
+
+   .input-hide-date-picker::-webkit-calendar-picker-indicator,
+   .input-hide-date-picker::-webkit-clear-button,
+   .input-hide-date-picker::-webkit-inner-spin-button {
+      display: none;
+      -webkit-appearance: none;
+   }
 }

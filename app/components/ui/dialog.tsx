@@ -13,7 +13,7 @@ type DialogContext = {
 
 const DialogContext = createContext<DialogContext | undefined>(undefined);
 
-export const Dialog = forwardRef((props: ComponentProps<"dialog">, ref?: Ref<HTMLDialogElement>) => {
+export const Dialog = forwardRef(({ className, ...props }: ComponentProps<"dialog">, ref?: Ref<HTMLDialogElement>) => {
    const id = useId();
    const titleId = id + "-title";
    return (
@@ -21,7 +21,10 @@ export const Dialog = forwardRef((props: ComponentProps<"dialog">, ref?: Ref<HTM
          <dialog
             id={id}
             aria-labelledby={titleId}
-            className="px-8 py-6 rounded-md border border-border backdrop:bg-black/40 max-w-[500px] w-full"
+            className={cn(
+               "px-8 py-6 rounded-md border border-border backdrop:bg-black/40 max-w-[500px] w-full",
+               className
+            )}
             ref={ref}
             {...props}
          />
