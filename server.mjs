@@ -7,10 +7,10 @@ const viteDevServer =
    process.env.NODE_ENV === "production"
       ? undefined
       : await import("vite").then((vite) =>
-           vite.createServer({
-              server: { middlewareMode: true },
-           })
-        );
+         vite.createServer({
+            server: { middlewareMode: true },
+         })
+      );
 
 const remixHandler = createRequestHandler({
    build: viteDevServer
@@ -42,4 +42,15 @@ app.use(morgan("tiny"));
 // handle SSR requests
 app.all("*", remixHandler);
 
-app.listen(3000, "0.0.0.0", () => console.log(`Express server listening at http://localhost:3000`));
+const server = app.listen(3000, "0.0.0.0", () => console.log(`Express server listening at http://localhost:3000`));
+
+// Graceful shutdown for Fly.io rolling deployments
+process.on('SIGINT', () => {
+   console.log('SIGINT received, closing server gracefully...');
+   server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+   });
+   // Force close after 30s
+   setTimeout(() => process.exit(1), 30000);
+});
