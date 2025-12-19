@@ -6,6 +6,7 @@ import { DayPicker } from "react-day-picker";
 import { useFetcher } from "react-router";
 
 import type { User } from "~/.server/db/user";
+import { MapPicker } from "~/components/MapPicker";
 import { Button, ButtonResponsive } from "~/components/ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "~/components/ui/dialog";
 import {
@@ -42,6 +43,8 @@ export const NewEvent = ({ users }: Props) => {
    const [date, setDate] = useState<Date>();
    const [rawDate, setRawDate] = useState("");
    const [type, setType] = useState("");
+   const [longitude, setLongitude] = useState<number>();
+   const [latitude, setLatitude] = useState<number>();
    const handleTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       if (event.target.checked) {
          setType(event.target.value);
@@ -52,6 +55,8 @@ export const NewEvent = ({ users }: Props) => {
       setType("");
       setDate(undefined);
       setRawDate("");
+      setLongitude(undefined);
+      setLatitude(undefined);
    };
 
    useEffect(() => {
@@ -181,18 +186,36 @@ export const NewEvent = ({ users }: Props) => {
                      </FormItem>
 
                      {type === "home" ? (
-                        <div className="space-y-2">
+                        <div className="space-y-4">
                            <FormItem name="place">
                               <FormLabel>Sted</FormLabel>
                               <FormControl render={(props) => <Input {...props} autoComplete="off" />} />
                               <FormMessage />
                            </FormItem>
+                           <div>
+                              <Label className="block mb-2">Velg posisjon</Label>
+                              <MapPicker
+                                 longitude={longitude}
+                                 latitude={latitude}
+                                 onCoordinatesChange={(lng, lat) => {
+                                    setLongitude(lng);
+                                    setLatitude(lat);
+                                 }}
+                              />
+                           </div>
                            <div className="flex gap-2">
                               <FormItem name="longitude">
                                  <FormLabel>Lengdegrad</FormLabel>
                                  <FormControl
                                     render={(props) => (
-                                       <Input {...props} type="number" step={0.0001} autoComplete="off" />
+                                       <Input
+                                          {...props}
+                                          type="number"
+                                          step={0.0001}
+                                          autoComplete="off"
+                                          value={longitude ?? ""}
+                                          onChange={(e) => setLongitude(e.target.valueAsNumber || undefined)}
+                                       />
                                     )}
                                  />
                                  <FormMessage />
@@ -201,7 +224,14 @@ export const NewEvent = ({ users }: Props) => {
                                  <FormLabel>Breddegrad</FormLabel>
                                  <FormControl
                                     render={(props) => (
-                                       <Input {...props} type="number" step={0.0001} autoComplete="off" />
+                                       <Input
+                                          {...props}
+                                          type="number"
+                                          step={0.0001}
+                                          autoComplete="off"
+                                          value={latitude ?? ""}
+                                          onChange={(e) => setLatitude(e.target.valueAsNumber || undefined)}
+                                       />
                                     )}
                                  />
                                  <FormMessage />
