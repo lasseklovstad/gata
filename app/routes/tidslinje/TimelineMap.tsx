@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Map, { Marker } from "react-map-gl/maplibre";
+import type { MapRef } from "react-map-gl/maplibre";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -19,6 +20,7 @@ export const TimeLineMap = ({ timelineEvents, users }: Props) => {
    const [currentTimeIndex, setCurrentTimeIndex] = useState<number>(0);
    const [selectedMarkerUserId, setSelectedMarkerUserId] = useState<string | null>(null);
    const dialogRef = useRef<HTMLDialogElement>(null);
+   const mapRef = useRef<MapRef>(null);
 
    // Extract unique dates and sort chronologically
    const uniqueDates = Array.from(new Set(timelineEvents.map((event) => event.eventDate))).sort(
@@ -104,6 +106,45 @@ export const TimeLineMap = ({ timelineEvents, users }: Props) => {
       dialogRef.current?.close();
       setSelectedMarkerUserId(null);
    };
+
+   // Auto-fit map to show all markers
+   useEffect(() => {
+      if (!mapRef.current || latestHomeByUser.length === 0) return;
+
+      // Calculate bounds from all markers
+      const longitudes = latestHomeByUser.map((event) => event.longitude).filter((lng): lng is number => lng != null);
+      const latitudes = latestHomeByUser.map((event) => event.latitude).filter((lat): lat is number => lat != null);
+
+      if (longitudes.length === 0 || latitudes.length === 0) return;
+
+      // Handle single marker case
+      if (longitudes.length === 1 && latitudes.length === 1) {
+         mapRef.current.flyTo({
+            center: [longitudes[0], latitudes[0]],
+            zoom: 10,
+            duration: 1000,
+         });
+         return;
+      }
+
+      const minLng = Math.min(...longitudes);
+      const maxLng = Math.max(...longitudes);
+      const minLat = Math.min(...latitudes);
+      const maxLat = Math.max(...latitudes);
+
+      // Fit map to bounds with padding
+      mapRef.current.fitBounds(
+         [
+            [minLng, minLat],
+            [maxLng, maxLat],
+         ],
+         {
+            padding: { top: 50, bottom: 50, left: 50, right: 50 },
+            duration: 1000,
+         }
+      );
+   }, [latestHomeByUser]);
+
    return (
       <div>
          {/* Timeline Slider */}
@@ -164,6 +205,7 @@ export const TimeLineMap = ({ timelineEvents, users }: Props) => {
 
          {/* Map with Markers */}
          <Map
+            ref={mapRef}
             initialViewState={{
                longitude: 10.7461,
                latitude: 59.9127,
