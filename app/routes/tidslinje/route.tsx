@@ -4,7 +4,9 @@ import { zfd } from "zod-form-data";
 
 import { getUsers } from "~/.server/db/user";
 import {
+   deleteUserTimelineEvent,
    getAllUserTimelineEvents,
+   getUserTimelineEvent,
    insertUserTimelineEvent,
    updateUserTimelineEvent,
 } from "~/.server/db/userTimelineEvent";
@@ -12,6 +14,7 @@ import { PageLayout } from "~/components/PageLayout";
 import { Typography } from "~/components/ui/typography";
 import { cn } from "~/utils";
 import { getRequiredUser } from "~/utils/auth.server";
+import { badRequest, unauthorized } from "~/utils/responseUtils";
 import { getIsTimelineAdmin } from "~/utils/roleUtils";
 import { transformErrorResponse } from "~/utils/validateUtils";
 
@@ -96,13 +99,13 @@ export const action = async ({ request }: Route.ActionArgs) => {
       const isVerified = formData.get("isVerified");
 
       if (typeof eventId !== "string" || typeof isVerified !== "string") {
-         return { ok: false, error: "Invalid data" };
+         throw badRequest("Invalid data");
       }
 
       const isTimelineAdmin = getIsTimelineAdmin(loggedInUser);
 
       if (!isTimelineAdmin) {
-         return { ok: false, error: "Unauthorized" };
+         throw unauthorized();
       }
 
       await updateUserTimelineEvent(eventId, { isVerified: isVerified === "true" });
@@ -110,7 +113,25 @@ export const action = async ({ request }: Route.ActionArgs) => {
       return { ok: true };
    }
 
-   return { ok: false };
+   if (intent === "deleteTimelineEvent") {
+      const eventId = formData.get("eventId");
+
+      if (typeof eventId !== "string") {
+         throw badRequest("Invalid data");
+      }
+      const timelineEvent = await getUserTimelineEvent(eventId);
+      const canDelete = getIsTimelineAdmin(loggedInUser) || loggedInUser.id === timelineEvent.createdBy;
+
+      if (!canDelete) {
+         throw unauthorized();
+      }
+
+      await deleteUserTimelineEvent(eventId);
+
+      return { ok: true };
+   }
+
+   throw badRequest("Invalid intent");
 };
 
 export default function Timeline({ loaderData: { users, timelineEvents, loggedInUser } }: Route.ComponentProps) {

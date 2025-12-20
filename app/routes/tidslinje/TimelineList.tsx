@@ -60,6 +60,7 @@ export const TimelineList = ({ loggedInUser, users, timelineEvents }: Props) => 
             ) : (
                sortedEvents.map((event) => {
                   const user = users.find((u) => u.id === event.userId);
+                  const canDelete = event.createdBy === loggedInUser.id || isTimelineAdmin;
                   if (!user) {
                      throw new Error("Could not find user!");
                   }
@@ -129,6 +130,15 @@ export const TimelineList = ({ loggedInUser, users, timelineEvents }: Props) => 
                                     size="sm"
                                  >
                                     {event.isVerified ? "Fjern verifisering" : "Verifiser"}
+                                 </Button>
+                              </Form>
+                           )}
+                           {canDelete && (
+                              <Form method="delete">
+                                 <input type="hidden" name="intent" value="deleteTimelineEvent" />
+                                 <input type="hidden" name="eventId" value={event.id} />
+                                 <Button type="submit" variant="destructive" size="sm">
+                                    Slett
                                  </Button>
                               </Form>
                            )}
