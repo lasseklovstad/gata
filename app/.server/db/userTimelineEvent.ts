@@ -13,10 +13,17 @@ export type TimeLineEvent = Awaited<ReturnType<typeof getAllUserTimelineEvents>>
 export const getAllUserTimelineEvents = async () => {
    return await db.select().from(userTimelineEvent);
 };
+export const getUserTimelineEvent = async (eventId: string) => {
+   return (await db.select().from(userTimelineEvent).where(eq(userTimelineEvent.id, eventId)))[0];
+};
 
 export const updateUserTimelineEvent = async (
    eventId: string,
    values: Partial<typeof userTimelineEvent.$inferInsert>
 ) => {
    await db.update(userTimelineEvent).set(values).where(eq(userTimelineEvent.id, eventId));
+};
+
+export const deleteUserTimelineEvent = async (eventId: string) => {
+   await db.delete(userTimelineEvent).where(eq(userTimelineEvent.id, eventId));
 };
