@@ -1,5 +1,4 @@
 import { Pencil } from "lucide-react";
-import { useState } from "react";
 
 import type { User } from "~/.server/db/user";
 import type { TimeLineEvent } from "~/.server/db/userTimelineEvent";
