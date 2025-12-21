@@ -53,6 +53,34 @@ const newEventSchema = zfd
       }
    );
 
+const updateEventSchema = zfd
+   .formData({
+      intent: zfd.text(z.literal("updateEvent")),
+      eventId: zfd.text(z.string().uuid({ message: "Ugyldig hendelse" })),
+      date: zfd.text(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { message: "Ugyldig dato" })),
+      type: zfd.text(
+         z.enum(["civil-status", "home", "work"], {
+            message: "Velg en gyldig type",
+         })
+      ),
+      place: zfd.text().optional(),
+      longitude: zfd.numeric().optional(),
+      latitude: zfd.numeric().optional(),
+      description: zfd.text(z.string().default("")),
+   })
+   .refine(
+      (data) => {
+         if (data.type === "home") {
+            return data.place && data.longitude && data.latitude;
+         }
+         return true;
+      },
+      {
+         message: 'Sted, lengdegrad og breddegrad er påkrevd når type er "home"',
+         path: ["place"],
+      }
+   );
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
    const loggedInUser = await getRequiredUser(request);
    return {
@@ -109,6 +137,35 @@ export const action = async ({ request }: Route.ActionArgs) => {
       }
 
       await updateUserTimelineEvent(eventId, { isVerified: isVerified === "true" });
+
+      return { ok: true };
+   }
+
+   if (intent === "updateEvent") {
+      const parsedForm = updateEventSchema.safeParse(formData);
+      if (!parsedForm.success) {
+         return transformErrorResponse(parsedForm.error);
+      }
+
+      const { eventId, date, type, place, longitude, latitude, description } = parsedForm.data;
+
+      // Get the existing event to check permissions
+      const timelineEvent = await getUserTimelineEvent(eventId);
+      const canEdit = getIsTimelineAdmin(loggedInUser) || loggedInUser.id === timelineEvent.createdBy;
+
+      if (!canEdit) {
+         throw unauthorized();
+      }
+
+      await updateUserTimelineEvent(eventId, {
+         eventType: type,
+         eventDate: date,
+         description,
+         place: place || null,
+         longitude: longitude || null,
+         latitude: latitude || null,
+         isVerified: getIsTimelineAdmin(loggedInUser),
+      });
 
       return { ok: true };
    }
