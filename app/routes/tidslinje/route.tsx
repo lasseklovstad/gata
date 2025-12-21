@@ -147,7 +147,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
          return transformErrorResponse(parsedForm.error);
       }
 
-      const { eventId, user: userId, date, type, place, longitude, latitude, description } = parsedForm.data;
+      const { eventId, date, type, place, longitude, latitude, description } = parsedForm.data;
 
       // Get the existing event to check permissions
       const timelineEvent = await getUserTimelineEvent(eventId);
@@ -158,13 +158,13 @@ export const action = async ({ request }: Route.ActionArgs) => {
       }
 
       await updateUserTimelineEvent(eventId, {
-         userId,
          eventType: type,
          eventDate: date,
          description,
          place: place || null,
          longitude: longitude || null,
          latitude: latitude || null,
+         isVerified: getIsTimelineAdmin(loggedInUser),
       });
 
       return { ok: true };
