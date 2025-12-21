@@ -8,6 +8,8 @@ import { NativeSelect } from "~/components/ui/native-select";
 import { Typography } from "~/components/ui/typography";
 import { getIsTimelineAdmin } from "~/utils/roleUtils";
 
+import { EditEvent } from "./EditEvent";
+
 type Props = {
    timelineEvents: TimeLineEvent[];
    users: User[];
@@ -61,6 +63,7 @@ export const TimelineList = ({ loggedInUser, users, timelineEvents }: Props) => 
                sortedEvents.map((event) => {
                   const user = users.find((u) => u.id === event.userId);
                   const canDelete = event.createdBy === loggedInUser.id || isTimelineAdmin;
+                  const canEdit = event.createdBy === loggedInUser.id || isTimelineAdmin;
                   if (!user) {
                      throw new Error("Could not find user!");
                   }
@@ -115,33 +118,36 @@ export const TimelineList = ({ loggedInUser, users, timelineEvents }: Props) => 
                                  <Typography variant="p">{event.description}</Typography>
                               </div>
                            )}
-                           {isTimelineAdmin && (
-                              <Form method="post">
-                                 <input type="hidden" name="intent" value="toggleVerify" />
-                                 <input type="hidden" name="eventId" value={event.id} />
-                                 <input type="hidden" name="isVerified" value={(!event.isVerified).toString()} />
-                                 <Button
-                                    type="submit"
-                                    disabled={
-                                       navigation.state === "submitting" &&
-                                       navigation.formData?.get("eventId") === event.id
-                                    }
-                                    variant={event.isVerified ? "secondary" : "default"}
-                                    size="sm"
-                                 >
-                                    {event.isVerified ? "Fjern verifisering" : "Verifiser"}
-                                 </Button>
-                              </Form>
-                           )}
-                           {canDelete && (
-                              <Form method="delete">
-                                 <input type="hidden" name="intent" value="deleteTimelineEvent" />
-                                 <input type="hidden" name="eventId" value={event.id} />
-                                 <Button type="submit" variant="destructive" size="sm">
-                                    Slett
-                                 </Button>
-                              </Form>
-                           )}
+                           <div className="flex gap-2 flex-wrap">
+                              {isTimelineAdmin && (
+                                 <Form method="post">
+                                    <input type="hidden" name="intent" value="toggleVerify" />
+                                    <input type="hidden" name="eventId" value={event.id} />
+                                    <input type="hidden" name="isVerified" value={(!event.isVerified).toString()} />
+                                    <Button
+                                       type="submit"
+                                       disabled={
+                                          navigation.state === "submitting" &&
+                                          navigation.formData?.get("eventId") === event.id
+                                       }
+                                       variant={event.isVerified ? "secondary" : "default"}
+                                       size="sm"
+                                    >
+                                       {event.isVerified ? "Fjern verifisering" : "Verifiser"}
+                                    </Button>
+                                 </Form>
+                              )}
+                              {canEdit && <EditEvent event={event} users={users} />}
+                              {canDelete && (
+                                 <Form method="delete">
+                                    <input type="hidden" name="intent" value="deleteTimelineEvent" />
+                                    <input type="hidden" name="eventId" value={event.id} />
+                                    <Button type="submit" variant="destructive" size="sm">
+                                       Slett
+                                    </Button>
+                                 </Form>
+                              )}
+                           </div>
                         </div>
                      </div>
                   );
