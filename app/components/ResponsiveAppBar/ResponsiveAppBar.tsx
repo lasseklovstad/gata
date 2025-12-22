@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { href, Link } from "react-router";
 
 import type { User } from "~/.server/db/user";
 
@@ -17,11 +17,11 @@ export const ResponsiveAppBar = ({ isLoggedIn, loggedInUser }: ResponsiveAppBarP
    const isUserAdmin = isAdmin(loggedInUser);
 
    const filteredPages = [
-      { name: "Hjem", url: "/home" },
-      { name: "Min side", url: `member/${loggedInUser?.id}`, isMember: true },
-      { name: "Medlemmer", url: "members", isMember: true },
-      { name: "Ansvarsposter", url: "responsibility", isMember: true },
-      { name: "Aktuelle dokumenter", url: "report", isMember: true },
+      { name: "Hjem", url: href("/home") },
+      { name: "Medlemmer", url: href("/members"), isMember: true },
+      { name: "Ansvarsposter", url: href("/responsibility"), isMember: true },
+      { name: "Aktuelle dokumenter", url: href("/report"), isMember: true },
+      { name: "Tidslinje", url: href("/tidslinje"), isMember: true },
       { name: "Arkiv", url: "https://1drv.ms/f/s!Aimiul1gt9LbrA10geM-AnPDKFoY", isMember: true },
    ].filter((page) => {
       return !page.isMember || isUserMember || isUserAdmin;
