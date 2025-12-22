@@ -261,5 +261,3 @@ export default function Timeline({ loaderData: { users, timelineEvents, loggedIn
       </PageLayout>
    );
 }
-
-
