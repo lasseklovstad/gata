@@ -1,14 +1,17 @@
+import { Pencil } from "lucide-react";
 import { useState } from "react";
 import { Form, useNavigation } from "react-router";
 
 import type { User } from "~/.server/db/user";
 import type { TimeLineEvent } from "~/.server/db/userTimelineEvent";
 import { Button } from "~/components/ui/button";
+import { Dialog } from "~/components/ui/dialog";
 import { NativeSelect } from "~/components/ui/native-select";
 import { Typography } from "~/components/ui/typography";
+import { useDialog } from "~/utils/dialogUtils";
 import { getIsTimelineAdmin } from "~/utils/roleUtils";
 
-import { EditEvent } from "./EditEvent";
+import { EventForm } from "./EventForm";
 
 type Props = {
    timelineEvents: TimeLineEvent[];
@@ -25,8 +28,25 @@ const eventTypeLabels: Record<string, string> = {
 
 export const TimelineList = ({ loggedInUser, users, timelineEvents }: Props) => {
    const [selectedUserId, setSelectedUserId] = useState<string>("");
+   const [editingEvent, setEditingEvent] = useState<TimeLineEvent | null>(null);
+   const editDialog = useDialog({ defaultOpen: false });
    const navigation = useNavigation();
    const isTimelineAdmin = getIsTimelineAdmin(loggedInUser);
+
+   const handleEdit = (event: TimeLineEvent) => {
+      setEditingEvent(event);
+      editDialog.open();
+   };
+
+   const handleEditSuccess = () => {
+      editDialog.close();
+      setEditingEvent(null);
+   };
+
+   const handleEditClose = () => {
+      editDialog.close();
+      setEditingEvent(null);
+   };
 
    const filteredEvents = selectedUserId
       ? timelineEvents.filter((event) => event.userId === selectedUserId)
@@ -137,7 +157,12 @@ export const TimelineList = ({ loggedInUser, users, timelineEvents }: Props) => 
                                     </Button>
                                  </Form>
                               )}
-                              {canEdit && <EditEvent event={event} users={users} />}
+                              {canEdit && (
+                                 <Button variant="secondary" size="sm" onClick={() => handleEdit(event)}>
+                                    <Pencil className="size-4 mr-1" />
+                                    Rediger
+                                 </Button>
+                              )}
                               {canDelete && (
                                  <Form method="delete">
                                     <input type="hidden" name="intent" value="deleteTimelineEvent" />
@@ -154,6 +179,11 @@ export const TimelineList = ({ loggedInUser, users, timelineEvents }: Props) => 
                })
             )}
          </div>
+         <Dialog ref={editDialog.dialogRef} className="max-w-4xl">
+            {editingEvent && (
+               <EventForm users={users} event={editingEvent} onSuccess={handleEditSuccess} onClose={handleEditClose} />
+            )}
+         </Dialog>
       </div>
    );
 };
