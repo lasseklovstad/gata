@@ -22,6 +22,7 @@ import type { Route } from "./+types/route";
 import { NewEvent } from "./NewEvent";
 import { TimelineList } from "./TimelineList";
 import { TimeLineMap } from "./TimelineMap";
+import { TimelineTable } from "./TimelineTable";
 
 // logg inn på https://cloud.maptiler.com/
 
@@ -192,7 +193,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 };
 
 export default function Timeline({ loaderData: { users, timelineEvents, loggedInUser } }: Route.ComponentProps) {
-   const [activeTab, setActiveTab] = useState<"map" | "list">("map");
+   const [activeTab, setActiveTab] = useState<"map" | "list" | "table">("map");
    const isTimelineAdmin = getIsTimelineAdmin(loggedInUser);
 
    return (
@@ -229,6 +230,19 @@ export default function Timeline({ loaderData: { users, timelineEvents, loggedIn
                      Liste
                   </button>
                </li>
+               <li className="-mb-[2px]">
+                  <button
+                     onClick={() => setActiveTab("table")}
+                     className={`px-4 py-2 border-b-2 transition-colors ${
+                        activeTab === "table"
+                           ? "border-primary text-primary"
+                           : "border-transparent text-muted-foreground hover:text-foreground"
+                     }`}
+                     aria-current={activeTab === "table" ? "page" : undefined}
+                  >
+                     Tabell
+                  </button>
+               </li>
             </ul>
          </nav>
          <div className={cn(activeTab !== "map" && "hidden")}>
@@ -238,6 +252,11 @@ export default function Timeline({ loaderData: { users, timelineEvents, loggedIn
          {/* List View */}
          {activeTab === "list" && (
             <TimelineList loggedInUser={loggedInUser} timelineEvents={timelineEvents} users={users} />
+         )}
+
+         {/* Table View */}
+         {activeTab === "table" && (
+            <TimelineTable loggedInUser={loggedInUser} timelineEvents={timelineEvents} users={users} />
          )}
       </PageLayout>
    );
