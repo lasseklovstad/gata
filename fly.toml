@@ -5,8 +5,9 @@
 
 app = 'gata-app'
 primary_region = 'arn'
-kill_timeout = 60
+kill_timeout = 5
 kill_signal = "SIGINT"
+swap_size_mb = 512
 
 [mounts]
 source = "data"
