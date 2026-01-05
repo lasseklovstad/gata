@@ -9,7 +9,7 @@ export const editResponsibility = async (page: Page, name: string, content: stri
    const memberPage = new MemberPage(page);
    const header = new GataHeader(page);
    await page.goto("/");
-   await header.myPageLink.click();
+   await header.clickMenuItem("Min side");
    await memberPage.goToResponsibilityTab();
    await memberPage.editResponsibiblity(name, content);
 };

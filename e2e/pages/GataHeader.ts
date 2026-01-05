@@ -5,7 +5,6 @@ export class GataHeader {
    page: Page;
    responsibilityLink: Locator;
    homeLink: Locator;
-   myPageLink: Locator;
    memberLink: Locator;
    documentsLink: Locator;
    menuButton: Locator;
@@ -14,7 +13,6 @@ export class GataHeader {
    constructor(page: Page) {
       this.responsibilityLink = page.getByRole("link", { name: "Ansvarsposter" });
       this.homeLink = page.getByRole("link", { name: "Hjem", exact: true });
-      this.myPageLink = page.getByRole("link", { name: "Min side" });
       this.memberLink = page.getByRole("link", { name: "Medlemmer" });
       this.documentsLink = page.getByRole("link", {
          name: "Aktuelle dokumenter",
@@ -31,5 +29,10 @@ export class GataHeader {
       await expect(roleButton).toBeVisible();
       await this.page.keyboard.press("Escape");
       await expect(this.menu).toBeHidden();
+   }
+
+   async clickMenuItem(name: "Min side") {
+      await this.menuButton.click();
+      await this.page.getByRole("menuitem", { name }).click();
    }
 }

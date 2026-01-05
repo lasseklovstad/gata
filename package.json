@@ -44,6 +44,7 @@
     "@unpic/react": "^1.0.0",
     "better-sqlite3": "^12.5.0",
     "class-variance-authority": "0.7.1",
+    "close-with-grace": "^2.4.0",
     "cloudinary": "2.8.0",
     "clsx": "2.1.1",
     "compression": "1.8.1",

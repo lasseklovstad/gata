@@ -2,15 +2,16 @@ import { createRequestHandler } from "@react-router/express";
 import compression from "compression";
 import express from "express";
 import morgan from "morgan";
+import closeWithGrace from 'close-with-grace';
 
 const viteDevServer =
    process.env.NODE_ENV === "production"
       ? undefined
       : await import("vite").then((vite) =>
-           vite.createServer({
-              server: { middlewareMode: true },
-           })
-        );
+         vite.createServer({
+            server: { middlewareMode: true },
+         })
+      );
 
 const remixHandler = createRequestHandler({
    build: viteDevServer
@@ -42,4 +43,15 @@ app.use(morgan("tiny"));
 // handle SSR requests
 app.all("*", remixHandler);
 
-app.listen(3000, "0.0.0.0", () => console.log(`Express server listening at http://localhost:3000`));
+const server = app.listen(3000, "0.0.0.0", () => console.log(`Express server listening at http://localhost:3000`));
+
+closeWithGrace(async ({ err }) => {
+   await new Promise((resolve, reject) => {
+      server.close((e) => (e ? reject(e) : resolve('ok')))
+   })
+   if (err) {
+      console.error(err)
+   }
+})
+
+

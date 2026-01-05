@@ -92,6 +92,6 @@ const assertThatNonMemberIsLinked = async (page: Page, primaryUsername: string) 
    // Navigate
    await page.goto("/");
    await header.validateRoleInMenu("medlem");
-   await header.myPageLink.click();
+   await header.clickMenuItem("Min side");
    await memberPage.assertPrimaryEmail(primaryUsername);
 };
