@@ -59,6 +59,9 @@ importers:
       class-variance-authority:
         specifier: 0.7.1
         version: 0.7.1
+      close-with-grace:
+        specifier: ^2.4.0
+        version: 2.4.0
       cloudinary:
         specifier: 2.8.0
         version: 2.8.0
@@ -2683,6 +2686,9 @@ packages:
   clone@1.0.4:
     resolution: {integrity: sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==}
     engines: {node: '>=0.8'}
+
+  close-with-grace@2.4.0:
+    resolution: {integrity: sha512-bzAYS0Kax7I0ejiCFHVshsT9giz6MrOpkdpP1CEGpkDRG3mXVgHZ9QdzVGHRZR0jrAq6JyN1mB4Ty3ILnmzLdg==}
 
   cloudinary@2.8.0:
     resolution: {integrity: sha512-s7frvR0HnQXeJsQSIsbLa/I09IMb1lOnVLEDH5b5E53WTiCYgrNNOBGV/i/nLHwrcEOUkqjfSwP1+enXWNYmdw==}
@@ -7514,6 +7520,8 @@ snapshots:
 
   clone@1.0.4:
     optional: true
+
+  close-with-grace@2.4.0: {}
 
   cloudinary@2.8.0:
     dependencies:

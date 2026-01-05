@@ -5,7 +5,8 @@
 
 app = 'gata-app'
 primary_region = 'arn'
-kill_timeout = 300
+kill_timeout = 60
+kill_signal = "SIGINT"
 
 [mounts]
 source = "data"
@@ -26,8 +27,8 @@ destination = "/data"
   processes = ['app']
 
 [[http_service.checks]]
-  grace_period = "30s"
-  interval = "30s"
+  grace_period = "10s"
+  interval = "10s"
   method = "GET"
   timeout = "5s"
   path = "/health"
