@@ -16,5 +16,4 @@ test("Should have welcome title", async ({ page }) => {
    await expect(gataHeader.responsibilityLink).toBeVisible();
    await expect(gataHeader.documentsLink).toBeVisible();
    await expect(gataHeader.memberLink).toBeVisible();
-   await expect(gataHeader.myPageLink).toBeVisible();
 });

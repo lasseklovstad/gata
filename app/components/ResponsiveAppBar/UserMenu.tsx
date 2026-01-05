@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Area } from "react-easy-crop";
-import { Form, Link, useFetcher } from "react-router";
+import { Form, href, Link, useFetcher } from "react-router";
 
 import type { User } from "~/.server/db/user";
 import type { action } from "~/root";
@@ -61,6 +61,11 @@ export const UserMenu = ({ roleText, isAuthenticated, loggedInUser }: UserMenuPr
                      </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
+                     {loggedInUser ? (
+                        <DropdownMenuItem asChild>
+                           <Link to={href("/member/:memberId", { memberId: loggedInUser.id })}>Min side</Link>
+                        </DropdownMenuItem>
+                     ) : null}
                      {loggedInUser ? (
                         <DropdownMenuItem onClick={editProfileDialog.open}>Rediger profil</DropdownMenuItem>
                      ) : null}
