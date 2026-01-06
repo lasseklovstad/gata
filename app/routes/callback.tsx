@@ -1,3 +1,4 @@
+import { captureException } from "@sentry/react-router";
 import { redirect, type LoaderFunctionArgs } from "react-router";
 
 import { getNumberOfAdmins, insertOrUpdateExternalUser, insertUser } from "~/.server/db/user";
@@ -20,10 +21,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       const redirectPath = await getSessionLoginPath(request);
       return redirect(redirectPath ?? "/home", { headers });
    } catch (error) {
-      if (error instanceof Error) {
-         // here the error related to the authentication process
-      }
-
-      throw error; // Re-throw other values or unhandled errors
+      captureException(error);
+      const session = await sessionStorage.getSession(request.headers.get("cookie"));
+      const headers = new Headers({ "Set-Cookie": await sessionStorage.destroySession(session) });
+      return redirect("/", { headers });
    }
 };

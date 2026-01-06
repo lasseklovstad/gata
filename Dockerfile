@@ -10,6 +10,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV APP_DATABASE_URL=/data/sqlite.db
 ENV IMAGE_DIR=/data/images
+ARG COMMIT_SHA
+ENV COMMIT_SHA=$COMMIT_SHA
 
 FROM base AS production-deps
 WORKDIR /app
@@ -23,8 +25,11 @@ ADD package.json pnpm-lock.yaml ./
 RUN pnpm i --frozen-lockfile
 # Copy application code
 COPY --link . .
-# Build application
-RUN pnpm build
+
+# Mount the secret and set it as an environment variable and run the build
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
+  export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) && \
+  pnpm build
 
 
 # Final stage for app image
