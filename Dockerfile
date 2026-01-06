@@ -34,6 +34,7 @@ FROM base
 COPY --from=build /app/build /app/build
 COPY --from=production-deps /app/node_modules /app/node_modules
 COPY --from=build /app/package.json /app/package.json
+COPY --from=build /app/instrument.server.mjs /app/instrument.server.mjs
 COPY --from=build /app/server.mjs /app/server.mjs
 COPY --from=build /app/migrations /app/migrations
 
