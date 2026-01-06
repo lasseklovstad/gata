@@ -6,6 +6,7 @@ import path from "path";
 
 import { createFsFileStorage } from "@remix-run/file-storage/fs";
 import { type FileUpload, parseFormData } from "@remix-run/form-data-parser";
+import * as Sentry from "@sentry/react-router";
 import PullToRefresh from "pulltorefreshjs";
 import type { ComponentProps } from "react";
 import { useEffect } from "react";
@@ -18,7 +19,7 @@ import {
    Scripts,
    ScrollRestoration,
    isRouteErrorResponse,
-   useRouteError,
+   useLoaderData,
    useRouteLoaderData,
 } from "react-router";
 import { z } from "zod";
@@ -31,7 +32,7 @@ import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar
 import { Button } from "./components/ui/button";
 import { Typography } from "./components/ui/typography";
 import { getRequiredUser, getUserSession } from "./utils/auth.server";
-import { env } from "./utils/env.server";
+import { getEnv } from "./utils/env.server";
 import { badRequest } from "./utils/responseUtils";
 import { profileSchema } from "./utils/schemas/profileSchema";
 import { useRevalidateOnFocus } from "./utils/useRevalidateOnFocus";
@@ -61,11 +62,7 @@ export const links: LinksFunction = () => {
    ];
 };
 
-interface DocumentProps {
-   children: React.ReactNode;
-}
-
-const Document = ({ children }: DocumentProps) => {
+const Document = ({ children, env = {} }: { children: React.ReactNode; env?: Record<string, string | undefined> }) => {
    return (
       <html lang="no">
          <head>
@@ -79,6 +76,11 @@ const Document = ({ children }: DocumentProps) => {
          </head>
          <body>
             {children}
+            <script
+               dangerouslySetInnerHTML={{
+                  __html: `window.ENV = ${JSON.stringify(env)}`,
+               }}
+            />
             <ScrollRestoration />
             <Scripts />
          </body>
@@ -87,6 +89,7 @@ const Document = ({ children }: DocumentProps) => {
 };
 
 export function Layout({ children }: ComponentProps<never>) {
+   const data = useLoaderData<typeof loader | null>();
    useEffect(() => {
       const standalone = window.matchMedia("(display-mode: standalone)").matches;
       if (!standalone) {
@@ -106,19 +109,17 @@ export function Layout({ children }: ComponentProps<never>) {
          PullToRefresh.destroyAll();
       };
    }, []);
-   return <Document>{children}</Document>;
+   return <Document env={data?.ENV}>{children}</Document>;
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
    const auth0User = await getUserSession(request);
    const loggedInUser = auth0User ? (await getOptionalUserFromExternalUserId(auth0User.id)) || undefined : undefined;
-   const version = env.VERSION;
-   const pwaPublicKey = env.PWA_PUBLIC_KEY;
+
    return {
       auth0User,
       loggedInUser,
-      version,
-      pwaPublicKey,
+      ENV: getEnv(),
    };
 };
 
@@ -178,11 +179,11 @@ export const action = async ({ request }: Route.ActionArgs) => {
    throw badRequest("Invalid intent");
 };
 
-export default function App({ loaderData: { auth0User, loggedInUser, version, pwaPublicKey } }: Route.ComponentProps) {
+export default function App({ loaderData: { auth0User, loggedInUser, ENV } }: Route.ComponentProps) {
    useRevalidateOnFocus();
 
    return (
-      <PushSubscriptionProvider pwaPublicKey={pwaPublicKey}>
+      <PushSubscriptionProvider pwaPublicKey={ENV.PWA_PUBLIC_KEY}>
          <div className="flex flex-col min-h-lvh">
             <ResponsiveAppBar isLoggedIn={!!auth0User} loggedInUser={loggedInUser} />
             <main className="mb-8 max-w-[1000px] w-full me-auto ms-auto px-4">
@@ -195,7 +196,7 @@ export default function App({ loaderData: { auth0User, loggedInUser, version, pw
                <Button variant="link" as={Link} to="/about">
                   About
                </Button>
-               Versjon: {version}
+               Versjon: {ENV.COMMIT_SHA}
             </footer>
          </div>
       </PushSubscriptionProvider>
@@ -222,9 +223,7 @@ export const useRootLoader = () => {
    return useRouteLoaderData<typeof loader>("root");
 };
 
-export function ErrorBoundary() {
-   const error = useRouteError();
-
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
    useEffect(() => {
       console.log(JSON.stringify(error));
    }, [error]);
@@ -239,6 +238,8 @@ export function ErrorBoundary() {
          </div>
       );
    } else if (error instanceof Error) {
+      // you only want to capture non 404-errors that reach the boundary
+      Sentry.captureException(error);
       return (
          <div>
             <Typography variant="h1">Error</Typography>

@@ -6,8 +6,8 @@
   "sideEffects": false,
   "scripts": {
     "build": "react-router build",
-    "dev": "node ./server.mjs",
-    "start": "node ./server.mjs",
+    "dev": "node --import ./instrument.server.mjs ./server.mjs",
+    "start": "node --import ./instrument.server.mjs ./server.mjs",
     "test": "vitest watch",
     "test:ci": "vitest run",
     "lint": "eslint .",
@@ -41,6 +41,7 @@
     "@remix-run/file-storage": "0.13.0",
     "@remix-run/form-data-parser": "0.14.0",
     "@remix-run/multipart-parser": "0.14.0",
+    "@sentry/react-router": "^10.32.1",
     "@unpic/react": "^1.0.0",
     "better-sqlite3": "^12.5.0",
     "class-variance-authority": "0.7.1",

@@ -1,11 +1,10 @@
 import { db } from "db/config.server";
 import { contingent } from "db/schema";
-import { env } from "~/utils/env.server";
 
 export const getContingentInfo = () => {
    return {
-      size: env.DEFAULT_CONTINGENT_SIZE,
-      bank: env.CONTINGENT_BANK,
+      size: process.env.DEFAULT_CONTINGENT_SIZE,
+      bank: process.env.CONTINGENT_BANK,
    };
 };
 

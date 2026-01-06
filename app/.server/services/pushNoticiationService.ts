@@ -1,7 +1,4 @@
-import { WebPushError, type PushSubscription } from "web-push";
-import webpush from "web-push";
-
-import { env } from "~/utils/env.server";
+import webpush, { WebPushError, type PushSubscription } from "web-push";
 
 import { deletePushSubscription } from "../db/pushSubscriptions";
 
@@ -15,8 +12,8 @@ export const sendPushNotification = async (
             .sendNotification(subscription, JSON.stringify(notification), {
                headers: { "Content-Type": "application/json" },
                vapidDetails: {
-                  privateKey: env.PWA_PRIVATE_KEY,
-                  publicKey: env.PWA_PUBLIC_KEY,
+                  privateKey: process.env.PWA_PRIVATE_KEY,
+                  publicKey: process.env.PWA_PUBLIC_KEY,
                   subject: "mailto:admin@gataersamla.no",
                },
             })
