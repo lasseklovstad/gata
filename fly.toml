@@ -1,40 +1,51 @@
-# fly.toml app configuration file generated for gata-app on 2024-06-07T17:09:38+02:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
 app = 'gata-app'
 primary_region = 'arn'
-kill_timeout = 5
 kill_signal = "SIGINT"
+kill_timeout = 5
+processes = [ ]
+swap_size_mb = 512
 
 [mounts]
 source = "data"
 destination = "/data"
 
-[build]
+[[services]]
+internal_port = 3000
+processes = [ "app" ]
+protocol = "tcp"
+script_checks = [ ]
 
-[deploy]
-  strategy = "immediate"
+  [services.concurrency]
+  hard_limit = 100
+  soft_limit = 80
+  type = "requests"
 
-[env]
-  DEFAULT_CONTINGENT_SIZE= "600"
-  AUTH0_CALLBACK= "https://gataersamla.no/callback"
-
-[http_service]
-  internal_port = 3000
+  [[services.ports]]
+  handlers = [ "http" ]
+  port = 80
   force_https = true
-  min_machines_running = 1
-  processes = ['app']
 
-[[http_service.checks]]
-  grace_period = "10s"
+  [[services.ports]]
+  handlers = [ "tls", "http" ]
+  port = 443
+
+  [[services.tcp_checks]]
+  grace_period = "1s"
+  interval = "15s"
+  restart_limit = 0
+  timeout = "2s"
+
+  [[services.http_checks]]
   interval = "10s"
-  method = "GET"
-  timeout = "5s"
+  grace_period = "5s"
+  method = "get"
   path = "/health"
+  protocol = "http"
+  timeout = "2s"
+  tls_skip_verify = false
+  headers = { }
 
-[vm]
+[[vm]]
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
