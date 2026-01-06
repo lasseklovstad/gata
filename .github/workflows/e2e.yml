@@ -86,6 +86,13 @@ jobs:
       DEFAULT_CONTINGENT_SIZE: 600
       CONTINGENT_BANK: 000.0123.1230.123
       MAKE_FIRST_USER_ADMIN: true
+      CLOUDINARY_API_SECRET: xxx
+      CLOUDINARY_API_KEY: xxx
+      CLOUDINARY_NAME: xxx
+      SENDGRID_API_KEY: xxx
+      PWA_PUBLIC_KEY: xxx
+      PWA_PRIVATE_KEY: xxx
+      IMAGE_DIR: "/data"
 
     steps:
       - uses: actions/checkout@v6
