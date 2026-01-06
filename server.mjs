@@ -43,7 +43,7 @@ app.use(morgan("tiny"));
 // handle SSR requests
 app.all("*", remixHandler);
 
-const server = app.listen(Number(Number(process.env.PORT || 3000)), "0.0.0.0", () => console.log(`Express server listening at http://localhost:3000`));
+const server = app.listen(Number(process.env.PORT || 3000), "0.0.0.0", () => console.log(`Express server listening at http://localhost:3000`));
 
 closeWithGrace(async ({ err }) => {
    await new Promise((resolve, reject) => {

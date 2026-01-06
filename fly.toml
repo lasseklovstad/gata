@@ -9,6 +9,10 @@ swap_size_mb = 512
 source = "data"
 destination = "/data"
 
+[env]
+DEFAULT_CONTINGENT_SIZE= "600"
+AUTH0_CALLBACK= "https://gataersamla.no/callback"
+
 [[services]]
 internal_port = 3000
 processes = [ "app" ]
