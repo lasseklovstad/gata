@@ -7,13 +7,15 @@ app = 'gata-app'
 primary_region = 'arn'
 kill_timeout = 5
 kill_signal = "SIGINT"
-swap_size_mb = 512
 
 [mounts]
 source = "data"
 destination = "/data"
 
 [build]
+
+[deploy]
+  strategy = "immediate"
 
 [env]
   DEFAULT_CONTINGENT_SIZE= "600"
