@@ -1,5 +1,3 @@
-import { env } from "~/utils/env.server";
-
 type MailData = {
    to: { email: string }[];
    html: string;
@@ -12,7 +10,7 @@ const from = {
 };
 
 export const sendMail = async (mailData: MailData) => {
-   const apiKey = env.SENDGRID_API_KEY;
+   const apiKey = process.env.SENDGRID_API_KEY;
    const url = "https://api.sendgrid.com/v3/mail/send";
 
    const emailData = {

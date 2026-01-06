@@ -5,7 +5,6 @@ import { getOptionalUserFromExternalUserId } from "~/.server/db/user";
 import type { Auth0User } from "~/types/Auth0User";
 
 import { Auth0Strategy } from "./auth0";
-import { env } from "./env.server";
 import type { RoleName } from "./roleUtils";
 
 type UserPreference = {
@@ -21,7 +20,7 @@ export const sessionStorage = createCookieSessionStorage<{ user: Auth0User }>({
       path: "/",
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      secrets: [env.AUTH0_COOKIE_SECRET],
+      secrets: [process.env.AUTH0_COOKIE_SECRET],
       maxAge: 60 * 60 * 24 * 400, // 400 days
    },
 });
@@ -30,11 +29,11 @@ const authenticator = new Authenticator<Auth0User>();
 
 const auth0Strategy = new Auth0Strategy(
    {
-      redirectURI: env.AUTH0_CALLBACK,
-      clientId: env.AUTH0_CLIENT_ID,
-      audience: env.AUTH0_AUDIENCE,
-      clientSecret: env.AUTH0_CLIENT_SECRET,
-      domain: env.AUTH0_DOMAIN,
+      redirectURI: process.env.AUTH0_CALLBACK,
+      clientId: process.env.AUTH0_CLIENT_ID,
+      audience: process.env.AUTH0_AUDIENCE,
+      clientSecret: process.env.AUTH0_CLIENT_SECRET,
+      domain: process.env.AUTH0_DOMAIN,
    },
    ({ profile }) => {
       const id = profile.id;

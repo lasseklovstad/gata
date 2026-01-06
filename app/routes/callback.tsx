@@ -2,7 +2,6 @@ import { redirect, type LoaderFunctionArgs } from "react-router";
 
 import { getNumberOfAdmins, insertOrUpdateExternalUser, insertUser } from "~/.server/db/user";
 import authenticator, { getSessionLoginPath, sessionStorage } from "~/utils/auth.server";
-import { env } from "~/utils/env.server";
 import { RoleName } from "~/utils/roleUtils";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -12,7 +11,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       session.set("user", user);
       const headers = new Headers({ "Set-Cookie": await sessionStorage.commitSession(session) });
       const [externalUser] = await insertOrUpdateExternalUser(user);
-      if (env.MAKE_FIRST_USER_ADMIN === "true") {
+      if (process.env.MAKE_FIRST_USER_ADMIN === "true") {
          const [{ count }] = await getNumberOfAdmins();
          if (count === 0) {
             await insertUser(externalUser.id, RoleName.Admin);

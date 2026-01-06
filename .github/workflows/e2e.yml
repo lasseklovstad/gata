@@ -80,11 +80,19 @@ jobs:
       AUTH0_CLIENT_SECRET: ${{secrets.AUTH0_CLIENT_SECRET}}
       AUTH0_AUDIENCE: "https://gataersamla.no"
       AUTH0_CALLBACK: "http://localhost:3000/callback"
+      SENTRY_DSN: "xxx"
       AUTH0_COOKIE_SECRET: "s3cret"
       APP_DATABASE_URL: "./sqlite.db"
       DEFAULT_CONTINGENT_SIZE: 600
       CONTINGENT_BANK: 000.0123.1230.123
       MAKE_FIRST_USER_ADMIN: true
+      CLOUDINARY_API_SECRET: "xxx"
+      CLOUDINARY_API_KEY: "xxx"
+      CLOUDINARY_NAME: "xxx"
+      SENDGRID_API_KEY: "xxx"
+      PWA_PUBLIC_KEY: "xxx"
+      PWA_PRIVATE_KEY: "xxx"
+      IMAGE_DIR: "/data"
 
     steps:
       - uses: actions/checkout@v6

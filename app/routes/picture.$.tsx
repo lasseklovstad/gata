@@ -4,13 +4,12 @@ import { resolve } from "node:path";
 import mime from "mime/lite";
 
 import { getRequiredUser } from "~/utils/auth.server";
-import { env } from "~/utils/env.server";
 
 import type { Route } from "./+types/picture.$";
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
    await getRequiredUser(request);
-   const imagePath = resolve(`${env.IMAGE_DIR}/${params["*"]}`);
+   const imagePath = resolve(`${process.env.IMAGE_DIR}/${params["*"]}`);
    if (!existsSync(imagePath)) {
       throw new Response("Not Found", {
          status: 404,

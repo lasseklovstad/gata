@@ -8,16 +8,25 @@
     "**/.client/**/*.tsx",
     "eslint.config.js",
     "postcss.config.cjs",
-    "server.mjs",
+    "*.mjs",
     "launch-webkit.js",
     "public/sw.js",
     ".react-router/types/**/*",
     "generate-vapid-keys.js"
   ],
-  "exclude": ["node_modules"],
+  "exclude": [
+    "node_modules"
+  ],
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "types": ["@react-router/node", "vite/client"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2022"
+    ],
+    "types": [
+      "@react-router/node",
+      "vite/client"
+    ],
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
@@ -31,10 +40,14 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": [
+        "./app/*"
+      ]
     },
-    "rootDirs": [".", "./.react-router/types"],
-
+    "rootDirs": [
+      ".",
+      "./.react-router/types"
+    ],
     // Vite takes care of building everything, not tsc.
     "noEmit": true
   }
