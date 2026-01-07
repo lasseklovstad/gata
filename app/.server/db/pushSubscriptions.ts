@@ -16,6 +16,10 @@ export const getAllSubscriptions = async (notIncludedUser: string) => {
    return await db.select().from(pushSubscriptions).where(ne(pushSubscriptions.userId, notIncludedUser));
 };
 
+export const getSubscriptionByUserId = async (userId: string) => {
+   return await db.select().from(pushSubscriptions).where(eq(pushSubscriptions.userId, userId));
+};
+
 export const getAllUsersWithSubscription = async (notIncludedUser: string) => {
    return await db
       .select()
