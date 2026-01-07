@@ -9,10 +9,13 @@ import { sendPushNotification } from "~/.server/services/pushNoticiationService"
 import { sendMail } from "~/.server/services/sendgrid";
 import { Button } from "~/components/ui/button";
 import { NativeSelect } from "~/components/ui/native-select";
+import { getRequiredUser } from "~/utils/auth.server";
+import { RoleName } from "~/utils/roleUtils";
 
 import type { Route } from "./+types/sentry-test";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
+   await getRequiredUser(request, [RoleName.Admin]);
    const search = new URL(request.url).searchParams;
    if (search.get("error") === "true") {
       throw new Error("Error in loader...");
@@ -24,6 +27,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 };
 
 export const action = async ({ request }: Route.ActionArgs) => {
+   await getRequiredUser(request, [RoleName.Admin]);
    const formData = await request.formData();
    const intent = formData.get("intent");
    if (intent === "sentry-error") {
