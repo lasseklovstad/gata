@@ -25,7 +25,8 @@ ADD package.json pnpm-lock.yaml ./
 RUN pnpm i --frozen-lockfile
 # Copy application code
 COPY --link . .
-
+# Ensure the package list is updated, then install ca-certificates (Required for uploading sentry source maps)
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 # Mount the secret and set it as an environment variable and run the build
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
   export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) && \

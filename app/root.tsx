@@ -189,14 +189,14 @@ export default function App({ loaderData: { auth0User, loggedInUser, ENV } }: Ro
             <main className="mb-8 max-w-[1000px] w-full me-auto ms-auto px-4">
                <Outlet />
             </main>
-            <footer className="p-4 flex gap-4 max-w-[1000px] w-full ms-auto me-auto mt-auto items-center">
+            <footer className="p-4 flex gap-4 max-w-[1000px] w-full ms-auto me-auto mt-auto items-center flex-wrap">
                <Button variant="link" as={Link} to="/privacy">
                   Privacy
                </Button>
                <Button variant="link" as={Link} to="/about">
                   About
                </Button>
-               Versjon: {ENV.COMMIT_SHA}
+               <Typography variant="smallText">Versjon: {ENV.COMMIT_SHA}</Typography>
             </footer>
          </div>
       </PushSubscriptionProvider>
