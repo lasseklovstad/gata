@@ -22,12 +22,12 @@ export const News = ({ reports, loggedInUser, events }: NewsProps) => {
       <PageLayout>
          <div className="flex items-center justify-between flex-wrap mb-4 gap-2">
             <Typography variant="h1" id={titleId}>
-               Nyheter
+               Arrangement
             </Typography>
 
-            <Button as={Link} to="new" variant="ghost">
+            <Button as={Link} to="new-event">
                <Plus className="mr-1" />
-               Nytt innlegg
+               Opprett arrangement
             </Button>
          </div>
          <ul className="flex gap-2 flex-wrap mb-2" aria-label="Arrangement">
@@ -39,13 +39,17 @@ export const News = ({ reports, loggedInUser, events }: NewsProps) => {
                   </Link>
                </li>
             ))}
-            <li>
-               <Button as={Link} to="new-event" variant="ghost">
-                  <Plus className="mr-1" />
-                  Nytt arrangement
-               </Button>
-            </li>
          </ul>
+         <div className="flex items-center justify-between flex-wrap mb-4 gap-2 pt-8">
+            <Typography variant="h1" id={titleId}>
+               Nyheter
+            </Typography>
+
+            <Button as={Link} to="new" variant="ghost">
+               <Plus className="mr-1" />
+               Nytt innlegg
+            </Button>
+         </div>
          <ul aria-labelledby={titleId}>
             {reports.map((report) => {
                return (

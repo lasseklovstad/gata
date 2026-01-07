@@ -1,7 +1,8 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { redirect } from "react-router";
+import { href, redirect } from "react-router";
 
-import { getReportSimple, insertReport, updateReport } from "~/.server/db/report";
+import { insertReportAndNotify } from "~/.server/data-layer/report";
+import { getReportSimple, updateReport } from "~/.server/db/report";
 import { getRequiredUser } from "~/utils/auth.server";
 import { reportSchema } from "~/utils/formSchema";
 import { RoleName } from "~/utils/roleUtils";
@@ -20,11 +21,11 @@ export const gataReportFormDialogAction = async ({ request, params }: LoaderFunc
    }
 
    if (request.method === "POST") {
-      const [{ reportId }] = await insertReport(form.data, loggedInUser);
-      return redirect(`/reportInfo/${reportId}`);
+      const { id } = await insertReportAndNotify(form.data, loggedInUser);
+      return redirect(href("/reportInfo/:reportId", { reportId: id }));
    }
    if (request.method === "PUT" && params.reportId) {
       await updateReport(params.reportId, form.data, loggedInUser);
-      return redirect(`/reportInfo/${params.reportId}`);
+      return redirect(href("/reportInfo/:reportId", { reportId: params.reportId }));
    }
 };
