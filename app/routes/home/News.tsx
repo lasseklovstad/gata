@@ -21,7 +21,7 @@ export const News = ({ reports, loggedInUser, events }: NewsProps) => {
    return (
       <PageLayout>
          <div className="flex items-center justify-between flex-wrap mb-4 gap-2">
-            <Typography variant="h1" id={titleId}>
+            <Typography variant="h2" id={titleId}>
                Arrangement
             </Typography>
 
@@ -41,7 +41,7 @@ export const News = ({ reports, loggedInUser, events }: NewsProps) => {
             ))}
          </ul>
          <div className="flex items-center justify-between flex-wrap mb-4 gap-2 pt-8">
-            <Typography variant="h1" id={titleId}>
+            <Typography variant="h2" id={titleId}>
                Nyheter
             </Typography>
 
