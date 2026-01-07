@@ -27,7 +27,7 @@ export const News = ({ reports, loggedInUser, events }: NewsProps) => {
 
             <Button as={Link} to="new-event">
                <Plus className="mr-1" />
-               Opprett arrangement
+               Nytt Arrangement
             </Button>
          </div>
          <ul className="flex gap-2 flex-wrap mb-2" aria-label="Arrangement">
