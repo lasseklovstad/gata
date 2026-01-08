@@ -17,11 +17,12 @@ type NewsProps = {
 };
 
 export const News = ({ reports, loggedInUser, events }: NewsProps) => {
-   const titleId = useId();
+   const newsTitleId = useId();
+   const eventsTitleId = useId();
    return (
       <PageLayout>
          <div className="flex items-center justify-between flex-wrap mb-4 gap-2">
-            <Typography variant="h2" id={titleId}>
+            <Typography variant="h2" id={eventsTitleId}>
                Arrangement
             </Typography>
 
@@ -30,7 +31,7 @@ export const News = ({ reports, loggedInUser, events }: NewsProps) => {
                Nytt Arrangement
             </Button>
          </div>
-         <ul className="flex gap-2 flex-wrap mb-2" aria-label="Arrangement">
+         <ul className="flex gap-2 flex-wrap mb-2" aria-labelledby={eventsTitleId}>
             {events.map((event) => (
                <li key={event.id} className="bg-orange-100 rounded py-2 px-4 shadow flex">
                   <Link to={`/event/${event.id}`} className="w-full text-base flex">
@@ -41,7 +42,7 @@ export const News = ({ reports, loggedInUser, events }: NewsProps) => {
             ))}
          </ul>
          <div className="flex items-center justify-between flex-wrap mb-4 gap-2 pt-8">
-            <Typography variant="h2" id={titleId}>
+            <Typography variant="h2" id={newsTitleId}>
                Nyheter
             </Typography>
 
@@ -50,7 +51,7 @@ export const News = ({ reports, loggedInUser, events }: NewsProps) => {
                Nytt innlegg
             </Button>
          </div>
-         <ul aria-labelledby={titleId}>
+         <ul aria-labelledby={newsTitleId}>
             {reports.map((report) => {
                return (
                   <li key={report.id}>
