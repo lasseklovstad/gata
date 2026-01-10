@@ -17,20 +17,21 @@ type NewsProps = {
 };
 
 export const News = ({ reports, loggedInUser, events }: NewsProps) => {
-   const titleId = useId();
+   const newsTitleId = useId();
+   const eventsTitleId = useId();
    return (
       <PageLayout>
          <div className="flex items-center justify-between flex-wrap mb-4 gap-2">
-            <Typography variant="h1" id={titleId}>
-               Nyheter
+            <Typography variant="h2" id={eventsTitleId}>
+               Arrangement
             </Typography>
 
-            <Button as={Link} to="new" variant="ghost">
+            <Button as={Link} to="new-event">
                <Plus className="mr-1" />
-               Nytt innlegg
+               Nytt Arrangement
             </Button>
          </div>
-         <ul className="flex gap-2 flex-wrap mb-2" aria-label="Arrangement">
+         <ul className="flex gap-2 flex-wrap mb-2" aria-labelledby={eventsTitleId}>
             {events.map((event) => (
                <li key={event.id} className="bg-orange-100 rounded py-2 px-4 shadow flex">
                   <Link to={`/event/${event.id}`} className="w-full text-base flex">
@@ -39,14 +40,18 @@ export const News = ({ reports, loggedInUser, events }: NewsProps) => {
                   </Link>
                </li>
             ))}
-            <li>
-               <Button as={Link} to="new-event" variant="ghost">
-                  <Plus className="mr-1" />
-                  Nytt arrangement
-               </Button>
-            </li>
          </ul>
-         <ul aria-labelledby={titleId}>
+         <div className="flex items-center justify-between flex-wrap mb-4 gap-2 pt-8">
+            <Typography variant="h2" id={newsTitleId}>
+               Nyheter
+            </Typography>
+
+            <Button as={Link} to="new" variant="ghost">
+               <Plus className="mr-1" />
+               Nytt innlegg
+            </Button>
+         </div>
+         <ul aria-labelledby={newsTitleId}>
             {reports.map((report) => {
                return (
                   <li key={report.id}>

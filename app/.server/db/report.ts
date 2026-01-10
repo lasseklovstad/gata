@@ -74,7 +74,7 @@ export const insertReport = async (values: ReportSchema, loggedInUser: User) => 
          createdBy: loggedInUser.id,
          lastModifiedBy: loggedInUser.name,
       })
-      .returning({ reportId: gataReport.id });
+      .returning();
 };
 
 export const updateReport = async (reportId: string, values: ReportSchema, loggedInUser: User) => {
