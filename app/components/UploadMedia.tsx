@@ -1,3 +1,4 @@
+import { captureException } from "@sentry/react-router";
 import { Loader2 } from "lucide-react";
 import { href, useFetcher } from "react-router";
 
@@ -101,6 +102,7 @@ export const UploadMedia = ({ eventId }: Props) => {
                });
             } catch (e: unknown) {
                console.error(e);
+               captureException(e);
             }
          }
          if (uploadedFiles.length === 0) return;
