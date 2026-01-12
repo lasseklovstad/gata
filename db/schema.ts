@@ -230,7 +230,7 @@ export const eventCloudinaryImages = sqliteTable("event_cloudinary_images", {
       .references(() => gataEvent.id)
       .notNull(),
    cloudId: text("cloudinary_cloud_id")
-      .references(() => cloudinaryImage.cloudId, { onDelete: "cascade" })
+      .references(() => cloudinaryImage.cloudId, { onDelete: "cascade", onUpdate: "cascade" })
       .notNull(),
 });
 
