@@ -218,9 +218,11 @@ export const cloudinaryImage = sqliteTable("cloudinary_image", {
    cloudId: text("cloud_id").primaryKey(),
    width: integer("width").notNull(),
    height: integer("height").notNull(),
+   isDeleted: integer("is_deleted", { mode: "boolean" }).notNull().default(false),
+   type: text("type"),
 });
 
-export type CloudinaryImage = typeof cloudinaryImage.$inferSelect;
+export type CloudinaryImage = Omit<typeof cloudinaryImage.$inferSelect, "isDeleted">;
 
 export const eventCloudinaryImages = sqliteTable("event_cloudinary_images", {
    // Ikke slett bilde hvis event slettes

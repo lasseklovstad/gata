@@ -1,8 +1,10 @@
+import type { CloudinaryImage } from "db/schema";
+
 export const getCloudinaryUploadFolder = () => {
    return process.env.NODE_ENV === "production" ? "gata" : "gata-local";
 };
 
-export const getIsVideo = (cloudUrl: string) => {
+export const getIsVideo = (image: CloudinaryImage) => {
    const videoRegexp = /.*\/video\/upload\/.*/;
-   return videoRegexp.test(cloudUrl);
+   return videoRegexp.test(image.cloudUrl) || image.type?.startsWith("video");
 };

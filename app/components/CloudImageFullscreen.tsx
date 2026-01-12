@@ -1,4 +1,3 @@
-import { Image } from "@unpic/react";
 import { ChevronLeft, ChevronRight, Loader2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -20,6 +19,7 @@ type Props = {
 
 export const CloudImageFullscreen = ({
    cloudImage: { cloudUrl, width, height },
+   cloudImage,
    onNext,
    onPrevious,
    onClose,
@@ -29,12 +29,12 @@ export const CloudImageFullscreen = ({
    const [isLoaded, setIsLoaded] = useState(false);
 
    useEffect(() => {
-      if (getIsVideo(cloudUrl)) {
+      if (getIsVideo(cloudImage)) {
          setIsLoaded(true);
       } else {
          setIsLoaded(false);
       }
-   }, [cloudUrl]);
+   }, [cloudImage]);
 
    return (
       <>
@@ -92,7 +92,7 @@ export const CloudImageFullscreen = ({
             >
                <Loader2 className="animate-spin size-12" />
             </Typography>
-            {getIsVideo(cloudUrl) ? (
+            {getIsVideo(cloudImage) ? (
                <video
                   className={cn("max-h-screen object-contain max-w-full", isLoaded ? "opacity-100" : "opacity-30")}
                   controls
@@ -105,13 +105,11 @@ export const CloudImageFullscreen = ({
                   <track default kind="captions" />
                </video>
             ) : (
-               <Image
+               <img
                   loading="eager"
-                  unstyled
                   className={cn("max-h-screen object-contain", isLoaded ? "opacity-100" : "opacity-30")}
                   fetchPriority="high"
                   src={cloudUrl}
-                  background="auto"
                   alt=""
                   width={width}
                   height={height}

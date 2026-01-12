@@ -172,6 +172,10 @@ export const insertCloudinaryImage = async (eventId: number, values: typeof clou
    await db.insert(cloudinaryImage).values(values);
    await db.insert(eventCloudinaryImages).values({ eventId, cloudId: values.cloudId });
 };
+export const insertAzureBlob = async (eventId: number, values: (typeof cloudinaryImage.$inferInsert)[]) => {
+   await db.insert(cloudinaryImage).values(values);
+   await db.insert(eventCloudinaryImages).values(values.map((file) => ({ eventId, cloudId: file.cloudId })));
+};
 
 export const getEventCloudinaryImages = async (eventId: number) => {
    return await db
@@ -180,15 +184,16 @@ export const getEventCloudinaryImages = async (eventId: number) => {
          cloudUrl: cloudinaryImage.cloudUrl,
          width: cloudinaryImage.width,
          height: cloudinaryImage.height,
+         type: cloudinaryImage.type,
       })
       .from(eventCloudinaryImages)
       .innerJoin(cloudinaryImage, eq(cloudinaryImage.cloudId, eventCloudinaryImages.cloudId))
       .orderBy(desc(sql`${eventCloudinaryImages}.rowid`))
-      .where(eq(eventCloudinaryImages.eventId, eventId));
+      .where(and(eq(eventCloudinaryImages.eventId, eventId), eq(cloudinaryImage.isDeleted, false)));
 };
 
 export const deleteEventCloudinaryImage = async (cloudId: string) => {
-   await db.delete(cloudinaryImage).where(eq(cloudinaryImage.cloudId, cloudId));
+   await db.update(cloudinaryImage).set({ isDeleted: true }).where(eq(cloudinaryImage.cloudId, cloudId));
 };
 
 export const getNumberOfImages = async (eventId: number) => {

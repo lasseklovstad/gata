@@ -6,7 +6,6 @@ import { ReportType } from "~/types/GataReport.type";
 import type { ReportSchema } from "~/utils/formSchema";
 
 import type { User } from "./user";
-import { deleteImage } from "../services/cloudinaryService";
 
 export const getReportsSimple = async (reportType: ReportType) => {
    return await db
@@ -96,7 +95,6 @@ export const deleteReport = async (reportId: string) => {
          if (!file.cloudId) {
             throw new Error("No cloud id!");
          }
-         await deleteImage(file.cloudId);
          await db.delete(reportFile).where(eq(reportFile.id, file.id));
       })
    );

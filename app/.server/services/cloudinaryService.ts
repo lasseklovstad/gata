@@ -33,18 +33,6 @@ export const generateZip = (folderName: string, zipName: string) => {
    return zipUrl;
 };
 
-export const deleteImage = (publicId: string) => {
-   return new Promise((resolve, reject) => {
-      void cloudinary.v2.uploader.destroy(publicId, (error, result) => {
-         if (error) {
-            reject(error as Error);
-         } else {
-            resolve(result);
-         }
-      });
-   });
-};
-
 export function uploadImageToCloudinary(data: ArrayBuffer, folder: string) {
    const buffer = Buffer.from(data);
    const uploadPromise = new Promise<UploadApiResponse>((resolve, reject) => {

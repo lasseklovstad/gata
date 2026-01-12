@@ -42,7 +42,6 @@
     "@remix-run/form-data-parser": "0.14.0",
     "@remix-run/multipart-parser": "0.14.0",
     "@sentry/react-router": "^10.32.1",
-    "@unpic/react": "^1.0.0",
     "better-sqlite3": "^12.5.0",
     "class-variance-authority": "0.7.1",
     "close-with-grace": "^2.4.0",

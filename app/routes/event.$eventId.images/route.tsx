@@ -9,10 +9,11 @@ import {
    deleteEventCloudinaryImage,
    getEvent,
    getEventCloudinaryImages,
+   insertAzureBlob,
    insertCloudinaryImage,
    updateEvent,
 } from "~/.server/db/gataEvent";
-import { deleteImage, generateZip } from "~/.server/services/cloudinaryService";
+import { generateZip } from "~/.server/services/cloudinaryService";
 import { CloudImageCheckbox } from "~/components/CloudImageCheckbox";
 import { CloudImageGallery } from "~/components/CloudImageGallery";
 import { Button } from "~/components/ui/button";
@@ -27,6 +28,7 @@ import { badRequest } from "~/utils/responseUtils";
 
 import type { Route } from "./+types/route";
 import { DownloadZip } from "./DownloadZip";
+import { uploadFilesIntent, UploadFilesSchema } from "./uploadFilesAction";
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
    const eventId = z.coerce.number().parse(params.eventId);
@@ -68,6 +70,24 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
 
    const event = await getEvent(eventId);
 
+   if (intent === uploadFilesIntent) {
+      const form = UploadFilesSchema.parse(formdata);
+      const container = process.env.NODE_ENV === "production" ? "gata" : "gata-local";
+      await insertAzureBlob(
+         eventId,
+         form.files.map((file) => ({
+            cloudId: file.id,
+            cloudUrl: `https://${process.env.AZURE_BLOB_NAME}.blob.core.windows.net/${container}/event/${eventId}/${file.id}`,
+            height: file.height ?? 0,
+            width: file.width ?? 0,
+            type: file.type,
+         }))
+      );
+      // TODO:
+      // await notifyParticipantsImagesIsUploaded(loggedInUser, eventId);
+      return { ok: true };
+   }
+
    if (intent === "generateZipUrl") {
       const zipUrl = generateZip(folder, event.title);
       await updateEvent(eventId, { zipUrl });
@@ -81,7 +101,6 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
    if (intent === "deleteImages") {
       const { image } = deleteImagesSchema.parse(formdata);
       for (const cloudId of image) {
-         await deleteImage(cloudId);
          await deleteEventCloudinaryImage(cloudId);
       }
       return { ok: true };

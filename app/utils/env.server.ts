@@ -23,6 +23,9 @@ const schema = z.object({
    AUTH0_CALLBACK: z.string(),
    //Versioning
    COMMIT_SHA: z.string().optional(),
+   // Blob storage for uploading files
+   AZURE_BLOB_NAME: z.string(),
+   AZURE_BLOB_KEY: z.string(),
 });
 
 type EnvSchema = z.infer<typeof schema>;
