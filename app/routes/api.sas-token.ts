@@ -5,13 +5,13 @@ import { createBlobSas } from "~/utils/azure.server";
 
 import type { Route } from "./+types/api.sas-token";
 
-const expireInMin = 1;
+const expireInMin = 5;
 const expireInMs = expireInMin * 60 * 1000;
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
    const searchParams = new URL(request.url).searchParams;
    const eventId = z.coerce.number().parse(searchParams.get("eventId"));
-   const numberOfFiles = z.coerce.number().parse(searchParams.get("numberOfFiles"));
+   const numberOfFiles = z.coerce.number().max(100).parse(searchParams.get("numberOfFiles"));
    await getRequiredUser(request);
    const containerName = process.env.NODE_ENV === "production" ? "gata" : "gata-local";
 
