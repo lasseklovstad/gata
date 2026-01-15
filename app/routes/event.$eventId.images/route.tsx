@@ -21,7 +21,7 @@ import { Toggle } from "~/components/ui/toggle";
 import { Typography } from "~/components/ui/typography";
 import { UploadMedia } from "~/components/UploadMedia";
 import { getRequiredUser } from "~/utils/auth.server";
-import { getCloudinaryUploadFolder } from "~/utils/cloudinaryUtils";
+import { getCloudinaryUploadFolder } from "~/utils/file.utils";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
 import { migrateCloudinaryImagesToBlob } from "~/utils/migrateCloudinaryImages.server";
 import { isCloudinaryFilePart, uploadFilesToCloudinaryAndGetMultiformParts } from "~/utils/multipartUtils";
@@ -78,12 +78,11 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
 
    if (intent === uploadFilesIntent) {
       const form = UploadFilesSchema.parse(formdata);
-      const container = process.env.NODE_ENV === "production" ? "gata" : "gata-local";
       await insertAzureBlob(
          eventId,
          form.files.map((file) => ({
             cloudId: file.id,
-            cloudUrl: `https://${process.env.AZURE_BLOB_NAME}.blob.core.windows.net/${container}/event/${eventId}/${file.id}`,
+            cloudUrl: file.url,
             height: file.height ?? 0,
             width: file.width ?? 0,
             type: file.type,

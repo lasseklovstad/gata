@@ -9,6 +9,7 @@ export const UploadFilesSchema = zfd.formData({
          z.object({
             id: z.string(),
             type: z.string(),
+            url: z.string(),
             width: z.coerce.number().optional(),
             height: z.coerce.number().optional(),
          })

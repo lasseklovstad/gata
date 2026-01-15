@@ -1,7 +1,7 @@
 import { desc, eq, sql } from "drizzle-orm";
 
 import { db } from "db/config.server";
-import { gataReport, reportFile } from "db/schema";
+import { gataReport, oldReportFiles } from "db/schema";
 import { ReportType } from "~/types/GataReport.type";
 import type { ReportSchema } from "~/utils/formSchema";
 
@@ -89,13 +89,13 @@ export const updateReport = async (reportId: string, values: ReportSchema, logge
 };
 
 export const deleteReport = async (reportId: string) => {
-   const reportFiles = await db.select().from(reportFile).where(eq(reportFile.reportId, reportId));
+   const reportFiles = await db.select().from(oldReportFiles).where(eq(oldReportFiles.reportId, reportId));
    await Promise.all(
       reportFiles.map(async (file) => {
          if (!file.cloudId) {
             throw new Error("No cloud id!");
          }
-         await db.delete(reportFile).where(eq(reportFile.id, file.id));
+         await db.delete(oldReportFiles).where(eq(oldReportFiles.id, file.id));
       })
    );
    await db.delete(gataReport).where(eq(gataReport.id, reportId));

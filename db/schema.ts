@@ -77,7 +77,7 @@ export const responsibility = sqliteTable("responsibility", {
    name: text("name", { length: 255 }).notNull(),
 });
 
-export const reportFile = sqliteTable("gata_report_file", {
+export const oldReportFiles = sqliteTable("gata_report_file", {
    id: text("id")
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
@@ -230,6 +230,15 @@ export const eventCloudinaryImages = sqliteTable("event_cloudinary_images", {
       .references(() => gataEvent.id)
       .notNull(),
    cloudId: text("cloudinary_cloud_id")
+      .references(() => cloudinaryImage.cloudId, { onDelete: "cascade", onUpdate: "cascade" })
+      .notNull(),
+});
+
+export const reportFiles = sqliteTable("report_files", {
+   reportId: text("report_id")
+      .references(() => gataReport.id)
+      .notNull(),
+   fileId: text("file_id")
       .references(() => cloudinaryImage.cloudId, { onDelete: "cascade", onUpdate: "cascade" })
       .notNull(),
 });
@@ -415,15 +424,15 @@ export const responsibility_yearRelations = relations(responsibilityYear, ({ one
    }),
 }));
 
-export const gataReportFileRelations = relations(reportFile, ({ one }) => ({
+export const gataReportFileRelations = relations(oldReportFiles, ({ one }) => ({
    gataReport: one(gataReport, {
-      fields: [reportFile.reportId],
+      fields: [oldReportFiles.reportId],
       references: [gataReport.id],
    }),
 }));
 
 export const gataReportRelations = relations(gataReport, ({ one, many }) => ({
-   gataReportFiles: many(reportFile),
+   gataReportFiles: many(oldReportFiles),
    user: one(user, {
       fields: [gataReport.createdBy],
       references: [user.id],

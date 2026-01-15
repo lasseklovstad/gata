@@ -1,31 +1,36 @@
 import { Loader2, Save } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useSubmit } from "react-router";
-import { createEditor } from "slate";
 import type { Descendant } from "slate";
+import { createEditor } from "slate";
 import { withHistory } from "slate-history";
-import { Editable, Slate, withReact } from "slate-react";
 import type { RenderElementProps, RenderLeafProps } from "slate-react";
+import { Editable, Slate, withReact } from "slate-react";
 
-import { AddImage } from "./AddImage";
+import type { GataReport } from "db/schema";
+
 import { insertTab, toggleMark } from "./RichTextEditor.util";
 import { RichTextElement } from "./RichTextElement";
 import { RichTextLeaf } from "./RichTextLeaf";
 import { TextDecorationGroup } from "./TextDecorationGroup";
 import { TextStyleGroup } from "./TextStyleGroup";
-import { insertImage, withImages } from "./withImages";
+import { withImages } from "./withImages";
 import { Button } from "../ui/button";
 
 type RichTextEditorProps = {
    onCancel: () => void;
    onSave: (content: Descendant[] | undefined, close: boolean) => void;
-   initialContent?: string | null;
+   report: Pick<GataReport, "content" | "id">;
    isLoading: boolean;
 };
 
-export const RichTextEditor = ({ onCancel, onSave, isLoading, initialContent }: RichTextEditorProps) => {
+export const RichTextEditor = ({ onCancel, onSave, isLoading, report }: RichTextEditorProps) => {
+   const initialContent = report.content;
    const submitImage = useSubmit();
-   const editor = useMemo(() => withImages(withHistory(withReact(createEditor())), submitImage), [submitImage]);
+   const editor = useMemo(
+      () => withImages(withHistory(withReact(createEditor())), submitImage, report.id),
+      [submitImage, report.id]
+   );
    const renderElement = useCallback((props: RenderElementProps) => <RichTextElement {...props} />, []);
    const renderLeaf = useCallback((props: RenderLeafProps) => {
       return <RichTextLeaf {...props} />;
@@ -77,11 +82,6 @@ export const RichTextEditor = ({ onCancel, onSave, isLoading, initialContent }: 
                   <div className="flex p-1 gap-2 flex-wrap items-center">
                      <TextStyleGroup />
                      <TextDecorationGroup />
-                     <AddImage
-                        onAddImage={(url) => {
-                           insertImage(editor, url);
-                        }}
-                     />
                      {isLoading && <Loader2 className=" h-6 w-6 animate-spin" />}
                   </div>
                   <div className="flex gap-2">

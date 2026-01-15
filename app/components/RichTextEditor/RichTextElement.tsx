@@ -48,7 +48,7 @@ export const RichTextElement = ({ attributes, children, element, outsideContext 
             </ol>
          );
       case "saving-image":
-         return !outsideContext ? <SavingImage oldId={element.imageId!} /> : null;
+         return <SavingImage />;
       case "image":
          return !outsideContext ? (
             <SlateImage attributes={attributes} element={element}>

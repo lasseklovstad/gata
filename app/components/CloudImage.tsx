@@ -1,7 +1,7 @@
 import { Video } from "lucide-react";
 
 import type { CloudinaryImage } from "db/schema";
-import { getIsVideo } from "~/utils/cloudinaryUtils";
+import { getIsVideo } from "~/utils/file.utils";
 
 type Props = {
    cloudImage: CloudinaryImage;

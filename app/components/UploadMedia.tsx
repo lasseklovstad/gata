@@ -7,6 +7,8 @@ import { Typography } from "~/components/ui/typography";
 import type { loader } from "~/routes/api.sas-token";
 import type { action } from "~/routes/event.$eventId.images/route";
 import { uploadFilesIntent } from "~/routes/event.$eventId.images/uploadFilesAction";
+import { fetchTokens, getMediaDimensions } from "~/utils/file.client";
+import { uploadNewBlob } from "~/utils/file.utils";
 
 type Props = {
    eventId: number;
@@ -17,72 +19,10 @@ export const UploadMedia = ({ eventId }: Props) => {
    const isLoading = fetcher.state !== "idle";
    const actionPath = `/event/${eventId}/images`;
 
-   function getMediaDimensions(file: File): Promise<{ width: number; height: number } | null> {
-      if (file.type.startsWith("image/")) {
-         return new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => {
-               URL.revokeObjectURL(img.src);
-               resolve({ width: img.naturalWidth, height: img.naturalHeight });
-            };
-            img.onerror = () => {
-               URL.revokeObjectURL(img.src);
-               resolve(null);
-            };
-            img.src = URL.createObjectURL(file);
-         });
-      }
-
-      if (file.type.startsWith("video/")) {
-         return new Promise((resolve) => {
-            const video = document.createElement("video");
-            video.preload = "metadata";
-            video.onloadedmetadata = () => {
-               URL.revokeObjectURL(video.src);
-               resolve({ width: video.videoWidth, height: video.videoHeight });
-            };
-            video.onerror = () => {
-               URL.revokeObjectURL(video.src);
-               resolve(null);
-            };
-            video.src = URL.createObjectURL(file);
-         });
-      }
-
-      return Promise.resolve(null);
-   }
-
-   async function uploadNewBlob(file: File, { token, id }: { token: string; id: string }) {
-      const res = await fetch(token, {
-         method: "PUT",
-         headers: {
-            "x-ms-blob-type": "BlockBlob",
-            "Content-Type": file.type || "application/octet-stream",
-         },
-         body: file,
-      });
-      if (res.status === 409) {
-         throw new Error("Blob already exists (conflict).");
-      }
-      if (!res.ok) {
-         throw new Error(`Upload failed: ${res.status} ${await res.text()}`);
-      }
-      return { id, type: file.type.toString() };
-   }
-
    const uploadFiles = async (files: FileList | null) => {
       if (files && files.length > 0) {
-         const uploadedFiles: { id: string; type: string; width?: number; height?: number }[] = [];
-         const formData = new FormData();
-         const response = await fetch(
-            href("/api/sas-token") +
-               "?" +
-               new URLSearchParams({
-                  eventId: eventId.toString(),
-                  numberOfFiles: files.length.toString(),
-               }).toString()
-         );
-         const sasTokens = (await response.json()) as unknown as Awaited<ReturnType<typeof loader>>;
+         const uploadedFiles: { id: string; type: string; width?: number; height?: number; url: string }[] = [];
+         const sasTokens = await fetchTokens({ numberOfFiles: files.length, eventId });
          for (let i = 0; i < files.length; i++) {
             try {
                const file = files.item(i);
@@ -99,6 +39,7 @@ export const UploadMedia = ({ eventId }: Props) => {
                uploadedFiles.push({
                   ...uploadResponse,
                   ...(dimensions && { width: dimensions.width, height: dimensions.height }),
+                  url: token.url,
                });
             } catch (e: unknown) {
                console.error(e);
@@ -106,9 +47,11 @@ export const UploadMedia = ({ eventId }: Props) => {
             }
          }
          if (uploadedFiles.length === 0) return;
+         const formData = new FormData();
          uploadedFiles.forEach((file, index) => {
             formData.append(`files[${index}].id`, file.id);
             formData.append(`files[${index}].type`, file.type);
+            formData.append(`files[${index}].url`, file.url);
             if (file.width !== undefined) {
                formData.append(`files[${index}].width`, file.width.toString());
             }

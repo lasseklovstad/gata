@@ -108,21 +108,10 @@ const InternalImage = ({ id, selected = false, focused = false, size = 50 }: Ima
 
 const ExternalImage = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
    return (
-      <object data={id} className={cn(selected && focused && "ring", "block my-1")} style={{ width: `${size}%` }}>
-         <img src="/image404.png" alt="Not found" />
-      </object>
+      <img src={id} alt="" className={cn(selected && focused && "ring", "block my-1")} style={{ width: `${size}%` }} />
    );
 };
 
-export const SavingImage = ({ oldId }: { oldId: string }) => {
-   const fetcher = useFetcher<typeof fileAction>({ key: oldId });
-   const editor = useSlate();
-
-   useEffect(() => {
-      if (fetcher.state === "idle" && fetcher.data && fetcher.data.intent === "post-file") {
-         replaceSavingImage(editor, fetcher.data.file.id, oldId);
-      }
-   }, [editor, fetcher, oldId]);
-
+export const SavingImage = () => {
    return <Skeleton className="w-[400px] h-[300px]" />;
 };
