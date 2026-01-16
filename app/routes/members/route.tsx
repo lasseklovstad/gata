@@ -1,5 +1,5 @@
 import { Mail } from "lucide-react";
-import { Link, Outlet } from "react-router";
+import { Form, Link, Outlet } from "react-router";
 import { zfd } from "zod-form-data";
 
 import { getAllSubscriptions } from "~/.server/db/pushSubscriptions";
@@ -11,6 +11,11 @@ import { Typography } from "~/components/ui/typography";
 import { ExternalUsersWithNoGataUser } from "~/routes/members/ExternalUsersWithNoGataUser";
 import { UserListItem } from "~/routes/members/UserListItem";
 import { getRequiredUser } from "~/utils/auth.server";
+import {
+   migrateAllUserPicturesToBlob,
+   migrateUserPicturesToBlobIntent,
+   migrateUserPicturesToBlobSchema,
+} from "~/utils/migrateProfilePictures.server";
 import { isAdmin, isMember, RoleName } from "~/utils/roleUtils";
 
 import type { Route } from "./+types/route";
@@ -34,8 +39,16 @@ const MembersActionSchema = zfd.formData({
 });
 
 export const action = async ({ request }: Route.ActionArgs) => {
+   const formData = await request.formData();
+   if (formData.get("intent") === migrateUserPicturesToBlobIntent) {
+      migrateUserPicturesToBlobSchema.parse(formData);
+      await migrateAllUserPicturesToBlob();
+      return { ok: true };
+   }
    await getRequiredUser(request, [RoleName.Admin]);
-   const { externalUserId } = MembersActionSchema.parse(await request.formData());
+
+   const { externalUserId } = MembersActionSchema.parse(formData);
+
    if (request.method === "POST") {
       await insertUser(externalUserId);
       return { ok: true };
@@ -74,6 +87,10 @@ export default function MemberPage({
                </TooltipProvider>
             )}
          </div>
+         <Form method="POST">
+            <input type="hidden" name="intent" value="migrateUserPicturesToBlob" />
+            <Button type="submit">Migrate User Pictures to Azure</Button>
+         </Form>
          <Typography variant="h2" id="admin-title">
             Administratorer
          </Typography>
