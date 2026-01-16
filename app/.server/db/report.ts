@@ -1,7 +1,7 @@
 import { desc, eq, sql } from "drizzle-orm";
 
 import { db } from "db/config.server";
-import { gataReport, oldReportFiles } from "db/schema";
+import { gataReport, oldReportFiles, cloudinaryImage, reportFiles } from "db/schema";
 import { ReportType } from "~/types/GataReport.type";
 import type { ReportSchema } from "~/utils/formSchema";
 
@@ -110,4 +110,36 @@ export const updateReportContent = async (reportId: string, content: string, log
          lastModifiedDate: sql`(CURRENT_TIMESTAMP)`,
       })
       .where(eq(gataReport.id, reportId));
+};
+
+export const getAllReportsWithOldFiles = async () => {
+   const reports = await db
+      .select({
+         id: gataReport.id,
+         content: gataReport.content,
+      })
+      .from(gataReport);
+
+   const reportsWithFiles = await Promise.all(
+      reports.map(async (report) => {
+         const files = await db.select().from(oldReportFiles).where(eq(oldReportFiles.reportId, report.id));
+         return { ...report, oldFiles: files };
+      })
+   );
+
+   return reportsWithFiles.filter((report) => report.oldFiles.length > 0);
+};
+
+export const batchInsertCloudImages = async (images: Array<typeof cloudinaryImage.$inferInsert>) => {
+   if (images.length === 0) return;
+   await db.insert(cloudinaryImage).values(images);
+};
+
+export const batchInsertReportFiles = async (reportFileRecords: Array<{ reportId: string; fileId: string }>) => {
+   if (reportFileRecords.length === 0) return;
+   await db.insert(reportFiles).values(reportFileRecords);
+};
+
+export const updateReportContentOnly = async (reportId: string, content: string) => {
+   await db.update(gataReport).set({ content }).where(eq(gataReport.id, reportId));
 };
