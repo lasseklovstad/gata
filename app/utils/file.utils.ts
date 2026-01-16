@@ -10,7 +10,7 @@ export const getIsVideo = (image: CloudinaryImage) => {
    return videoRegexp.test(image.cloudUrl) || image.type?.startsWith("video");
 };
 
-export async function uploadNewBlob(file: File, { token, id }: { token: string; id: string }) {
+export async function uploadNewBlob(file: Blob, { token, id }: { token: string; id: string }) {
    const res = await fetch(token, {
       method: "PUT",
       headers: {

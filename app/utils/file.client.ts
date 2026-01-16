@@ -40,10 +40,12 @@ export function getMediaDimensions(file: File): Promise<{ width: number; height:
 export const fetchTokens = async ({
    eventId,
    reportId,
+   userId,
    numberOfFiles,
 }: {
    eventId?: number;
    reportId?: string;
+   userId?: string;
    numberOfFiles: number;
 }) => {
    const searchParams = new URLSearchParams({ numberOfFiles: numberOfFiles.toString() });
@@ -52,6 +54,9 @@ export const fetchTokens = async ({
    }
    if (reportId) {
       searchParams.set("reportId", reportId);
+   }
+   if (userId) {
+      searchParams.set("userId", userId);
    }
    const response = await fetch(href("/api/sas-token") + "?" + searchParams.toString());
    return (await response.json()) as unknown as Awaited<ReturnType<typeof loader>>;

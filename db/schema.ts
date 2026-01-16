@@ -11,7 +11,7 @@ export const user = sqliteTable("gata_user", {
    primaryExternalUserId: text("primary_external_user_id").notNull().unique(),
    name: text("name").notNull().unique(),
    picture: text("picture").notNull(),
-   //.references((): AnySQLiteColumn => externalUser.id),
+   originalPicture: text("original_picture"),
 });
 
 export const externalUser = sqliteTable("external_user", {

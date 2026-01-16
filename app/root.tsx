@@ -156,15 +156,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
       }
       const form = formResult.data;
       if (form.picture) {
-         const newName = await cropProfileImage(form.picture, {
-            height: form.pictureCropHeight,
-            width: form.pictureCropWidth,
-            left: form.pictureCropX,
-            top: form.pictureCropY,
-         });
          await updateUser(loggedInUser.id, {
             name: form.name,
-            picture: newName,
+            picture: form.picture,
+            originalPicture: form.originalPicture,
             subscribe: form.emailSubscription,
          });
       } else {

@@ -10,8 +10,9 @@ const expireInMs = expireInMin * 60 * 1000;
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
    const searchParams = new URL(request.url).searchParams;
-   const eventId = z.coerce.number().parse(searchParams.get("eventId"));
-   const reportId = z.string().optional().parse(searchParams.get("reportId"));
+   const eventId = z.coerce.number().nullable().parse(searchParams.get("eventId"));
+   const reportId = z.string().nullable().parse(searchParams.get("reportId"));
+   const userId = z.string().nullable().parse(searchParams.get("userId"));
    const numberOfFiles = z.coerce.number().max(100).parse(searchParams.get("numberOfFiles"));
    await getRequiredUser(request);
    const containerName = process.env.NODE_ENV === "production" ? "gata" : "gata-local";
@@ -21,7 +22,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
          .fill(null)
          .map(async () => {
             const id = crypto.randomUUID();
-            const blobName = getBlobName({ eventId, id, reportId });
+            const blobName = getBlobName({ eventId, id, reportId, userId });
             return {
                id,
                token: await createBlobSas({
@@ -39,12 +40,25 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
    );
 };
 
-const getBlobName = ({ eventId, reportId, id }: { eventId?: number; reportId?: string; id: string }) => {
+const getBlobName = ({
+   eventId,
+   reportId,
+   id,
+   userId,
+}: {
+   eventId?: number | null;
+   reportId?: string | null;
+   userId?: string | null;
+   id: string;
+}) => {
    if (eventId) {
       return `event/${eventId}/${id}`;
    }
    if (reportId) {
       return `report/${reportId}/${id}`;
+   }
+   if (userId) {
+      return `user/${userId}/${id}`;
    }
    throw new Error("Could not generate blobname for token!");
 };

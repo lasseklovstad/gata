@@ -5,9 +5,12 @@ import { Form, href, Link, useFetcher } from "react-router";
 import type { User } from "~/.server/db/user";
 import type { action } from "~/root";
 import { useDialog } from "~/utils/dialogUtils";
+import { fetchTokens } from "~/utils/file.client";
+import { uploadNewBlob } from "~/utils/file.utils";
 
 import { UserForm } from "./UserForm";
 import { AvatarUser } from "../AvatarUser";
+import getCroppedImg from "./cropImage";
 import { Button } from "../ui/button";
 import { Dialog, DialogFooter, DialogHeading } from "../ui/dialog";
 import {
@@ -50,6 +53,27 @@ export const UserMenu = ({ roleText, isAuthenticated, loggedInUser }: UserMenuPr
       setCrop({ x: 0, y: 0 });
    };
 
+   const handleSubmit = async (formData: FormData) => {
+      if (!loggedInUser) return;
+      const originalImageFile = formData.get("picture") as File | null;
+      if (originalImageFile && area) {
+         const croppedImage = await getCroppedImg(URL.createObjectURL(originalImageFile), area);
+         if (!croppedImage) {
+            throw new Error("Could not crop image");
+         }
+         const tokens = await fetchTokens({ numberOfFiles: 2, userId: loggedInUser.id });
+         await uploadNewBlob(croppedImage, { token: tokens[0].token, id: tokens[0].id });
+         await uploadNewBlob(originalImageFile, {
+            token: tokens[1].token,
+            id: tokens[1].id,
+         });
+         formData.set("picture", tokens[0].url);
+         formData.set("originalPicture", tokens[1].url);
+      }
+      formData.set("intent", "updateProfile");
+      await fetcher.submit(formData, { method: "PUT" });
+   };
+
    return (
       <>
          {isAuthenticated && (
@@ -87,12 +111,18 @@ export const UserMenu = ({ roleText, isAuthenticated, loggedInUser }: UserMenuPr
          )}
          {loggedInUser ? (
             <Dialog ref={editProfileDialog.dialogRef}>
-               <fetcher.Form ref={formRef} encType="multipart/form-data" method="PUT" onReset={handleReset}>
+               <fetcher.Form
+                  ref={formRef}
+                  onReset={handleReset}
+                  onSubmit={(e) => {
+                     e.preventDefault();
+                     void handleSubmit(new FormData(e.currentTarget));
+                  }}
+               >
                   <DialogHeading>Rediger profil</DialogHeading>
                   <FormProvider errors={fetcher.data && "errors" in fetcher.data ? fetcher.data.errors : undefined}>
                      <UserForm
                         user={loggedInUser}
-                        area={area}
                         crop={crop}
                         picture={picture}
                         setCrop={setCrop}
@@ -104,9 +134,7 @@ export const UserMenu = ({ roleText, isAuthenticated, loggedInUser }: UserMenuPr
                   </FormProvider>
 
                   <DialogFooter>
-                     <Button type="submit" name="intent" value="updateProfile">
-                        Lagre
-                     </Button>
+                     <Button type="submit">Lagre</Button>
                      <Button type="reset" variant="ghost" onClick={editProfileDialog.close}>
                         Avbryt
                      </Button>
