@@ -14,7 +14,11 @@ const UpdateContentSchema = zfd.formData({
 
 const PostFileSchema = zfd.formData({
    intent: z.literal(reportInfoIntent.postFileIntent),
-   data: zfd.text(),
+   id: z.string(),
+   type: z.string(),
+   url: z.string(),
+   width: z.coerce.number().optional(),
+   height: z.coerce.number().optional(),
 });
 
 export const ReportInfoSchema = z.union([UpdateContentSchema, PostFileSchema]);

@@ -26,7 +26,6 @@ import { z } from "zod";
 
 import type { Route } from "./+types/root";
 import { getOptionalUserFromExternalUserId, getUserByName, updateUser } from "./.server/db/user";
-import { cropProfileImage } from "./.server/services/localImageService";
 import { PushSubscriptionProvider } from "./components/PushSubscriptionContext";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
 import { Button } from "./components/ui/button";
@@ -156,15 +155,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
       }
       const form = formResult.data;
       if (form.picture) {
-         const newName = await cropProfileImage(form.picture, {
-            height: form.pictureCropHeight,
-            width: form.pictureCropWidth,
-            left: form.pictureCropX,
-            top: form.pictureCropY,
-         });
          await updateUser(loggedInUser.id, {
             name: form.name,
-            picture: newName,
+            picture: form.picture,
+            originalPicture: form.originalPicture,
             subscribe: form.emailSubscription,
          });
       } else {

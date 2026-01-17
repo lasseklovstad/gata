@@ -15,13 +15,12 @@ type Props = {
    setCrop: (crop: Point) => void;
    zoom: number;
    setZoom: (zoom: number) => void;
-   area: Area | undefined;
    setArea: (area: Area) => void;
    picture: string | undefined;
    setPicture: (value: string | undefined) => void;
 };
 
-export const UserForm = ({ user, area, crop, picture, setCrop, setPicture, setZoom, zoom, setArea }: Props) => {
+export const UserForm = ({ user, crop, picture, setCrop, setPicture, setZoom, zoom, setArea }: Props) => {
    return (
       <>
          <FormItem name="name">
@@ -65,15 +64,10 @@ export const UserForm = ({ user, area, crop, picture, setCrop, setPicture, setZo
                   cropShape="round"
                   maxZoom={10}
                   zoomSpeed={0.3}
-                  onCropAreaChange={(area, areaPx) => setArea(areaPx)}
+                  onCropComplete={(area, areaPx) => setArea(areaPx)}
                />
             </div>
          ) : null}
-
-         <input hidden readOnly value={area?.x ?? 0} name="pictureCropX" />
-         <input hidden readOnly value={area?.y ?? 0} name="pictureCropY" />
-         <input hidden readOnly value={area?.width ?? 0} name="pictureCropWidth" />
-         <input hidden readOnly value={area?.height ?? 0} name="pictureCropHeight" />
 
          <FormItem name="emailSubscription" className="border p-2 flex justify-between items-center rounded">
             <div>

@@ -93,6 +93,8 @@ jobs:
       PWA_PUBLIC_KEY: "xxx"
       PWA_PRIVATE_KEY: "xxx"
       IMAGE_DIR: "/data"
+      AZURE_BLOB_KEY: "xxx"
+      AZURE_BLOB_NAME: "xxx"
 
     steps:
       - uses: actions/checkout@v6

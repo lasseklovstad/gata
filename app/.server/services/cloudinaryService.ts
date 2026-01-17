@@ -9,20 +9,6 @@ cloudinary.v2.config({
    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export const uploadImage = (data: string, folder: string) => {
-   return new Promise<UploadApiResponse>((resolve, reject) => {
-      void cloudinary.v2.uploader.upload(data, { folder }, (error, result) => {
-         if (error) {
-            console.error(error);
-            reject(error as Error);
-         }
-         if (result) {
-            resolve(result);
-         }
-      });
-   });
-};
-
 export const generateZip = (folderName: string, zipName: string) => {
    const zipUrl = cloudinary.v2.utils.download_zip_url({
       resource_type: "all",
@@ -31,18 +17,6 @@ export const generateZip = (folderName: string, zipName: string) => {
       target_public_id: zipName,
    });
    return zipUrl;
-};
-
-export const deleteImage = (publicId: string) => {
-   return new Promise((resolve, reject) => {
-      void cloudinary.v2.uploader.destroy(publicId, (error, result) => {
-         if (error) {
-            reject(error as Error);
-         } else {
-            resolve(result);
-         }
-      });
-   });
 };
 
 export function uploadImageToCloudinary(data: ArrayBuffer, folder: string) {

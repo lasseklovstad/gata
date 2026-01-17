@@ -1,12 +1,14 @@
-import type { SubmitFunction } from "react-router";
+import { type SubmitFunction } from "react-router";
 import { Editor, Element, Transforms } from "slate";
 
 import { reportInfoIntent } from "~/routes/reportInfo.$reportId/intent";
+import { fetchTokens, getMediaDimensions } from "~/utils/file.client";
+import { uploadNewBlob } from "~/utils/file.utils";
 
 let counter = 0;
 const generateSavingImageId = () => `saving-image-${counter++}`;
 
-export const withImages = (editor: Editor, submit: SubmitFunction) => {
+export const withImages = (editor: Editor, submit: SubmitFunction, reportId: string) => {
    const { isVoid, insertData } = editor;
 
    editor.isVoid = (element: Element) => {
@@ -21,21 +23,28 @@ export const withImages = (editor: Editor, submit: SubmitFunction) => {
             const file = files.item(i);
             const [mime] = file!.type.split("/");
 
-            if (mime === "image") {
-               const reader = new FileReader();
-               reader.addEventListener("load", () => {
-                  const data = reader.result;
-                  const tempId = generateSavingImageId();
-                  if (typeof data === "string") {
-                     insertSavingImage(editor, tempId);
-                     void submit(
-                        { data, intent: reportInfoIntent.postFileIntent },
-                        { method: "POST", fetcherKey: tempId, navigate: false }
-                     );
+            if (file && mime === "image") {
+               const tempId = generateSavingImageId();
+               insertSavingImage(editor, tempId);
+               const uploadImage = async () => {
+                  const sasTokens = await fetchTokens({ numberOfFiles: 1, reportId });
+                  const token = sasTokens[0];
+                  const uploadResponse = await uploadNewBlob(file, token);
+                  const dimensions = await getMediaDimensions(file);
+                  const formData = new FormData();
+                  formData.set("intent", reportInfoIntent.postFileIntent);
+                  formData.set("id", token.id);
+                  formData.set("url", token.url);
+                  formData.set("type", uploadResponse.type);
+                  if (dimensions) {
+                     formData.set("width", dimensions.width.toString());
+                     formData.set("height", dimensions.height.toString());
                   }
-               });
+                  void submit(formData, { method: "POST", fetcherKey: tempId, navigate: false });
+                  replaceSavingImage(editor, token.url, tempId);
+               };
 
-               reader.readAsDataURL(file!);
+               void uploadImage();
             }
          }
       }
@@ -43,15 +52,6 @@ export const withImages = (editor: Editor, submit: SubmitFunction) => {
    };
 
    return editor;
-};
-
-export const insertImage = (editor: Editor, imageId: string | null) => {
-   const text = { text: "" };
-   const image = [
-      { type: "image" as const, imageId, size: 50, children: [text] },
-      { type: "body2" as const, children: [text] },
-   ];
-   Transforms.insertNodes(editor, image);
 };
 
 const insertSavingImage = (editor: Editor, imageId: string) => {
@@ -63,7 +63,7 @@ const insertSavingImage = (editor: Editor, imageId: string) => {
    Transforms.insertNodes(editor, image);
 };
 
-export const replaceSavingImage = (editor: Editor, imageId: string, oldId: string) => {
+const replaceSavingImage = (editor: Editor, imageId: string, oldId: string) => {
    const image = { type: "image" as const, imageId };
    Transforms.setNodes(editor, image, {
       at: [],

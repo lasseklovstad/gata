@@ -5,7 +5,6 @@ import type { Descendant } from "slate";
 
 import { getReport, updateReportContent } from "~/.server/db/report";
 import { insertReportFile } from "~/.server/db/reportFile";
-import { uploadImage } from "~/.server/services/cloudinaryService";
 import { ClientOnly } from "~/components/ClientOnly";
 import { PageLayout } from "~/components/PageLayout";
 import { RichTextEditor } from "~/components/RichTextEditor/RichTextEditor";
@@ -13,7 +12,6 @@ import { RichTextPreview } from "~/components/RichTextEditor/RichTextPreview";
 import { ButtonResponsive } from "~/components/ui/button";
 import { Typography } from "~/components/ui/typography";
 import { getRequiredUser } from "~/utils/auth.server";
-import { getCloudinaryUploadFolder } from "~/utils/cloudinaryUtils";
 import { formatDateTime } from "~/utils/date.utils";
 import { isAdmin } from "~/utils/roleUtils";
 
@@ -41,18 +39,15 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
          return { ok: true, close: result.close, intent: reportInfoIntent.updateContentIntent };
       }
       case reportInfoIntent.postFileIntent: {
-         const data = result.data;
-         const folder = `${getCloudinaryUploadFolder()}/report-${params.reportId}`;
-         const { public_id, secure_url } = await uploadImage(data, folder);
-         const [file] = await insertReportFile({
-            reportId: params.reportId,
-            cloudId: public_id,
-            cloudUrl: secure_url,
+         await insertReportFile(params.reportId, {
+            cloudId: result.id,
+            cloudUrl: result.url,
+            height: result.height ?? 0,
+            width: result.width ?? 0,
+            type: result.type,
          });
          return {
             ok: true,
-            file,
-            intent: reportInfoIntent.postFileIntent,
          };
       }
    }
@@ -140,7 +135,7 @@ export default function ReportInfoPage({ loaderData: { report, loggedInUser } }:
             {editing && (
                <ClientOnly>
                   <RichTextEditor
-                     initialContent={report.content}
+                     report={report}
                      onCancel={() => setEditing(false)}
                      onSave={handleSaveContent}
                      isLoading={fetcher.state !== "idle"}

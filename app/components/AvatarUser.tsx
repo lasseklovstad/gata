@@ -1,5 +1,3 @@
-import { Image } from "@unpic/react";
-
 import type { User } from "~/.server/db/user";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { cn } from "~/utils";
@@ -42,8 +40,7 @@ export const AvatarUserButton = ({ user, className }: Props) => {
 
          <Dialog ref={dialogRef} className="backdrop:bg-black/80">
             <DialogCloseButton onClose={close} />
-            <Image
-               unstyled
+            <img
                className={cn("max-h-screen object-contain")}
                src={user?.picture || ""}
                alt=""

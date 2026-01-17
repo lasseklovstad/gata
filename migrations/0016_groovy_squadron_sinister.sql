@@ -1,0 +1,1 @@
+ALTER TABLE `gata_user` ADD `original_picture` text;

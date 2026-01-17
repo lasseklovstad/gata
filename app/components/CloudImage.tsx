@@ -1,15 +1,14 @@
-import { Image } from "@unpic/react";
 import { Video } from "lucide-react";
 
 import type { CloudinaryImage } from "db/schema";
-import { getIsVideo } from "~/utils/cloudinaryUtils";
+import { getIsVideo } from "~/utils/file.utils";
 
 type Props = {
    cloudImage: CloudinaryImage;
 };
 
 export const CloudImage = ({ cloudImage }: Props) => {
-   if (getIsVideo(cloudImage.cloudUrl)) {
+   if (getIsVideo(cloudImage)) {
       return (
          <div className="relative h-full object-cover">
             <video className="h-full rounded shadow" loop muted playsInline preload="metadata">
@@ -22,14 +21,6 @@ export const CloudImage = ({ cloudImage }: Props) => {
       );
    }
    return (
-      <Image
-         className="rounded shadow h-full object-cover"
-         src={cloudImage.cloudUrl}
-         alt=""
-         height={300}
-         unstyled
-         background="auto"
-         width={200}
-      />
+      <img className="rounded shadow h-full object-cover" src={cloudImage.cloudUrl} alt="" height={300} width={200} />
    );
 };
