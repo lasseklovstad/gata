@@ -1,10 +1,9 @@
 import { captureException } from "@sentry/react-router";
 import { Loader2 } from "lucide-react";
-import { href, useFetcher } from "react-router";
+import { useFetcher } from "react-router";
 
 import { Input } from "~/components/ui/input";
 import { Typography } from "~/components/ui/typography";
-import type { loader } from "~/routes/api.sas-token";
 import type { action } from "~/routes/event.$eventId.images/route";
 import { uploadFilesIntent } from "~/routes/event.$eventId.images/uploadFilesAction";
 import { fetchTokens, getMediaDimensions } from "~/utils/file.client";

@@ -4,13 +4,11 @@ import { useFetcher } from "react-router";
 import type { Element } from "slate";
 import { Transforms } from "slate";
 import type { RenderElementProps } from "slate-react";
-import { ReactEditor, useFocused, useSelected, useSlate, useSlateStatic } from "slate-react";
+import { ReactEditor, useFocused, useSelected, useSlateStatic } from "slate-react";
 
 import type { loader as fileLoader } from "~/routes/file.$fileId";
-import type { action as fileAction } from "~/routes/reportInfo.$reportId/route";
 import { cn } from "~/utils";
 
-import { replaceSavingImage } from "./withImages";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 

@@ -26,7 +26,6 @@ import { z } from "zod";
 
 import type { Route } from "./+types/root";
 import { getOptionalUserFromExternalUserId, getUserByName, updateUser } from "./.server/db/user";
-import { cropProfileImage } from "./.server/services/localImageService";
 import { PushSubscriptionProvider } from "./components/PushSubscriptionContext";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
 import { Button } from "./components/ui/button";
