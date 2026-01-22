@@ -1,13 +1,7 @@
 import type { CloudinaryImage } from "db/schema";
 
-export const getCloudinaryUploadFolder = () => {
-   return process.env.NODE_ENV === "production" ? "gata" : "gata-local";
-};
-
 export const getIsVideo = (image: CloudinaryImage) => {
-   // Todo: Remove video regexp.
-   const videoRegexp = /.*\/video\/upload\/.*/;
-   return videoRegexp.test(image.cloudUrl) || image.type?.startsWith("video");
+   return image.type?.startsWith("video");
 };
 
 export async function uploadNewBlob(file: Blob, { token, id }: { token: string; id: string }) {

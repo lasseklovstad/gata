@@ -1,12 +1,9 @@
 import { Minus, Plus, Trash } from "lucide-react";
-import { useEffect } from "react";
-import { useFetcher } from "react-router";
 import type { Element } from "slate";
 import { Transforms } from "slate";
 import type { RenderElementProps } from "slate-react";
 import { ReactEditor, useFocused, useSelected, useSlateStatic } from "slate-react";
 
-import type { loader as fileLoader } from "~/routes/file.$fileId";
 import { cn } from "~/utils";
 
 import { Button } from "../ui/button";
@@ -80,31 +77,7 @@ type ImageProps = {
    savingImageData?: string;
 };
 
-export const Image = (props: ImageProps) => {
-   if (props.id.startsWith("https")) {
-      return <ExternalImage {...props} />;
-   }
-   return <InternalImage {...props} />;
-};
-
-const InternalImage = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
-   const fetcher = useFetcher<typeof fileLoader>();
-
-   const { load } = fetcher;
-   useEffect(() => {
-      void load(`/file/${id}`);
-   }, [id, load]);
-
-   const imageSrc = fetcher.data?.data || fetcher.data?.cloudUrl;
-   return (
-      <>
-         {fetcher.state !== "idle" && <Skeleton className="w-[400px] h-[300px]" />}
-         {fetcher.data && <ExternalImage id={imageSrc ?? ""} size={size} selected={selected} focused={focused} />}
-      </>
-   );
-};
-
-const ExternalImage = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
+export const Image = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
    return (
       <img src={id} alt="" className={cn(selected && focused && "ring", "block my-1")} style={{ width: `${size}%` }} />
    );
