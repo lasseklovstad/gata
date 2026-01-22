@@ -33,23 +33,26 @@ export const getUpCommingEvents = async (loggedInUserId: string) => {
       .select()
       .from(gataEvent)
       .where(
-         or(
-            eq(gataEvent.visibility, "everyone"),
-            and(
-               // Filter out event only visible to event organizers and admins
-               eq(gataEvent.visibility, "event-organizers"),
-               exists(
-                  db
-                     .select({ userId: eventOrganizer.userId })
-                     .from(eventOrganizer)
-                     .innerJoin(userRoles, eq(userRoles.usersId, loggedInUserId))
-                     .innerJoin(role, eq(role.id, userRoles.roleId))
-                     .where(
-                        or(
-                           and(eq(eventOrganizer.eventId, gataEvent.id), eq(eventOrganizer.userId, loggedInUserId)),
-                           eq(role.roleName, RoleName.Admin)
+         and(
+            eq(gataEvent.isDeleted, false),
+            or(
+               eq(gataEvent.visibility, "everyone"),
+               and(
+                  // Filter out event only visible to event organizers and admins
+                  eq(gataEvent.visibility, "event-organizers"),
+                  exists(
+                     db
+                        .select({ userId: eventOrganizer.userId })
+                        .from(eventOrganizer)
+                        .innerJoin(userRoles, eq(userRoles.usersId, loggedInUserId))
+                        .innerJoin(role, eq(role.id, userRoles.roleId))
+                        .where(
+                           or(
+                              and(eq(eventOrganizer.eventId, gataEvent.id), eq(eventOrganizer.userId, loggedInUserId)),
+                              eq(role.roleName, RoleName.Admin)
+                           )
                         )
-                     )
+                  )
                )
             )
          )
@@ -72,7 +75,7 @@ export const getEvent = async (eventId: number) => {
 };
 
 export const deleteEvent = async (eventId: number) => {
-   await db.delete(gataEvent).where(eq(gataEvent.id, eventId));
+   await db.update(gataEvent).set({ isDeleted: true }).where(eq(gataEvent.id, eventId));
 };
 
 export const updateEvent = async (eventId: number, values: Partial<typeof gataEvent.$inferInsert>) => {
@@ -168,10 +171,6 @@ export const updateOrganizers = async (eventId: number, organizers: string[]) =>
    await db.insert(eventOrganizer).values(organizers.map((userId) => ({ userId, eventId })));
 };
 
-export const insertCloudinaryImage = async (eventId: number, values: typeof cloudinaryImage.$inferInsert) => {
-   await db.insert(cloudinaryImage).values(values);
-   await db.insert(eventCloudinaryImages).values({ eventId, cloudId: values.cloudId });
-};
 export const insertAzureBlob = async (eventId: number, values: (typeof cloudinaryImage.$inferInsert)[]) => {
    await db.insert(cloudinaryImage).values(values);
    await db.insert(eventCloudinaryImages).values(values.map((file) => ({ eventId, cloudId: file.cloudId })));

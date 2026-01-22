@@ -77,18 +77,6 @@ export const responsibility = sqliteTable("responsibility", {
    name: text("name", { length: 255 }).notNull(),
 });
 
-export const oldReportFiles = sqliteTable("gata_report_file", {
-   id: text("id")
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-   data: text("data"),
-   reportId: text("report_id")
-      .references(() => gataReport.id)
-      .notNull(),
-   cloudUrl: text("cloud_url"),
-   cloudId: text("cloud_id"),
-});
-
 export const contingent = sqliteTable(
    "gata_contingent",
    {
@@ -134,6 +122,7 @@ export const gataReport = sqliteTable("gata_report", {
    title: text("title").notNull(),
    type: integer("type").notNull(),
    createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
+   isDeleted: integer("is_deleted", { mode: "boolean" }).default(false).notNull(),
 });
 
 export type GataReport = typeof gataReport.$inferSelect;
@@ -171,6 +160,7 @@ export const gataEvent = sqliteTable("gata_event", {
       .default("everyone")
       .notNull(),
    zipUrl: text("zip_url"),
+   isDeleted: integer("is_deleted", { mode: "boolean" }).default(false).notNull(),
 });
 
 export const eventOrganizer = sqliteTable(
@@ -424,15 +414,7 @@ export const responsibility_yearRelations = relations(responsibilityYear, ({ one
    }),
 }));
 
-export const gataReportFileRelations = relations(oldReportFiles, ({ one }) => ({
-   gataReport: one(gataReport, {
-      fields: [oldReportFiles.reportId],
-      references: [gataReport.id],
-   }),
-}));
-
-export const gataReportRelations = relations(gataReport, ({ one, many }) => ({
-   gataReportFiles: many(oldReportFiles),
+export const gataReportRelations = relations(gataReport, ({ one }) => ({
    user: one(user, {
       fields: [gataReport.createdBy],
       references: [user.id],
