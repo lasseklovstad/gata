@@ -2,6 +2,7 @@ import type { User } from "~/.server/db/user";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { cn } from "~/utils";
 import { useDialog } from "~/utils/dialogUtils";
+import { transformCloudflare } from "~/utils/file.utils";
 
 import { Button } from "./ui/button";
 import { Dialog, DialogCloseButton } from "./ui/dialog";
@@ -15,7 +16,7 @@ export const AvatarUser = ({ user, className }: Props) => {
    return (
       <>
          <Avatar className={className}>
-            <AvatarImage src={user?.picture || undefined} alt={user?.name || ""} />
+            <AvatarImage src={user?.picture ? transformCloudflare(user.picture) : undefined} alt={user?.name || ""} />
             <AvatarFallback>
                <img src="/no-profile.jpg" alt="" />
             </AvatarFallback>
@@ -31,7 +32,10 @@ export const AvatarUserButton = ({ user, className }: Props) => {
       <>
          <Button size="icon" variant="ghost" onClick={open} className="w-fit">
             <Avatar className={className}>
-               <AvatarImage src={user?.picture || undefined} alt={user?.name || ""} />
+               <AvatarImage
+                  src={user?.picture ? transformCloudflare(user.picture) : undefined}
+                  alt={user?.name || ""}
+               />
                <AvatarFallback>
                   <img src="/no-profile.jpg" alt="" />
                </AvatarFallback>

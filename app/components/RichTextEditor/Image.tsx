@@ -5,6 +5,7 @@ import type { RenderElementProps } from "slate-react";
 import { ReactEditor, useFocused, useSelected, useSlateStatic } from "slate-react";
 
 import { cn } from "~/utils";
+import { transformCloudflare } from "~/utils/file.utils";
 
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
@@ -79,7 +80,12 @@ type ImageProps = {
 
 export const Image = ({ id, selected = false, focused = false, size = 50 }: ImageProps) => {
    return (
-      <img src={id} alt="" className={cn(selected && focused && "ring", "block my-1")} style={{ width: `${size}%` }} />
+      <img
+         src={transformCloudflare(id, 1200)}
+         alt=""
+         className={cn(selected && focused && "ring", "block my-1 max-md:!w-full")}
+         style={{ width: `${size}%` }}
+      />
    );
 };
 
