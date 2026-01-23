@@ -1,7 +1,7 @@
 import { Video } from "lucide-react";
 
 import type { CloudinaryImage } from "db/schema";
-import { getIsVideo } from "~/utils/file.utils";
+import { getIsVideo, transformCloudflare } from "~/utils/file.utils";
 
 type Props = {
    cloudImage: CloudinaryImage;
@@ -21,6 +21,12 @@ export const CloudImage = ({ cloudImage }: Props) => {
       );
    }
    return (
-      <img className="rounded shadow h-full object-cover" src={cloudImage.cloudUrl} alt="" height={300} width={200} />
+      <img
+         className="rounded shadow h-full object-cover"
+         src={transformCloudflare(cloudImage.cloudUrl)}
+         alt=""
+         height={300}
+         width={200}
+      />
    );
 };
