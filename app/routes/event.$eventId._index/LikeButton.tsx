@@ -56,7 +56,7 @@ export const LikeButton = ({
             aria-label="Velg type"
             value={selectedLikeType}
             onValueChange={submitLike}
-            className={cn( className)}
+            className={cn(className)}
             size={"sm"}
          >
             {reactionTypes.map((type) => {
