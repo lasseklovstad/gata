@@ -314,3 +314,7 @@ export const insertImageLike = async (userId: string, cloudId: string, type: str
          set: { userId, cloudId, type },
       });
 };
+
+export const deleteImageLike = async (userId: string, imageId: string) => {
+   await db.delete(imageLikes).where(and(eq(imageLikes.cloudId, imageId), eq(imageLikes.userId, userId)));
+};

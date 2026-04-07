@@ -21,13 +21,15 @@ export const CloudImageGallery = ({ cloudImages, eventId, loggedInUserId }: Prop
       <>
          <ul className="flex gap-2 flex-wrap">
             {cloudImages.map((image, index) => (
-               <li key={image.cloudId} className="h-[160px] w-[160px] relative">
+               <li key={image.cloudId} className="h-[160px] w-[160px] relative overflow-hidden">
                   <CloudImageButton cloudImage={image} onClick={() => setSelectedIndex(index)} />
-                  <Likes
-                     likes={image.likes}
-                     size="normal"
-                     className="absolute bottom-0 text-white bg-black/40 p-1 rounded-lg"
-                  />
+                  {image.likes.length > 0 ? (
+                     <Likes
+                        likes={image.likes}
+                        size="normal"
+                        className="absolute bottom-0 text-white bg-black/40 p-1 rounded-lg"
+                     />
+                  ) : null}
                </li>
             ))}
          </ul>

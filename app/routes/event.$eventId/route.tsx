@@ -9,6 +9,7 @@ import { zfd } from "zod-form-data";
 import { updateEventAndNotify, updateParticipatingAndNotify } from "~/.server/data-layer/gataEvent";
 import {
    deleteEvent,
+   deleteImageLike,
    getEvent,
    getEventParticipants,
    getNumberOfImages,
@@ -71,7 +72,11 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
 
    if (intent === "likeImage") {
       const { cloudId, type } = likeImageSchema.parse(formData);
-      await insertImageLike(loggedInUser.id, cloudId, type);
+      if (request.method === "POST") {
+         await insertImageLike(loggedInUser.id, cloudId, type);
+      } else {
+         await deleteImageLike(loggedInUser.id, cloudId);
+      }
       return { ok: true };
    }
 
