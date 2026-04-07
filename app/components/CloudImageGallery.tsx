@@ -1,23 +1,33 @@
 import { useState } from "react";
 
 import type { CloudinaryImage } from "db/schema";
+import { Likes } from "~/routes/event.$eventId._index/Likes";
 
 import { CloudImageButton } from "./CloudImageButton";
 import { CloudImageFullscreen } from "./CloudImageFullscreen";
 
 type Props = {
-   cloudImages: CloudinaryImage[];
+   cloudImages: (CloudinaryImage & {
+      likes: { type: string; userId: string; user: { name: string; picture: string } }[];
+   })[];
+   eventId: number;
+   loggedInUserId: string;
 };
 
-export const CloudImageGallery = ({ cloudImages }: Props) => {
+export const CloudImageGallery = ({ cloudImages, eventId, loggedInUserId }: Props) => {
    const [selectedIndex, setSelectedIndex] = useState(-1);
    const selectedImage = selectedIndex !== -1 ? cloudImages[selectedIndex] : undefined;
    return (
       <>
          <ul className="flex gap-2 flex-wrap">
             {cloudImages.map((image, index) => (
-               <li key={image.cloudId} className="h-[160px]">
+               <li key={image.cloudId} className="h-[160px] w-[160px] relative">
                   <CloudImageButton cloudImage={image} onClick={() => setSelectedIndex(index)} />
+                  <Likes
+                     likes={image.likes}
+                     size="normal"
+                     className="absolute bottom-0 text-white bg-black/40 p-1 rounded-lg"
+                  />
                </li>
             ))}
          </ul>
@@ -34,6 +44,8 @@ export const CloudImageGallery = ({ cloudImages }: Props) => {
                }}
                onClose={() => setSelectedIndex(-1)}
                showNextAndPreviousButtons={cloudImages.length > 1}
+               eventId={eventId}
+               loggedInUserId={loggedInUserId}
             />
          ) : null}
       </>

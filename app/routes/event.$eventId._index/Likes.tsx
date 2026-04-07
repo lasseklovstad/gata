@@ -13,11 +13,12 @@ type Props = {
       };
    }[];
    size: "small" | "normal";
+   className?: string;
 };
 
-export const Likes = ({ likes, size }: Props) => {
+export const Likes = ({ likes, size, className }: Props) => {
    return (
-      <ul className="flex gap-2" aria-label="Reaksjoner">
+      <ul className={cn("flex gap-2", className)} aria-label="Reaksjoner">
          {[...new Set(likes.map((l) => l.type))].map((like) => {
             const likesOfCurrentType = likes.filter((l) => l.type === like);
             const Icon = LikeIconMapping[like as keyof typeof LikeIconMapping];

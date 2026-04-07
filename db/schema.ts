@@ -214,6 +214,20 @@ export const cloudinaryImage = sqliteTable("cloudinary_image", {
 
 export type CloudinaryImage = Omit<typeof cloudinaryImage.$inferSelect, "isDeleted">;
 
+export const imageLikes = sqliteTable(
+   "image_likes",
+   {
+      cloudId: text("cloud_id")
+         .notNull()
+         .references(() => cloudinaryImage.cloudId, { onDelete: "cascade" }),
+      userId: text("user_id")
+         .notNull()
+         .references(() => user.id, { onDelete: "cascade" }),
+      type: text("type").notNull(),
+   },
+   (table) => ({ pk: primaryKey({ columns: [table.cloudId, table.userId] }) })
+);
+
 export const eventCloudinaryImages = sqliteTable("event_cloudinary_images", {
    // Ikke slett bilde hvis event slettes
    eventId: integer("event_id")
@@ -333,6 +347,17 @@ export const messageLikesRelations = relations(messageLikes, ({ one }) => ({
    }),
 }));
 
+export const imageLikesRelations = relations(imageLikes, ({ one }) => ({
+   cloudinaryImage: one(cloudinaryImage, {
+      fields: [imageLikes.cloudId],
+      references: [cloudinaryImage.cloudId],
+   }),
+   user: one(user, {
+      fields: [imageLikes.userId],
+      references: [user.id],
+   }),
+}));
+
 export const messageReplies = sqliteTable(
    "message_replies",
    {
@@ -419,6 +444,10 @@ export const gataReportRelations = relations(gataReport, ({ one }) => ({
       fields: [gataReport.createdBy],
       references: [user.id],
    }),
+}));
+
+export const cloudinaryImageRelations = relations(cloudinaryImage, ({ many }) => ({
+   likes: many(imageLikes),
 }));
 
 export const contingentRelations = relations(contingent, ({ one }) => ({

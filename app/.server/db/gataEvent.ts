@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, exists, or, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, exists, inArray, or, sql } from "drizzle-orm";
 
 import { db } from "db/config.server";
 import {
@@ -9,6 +9,7 @@ import {
    eventParticipants,
    eventPolls,
    gataEvent,
+   imageLikes,
    messageLikes,
    messageReplies,
    messages,
@@ -177,7 +178,7 @@ export const insertAzureBlob = async (eventId: number, values: (typeof cloudinar
 };
 
 export const getEventCloudinaryImages = async (eventId: number) => {
-   return await db
+   const cloudImages = await db
       .select({
          cloudId: cloudinaryImage.cloudId,
          cloudUrl: cloudinaryImage.cloudUrl,
@@ -189,6 +190,23 @@ export const getEventCloudinaryImages = async (eventId: number) => {
       .innerJoin(cloudinaryImage, eq(cloudinaryImage.cloudId, eventCloudinaryImages.cloudId))
       .orderBy(desc(sql`${eventCloudinaryImages}.rowid`))
       .where(and(eq(eventCloudinaryImages.eventId, eventId), eq(cloudinaryImage.isDeleted, false)));
+
+   if (cloudImages.length === 0) {
+      return [];
+   }
+
+   const likes = await db.query.imageLikes.findMany({
+      where: inArray(
+         imageLikes.cloudId,
+         cloudImages.map((image) => image.cloudId)
+      ),
+      with: { user: { columns: { name: true, picture: true } } },
+   });
+
+   return cloudImages.map((image) => ({
+      ...image,
+      likes: likes.filter((like) => like.cloudId === image.cloudId),
+   }));
 };
 
 export const deleteEventCloudinaryImage = async (cloudId: string) => {
@@ -285,4 +303,14 @@ export const insertMessageLike = async (userId: string, messageId: number, type:
 
 export const deleteMessageLike = async (userId: string, messageId: number) => {
    await db.delete(messageLikes).where(and(eq(messageLikes.messageId, messageId), eq(messageLikes.userId, userId)));
+};
+
+export const insertImageLike = async (userId: string, cloudId: string, type: string) => {
+   await db
+      .insert(imageLikes)
+      .values({ userId, cloudId, type })
+      .onConflictDoUpdate({
+         target: [imageLikes.cloudId, imageLikes.userId],
+         set: { userId, cloudId, type },
+      });
 };

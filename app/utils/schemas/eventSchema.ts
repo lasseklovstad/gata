@@ -43,3 +43,8 @@ export const likeMessageSchema = zfd.formData({
    messageId: zfd.text(z.coerce.number()),
    type: z.enum(likeTypes),
 });
+
+export const likeImageSchema = zfd.formData({
+   cloudId: zfd.text(z.string().trim().min(1)),
+   type: z.enum(likeTypes),
+});

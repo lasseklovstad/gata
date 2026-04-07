@@ -127,6 +127,13 @@
       "when": 1769072292766,
       "tag": "0017_wide_black_tom",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1775555485919,
+      "tag": "0018_right_skreet",
+      "breakpoints": true
     }
   ]
 }

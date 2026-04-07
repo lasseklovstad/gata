@@ -12,6 +12,7 @@ import {
    getEvent,
    getEventParticipants,
    getNumberOfImages,
+   insertImageLike,
    updateOrganizers,
 } from "~/.server/db/gataEvent";
 import { getUsers } from "~/.server/db/user";
@@ -29,7 +30,7 @@ import type { Route } from "./+types/route";
 import { AttendingSelect } from "./AttendingSelect";
 import { EventMenu } from "./EventMenu";
 import { EventOrganizers } from "./EventOrganizers";
-import { eventSchema } from "../../utils/schemas/eventSchema";
+import { eventSchema, likeImageSchema } from "../../utils/schemas/eventSchema";
 
 export const meta = ({ data }: Route.MetaArgs) => {
    return [{ title: `${data.event.title} - Gata` }];
@@ -59,12 +60,18 @@ const updateParticipatingSchema = zfd.formData({
 export const action = async ({ request, params }: Route.ActionArgs) => {
    const eventId = z.coerce.number().parse(params.eventId);
    const loggedInUser = await getRequiredUser(request);
-   const formdata = await request.formData();
-   const intent = formdata.get("intent") as string;
+   const formData = await request.formData();
+   const intent = formData.get("intent") as string;
    const event = await getEvent(eventId);
    if (intent === "updateParticipating") {
-      const { status, subscribed } = updateParticipatingSchema.parse(formdata);
+      const { status, subscribed } = updateParticipatingSchema.parse(formData);
       await updateParticipatingAndNotify(loggedInUser, eventId, status, !subscribed);
+      return { ok: true };
+   }
+
+   if (intent === "likeImage") {
+      const { cloudId, type } = likeImageSchema.parse(formData);
+      await insertImageLike(loggedInUser.id, cloudId, type);
       return { ok: true };
    }
 
@@ -78,7 +85,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
    }
 
    if (intent === "updateEvent") {
-      const updateEventForm = eventSchema.safeParse(formdata);
+      const updateEventForm = eventSchema.safeParse(formData);
       if (!updateEventForm.success) {
          return transformErrorResponse(updateEventForm.error);
       }
@@ -88,7 +95,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
       return { ok: true };
    }
    if (intent === "updateOrganizers") {
-      const { organizers } = organizersUpdateSchema.parse(formdata);
+      const { organizers } = organizersUpdateSchema.parse(formData);
       if (organizers.length === 0) {
          throw badRequest("Det må være en arrangør");
       }

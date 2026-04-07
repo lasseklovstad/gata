@@ -57,7 +57,9 @@ export const ReplyList = ({ message, focusMessageId, loggedInUser }: Props) => {
 
                         <div className="flex">
                            <LikeButton
-                              messageId={reply.id}
+                              targetId={reply.id}
+                              targetIdKey="messageId"
+                              intent="likeMessage"
                               loggedInUserId={loggedInUser.id}
                               likes={reply.likes}
                               size="small"

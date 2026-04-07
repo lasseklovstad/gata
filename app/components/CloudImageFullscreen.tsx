@@ -1,8 +1,10 @@
 import { ChevronLeft, ChevronRight, Loader2, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { CloudinaryImage } from "db/schema";
 import { Button } from "~/components/ui/button";
+import { LikeButton } from "~/routes/event.$eventId._index/LikeButton";
+import { Likes } from "~/routes/event.$eventId._index/Likes";
 import { cn } from "~/utils";
 import { useDialog } from "~/utils/dialogUtils";
 import { getIsVideo } from "~/utils/file.utils";
@@ -10,11 +12,15 @@ import { getIsVideo } from "~/utils/file.utils";
 import { Typography } from "./ui/typography";
 
 type Props = {
-   cloudImage: CloudinaryImage;
+   cloudImage: CloudinaryImage & {
+      likes: { type: string; userId: string; user: { name: string; picture: string } }[];
+   };
    onNext: () => void;
    onPrevious: () => void;
    onClose: () => void;
    showNextAndPreviousButtons: boolean;
+   eventId: number;
+   loggedInUserId: string;
 };
 
 export const CloudImageFullscreen = ({
@@ -24,17 +30,12 @@ export const CloudImageFullscreen = ({
    onPrevious,
    onClose,
    showNextAndPreviousButtons,
+   eventId,
+   loggedInUserId,
 }: Props) => {
    const dialog = useDialog({ defaultOpen: true });
-   const [isLoaded, setIsLoaded] = useState(false);
-
-   useEffect(() => {
-      if (getIsVideo(cloudImage)) {
-         setIsLoaded(true);
-      } else {
-         setIsLoaded(false);
-      }
-   }, [cloudImage]);
+   const [loadedCloudId, setLoadedCloudId] = useState<string | null>(null);
+   const isLoaded = getIsVideo(cloudImage) || loadedCloudId === cloudImage.cloudId;
 
    return (
       <>
@@ -113,9 +114,23 @@ export const CloudImageFullscreen = ({
                   alt=""
                   width={width}
                   height={height}
-                  onLoad={() => setIsLoaded(true)}
+                  onLoad={() => setLoadedCloudId(cloudImage.cloudId)}
                />
             )}
+            <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full bg-black/40 px-4 py-2 text-white flex flex-col items-center gap-2">
+               <Likes likes={cloudImage.likes} size="normal" />
+               <LikeButton
+                  targetId={cloudImage.cloudId}
+                  targetIdKey="cloudId"
+                  intent="likeImage"
+                  actionPath={`/event/${eventId}`}
+                  loggedInUserId={loggedInUserId}
+                  likes={cloudImage.likes}
+                  size="normal"
+                  inline
+                  className="[&_button]:bg-white/90 [&_button]:text-black"
+               />
+            </div>
          </dialog>
       </>
    );
