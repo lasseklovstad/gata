@@ -142,7 +142,7 @@ export default function EventActivities({
             loggedInUserId={loggedInUser.id}
          />
          {cloudinaryImages.length ? (
-            <Button variant="outline" as={Link} to="images">
+            <Button variant="outline" as={Link} to="images" preventScrollReset>
                Se alle bilder
             </Button>
          ) : null}

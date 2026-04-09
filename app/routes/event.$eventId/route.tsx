@@ -152,31 +152,9 @@ export default function EventPage({
             )}
 
             <div className="relative z-10 flex min-h-56 items-start justify-between p-4 text-white md:min-h-72 md:p-6">
-               <div className="flex items-center">
-                  <Typography variant="h1" className="text-white drop-shadow-sm">
-                     {event.title}
-                  </Typography>
-                  <TooltipProvider>
-                     <Tooltip>
-                        <TooltipTrigger asChild>
-                           <Button
-                              size="icon"
-                              variant="ghost"
-                              className="text-white hover:bg-white/20 hover:text-white"
-                              onClick={() => {
-                                 void navigator.clipboard.writeText(`${location.origin}/event/${event.id}/public`);
-                              }}
-                           >
-                              <span className="sr-only">Kopier link for å dele</span>
-                              <Copy />
-                           </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                           <Typography>Kopier link for å dele</Typography>
-                        </TooltipContent>
-                     </Tooltip>
-                  </TooltipProvider>
-               </div>
+               <Typography variant="h1" className="text-white drop-shadow-sm">
+                  {event.title}
+               </Typography>
                {isOrganizer ? <EventMenu event={event} numberOfImages={numberOfImages} /> : null}
             </div>
          </section>
