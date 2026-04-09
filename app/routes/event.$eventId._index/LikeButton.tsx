@@ -10,16 +10,67 @@ import { cn } from "~/utils";
 import { LikeIconMapping } from "./LikeIconMapping";
 
 type Props = {
-   messageId: number;
+   targetId: number | string;
+   targetIdKey: "messageId" | "cloudId";
+   intent: "likeMessage" | "likeImage";
    likes: { type: string; userId: string }[];
    loggedInUserId: string;
    size: "normal" | "small";
    className?: string;
+   actionPath?: string;
+   inline?: boolean;
 };
 
-export const LikeButton = ({ messageId, loggedInUserId, likes, size, className }: Props) => {
+export const LikeButton = ({
+   targetId,
+   targetIdKey,
+   intent,
+   loggedInUserId,
+   likes,
+   size,
+   className,
+   actionPath,
+   inline = false,
+}: Props) => {
    const fetcher = useFetcher<typeof action>();
    const selectedLikeType = likes.find((like) => like.userId === loggedInUserId)?.type;
+
+   const submitLike = (type: string) => {
+      if (!type) {
+         void fetcher.submit(
+            { type: "thumbsUp", intent, [targetIdKey]: targetId },
+            { method: "DELETE", action: actionPath }
+         );
+      } else {
+         void fetcher.submit({ type, intent, [targetIdKey]: targetId }, { method: "POST", action: actionPath });
+      }
+   };
+
+   const reactionTypes = ["thumbsUp", "thumbsDown", "heart", "party", "cry", "angry", "haha"] as const;
+
+   if (inline) {
+      return (
+         <ToggleGroup
+            variant="default"
+            type="single"
+            aria-label="Velg type"
+            value={selectedLikeType}
+            onValueChange={submitLike}
+            className={cn(className)}
+            size={"sm"}
+         >
+            {reactionTypes.map((type) => {
+               const Icon = LikeIconMapping[type];
+               return (
+                  <ToggleGroupItem key={type} value={type} className="text-lg">
+                     {Icon}
+                  </ToggleGroupItem>
+               );
+            })}
+         </ToggleGroup>
+      );
+   }
+
    return (
       <>
          <Popover className={cn("relative", className)}>
@@ -41,18 +92,11 @@ export const LikeButton = ({ messageId, loggedInUserId, likes, size, className }
                      aria-label="Velg type"
                      value={selectedLikeType}
                      onValueChange={(type) => {
-                        if (!type) {
-                           void fetcher.submit(
-                              { type: "thumbsUp", intent: "likeMessage", messageId },
-                              { method: "DELETE" }
-                           );
-                        } else {
-                           void fetcher.submit({ type: type, intent: "likeMessage", messageId }, { method: "POST" });
-                        }
+                        submitLike(type);
                         close();
                      }}
                   >
-                     {(["thumbsUp", "thumbsDown", "heart", "party", "cry", "angry", "haha"] as const).map((type) => {
+                     {reactionTypes.map((type) => {
                         const Icon = LikeIconMapping[type];
                         return (
                            <ToggleGroupItem key={type} value={type} className="text-xl">

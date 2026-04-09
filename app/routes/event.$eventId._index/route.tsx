@@ -136,9 +136,13 @@ export default function EventActivities({
             Last opp bilder og video
          </Typography>
          <UploadMedia eventId={eventId} />
-         <CloudImageGallery cloudImages={cloudinaryImages.slice(0, 8)} />
+         <CloudImageGallery
+            cloudImages={cloudinaryImages.slice(0, 8)}
+            eventId={eventId}
+            loggedInUserId={loggedInUser.id}
+         />
          {cloudinaryImages.length ? (
-            <Button variant="outline" as={Link} to="images">
+            <Button variant="outline" as={Link} to="images" preventScrollReset>
                Se alle bilder
             </Button>
          ) : null}
@@ -168,7 +172,9 @@ export default function EventActivities({
                   </div>
                   <div>
                      <LikeButton
-                        messageId={message.id}
+                        targetId={message.id}
+                        targetIdKey="messageId"
+                        intent="likeMessage"
                         loggedInUserId={loggedInUser.id}
                         likes={message.likes}
                         size="normal"

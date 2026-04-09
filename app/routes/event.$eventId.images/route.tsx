@@ -123,7 +123,7 @@ export default function EventImages({ loaderData: { cloudinaryImages, event, log
                </fetcher.Form>
             </>
          ) : (
-            <CloudImageGallery cloudImages={cloudinaryImages} />
+            <CloudImageGallery cloudImages={cloudinaryImages} eventId={event.id} loggedInUserId={loggedInUser.id} />
          )}
       </div>
    );

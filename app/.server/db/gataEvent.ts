@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, exists, or, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, exists, inArray, or, sql } from "drizzle-orm";
 
 import { db } from "db/config.server";
 import {
@@ -9,6 +9,7 @@ import {
    eventParticipants,
    eventPolls,
    gataEvent,
+   imageLikes,
    messageLikes,
    messageReplies,
    messages,
@@ -177,7 +178,7 @@ export const insertAzureBlob = async (eventId: number, values: (typeof cloudinar
 };
 
 export const getEventCloudinaryImages = async (eventId: number) => {
-   return await db
+   const cloudImages = await db
       .select({
          cloudId: cloudinaryImage.cloudId,
          cloudUrl: cloudinaryImage.cloudUrl,
@@ -189,6 +190,54 @@ export const getEventCloudinaryImages = async (eventId: number) => {
       .innerJoin(cloudinaryImage, eq(cloudinaryImage.cloudId, eventCloudinaryImages.cloudId))
       .orderBy(desc(sql`${eventCloudinaryImages}.rowid`))
       .where(and(eq(eventCloudinaryImages.eventId, eventId), eq(cloudinaryImage.isDeleted, false)));
+
+   if (cloudImages.length === 0) {
+      return [];
+   }
+
+   const likes = await db.query.imageLikes.findMany({
+      where: inArray(
+         imageLikes.cloudId,
+         cloudImages.map((image) => image.cloudId)
+      ),
+      with: { user: { columns: { name: true, picture: true } } },
+   });
+
+   return cloudImages.map((image) => ({
+      ...image,
+      likes: likes.filter((like) => like.cloudId === image.cloudId),
+   }));
+};
+
+export const getEventCoverImageByHearts = async (eventId: number) => {
+   const cloudImages = await getEventCloudinaryImages(eventId);
+
+   // We only consider explicit heart reactions when picking the event cover image.
+   const withHeartCount = cloudImages.map((image) => ({
+      ...image,
+      heartCount: image.likes.filter((like) => like.type === "heart").length,
+   }));
+
+   const maxHeartCount = withHeartCount.reduce((max, image) => Math.max(max, image.heartCount), 0);
+   if (maxHeartCount === 0) {
+      return null;
+   }
+
+   // Images are returned newest-first. Reverse to prefer oldest when heart counts tie.
+   const oldestFirst = [...withHeartCount].reverse();
+   const coverImage = oldestFirst.find((image) => image.heartCount === maxHeartCount);
+
+   if (!coverImage) {
+      return null;
+   }
+
+   return {
+      cloudId: coverImage.cloudId,
+      cloudUrl: coverImage.cloudUrl,
+      width: coverImage.width,
+      height: coverImage.height,
+      type: coverImage.type,
+   };
 };
 
 export const deleteEventCloudinaryImage = async (cloudId: string) => {
@@ -285,4 +334,18 @@ export const insertMessageLike = async (userId: string, messageId: number, type:
 
 export const deleteMessageLike = async (userId: string, messageId: number) => {
    await db.delete(messageLikes).where(and(eq(messageLikes.messageId, messageId), eq(messageLikes.userId, userId)));
+};
+
+export const insertImageLike = async (userId: string, cloudId: string, type: string) => {
+   await db
+      .insert(imageLikes)
+      .values({ userId, cloudId, type })
+      .onConflictDoUpdate({
+         target: [imageLikes.cloudId, imageLikes.userId],
+         set: { userId, cloudId, type },
+      });
+};
+
+export const deleteImageLike = async (userId: string, imageId: string) => {
+   await db.delete(imageLikes).where(and(eq(imageLikes.cloudId, imageId), eq(imageLikes.userId, userId)));
 };

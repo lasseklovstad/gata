@@ -1,6 +1,5 @@
 import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
-import { Copy } from "lucide-react";
 import { useId } from "react";
 import { Outlet, redirect } from "react-router";
 import { z } from "zod";
@@ -9,18 +8,20 @@ import { zfd } from "zod-form-data";
 import { updateEventAndNotify, updateParticipatingAndNotify } from "~/.server/data-layer/gataEvent";
 import {
    deleteEvent,
+   deleteImageLike,
    getEvent,
+   getEventCoverImageByHearts,
    getEventParticipants,
    getNumberOfImages,
+   insertImageLike,
    updateOrganizers,
 } from "~/.server/db/gataEvent";
 import { getUsers } from "~/.server/db/user";
 import { PageLayout } from "~/components/PageLayout";
 import { TabNavLink } from "~/components/TabNavLink";
-import { Button } from "~/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
 import { Typography } from "~/components/ui/typography";
 import { getRequiredUser } from "~/utils/auth.server";
+import { transformCloudflare } from "~/utils/file.utils";
 import { isUserOrganizer } from "~/utils/gataEventUtils";
 import { badRequest } from "~/utils/responseUtils";
 import { transformErrorResponse } from "~/utils/validateUtils";
@@ -29,7 +30,7 @@ import type { Route } from "./+types/route";
 import { AttendingSelect } from "./AttendingSelect";
 import { EventMenu } from "./EventMenu";
 import { EventOrganizers } from "./EventOrganizers";
-import { eventSchema } from "../../utils/schemas/eventSchema";
+import { eventSchema, likeImageSchema } from "../../utils/schemas/eventSchema";
 
 export const meta = ({ data }: Route.MetaArgs) => {
    return [{ title: `${data.event.title} - Gata` }];
@@ -38,13 +39,14 @@ export const meta = ({ data }: Route.MetaArgs) => {
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
    const loggedInUser = await getRequiredUser(request);
    const eventId = z.coerce.number().parse(params.eventId);
-   const [event, users, numberOfImages, eventParticipants] = await Promise.all([
+   const [event, users, numberOfImages, eventParticipants, coverImage] = await Promise.all([
       getEvent(eventId),
       getUsers(),
       getNumberOfImages(eventId),
       getEventParticipants(eventId),
+      getEventCoverImageByHearts(eventId),
    ]);
-   return { event, loggedInUser, users, numberOfImages, eventParticipants };
+   return { event, loggedInUser, users, numberOfImages, eventParticipants, coverImage };
 };
 
 const organizersUpdateSchema = zfd.formData({
@@ -59,12 +61,22 @@ const updateParticipatingSchema = zfd.formData({
 export const action = async ({ request, params }: Route.ActionArgs) => {
    const eventId = z.coerce.number().parse(params.eventId);
    const loggedInUser = await getRequiredUser(request);
-   const formdata = await request.formData();
-   const intent = formdata.get("intent") as string;
+   const formData = await request.formData();
+   const intent = formData.get("intent") as string;
    const event = await getEvent(eventId);
    if (intent === "updateParticipating") {
-      const { status, subscribed } = updateParticipatingSchema.parse(formdata);
+      const { status, subscribed } = updateParticipatingSchema.parse(formData);
       await updateParticipatingAndNotify(loggedInUser, eventId, status, !subscribed);
+      return { ok: true };
+   }
+
+   if (intent === "likeImage") {
+      const { cloudId, type } = likeImageSchema.parse(formData);
+      if (request.method === "POST") {
+         await insertImageLike(loggedInUser.id, cloudId, type);
+      } else {
+         await deleteImageLike(loggedInUser.id, cloudId);
+      }
       return { ok: true };
    }
 
@@ -78,7 +90,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
    }
 
    if (intent === "updateEvent") {
-      const updateEventForm = eventSchema.safeParse(formdata);
+      const updateEventForm = eventSchema.safeParse(formData);
       if (!updateEventForm.success) {
          return transformErrorResponse(updateEventForm.error);
       }
@@ -88,7 +100,7 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
       return { ok: true };
    }
    if (intent === "updateOrganizers") {
-      const { organizers } = organizersUpdateSchema.parse(formdata);
+      const { organizers } = organizersUpdateSchema.parse(formData);
       if (organizers.length === 0) {
          throw badRequest("Det må være en arrangør");
       }
@@ -103,40 +115,47 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
 };
 
 export default function EventPage({
-   loaderData: { event, loggedInUser, users, numberOfImages, eventParticipants },
+   loaderData: { event, loggedInUser, users, numberOfImages, eventParticipants, coverImage },
 }: Route.ComponentProps) {
    const descriptionTitleId = useId();
    const organizers = users.filter((user) => event.organizers.find((organizer) => organizer.userId === user.id));
+   const coverBackgroundImage =
+      coverImage && !coverImage.type?.startsWith("video")
+         ? `url(${transformCloudflare(coverImage.cloudUrl, 1600)})`
+         : null;
 
    const isOrganizer = isUserOrganizer(event, loggedInUser);
 
    return (
       <PageLayout>
-         <div className="flex justify-between items-center mb-4">
-            <div className="flex">
-               <Typography variant="h1">{event.title}</Typography>
-               <TooltipProvider>
-                  <Tooltip>
-                     <TooltipTrigger asChild>
-                        <Button
-                           size="icon"
-                           variant="ghost"
-                           onClick={() => {
-                              void navigator.clipboard.writeText(`${location.origin}/event/${event.id}/public`);
-                           }}
-                        >
-                           <span className="sr-only">Kopier link for å dele</span>
-                           <Copy />
-                        </Button>
-                     </TooltipTrigger>
-                     <TooltipContent>
-                        <Typography>Kopier link for å dele</Typography>
-                     </TooltipContent>
-                  </Tooltip>
-               </TooltipProvider>
+         <section className="relative mb-4 min-h-56 overflow-hidden rounded-xl border md:min-h-72">
+            {coverBackgroundImage ? (
+               <>
+                  <div
+                     className="absolute inset-0 bg-cover bg-center"
+                     style={{ backgroundImage: coverBackgroundImage }}
+                     aria-hidden
+                  />
+                  <div
+                     className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-black/45"
+                     aria-hidden
+                  />
+               </>
+            ) : (
+               <div
+                  className="absolute inset-0 bg-gradient-to-br from-slate-700 via-slate-600 to-slate-800"
+                  aria-hidden
+               />
+            )}
+
+            <div className="relative z-10 flex min-h-56 items-start justify-between p-4 text-white md:min-h-72 md:p-6">
+               <Typography variant="h1" className="text-white drop-shadow-sm">
+                  {event.title}
+               </Typography>
+               {isOrganizer ? <EventMenu event={event} numberOfImages={numberOfImages} /> : null}
             </div>
-            {isOrganizer ? <EventMenu event={event} numberOfImages={numberOfImages} /> : null}
-         </div>
+         </section>
+
          {isOrganizer ? <EventOrganizers users={users} organizers={organizers} /> : null}
 
          <div className="space-y-4">
