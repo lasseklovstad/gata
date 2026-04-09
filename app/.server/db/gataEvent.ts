@@ -209,6 +209,37 @@ export const getEventCloudinaryImages = async (eventId: number) => {
    }));
 };
 
+export const getEventCoverImageByHearts = async (eventId: number) => {
+   const cloudImages = await getEventCloudinaryImages(eventId);
+
+   // We only consider explicit heart reactions when picking the event cover image.
+   const withHeartCount = cloudImages.map((image) => ({
+      ...image,
+      heartCount: image.likes.filter((like) => like.type === "heart").length,
+   }));
+
+   const maxHeartCount = withHeartCount.reduce((max, image) => Math.max(max, image.heartCount), 0);
+   if (maxHeartCount === 0) {
+      return null;
+   }
+
+   // Images are returned newest-first. Reverse to prefer oldest when heart counts tie.
+   const oldestFirst = [...withHeartCount].reverse();
+   const coverImage = oldestFirst.find((image) => image.heartCount === maxHeartCount);
+
+   if (!coverImage) {
+      return null;
+   }
+
+   return {
+      cloudId: coverImage.cloudId,
+      cloudUrl: coverImage.cloudUrl,
+      width: coverImage.width,
+      height: coverImage.height,
+      type: coverImage.type,
+   };
+};
+
 export const deleteEventCloudinaryImage = async (cloudId: string) => {
    await db.update(cloudinaryImage).set({ isDeleted: true }).where(eq(cloudinaryImage.cloudId, cloudId));
 };
