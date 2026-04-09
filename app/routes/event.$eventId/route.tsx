@@ -1,6 +1,5 @@
 import { formatDate } from "date-fns";
 import { nb } from "date-fns/locale";
-import { Copy } from "lucide-react";
 import { useId } from "react";
 import { Outlet, redirect } from "react-router";
 import { z } from "zod";
@@ -20,8 +19,6 @@ import {
 import { getUsers } from "~/.server/db/user";
 import { PageLayout } from "~/components/PageLayout";
 import { TabNavLink } from "~/components/TabNavLink";
-import { Button } from "~/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
 import { Typography } from "~/components/ui/typography";
 import { getRequiredUser } from "~/utils/auth.server";
 import { transformCloudflare } from "~/utils/file.utils";
