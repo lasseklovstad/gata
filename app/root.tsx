@@ -20,6 +20,7 @@ import {
    ScrollRestoration,
    isRouteErrorResponse,
    useLoaderData,
+   useNavigate,
    useRouteLoaderData,
 } from "react-router";
 import { z } from "zod";
@@ -175,6 +176,22 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
 export default function App({ loaderData: { auth0User, loggedInUser, ENV } }: Route.ComponentProps) {
    useRevalidateOnFocus();
+   const navigate = useNavigate();
+
+   useEffect(() => {
+      function onServiceWorkerNavigation(event: WindowEventMap["sw-notification-navigate"]) {
+         const { url } = event.detail;
+         try {
+            const parsedUrl = new URL(url, window.location.origin);
+            void navigate(`${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`);
+         } catch {
+            console.error("Invalid service worker navigation URL", url);
+         }
+      }
+
+      window.addEventListener("sw-notification-navigate", onServiceWorkerNavigation);
+      return () => window.removeEventListener("sw-notification-navigate", onServiceWorkerNavigation);
+   }, [navigate]);
 
    return (
       <PushSubscriptionProvider pwaPublicKey={ENV.PWA_PUBLIC_KEY}>

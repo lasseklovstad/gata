@@ -1,5 +1,5 @@
 import { Image, Vote } from "lucide-react";
-import { useEffect, useId } from "react";
+import { useEffect, useId, useMemo } from "react";
 import { Link, useSearchParams } from "react-router";
 import { z } from "zod";
 
@@ -101,14 +101,42 @@ export default function EventActivities({
    const [searchParams] = useSearchParams();
    const activePollsTitleId = useId();
    const activePolls = polls.filter((p) => p.poll.isActive);
+   const messageRenderSignature = useMemo(
+      () => messages.flatMap(({ message }) => [message.id, ...message.replies.map(({ reply }) => reply.id)]).join(","),
+      [messages]
+   );
 
    const focusMessageId = searchParams.get("messageId");
    useEffect(() => {
-      // Focus message when a user has clicked notification
-      if (focusMessageId) {
-         document.getElementById(`message-${focusMessageId}`)?.scrollIntoView();
+      if (!focusMessageId) {
+         return;
       }
-   }, [focusMessageId]);
+
+      let attempts = 0;
+      let animationFrameId = 0;
+      const maxAttempts = 20;
+
+      function focusMessageElement() {
+         const messageElement = document.getElementById(`message-${focusMessageId}`);
+         if (messageElement) {
+            messageElement.scrollIntoView({ block: "center" });
+            return;
+         }
+
+         if (attempts >= maxAttempts) {
+            return;
+         }
+
+         attempts += 1;
+         animationFrameId = window.requestAnimationFrame(focusMessageElement);
+      }
+
+      animationFrameId = window.requestAnimationFrame(focusMessageElement);
+
+      return () => {
+         window.cancelAnimationFrame(animationFrameId);
+      };
+   }, [focusMessageId, messageRenderSignature]);
 
    return (
       <div className="flex flex-col gap-4 items-start">

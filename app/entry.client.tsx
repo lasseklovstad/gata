@@ -3,6 +3,12 @@ import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { HydratedRouter } from "react-router/dom";
 
+declare global {
+   interface WindowEventMap {
+      "sw-notification-navigate": CustomEvent<{ url: string }>;
+   }
+}
+
 if ("serviceWorker" in navigator) {
    navigator.serviceWorker
       .register("/sw.js")
@@ -13,11 +19,12 @@ if ("serviceWorker" in navigator) {
          console.error("Service Worker registration failed:", error);
       });
 
-   // Listen to service worker messages sent via postMessage()
-   navigator.serviceWorker.addEventListener("message", (event: MessageEvent<{ url: string }>) => {
-      if ("url" in event.data) {
-         window.location.href = event.data.url;
+   // Forward service-worker notification URLs to app-level router navigation.
+   navigator.serviceWorker.addEventListener("message", (event: MessageEvent<{ url?: unknown }>) => {
+      if (typeof event.data?.url !== "string") {
+         return;
       }
+      window.dispatchEvent(new CustomEvent("sw-notification-navigate", { detail: { url: event.data.url } }));
    });
 }
 
