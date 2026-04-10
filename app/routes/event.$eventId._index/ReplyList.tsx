@@ -93,7 +93,11 @@ function getTimeDifference(dateString: string) {
 
    const duration = intervalToDuration({ start: getDateWithTimeZone(dateString), end: now });
 
-   if (duration.days && duration.days > 0) {
+   if (duration.years && duration.years > 0) {
+      return `${duration.years} år siden`;
+   } else if (duration.months && duration.months > 0) {
+      return `${duration.months} måneder siden`;
+   } else if (duration.days && duration.days > 0) {
       return `${duration.days} dager siden`;
    } else if (duration.hours && duration.hours > 0) {
       return `${duration.hours} timer siden`;
