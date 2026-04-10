@@ -38,6 +38,52 @@ import { profileSchema } from "./utils/schemas/profileSchema";
 import { useRevalidateOnFocus } from "./utils/useRevalidateOnFocus";
 import { transformErrorResponse } from "./utils/validateUtils";
 
+declare global {
+   interface Window {
+      __swNotificationNavigateListenerReady?: boolean;
+      __swNotificationPendingUrls?: string[];
+   }
+}
+
+const SW_NOTIFICATION_PENDING_URLS_STORAGE_KEY = "sw-notification-pending-urls";
+
+function readPendingUrlsFromStorage() {
+   try {
+      const raw = sessionStorage.getItem(SW_NOTIFICATION_PENDING_URLS_STORAGE_KEY);
+      if (!raw) {
+         return [];
+      }
+      const parsed: unknown = JSON.parse(raw);
+      if (!Array.isArray(parsed)) {
+         return [];
+      }
+      return parsed.filter((value): value is string => typeof value === "string");
+   } catch {
+      return [];
+   }
+}
+
+function writePendingUrlsToStorage(urls: string[]) {
+   try {
+      if (urls.length === 0) {
+         sessionStorage.removeItem(SW_NOTIFICATION_PENDING_URLS_STORAGE_KEY);
+         return;
+      }
+      sessionStorage.setItem(SW_NOTIFICATION_PENDING_URLS_STORAGE_KEY, JSON.stringify(urls));
+   } catch {
+      // Ignore storage failures; in-memory buffering still handles this session.
+   }
+}
+
+function consumePendingNotificationUrls() {
+   const inMemoryUrls = window.__swNotificationPendingUrls ?? [];
+   const persistedUrls = readPendingUrlsFromStorage();
+   const pendingUrls = [...inMemoryUrls, ...persistedUrls];
+   window.__swNotificationPendingUrls = [];
+   writePendingUrlsToStorage([]);
+   return pendingUrls;
+}
+
 export const meta: MetaFunction = () => {
    return [
       {
@@ -179,8 +225,7 @@ export default function App({ loaderData: { auth0User, loggedInUser, ENV } }: Ro
    const navigate = useNavigate();
 
    useEffect(() => {
-      function onServiceWorkerNavigation(event: WindowEventMap["sw-notification-navigate"]) {
-         const { url } = event.detail;
+      function navigateFromServiceWorkerUrl(url: string) {
          try {
             const parsedUrl = new URL(url, window.location.origin);
             void navigate(`${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`);
@@ -189,8 +234,22 @@ export default function App({ loaderData: { auth0User, loggedInUser, ENV } }: Ro
          }
       }
 
+      function onServiceWorkerNavigation(event: WindowEventMap["sw-notification-navigate"]) {
+         navigateFromServiceWorkerUrl(event.detail.url);
+      }
+
       window.addEventListener("sw-notification-navigate", onServiceWorkerNavigation);
-      return () => window.removeEventListener("sw-notification-navigate", onServiceWorkerNavigation);
+      window.__swNotificationNavigateListenerReady = true;
+
+      const pendingUrls = consumePendingNotificationUrls();
+      for (const pendingUrl of pendingUrls) {
+         navigateFromServiceWorkerUrl(pendingUrl);
+      }
+
+      return () => {
+         window.__swNotificationNavigateListenerReady = false;
+         window.removeEventListener("sw-notification-navigate", onServiceWorkerNavigation);
+      };
    }, [navigate]);
 
    return (
