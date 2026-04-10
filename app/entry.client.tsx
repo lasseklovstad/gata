@@ -21,6 +21,7 @@ if ("serviceWorker" in navigator) {
 
    // Forward service-worker notification URLs to app-level router navigation.
    navigator.serviceWorker.addEventListener("message", (event: MessageEvent<{ url?: unknown }>) => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (typeof event.data?.url !== "string") {
          return;
       }
