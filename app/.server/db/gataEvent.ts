@@ -246,7 +246,11 @@ export const deleteEventCloudinaryImage = async (cloudId: string) => {
 
 export const getNumberOfImages = async (eventId: number) => {
    return (
-      await db.select({ count: count() }).from(eventCloudinaryImages).where(eq(eventCloudinaryImages.eventId, eventId))
+      await db
+         .select({ count: count() })
+         .from(eventCloudinaryImages)
+         .innerJoin(cloudinaryImage, eq(cloudinaryImage.cloudId, eventCloudinaryImages.cloudId))
+         .where(and(eq(eventCloudinaryImages.eventId, eventId), eq(cloudinaryImage.isDeleted, false)))
    )[0].count;
 };
 
