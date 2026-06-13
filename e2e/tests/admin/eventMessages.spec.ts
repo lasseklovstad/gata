@@ -105,6 +105,9 @@ test.describe("Events (Admin created)", () => {
          await eventPage.openMenu("Rediger");
          await eventFormPage.selectVisibility("Alle");
          await eventFormPage.submit();
+         // Wait for the edit to commit before the member navigates; the dialog only
+         // closes once the update request has succeeded.
+         await expect(adminPage.getByRole("dialog", { name: "Rediger arrangement" })).toBeHidden();
       });
 
       await test.step("Member should now have access to all hidden events", async () => {
