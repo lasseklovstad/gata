@@ -11,6 +11,12 @@ interface Auth0StrategyOptions {
    organization?: string;
    invitation?: string;
    connection?: string;
+   /**
+    * Options for the cookie that stores the OAuth2 `state` and PKCE code verifier
+    * between the authorize redirect and the `/callback` request. Forwarded to the
+    * underlying {@link OAuth2Strategy}.
+    */
+   cookie?: OAuth2Strategy.ConstructorOptions["cookie"];
 }
 
 interface Auth0Profile {
@@ -83,6 +89,7 @@ export class Auth0Strategy<User> extends OAuth2Strategy<User> {
             clientId: options.clientId,
             clientSecret: options.clientSecret,
             redirectURI: options.redirectURI,
+            cookie: options.cookie,
          },
          async (verifyOptions) => {
             const profile = await this.userProfile(verifyOptions.tokens.accessToken());
