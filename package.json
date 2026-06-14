@@ -61,7 +61,7 @@
     "react-map-gl": "^8.1.0",
     "react-router": "7.10.0",
     "remix-auth": "4.2.0",
-    "remix-auth-oauth2": "3.4.1",
+    "remix-auth-auth0": "2.2.0",
     "remix-utils": "9.0.0",
     "slate": "0.112.0",
     "slate-history": "0.110.3",
