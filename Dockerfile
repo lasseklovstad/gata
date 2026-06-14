@@ -15,13 +15,13 @@ ENV COMMIT_SHA=$COMMIT_SHA
 
 FROM base AS production-deps
 WORKDIR /app
-ADD package.json pnpm-lock.yaml ./
+ADD package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm i --prod --frozen-lockfile
 
 
 # Throw-away build stage to reduce size of final image
 FROM base as build
-ADD package.json pnpm-lock.yaml ./
+ADD package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm i --frozen-lockfile
 # Copy application code
 COPY --link . .

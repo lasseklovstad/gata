@@ -105,12 +105,17 @@ export const UserMenu = ({ roleText, isAuthenticated, loggedInUser }: UserMenuPr
             </>
          )}
          {!isAuthenticated && (
-            <Form method="POST" action="/login">
+            /* reloadDocument forces a full-document POST so the browser commits the
+               remix-auth `oauth2` state cookie before navigating to Auth0. Without it the
+               Set-Cookie rides a single-fetch `.data` response and isn't persisted in time,
+               causing "Missing state on cookie" at /callback on the first login attempt. */
+            <Form method="POST" action="/login" reloadDocument>
                <Button type="submit">Logg inn</Button>
             </Form>
          )}
          {loggedInUser ? (
             <Dialog ref={editProfileDialog.dialogRef}>
+               v
                <fetcher.Form
                   ref={formRef}
                   onReset={handleReset}

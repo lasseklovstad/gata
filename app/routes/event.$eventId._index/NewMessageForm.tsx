@@ -23,7 +23,7 @@ export const NewMessageForm = ({ usersWithSubscription }: Props) => {
       if (fetcher.state === "idle" && fetcher.data?.ok) {
          setValue("");
       }
-   }, [fetcher]);
+   }, [fetcher.state, fetcher.data?.ok]);
 
    return (
       <fetcher.Form className="w-full space-y-2" method="POST" ref={formRef}>

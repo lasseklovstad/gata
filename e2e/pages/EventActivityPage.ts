@@ -13,6 +13,12 @@ export const EventActivityPage = (page: Page) => {
       await inputNewPost.fill(message);
       await buttonPublishNewPost.click();
       await expect(inputNewPost).toHaveValue("");
+      // Don't return until the post has actually rendered in the list. The cleared
+      // textarea only proves the action returned, not that the loader revalidated.
+      // Without this, a rapid second createNewPost races the first post's in-flight
+      // revalidation (fetcher load + SSE-triggered revalidate), which intermittently
+      // drops the newer post on slow CI runners.
+      await expect(getPostListItem(message)).toBeVisible();
    };
 
    const getPostListItem = (message: string) => {
