@@ -34,6 +34,22 @@ const auth0Strategy = new Auth0Strategy(
       audience: process.env.AUTH0_AUDIENCE,
       clientSecret: process.env.AUTH0_CLIENT_SECRET,
       domain: process.env.AUTH0_DOMAIN,
+      // The OAuth2 state/PKCE cookie must survive the cross-site round-trip to
+      // Auth0 and back to /callback. SameSite=None (with Secure) lets the browser
+      // send it on the cross-site return; the `state` value itself is the CSRF
+      // guard. We also set an explicit name to avoid the library default of
+      // `oauth2:<uuid>` (a colon is not a valid cookie-name token).
+      cookie: {
+         name: "gata_oauth2",
+         path: "/",
+         maxAge: 60 * 5,
+         httpOnly: true,
+         // SameSite=None requires Secure, so they're paired. In dev (http localhost)
+         // we fall back to Lax without Secure.
+         ...(process.env.NODE_ENV === "production"
+            ? ({ secure: true, sameSite: "None" } as const)
+            : ({ sameSite: "Lax" } as const)),
+      },
    },
    ({ profile }) => {
       const id = profile.id;
