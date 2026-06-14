@@ -1,10 +1,10 @@
 import { createCookie, createCookieSessionStorage, redirect } from "react-router";
 import { Authenticator } from "remix-auth";
+import { Auth0Strategy } from "remix-auth-auth0";
 
 import { getOptionalUserFromExternalUserId } from "~/.server/db/user";
 import type { Auth0User } from "~/types/Auth0User";
 
-import { Auth0Strategy } from "./auth0";
 import type { RoleName } from "./roleUtils";
 
 type UserPreference = {
@@ -27,49 +27,52 @@ export const sessionStorage = createCookieSessionStorage<{ user: Auth0User }>({
 
 const authenticator = new Authenticator<Auth0User>();
 
-const auth0Strategy = new Auth0Strategy(
+/**
+ * The OpenID Connect claims we read off the Auth0 `/userinfo` endpoint.
+ * @see https://auth0.com/docs/get-started/apis/scopes/openid-connect-scopes#standard-claims
+ */
+type Auth0UserInfo = {
+   sub?: string;
+   name?: string;
+   email?: string;
+   picture?: string;
+};
+
+// `remix-auth-auth0` hands the verify callback the OAuth2 tokens but does not
+// fetch the user profile for us, so we call the `/userinfo` endpoint ourselves
+// (this is what the previous custom strategy did under the hood).
+const fetchUserProfile = async (accessToken: string): Promise<Auth0User> => {
+   const response = await fetch(`https://${process.env.AUTH0_DOMAIN}/userinfo`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+   });
+   if (!response.ok) {
+      throw new Error(`Klarte ikke hente brukerprofil fra Auth0 (status ${response.status})`);
+   }
+   const data = (await response.json()) as Auth0UserInfo;
+   if (!data.sub) {
+      throw new Error("Bruker har ikke id!");
+   }
+   if (!data.email) {
+      throw new Error("Bruker har ikke email!");
+   }
+   return {
+      id: data.sub,
+      email: data.email,
+      name: data.name,
+      photo: data.picture,
+   };
+};
+
+const auth0Strategy = new Auth0Strategy<Auth0User>(
    {
       redirectURI: process.env.AUTH0_CALLBACK,
       clientId: process.env.AUTH0_CLIENT_ID,
       audience: process.env.AUTH0_AUDIENCE,
       clientSecret: process.env.AUTH0_CLIENT_SECRET,
       domain: process.env.AUTH0_DOMAIN,
-      // The OAuth2 state/PKCE cookie must survive the cross-site round-trip to
-      // Auth0 and back to /callback. SameSite=None (with Secure) lets the browser
-      // send it on the cross-site return; the `state` value itself is the CSRF
-      // guard. We also set an explicit name to avoid the library default of
-      // `oauth2:<uuid>` (a colon is not a valid cookie-name token).
-      cookie: {
-         name: "gata_oauth2",
-         path: "/",
-         maxAge: 60 * 5,
-         httpOnly: true,
-         // SameSite=None requires Secure, so they're paired. In dev (http localhost)
-         // we fall back to Lax without Secure.
-         ...(process.env.NODE_ENV === "production"
-            ? ({ secure: true, sameSite: "None" } as const)
-            : ({ sameSite: "Lax" } as const)),
-      },
+      scopes: ["openid", "profile", "email"],
    },
-   ({ profile }) => {
-      const id = profile.id;
-      const email = profile.emails ? profile.emails[0]?.value : undefined;
-      if (!id) {
-         throw new Error("Bruker har ikke id!");
-      }
-      if (!email) {
-         throw new Error("Bruker har ikke email!");
-      }
-      // Get the user data from your DB or API using the tokens and profile
-      const user = {
-         email,
-         id,
-         photo: profile.photos ? profile.photos[0]?.value : undefined,
-         name: profile.displayName,
-      };
-
-      return Promise.resolve(user);
-   }
+   ({ tokens }) => fetchUserProfile(tokens.accessToken())
 );
 
 authenticator.use(auth0Strategy);

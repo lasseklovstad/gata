@@ -110,9 +110,9 @@ importers:
       remix-auth:
         specifier: 4.2.0
         version: 4.2.0
-      remix-auth-oauth2:
-        specifier: 3.4.1
-        version: 3.4.1(remix-auth@4.2.0)
+      remix-auth-auth0:
+        specifier: 2.2.0
+        version: 2.2.0(remix-auth@4.2.0)
       remix-utils:
         specifier: 9.0.0
         version: 9.0.0(@oslojs/crypto@1.0.1)(@oslojs/encoding@1.1.0)(@standard-schema/spec@1.0.0)(react-router@7.10.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
@@ -396,10 +396,6 @@ packages:
 
   '@drizzle-team/brocli@0.10.2':
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
-
-  '@edgefirst-dev/data@0.0.4':
-    resolution: {integrity: sha512-VLhlvEPDJ0Sd0pE6sAYTQkIqZCXVonaWlgRJIQQHzfjTXCadF77qqHj5NxaPSc4wCul0DJO/0MnejVqJAXUiRg==}
-    engines: {node: '>=20.0.0'}
 
   '@emnapi/core@1.7.1':
     resolution: {integrity: sha512-o1uhUASyo921r2XtHYOHy7gdkGLge8ghBEQHMWmyJFoXlpU58kIrhhN3w26lpQb6dspetweapMn2CSNwQ8I4wg==}
@@ -2783,8 +2779,8 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  arctic@3.7.0:
-    resolution: {integrity: sha512-ZMQ+f6VazDgUJOd+qNV+H7GohNSYal1mVjm5kEaZfE2Ifb7Ss70w+Q7xpJC87qZDkMZIXYf0pTIYZA0OPasSbw==}
+  arctic@3.6.0:
+    resolution: {integrity: sha512-egHDsCqEacb6oSHz5QSSxNhp07J+QJwJdPvs0katL+mNM5LaGQVqxmcdq1KwfaSNSAlVumBBs0MRExS88TxbMg==}
 
   arg@5.0.2:
     resolution: {integrity: sha512-PYjyFOLKQ9y57JvQ6QLo8dAgNqswh8M1RMJYdQduT6xbWSgK36P/Z/v+p888pM69jMMfS8Xd8F6I1kQ/I9HUGg==}
@@ -3148,6 +3144,15 @@ packages:
 
   debug@4.3.7:
     resolution: {integrity: sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==}
+    engines: {node: '>=6.0'}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+
+  debug@4.4.0:
+    resolution: {integrity: sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==}
     engines: {node: '>=6.0'}
     peerDependencies:
       supports-color: '*'
@@ -4885,9 +4890,9 @@ packages:
     resolution: {integrity: sha512-dYqgNSZbDwkaJ2ceRd9ojCGjBq+mOm9LmtXnAnEGyHhN/5R7iDW2TRw3h+o/jCFxus3P2LfWIIiwowAjANm7IA==}
     engines: {node: '>= 0.4'}
 
-  remix-auth-oauth2@3.4.1:
-    resolution: {integrity: sha512-ZhGon1czdIsOw1/O9EcTCzapZB6FpT3u9vtXSVeEMwGNs+iWljRsibnUC1RtwJbzzCdLBSwIXTNTbiRmLZ4cZw==}
-    engines: {node: ^20.0.0 || >=20.0.0}
+  remix-auth-auth0@2.2.0:
+    resolution: {integrity: sha512-2cAhMRRPLPB2lKxlDTvuJANnUlkK3jBFAHC4scmuajb4pwHENHPw+iB+O7QwB9nZAZD8ied8By+wb4JFPS7fhg==}
+    engines: {node: ^18.0.0 || ^20.0.0 || >=20.0.0}
     peerDependencies:
       remix-auth: ^4.0.0
 
@@ -5941,8 +5946,6 @@ snapshots:
   '@date-fns/tz@1.4.1': {}
 
   '@drizzle-team/brocli@0.10.2': {}
-
-  '@edgefirst-dev/data@0.0.4': {}
 
   '@emnapi/core@1.7.1':
     dependencies:
@@ -8054,7 +8057,7 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  arctic@3.7.0:
+  arctic@3.6.0:
     dependencies:
       '@oslojs/crypto': 1.0.1
       '@oslojs/encoding': 1.1.0
@@ -8500,6 +8503,10 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
+  debug@4.4.0:
+    dependencies:
+      ms: 2.1.3
+
   debug@4.4.3:
     dependencies:
       ms: 2.1.3
@@ -8781,7 +8788,7 @@ snapshots:
 
   esbuild-register@3.5.0(esbuild@0.19.12):
     dependencies:
-      debug: 4.3.7
+      debug: 4.4.3
       esbuild: 0.19.12
     transitivePeerDependencies:
       - supports-color
@@ -10435,12 +10442,14 @@ snapshots:
       gopd: 1.2.0
       set-function-name: 2.0.2
 
-  remix-auth-oauth2@3.4.1(remix-auth@4.2.0):
+  remix-auth-auth0@2.2.0(remix-auth@4.2.0):
     dependencies:
-      '@edgefirst-dev/data': 0.0.4
       '@mjackson/headers': 0.10.0
-      arctic: 3.7.0
+      arctic: 3.6.0
+      debug: 4.4.0
       remix-auth: 4.2.0
+    transitivePeerDependencies:
+      - supports-color
 
   remix-auth@4.2.0: {}
 
