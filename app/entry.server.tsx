@@ -17,5 +17,7 @@ const handleRequest = Sentry.createSentryHandleRequest({
 export default handleRequest;
 
 export const handleError = Sentry.createSentryHandleError({
-   logErrors: false,
+   // TEMPORARY: surface uncaught server errors (e.g. the flaky 500 on the
+   // likeMessage action) in CI stdout. Revert to false once the stack is captured.
+   logErrors: true,
 });
