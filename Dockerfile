@@ -45,6 +45,10 @@ COPY --from=build /app/server.mjs /app/server.mjs
 COPY --from=build /app/migrations /app/migrations
 
 RUN mkdir /data
-# Start the server by default, this can be overwritten at runtime
+# Start the server by default, this can be overwritten at runtime.
+# Invoke node directly instead of `pnpm run start`: pnpm verifies deps before
+# running a script and, because node_modules here is a --prod-only install,
+# it would trigger a full reinstall (incl. devDependencies) at boot and the
+# server would never bind to 3000.
 EXPOSE 3000
-CMD [ "pnpm", "run", "start" ]
+CMD [ "node", "--import", "./instrument.server.mjs", "./server.mjs" ]
