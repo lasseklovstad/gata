@@ -134,6 +134,13 @@
       "when": 1775555485919,
       "tag": "0018_right_skreet",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "6",
+      "when": 1781809932907,
+      "tag": "0019_noisy_sabretooth",
+      "breakpoints": true
     }
   ]
 }
