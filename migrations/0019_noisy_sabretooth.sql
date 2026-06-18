@@ -1,0 +1,1 @@
+ALTER TABLE `external_user` RENAME COLUMN "last_login" TO "last_seen";

@@ -86,7 +86,7 @@ export const getResponsibilityYears = (userId: string) => {
 export const insertOrUpdateExternalUser = async ({ email, id, name, photo }: Auth0User) => {
    const values = {
       email,
-      lastLogin: sql`(CURRENT_TIMESTAMP)`,
+      lastSeen: sql`(CURRENT_TIMESTAMP)`,
       name: name ?? email,
       picture: photo,
    };
@@ -98,6 +98,18 @@ export const insertOrUpdateExternalUser = async ({ email, id, name, photo }: Aut
       })
       .onConflictDoUpdate({ target: externalUser.id, set: values })
       .returning({ id: externalUser.id });
+};
+
+/**
+ * Records that an external user was active. Called from the root loader on every
+ * page load, since the 400-day session cookie means actual logins are rare.
+ * A no-op (0 rows) if the external user no longer exists.
+ */
+export const updateExternalUserLastSeen = async (externalUserId: string) => {
+   await db
+      .update(externalUser)
+      .set({ lastSeen: sql`(CURRENT_TIMESTAMP)` })
+      .where(eq(externalUser.id, externalUserId));
 };
 
 export const getNumberOfAdmins = async () => {

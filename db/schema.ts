@@ -19,7 +19,7 @@ export const externalUser = sqliteTable("external_user", {
    name: text("name").notNull(),
    email: text("email").notNull(),
    picture: text("picture"),
-   lastLogin: text("last_login").notNull(),
+   lastSeen: text("last_seen").notNull(),
    userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
 });
 

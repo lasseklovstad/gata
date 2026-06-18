@@ -25,7 +25,12 @@ import {
 import { z } from "zod";
 
 import type { Route } from "./+types/root";
-import { getOptionalUserFromExternalUserId, getUserByName, updateUser } from "./.server/db/user";
+import {
+   getOptionalUserFromExternalUserId,
+   getUserByName,
+   updateExternalUserLastSeen,
+   updateUser,
+} from "./.server/db/user";
 import { PushSubscriptionProvider } from "./components/PushSubscriptionContext";
 import { ResponsiveAppBar } from "./components/ResponsiveAppBar/ResponsiveAppBar";
 import { Button } from "./components/ui/button";
@@ -113,6 +118,11 @@ export function Layout({ children }: ComponentProps<never>) {
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
    const auth0User = await getUserSession(request);
+   if (auth0User) {
+      // Record activity here rather than on login: the 400-day session cookie
+      // means actual logins are rare, so this is what keeps "Sist aktiv" fresh.
+      await updateExternalUserLastSeen(auth0User.id);
+   }
    const loggedInUser = auth0User ? (await getOptionalUserFromExternalUserId(auth0User.id)) || undefined : undefined;
 
    return {
