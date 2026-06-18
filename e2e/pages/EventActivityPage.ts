@@ -28,7 +28,7 @@ export const EventActivityPage = (page: Page) => {
    const likePost = async (message: string, type: Like["type"]) => {
       const listItem = getPostListItem(message);
       await listItem.getByRole("button", { name: "Liker" }).click();
-      const likePopover = page.getByRole("group", { name: "Velg type" });
+      const likePopover = page.getByRole("radiogroup", { name: "Velg type" });
       await expect(likePopover).toBeVisible();
       await likePopover.getByRole("radio", { name: type }).click();
       await expect(likePopover).toBeHidden();
