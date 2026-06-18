@@ -193,6 +193,15 @@
   dialog:modal {
     margin: auto;
   }
+
+  /*
+     Tailwind v4 changed the default button cursor to `default`. Restore the
+     v3 `pointer` cursor for interactive buttons.
+   */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
 /*

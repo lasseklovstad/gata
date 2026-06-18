@@ -67,7 +67,7 @@
     "slate-dom": "0.124.1",
     "slate-history": "0.113.1",
     "slate-react": "0.124.2",
-    "tailwind-merge": "^2.6.1",
+    "tailwind-merge": "^3.6.0",
     "textarea-caret": "3.1.0",
     "web-push": "3.6.7",
     "zod": "^3.25.76",
