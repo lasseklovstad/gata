@@ -35,7 +35,7 @@ export default function ResponsibilityPage({ loaderData: { responsibilities, log
                return (
                   <li key={id} className="p-2">
                      <div className="flex">
-                        <div className="flex-grow flex flex-col">
+                        <div className="grow flex flex-col">
                            <Typography variant="largeText">{name}</Typography>
                            <Typography variant="smallText" className="mb-2">
                               Ansvarlig: {usernames.length ? usernames.sort().join(", ") : "Ingen"}

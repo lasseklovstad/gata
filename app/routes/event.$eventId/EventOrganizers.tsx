@@ -22,7 +22,7 @@ export const EventOrganizers = ({ users, organizers }: Props) => {
             void submit(formData, { method: "PUT" });
          }}
       >
-         <ListboxButton className="border items-center outline-none rounded bg-background flex gap-2 py-2 px-2 data-[focus]:ring-2 data-[focus]:ring-ring data-[focus]:ring-offset-2">
+         <ListboxButton className="border items-center outline-hidden rounded bg-background flex gap-2 py-2 px-2 data-focus:ring-2 data-focus:ring-ring data-focus:ring-offset-2">
             Velg arrangører
             <ChevronDown aria-hidden="true" className="bg-background size-6 pointer-events-none" />
          </ListboxButton>
@@ -34,7 +34,7 @@ export const EventOrganizers = ({ users, organizers }: Props) => {
                      key={user.id}
                      value={user.id}
                      disabled={organizers.length === 1 && isSelected}
-                     className="cursor-default data-[selected]:bg-blue-200 data-[focus]:bg-blue-100 py-1 px-2 flex gap-2"
+                     className="cursor-default data-selected:bg-blue-200 data-focus:bg-blue-100 py-1 px-2 flex gap-2"
                   >
                      {isSelected ? <Check /> : null} {user.name}
                   </ListboxOption>

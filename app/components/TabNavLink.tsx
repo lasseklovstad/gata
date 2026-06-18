@@ -7,7 +7,7 @@ export const TabNavLink = (props: ComponentProps<typeof NavLink>) => {
          {...props}
          end
          preventScrollReset
-         className="-mb-[2px] block p-2 aria-current:text-primary aria-current:border-b-2 border-primary"
+         className="mb-[-2px] block p-2 aria-current:text-primary aria-current:border-b-2 border-primary"
       />
    );
 };

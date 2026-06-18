@@ -43,7 +43,7 @@ export const ReplyList = ({ message, focusMessageId, loggedInUser }: Props) => {
                   key={reply.id}
                   id={`message-${reply.id}`}
                   className={cn(
-                     reply.id.toString() === focusMessageId && "outline outline-primary outline-offset-4 rounded"
+                     reply.id.toString() === focusMessageId && "outline-solid outline-primary outline-offset-4 rounded"
                   )}
                >
                   <div className="flex gap-2">

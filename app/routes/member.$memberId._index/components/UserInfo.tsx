@@ -57,7 +57,7 @@ export const UserInfo = ({ user, contingentInfo, loggedInUser }: UserInfoProps) 
                   Kontingent
                </Typography>
                <fetcher.Form method="POST" key={selectedYear}>
-                  <div className="shadow bg-background rounded p-2 mb-4">
+                  <div className="shadow-sm bg-background rounded p-2 mb-4">
                      <div className="flex gap-4 items-end flex-wrap">
                         <FormItem name="year">
                            <FormLabel>Velg år</FormLabel>

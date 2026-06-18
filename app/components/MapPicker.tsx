@@ -51,7 +51,7 @@ export const MapPicker = ({ longitude, latitude, onCoordinatesChange }: MapPicke
                </Marker>
             )}
          </Map>
-         <div className="absolute top-2 left-2 bg-background/90 backdrop-blur-sm px-3 py-2 rounded-md text-sm shadow-md border">
+         <div className="absolute top-2 left-2 bg-background/90 backdrop-blur-xs px-3 py-2 rounded-md text-sm shadow-md border">
             <p className="font-medium">Klikk på kartet for å velge posisjon</p>
             {longitude !== undefined && latitude !== undefined && (
                <p className="text-muted-foreground text-xs mt-1">

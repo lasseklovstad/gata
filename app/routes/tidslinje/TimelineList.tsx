@@ -88,7 +88,7 @@ export const TimelineList = ({ loggedInUser, users, timelineEvents }: Props) => 
                      throw new Error("Could not find user!");
                   }
                   return (
-                     <div key={event.id} className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                     <div key={event.id} className="border rounded-lg p-4 shadow-xs hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-2">
                            <Typography variant="h4">{eventTypeLabels[event.eventType]}</Typography>
                            <div className="flex items-center gap-2">

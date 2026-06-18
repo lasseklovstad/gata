@@ -11,7 +11,7 @@ export const ExternalUserIcon = ({ user }: ExternalUserIconProps) => {
       <>
          {user.id.includes("facebook") && (
             <svg
-               className="h-6 w-6 flex-shrink-0"
+               className="h-6 w-6 shrink-0"
                fill="#0866FF"
                role="img"
                viewBox="0 0 24 24"
@@ -25,7 +25,7 @@ export const ExternalUserIcon = ({ user }: ExternalUserIconProps) => {
             <svg
                role="img"
                fill="#4285F4"
-               className="h-6 w-6 flex-shrink-0"
+               className="h-6 w-6 shrink-0"
                viewBox="0 0 24 24"
                xmlns="http://www.w3.org/2000/svg"
             >
@@ -35,7 +35,7 @@ export const ExternalUserIcon = ({ user }: ExternalUserIconProps) => {
          )}
          {user.id.includes("auth0") && (
             <svg
-               className="h-6 w-6 flex-shrink-0"
+               className="h-6 w-6 shrink-0"
                fill="#EB5424"
                role="img"
                viewBox="0 0 24 24"

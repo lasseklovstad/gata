@@ -53,7 +53,7 @@ export default function MemberResponsibility({
             )}
          </div>
          <div className="my-4">
-            <div className="shadow rounded divide-y">
+            <div className="shadow-sm rounded divide-y">
                {responsibilityYears.map((responsibilityYear) => {
                   return (
                      <ResponsibilityForm

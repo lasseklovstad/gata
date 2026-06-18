@@ -99,7 +99,7 @@ export const TextareaWithAutocomplete = ({
                   }}
                >
                   {filteredPeople.map((person) => (
-                     <ComboboxOption key={person.id} value={person} className="data-[focus]:bg-blue-100 p-2 flex gap-2">
+                     <ComboboxOption key={person.id} value={person} className="data-focus:bg-blue-100 p-2 flex gap-2">
                         <AvatarUser user={person} className="size-6" />
                         {person.name}
                      </ComboboxOption>

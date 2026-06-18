@@ -120,7 +120,7 @@ export default function EventActivities({
                <ul className="flex gap-2 flex-wrap" aria-labelledby={activePollsTitleId}>
                   {activePolls.map(({ poll }) => {
                      return (
-                        <li key={poll.id} className="bg-orange-100 rounded py-2 px-4 shadow flex">
+                        <li key={poll.id} className="bg-orange-100 rounded py-2 px-4 shadow-sm flex">
                            <Link to={`polls?pollId=${poll.id}`} className="w-full text-base flex">
                               <Vote className="mr-2" />
                               {poll.name}
@@ -153,8 +153,8 @@ export default function EventActivities({
                   key={message.id}
                   id={`message-${message.id}`}
                   className={cn(
-                     "flex flex-col gap-2 p-4 w-full whitespace-pre-line border rounded shadow-sm",
-                     message.id.toString() === focusMessageId && "outline outline-primary outline-offset-2"
+                     "flex flex-col gap-2 p-4 w-full whitespace-pre-line border rounded shadow-xs",
+                     message.id.toString() === focusMessageId && "outline-solid outline-primary outline-offset-2"
                   )}
                >
                   <div className="flex gap-2 items-center">

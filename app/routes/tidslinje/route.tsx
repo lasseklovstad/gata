@@ -204,7 +204,7 @@ export default function Timeline({ loaderData: { users, timelineEvents, loggedIn
          {/* Tab Navigation */}
          <nav className="border-b-2">
             <ul className="flex">
-               <li className="-mb-[2px]">
+               <li className="mb-[-2px]">
                   <button
                      onClick={() => setActiveTab("map")}
                      className={`px-4 py-2 border-b-2 transition-colors ${
@@ -217,7 +217,7 @@ export default function Timeline({ loaderData: { users, timelineEvents, loggedIn
                      Kart
                   </button>
                </li>
-               <li className="-mb-[2px]">
+               <li className="mb-[-2px]">
                   <button
                      onClick={() => setActiveTab("list")}
                      className={`px-4 py-2 border-b-2 transition-colors ${
@@ -230,7 +230,7 @@ export default function Timeline({ loaderData: { users, timelineEvents, loggedIn
                      Liste
                   </button>
                </li>
-               <li className="-mb-[2px]">
+               <li className="mb-[-2px]">
                   <button
                      onClick={() => setActiveTab("table")}
                      className={`px-4 py-2 border-b-2 transition-colors ${
