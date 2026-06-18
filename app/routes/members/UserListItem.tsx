@@ -42,7 +42,7 @@ export const UserListItem = ({ user, isLoggedInUserAdmin, isPushSubscribed }: Us
                      </div>
                   </div>
                   <Typography variant="smallText" className="text-gray-500">
-                     Sist innlogget: {new Date(user.primaryUser.lastLogin).toLocaleDateString("no")}
+                     Sist aktiv: {new Date(user.primaryUser.lastSeen).toLocaleDateString("no")}
                   </Typography>
                   {isLoggedInUserAdmin && isMember(user) && (
                      <Typography

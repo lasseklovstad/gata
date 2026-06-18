@@ -34,7 +34,7 @@ export const ExternalUsersWithNoGataUserListItem = ({ user }: ExternalUsersWithN
          <div className="grow">
             <Typography variant="largeText">{user.name}</Typography>
             <Typography variant="smallText" className="text-gray-500">
-               Sist innlogget: {new Date(user.lastLogin).toLocaleDateString("no")}
+               Sist aktiv: {new Date(user.lastSeen).toLocaleDateString("no")}
             </Typography>
          </div>
 
