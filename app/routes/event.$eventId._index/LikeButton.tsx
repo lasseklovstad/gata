@@ -76,7 +76,7 @@ export const LikeButton = ({
          <Popover className={cn("relative", className)}>
             <PopoverButton
                as={Button}
-               variant={size === "normal" ? "outline" : "ghost"}
+               variant={size === "normal" ? "outline-solid" : "ghost"}
                size={size === "normal" ? "sm" : "icon"}
                className="flex gap-1"
                isLoading={fetcher.state !== "idle"}

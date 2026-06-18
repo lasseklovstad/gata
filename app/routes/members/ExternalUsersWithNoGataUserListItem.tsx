@@ -31,7 +31,7 @@ export const ExternalUsersWithNoGataUserListItem = ({ user }: ExternalUsersWithN
                <User />
             </AvatarFallback>
          </Avatar>
-         <div className="flex-grow">
+         <div className="grow">
             <Typography variant="largeText">{user.name}</Typography>
             <Typography variant="smallText" className="text-gray-500">
                Sist aktiv: {new Date(user.lastSeen).toLocaleDateString("no")}

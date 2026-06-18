@@ -100,7 +100,7 @@ export const LinkExternalUserToGataUserSelect = ({
 
                      <div className="relative">
                         <ComboboxInput
-                           className="border outline-none w-full py-2 px-1 bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 rounded"
+                           className="border outline-hidden w-full py-2 px-1 bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 rounded"
                            id={inputId}
                            placeholder="Søk epost"
                            onChange={(event) => setQuery(event.target.value)}
@@ -114,13 +114,13 @@ export const LinkExternalUserToGataUserSelect = ({
 
                      <ComboboxOptions
                         anchor="bottom"
-                        className={cn("empty:hidden w-full bg-background border rounded p-1", "w-[var(--input-width)]")}
+                        className={cn("empty:hidden w-full bg-background border rounded p-1", "w-(--input-width)")}
                      >
                         {filteredPeople.map((person) => (
                            <ComboboxOption
                               key={person.value}
                               value={person}
-                              className="data-[focus]:bg-blue-100 data-[selected]:hidden p-2 flex gap-2 items-center"
+                              className="data-focus:bg-blue-100 data-selected:hidden p-2 flex gap-2 items-center"
                            >
                               {person.icon} {person.label}
                            </ComboboxOption>

@@ -176,7 +176,7 @@ export const TimeLineMap = ({ timelineEvents, users }: Props) => {
                   </Button>
                </div>
                <div className="flex items-center gap-3">
-                  <Typography variant="smallText" className="text-muted-foreground flex-shrink-0">
+                  <Typography variant="smallText" className="text-muted-foreground shrink-0">
                      {new Date(uniqueDates[0]).toLocaleDateString("nb-NO", {
                         year: "numeric",
                         month: "short",
@@ -193,7 +193,7 @@ export const TimeLineMap = ({ timelineEvents, users }: Props) => {
                         background: `linear-gradient(to right, hsl(var(--primary)) 0%, hsl(var(--primary)) ${(currentTimeIndex / (uniqueDates.length - 1)) * 100}%, rgb(229 231 235) ${(currentTimeIndex / (uniqueDates.length - 1)) * 100}%, rgb(229 231 235) 100%)`,
                      }}
                   />
-                  <Typography variant="smallText" className="text-muted-foreground flex-shrink-0">
+                  <Typography variant="smallText" className="text-muted-foreground shrink-0">
                      {new Date(uniqueDates[uniqueDates.length - 1]).toLocaleDateString("nb-NO", {
                         year: "numeric",
                         month: "short",
@@ -250,7 +250,7 @@ export const TimeLineMap = ({ timelineEvents, users }: Props) => {
                   </Typography>
                ) : (
                   selectedUserEvents.map((event) => (
-                     <div key={event.id} className="border rounded-lg p-4 shadow-sm">
+                     <div key={event.id} className="border rounded-lg p-4 shadow-xs">
                         <div className="flex justify-between items-start mb-2">
                            <Typography variant="h4">{eventTypeLabels[event.eventType]}</Typography>
                            {event.isVerified ? (

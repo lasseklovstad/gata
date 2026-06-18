@@ -1,5 +1,6 @@
 import { reactRouter } from "@react-router/dev/vite";
 import { sentryReactRouter, type SentryReactRouterBuildOptions } from "@sentry/react-router";
+import tailwindcss from "@tailwindcss/vite";
 import checker from "vite-plugin-checker";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
@@ -27,6 +28,7 @@ export default defineConfig((config) => ({
       port: 3000,
    },
    plugins: [
+      tailwindcss(),
       reactRouter(),
       tsconfigPaths(),
       process.env.NODE_ENV === "development" ? checker({ typescript: true }) : undefined,

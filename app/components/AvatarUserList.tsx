@@ -14,7 +14,7 @@ export const AvatarUserList = ({ users, className, "aria-label": ariaLabel }: Pr
       <ul aria-label={ariaLabel} className={cn("flex flex-row-reverse h-6 ml-3", className)}>
          {users.map((user) => (
             <li key={user.id}>
-               <AvatarUser user={user} className="size-6 shadow -ml-3" />
+               <AvatarUser user={user} className="size-6 shadow-sm -ml-3" />
             </li>
          ))}
       </ul>

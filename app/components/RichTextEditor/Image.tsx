@@ -83,7 +83,7 @@ export const Image = ({ id, selected = false, focused = false, size = 50 }: Imag
       <img
          src={transformCloudflare(id, 1200)}
          alt=""
-         className={cn(selected && focused && "ring", "block my-1 max-md:!w-full")}
+         className={cn(selected && focused && "ring-3", "block my-1 max-md:w-full!")}
          style={{ width: `${size}%` }}
       />
    );

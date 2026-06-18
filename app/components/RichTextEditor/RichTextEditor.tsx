@@ -77,7 +77,7 @@ export const RichTextEditor = ({ onCancel, onSave, isLoading, report }: RichText
                }
             }}
          >
-            <div className="shadow mt-1 divide-y">
+            <div className="shadow-sm mt-1 divide-y">
                <div className="bg-background p-1 z-10 sticky top-0 flex flex-wrap-reverse items-center justify-between">
                   <div className="flex p-1 gap-2 flex-wrap items-center">
                      <TextStyleGroup />

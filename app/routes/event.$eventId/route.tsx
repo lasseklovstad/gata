@@ -136,20 +136,17 @@ export default function EventPage({
                      style={{ backgroundImage: coverBackgroundImage }}
                      aria-hidden
                   />
-                  <div
-                     className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-black/45"
-                     aria-hidden
-                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/30 to-black/45" aria-hidden />
                </>
             ) : (
                <div
-                  className="absolute inset-0 bg-gradient-to-br from-slate-700 via-slate-600 to-slate-800"
+                  className="absolute inset-0 bg-linear-to-br from-slate-700 via-slate-600 to-slate-800"
                   aria-hidden
                />
             )}
 
             <div className="relative z-10 flex min-h-56 items-start justify-between p-4 text-white md:min-h-72 md:p-6">
-               <Typography variant="h1" className="text-white drop-shadow-sm">
+               <Typography variant="h1" className="text-white drop-shadow-xs">
                   {event.title}
                </Typography>
                {isOrganizer ? <EventMenu event={event} numberOfImages={numberOfImages} /> : null}
