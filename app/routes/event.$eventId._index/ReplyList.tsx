@@ -1,5 +1,5 @@
 import { intervalToDuration } from "date-fns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { User } from "~/.server/db/user";
 import { AvatarUserButton } from "~/components/AvatarUser";
@@ -21,6 +21,18 @@ type Props = {
 
 export const ReplyList = ({ message, focusMessageId, loggedInUser }: Props) => {
    const [replyStartIndex, setReplyStartIndex] = useState(message.replies.length > 5 ? message.replies.length - 5 : 0);
+
+   useEffect(() => {
+      if (!focusMessageId) {
+         return;
+      }
+
+      const focusedReplyIndex = message.replies.findIndex(({ reply }) => reply.id.toString() === focusMessageId);
+      if (focusedReplyIndex !== -1 && focusedReplyIndex < replyStartIndex) {
+         setReplyStartIndex(0);
+      }
+   }, [focusMessageId, message.replies, replyStartIndex]);
+
    return (
       <ul className="flex flex-col gap-2" aria-label="Kommentarer">
          {replyStartIndex > 0 ? (
@@ -81,7 +93,11 @@ function getTimeDifference(dateString: string) {
 
    const duration = intervalToDuration({ start: getDateWithTimeZone(dateString), end: now });
 
-   if (duration.days && duration.days > 0) {
+   if (duration.years && duration.years > 0) {
+      return `${duration.years} år siden`;
+   } else if (duration.months && duration.months > 0) {
+      return `${duration.months} måneder siden`;
+   } else if (duration.days && duration.days > 0) {
       return `${duration.days} dager siden`;
    } else if (duration.hours && duration.hours > 0) {
       return `${duration.hours} timer siden`;
